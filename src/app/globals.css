@@ -1,0 +1,1918 @@
+@import "tailwindcss";
+@import "../styles/design-tokens.css";
+@import "../styles/mobile-enhancements.css";
+@import "../styles/responsive-design.css";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  --background: #0a0b14;
+  --foreground: #ffffff;
+  --primary: #00d4ff;
+  --primary-foreground: #000000;
+  --secondary: #1a1b2e;
+  --secondary-foreground: #ffffff;
+  --muted: #16213e;
+  --muted-foreground: #64ffda;
+  --accent: #00d4ff;
+  --accent-foreground: #000000;
+  --destructive: #00d4ff;
+  --destructive-foreground: #ffffff;
+  --border: #233554;
+  --input: #233554;
+  --ring: #00d4ff;
+  --chart-1: #00d4ff;
+  --chart-2: #64ffda;
+  --chart-3: #1a1b2e;
+  --chart-4: #233554;
+  --chart-5: #16213e;
+  
+  /* Consistent Futuristic Color Scheme - Only 3 Colors */
+  --cyber-primary: #00d4ff;    /* Primary Cyan */
+  --cyber-secondary: #64ffda;  /* Secondary Teal */
+  --cyber-tertiary: #1a1b2e;   /* Dark Blue */
+  --neural-dark: #0a0b14;      /* Darkest Background */
+  --neural-medium: #1a1b2e;    /* Medium Background */
+  --neural-light: #233554;     /* Light Background */
+  
+  /* Legacy support - all using consistent colors */
+  --cyber-blue: #00d4ff;
+  --cyber-purple: #00d4ff;
+  --cyber-pink: #64ffda;
+  --cyber-green: #64ffda;
+  --cyber-yellow: #00d4ff;
+  --hologram: #64ffda;
+}
+
+/* Beautiful animations for ASH AI */
+@keyframes animate-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-in {
+  animation: animate-in 0.6s ease-out forwards;
+}
+
+/* Smooth hover effects */
+.hover-lift {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Glassmorphism effects */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Gradient text animations */
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animated-gradient-text {
+  background: linear-gradient(-45deg, #667eea, #764ba2, #6366f1, #8b5cf6);
+  background-size: 400% 400%;
+  animation: gradient-shift 4s ease infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Loading skeleton */
+@keyframes skeleton-loading {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.skeleton {
+  background-image: linear-gradient(90deg, #f0f0f0 0px, #e0e0e0 40px, #f0f0f0 80px);
+  background-size: 200px;
+  animation: skeleton-loading 1.2s ease-in-out infinite;
+}
+
+/* Enhanced card hover effects */
+.enhanced-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.enhanced-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.enhanced-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.5s;
+}
+
+.enhanced-card:hover::before {
+  left: 100%;
+}
+
+/* Pulse animation for important elements */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(99, 102, 241, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.8), 0 0 30px rgba(99, 102, 241, 0.6);
+  }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Smooth scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #5a67d8, #6b46c1);
+}
+
+/* Success, warning, error states with animations */
+.status-success {
+  background: linear-gradient(135deg, #10b981, #059669);
+  animation: gentle-pulse 2s ease-in-out infinite;
+}
+
+.status-warning {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  animation: gentle-pulse 2s ease-in-out infinite;
+}
+
+.status-error {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes gentle-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* Beautiful focus states */
+.enhanced-input {
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.enhanced-input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+  transform: scale(1.02);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+/* Ensure text readability on all backgrounds */
+.gradient-mesh {
+  /* Pages with gradient mesh background should use white text */
+  color: white !important;
+}
+
+.gradient-mesh * {
+  /* All text within gradient mesh containers should be white by default */
+  color: inherit !important;
+}
+
+/* Override for specific elements that need different colors */
+.gradient-mesh .glass-card {
+  color: white !important;
+}
+
+.gradient-mesh .glass-card * {
+  color: white !important;
+}
+
+/* Ensure regular pages have proper contrast */
+body:not(.gradient-mesh) {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* For pages without gradient mesh, ensure good contrast */
+.page-content {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* Enhanced gradient mesh text readability */
+.gradient-mesh h1,
+.gradient-mesh h2,
+.gradient-mesh h3,
+.gradient-mesh h4,
+.gradient-mesh h5,
+.gradient-mesh h6,
+.gradient-mesh p,
+.gradient-mesh span,
+.gradient-mesh div,
+.gradient-mesh button,
+.gradient-mesh .card-title,
+.gradient-mesh .card-description {
+  color: white !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7) !important;
+  font-weight: 600 !important;
+}
+
+/* Force readable text on all gradient backgrounds */
+.gradient-mesh * {
+  color: white !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Override for buttons and interactive elements */
+.gradient-mesh button {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: blur(10px) !important;
+  color: white !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) !important;
+}
+
+.gradient-mesh button:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+  color: white !important;
+}
+
+/* Better contrast for smaller text */
+.gradient-mesh .text-sm,
+.gradient-mesh .text-xs {
+  color: rgba(255, 255, 255, 0.9) !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Ensure headings are more visible */
+.gradient-mesh h1, 
+.gradient-mesh h2, 
+.gradient-mesh h3 {
+  color: white !important;
+  font-weight: 700 !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Better badge visibility */
+.gradient-mesh .badge {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: white !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+/* Ensure chart text and tooltips are visible */
+.gradient-mesh .recharts-text {
+  fill: rgba(255, 255, 255, 0.8) !important;
+}
+
+.gradient-mesh .recharts-tooltip-wrapper {
+  color: white !important;
+}
+
+/* Default card styling for better readability */
+.card-default {
+  background: white;
+  color: var(--foreground);
+  border: 1px solid var(--border);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Smooth animations */
+* {
+  @apply transition-colors duration-200;
+}
+
+/* Mobile-first touch improvements */
+@media (max-width: 768px) {
+  /* Larger touch targets for mobile */
+  button, 
+  input[type="button"], 
+  input[type="submit"], 
+  .btn,
+  .touch-target {
+    min-height: 44px !important;
+    min-width: 44px !important;
+    padding: 12px 16px !important;
+  }
+
+  /* Better form inputs on mobile */
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  input[type="password"],
+  textarea,
+  select {
+    font-size: 16px !important; /* Prevents zoom on iOS */
+    padding: 12px 16px !important;
+    border-radius: 8px !important;
+  }
+
+  /* Mobile-friendly cards */
+  .card {
+    margin-bottom: 16px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Mobile navigation improvements */
+  .mobile-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid #e5e7eb;
+    padding: 8px;
+    z-index: 50;
+  }
+
+  /* Safe area for devices with notches */
+  .mobile-safe-area-top {
+    padding-top: max(20px, env(safe-area-inset-top));
+  }
+
+  .mobile-safe-area-bottom {
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+  }
+
+  /* Mobile-friendly modal/sheet */
+  .mobile-sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+  }
+
+  .mobile-sheet.open {
+    transform: translateY(0);
+  }
+
+  /* Better scrolling on mobile */
+  .mobile-scroll {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  /* Mobile-friendly table alternative */
+  .mobile-list-item {
+    display: block;
+    padding: 16px;
+    border-bottom: 1px solid #f3f4f6;
+    background: white;
+    margin-bottom: 1px;
+  }
+
+  /* Camera/scanner optimizations */
+  .camera-view {
+    aspect-ratio: 4/3;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .camera-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  .scan-frame {
+    width: 200px;
+    height: 200px;
+    border: 2px solid white;
+    border-radius: 12px;
+    position: relative;
+  }
+
+  .scan-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #ef4444;
+    animation: scanLine 2s ease-in-out infinite;
+  }
+
+  @keyframes scanLine {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(196px); }
+  }
+}
+
+/* Touch-friendly hover states */
+@media (hover: none) {
+  .hover\:bg-gray-50:hover {
+    background-color: transparent;
+  }
+  
+  .hover\:scale-105:hover {
+    transform: none;
+  }
+  
+  /* Use active states instead of hover on touch devices */
+  .touch-active:active {
+    background-color: #f3f4f6;
+    transform: scale(0.98);
+  }
+}
+
+/* Improved accessibility for mobile */
+@media (max-width: 768px) {
+  /* Ensure text is readable */
+  body {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.25rem; }
+  h4 { font-size: 1.125rem; }
+
+  /* Better focus indicators */
+  *:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+/* Loading states for mobile */
+.mobile-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  text-align: center;
+}
+
+.mobile-loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f4f6;
+  border-top: 4px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+/* Mobile-friendly status indicators */
+.mobile-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Swipe gestures (for future enhancement) */
+.swipe-item {
+  position: relative;
+  overflow: hidden;
+  touch-action: pan-x;
+}
+
+.swipe-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  background: #ef4444;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+/* Glass morphism effect */
+.glass {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Consistent Futuristic Gradient Backgrounds */
+.gradient-primary {
+  background: linear-gradient(135deg, var(--cyber-primary) 0%, var(--cyber-secondary) 100%);
+}
+
+.gradient-secondary {
+  background: linear-gradient(135deg, var(--cyber-secondary) 0%, var(--neural-medium) 100%);
+}
+
+.gradient-success {
+  background: linear-gradient(135deg, var(--cyber-primary) 0%, var(--cyber-secondary) 100%);
+}
+
+.gradient-purple {
+  background: linear-gradient(135deg, var(--cyber-primary) 0%, var(--neural-medium) 100%);
+}
+
+.gradient-pink {
+  background: linear-gradient(135deg, var(--cyber-secondary) 0%, var(--cyber-primary) 100%);
+}
+
+.gradient-blue {
+  background: linear-gradient(135deg, var(--cyber-primary) 0%, var(--cyber-secondary) 100%);
+}
+
+.gradient-green {
+  background: linear-gradient(135deg, var(--cyber-secondary) 0%, var(--cyber-primary) 100%);
+}
+
+.gradient-orange {
+  background: linear-gradient(135deg, var(--cyber-primary) 0%, var(--cyber-secondary) 100%);
+}
+
+.gradient-teal {
+  background: linear-gradient(135deg, var(--cyber-secondary) 0%, var(--neural-medium) 100%);
+}
+
+/* Card hover effects */
+.card-hover {
+  @apply transform transition-all duration-300 hover:scale-105 hover:shadow-xl;
+}
+
+/* Button animations */
+.btn-animate {
+  @apply transform transition-all duration-200 active:scale-95;
+}
+
+/* Loading shimmer effect */
+.shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Floating animation */
+.float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Pulse animation */
+.pulse-slow {
+  animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Modern shadows */
+.shadow-modern {
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+.shadow-modern-lg {
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+/* Consistent Futuristic Gradient Mesh Background */
+.gradient-mesh {
+  background: linear-gradient(135deg, var(--neural-dark) 0%, var(--cyber-primary) 25%, var(--neural-medium) 50%, var(--cyber-primary) 75%, var(--neural-dark) 100%);
+  background-size: 300% 300%;
+  animation: gradientShift 8s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Glassmorphism cards */
+.glass-card {
+  background: rgba(255, 255, 255, 0.25) !important;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Ensure glass cards have readable text */
+.glass-card * {
+  color: white !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7) !important;
+}
+
+.glass-card h1,
+.glass-card h2, 
+.glass-card h3,
+.glass-card h4,
+.glass-card h5,
+.glass-card h6 {
+  color: white !important;
+  font-weight: 700 !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8) !important;
+}
+
+.glass-card p,
+.glass-card span,
+.glass-card div {
+  color: rgba(255, 255, 255, 0.95) !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Better glass card variants for different backgrounds */
+.glass-card-dark {
+  background: rgba(0, 0, 0, 0.3) !important;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+}
+
+.glass-card-light {
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  color: #1f2937 !important;
+}
+
+.glass-card-light * {
+  color: #1f2937 !important;
+  text-shadow: none !important;
+}
+
+/* Neon glow effect */
+.neon-glow {
+  box-shadow: 
+    0 0 5px rgba(99, 102, 241, 0.5),
+    0 0 20px rgba(99, 102, 241, 0.3),
+    0 0 30px rgba(99, 102, 241, 0.1);
+}
+
+/* Hover scale effect */
+.hover-scale {
+  @apply transform transition-all duration-500 hover:scale-105 hover:shadow-2xl;
+}
+
+/* Stagger animation for lists */
+.stagger-animation {
+  animation: staggerIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes staggerIn {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Beautiful progress bars */
+.progress-bar {
+  position: relative;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: progressShine 2s infinite;
+}
+
+@keyframes progressShine {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Breathing animation */
+.breathe {
+  animation: breathe 4s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* Rotating border */
+.rotating-border {
+  position: relative;
+  border-radius: 16px;
+  padding: 2px;
+  background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c);
+  background-size: 400% 400%;
+  animation: rotateBorder 4s linear infinite;
+}
+
+.rotating-border::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background: white;
+  border-radius: 14px;
+  z-index: -1;
+}
+
+@keyframes rotateBorder {
+  0% { background-position: 0% 50%; }
+  25% { background-position: 100% 50%; }
+  50% { background-position: 100% 100%; }
+  75% { background-position: 0% 100%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Morphing shapes */
+.morph-shape {
+  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  animation: morphShape 8s ease-in-out infinite;
+}
+
+@keyframes morphShape {
+  0%, 100% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  }
+  25% {
+    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+  }
+  50% {
+    border-radius: 50% 60% 30% 60% / 60% 40% 30% 70%;
+  }
+  75% {
+    border-radius: 40% 50% 60% 30% / 40% 70% 60% 50%;
+  }
+}
+
+/* Text gradient */
+.text-gradient {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Sliding in animations */
+.slide-in-left {
+  animation: slideInLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes slideInLeft {
+  0% {
+    transform: translateX(-100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.slide-in-right {
+  animation: slideInRight 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes slideInRight {
+  0% {
+    transform: translateX(100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.slide-in-up {
+  animation: slideInUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes slideInUp {
+  0% {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Interactive hover effects */
+.interactive-card {
+  @apply transition-all duration-300 hover:shadow-2xl;
+  transform-style: preserve-3d;
+}
+
+.interactive-card:hover {
+  transform: translateY(-8px) rotateX(5deg);
+}
+
+/* Loading skeleton */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton 1.5s infinite;
+  border-radius: 8px;
+}
+
+@keyframes skeleton {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ============================================
+   FUTURISTIC ASH AI DESIGN SYSTEM
+   Following CLIENT_UPDATED_PLAN.md specifications
+   ============================================ */
+
+/* Neural Network Background */
+.neural-bg {
+  background: var(--neural-dark);
+  position: relative;
+  overflow: hidden;
+}
+
+.neural-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 20%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(0, 212, 255, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 40% 60%, rgba(0, 212, 255, 0.05) 0%, transparent 50%);
+  animation: neuralPulse 8s ease-in-out infinite;
+}
+
+@keyframes neuralPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Consistent Holographic Effects */
+.hologram-card {
+  background: linear-gradient(135deg, 
+    rgba(0, 212, 255, 0.1) 0%,
+    rgba(26, 27, 46, 0.9) 25%,
+    rgba(0, 212, 255, 0.05) 50%,
+    rgba(26, 27, 46, 0.9) 75%,
+    rgba(0, 212, 255, 0.1) 100%
+  );
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--cyber-primary);
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.hologram-card::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, 
+    var(--cyber-primary), var(--cyber-primary), var(--neural-medium), var(--cyber-primary)
+  );
+  background-size: 400% 400%;
+  animation: hologramBorder 4s ease-in-out infinite;
+  border-radius: 18px;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.hologram-card:hover::before {
+  opacity: 1;
+}
+
+.hologram-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 
+    0 20px 40px rgba(0, 212, 255, 0.3),
+    0 0 60px rgba(0, 212, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+@keyframes hologramBorder {
+  0%, 100% { background-position: 0% 50%; }
+  25% { background-position: 100% 0%; }
+  50% { background-position: 100% 100%; }
+  75% { background-position: 0% 100%; }
+}
+
+/* Cyberpunk Glitch Effects */
+.glitch-text {
+  position: relative;
+  color: var(--cyber-blue);
+  font-weight: 700;
+  animation: glitch 2s linear infinite;
+}
+
+.glitch-text::before,
+.glitch-text::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.glitch-text::before {
+  animation: glitchTop 1s linear infinite;
+  clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
+  color: var(--cyber-secondary);
+}
+
+.glitch-text::after {
+  animation: glitchBottom 1.5s linear infinite;
+  clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
+  color: var(--cyber-primary);
+}
+
+@keyframes glitch {
+  0%, 2%, 4%, 6%, 8%, 10%, 12%, 14%, 16%, 18%, 20%, 22%, 24%, 26%, 28%, 30% {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes glitchTop {
+  2%, 6%, 10%, 14%, 18% {
+    transform: translateX(2px);
+  }
+  4%, 8%, 12%, 16%, 20% {
+    transform: translateX(-2px);
+  }
+}
+
+@keyframes glitchBottom {
+  2%, 6%, 10%, 14%, 18% {
+    transform: translateX(-2px);
+  }
+  4%, 8%, 12%, 16%, 20% {
+    transform: translateX(2px);
+  }
+}
+
+/* Quantum Particle Effects */
+.quantum-field {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.quantum-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--cyber-blue);
+  border-radius: 50%;
+  animation: quantumFloat 6s linear infinite;
+  box-shadow: 0 0 10px var(--cyber-blue);
+}
+
+.quantum-particle:nth-child(2n) {
+  background: var(--cyber-purple);
+  box-shadow: 0 0 10px var(--cyber-purple);
+  animation-duration: 8s;
+  animation-delay: -2s;
+}
+
+.quantum-particle:nth-child(3n) {
+  background: var(--cyber-pink);
+  box-shadow: 0 0 10px var(--cyber-pink);
+  animation-duration: 10s;
+  animation-delay: -4s;
+}
+
+@keyframes quantumFloat {
+  0% {
+    transform: translateY(100vh) translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-10vh) translateX(100px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* AI Circuit Patterns */
+.circuit-pattern {
+  background-image: 
+    linear-gradient(90deg, var(--neural-light) 1px, transparent 1px),
+    linear-gradient(180deg, var(--neural-light) 1px, transparent 1px);
+  background-size: 20px 20px;
+  position: relative;
+}
+
+.circuit-pattern::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 10px 10px, var(--cyber-blue) 1px, transparent 1px),
+    radial-gradient(circle at 30px 30px, var(--cyber-purple) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: circuitPulse 4s ease-in-out infinite;
+}
+
+@keyframes circuitPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.7; }
+}
+
+/* Neon Button Effects */
+.neon-btn {
+  background: transparent;
+  border: 2px solid var(--cyber-blue);
+  color: var(--cyber-blue);
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.neon-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.neon-btn:hover::before {
+  left: 100%;
+}
+
+.neon-btn:hover {
+  background: var(--cyber-blue);
+  color: var(--neural-dark);
+  box-shadow: 
+    0 0 20px var(--cyber-blue),
+    0 0 40px var(--cyber-blue),
+    0 0 60px var(--cyber-blue);
+  transform: translateY(-2px);
+}
+
+/* Data Stream Effects */
+.data-stream {
+  position: relative;
+  overflow: hidden;
+}
+
+.data-stream::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    var(--cyber-blue) 2px,
+    var(--cyber-blue) 4px
+  );
+  animation: dataFlow 3s linear infinite;
+  opacity: 0.1;
+}
+
+@keyframes dataFlow {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(20px); }
+}
+
+/* Holographic Status Indicators */
+.status-hologram {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-hologram::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: statusPulse 2s ease-in-out infinite;
+}
+
+.status-active::before {
+  background: var(--cyber-green);
+  box-shadow: 0 0 15px var(--cyber-green);
+}
+
+.status-pending::before {
+  background: var(--cyber-yellow);
+  box-shadow: 0 0 15px var(--cyber-yellow);
+}
+
+.status-error::before {
+  background: var(--cyber-pink);
+  box-shadow: 0 0 15px var(--cyber-pink);
+}
+
+@keyframes statusPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.2); }
+}
+
+/* Futuristic Loading Animations */
+.quantum-loader {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.quantum-loader div {
+  position: absolute;
+  border: 4px solid var(--cyber-blue);
+  border-radius: 50%;
+  animation: quantumSpin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-color: var(--cyber-blue) transparent transparent transparent;
+}
+
+.quantum-loader div:nth-child(1) { animation-delay: -0.45s; }
+.quantum-loader div:nth-child(2) { animation-delay: -0.3s; }
+.quantum-loader div:nth-child(3) { animation-delay: -0.15s; }
+
+@keyframes quantumSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Matrix Rain Effect */
+.matrix-rain {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.1;
+}
+
+.matrix-char {
+  position: absolute;
+  color: var(--cyber-green);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  animation: matrixFall 3s linear infinite;
+}
+
+@keyframes matrixFall {
+  0% {
+    transform: translateY(-100vh);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
+
+/* Futuristic Form Elements */
+.cyber-input {
+  background: rgba(0, 212, 255, 0.05);
+  border: 1px solid var(--neural-light);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: var(--foreground);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.cyber-input:focus {
+  border-color: var(--cyber-blue);
+  background: rgba(0, 212, 255, 0.1);
+  box-shadow: 
+    0 0 0 2px rgba(0, 212, 255, 0.2),
+    0 0 20px rgba(0, 212, 255, 0.1);
+  outline: none;
+}
+
+.cyber-select {
+  background: var(--neural-medium);
+  border: 1px solid var(--neural-light);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: var(--foreground);
+  position: relative;
+}
+
+.cyber-select:focus {
+  border-color: var(--cyber-blue);
+  box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2);
+}
+
+/* Holographic Tables */
+.holo-table {
+  background: rgba(0, 212, 255, 0.02);
+  border: 1px solid var(--neural-light);
+  border-radius: 12px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.holo-table thead {
+  background: linear-gradient(135deg, var(--cyber-blue), var(--cyber-purple));
+}
+
+.holo-table th {
+  color: white;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 16px;
+}
+
+.holo-table tbody tr {
+  border-bottom: 1px solid var(--neural-light);
+  transition: all 0.3s ease;
+}
+
+.holo-table tbody tr:hover {
+  background: rgba(0, 212, 255, 0.1);
+  transform: scale(1.01);
+}
+
+/* AI Assistant Visual Elements */
+.ai-orb {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--cyber-blue), var(--cyber-purple));
+  position: relative;
+  animation: aiPulse 3s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-orb::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: inherit;
+  opacity: 0.5;
+  animation: aiRipple 3s ease-out infinite;
+}
+
+@keyframes aiPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@keyframes aiRipple {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/* Futuristic Progress Indicators */
+.neural-progress {
+  height: 8px;
+  background: var(--neural-light);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.neural-progress::before {
+  content: '';
+  position: absolute;
+  left: -100%;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--cyber-blue), var(--cyber-purple), var(--cyber-pink));
+  animation: neuralProgress 2s ease-in-out infinite;
+}
+
+@keyframes neuralProgress {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Consistent Quantum Dashboard Cards */
+.quantum-card {
+  background: linear-gradient(135deg, 
+    rgba(0, 212, 255, 0.08),
+    rgba(26, 27, 46, 0.9)
+  );
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--cyber-primary);
+  border-radius: 16px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.quantum-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.1), 
+    transparent
+  );
+  transition: left 0.6s ease;
+}
+
+.quantum-card:hover::before {
+  left: 100%;
+}
+
+.quantum-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--cyber-blue);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.3),
+    0 0 40px rgba(0, 212, 255, 0.2);
+}
+
+/* Neon Glow Enhancement for AI Insights Panel */
+.neon-glow {
+  position: relative;
+}
+
+.neon-glow::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, 
+    rgba(0, 212, 255, 0.1),
+    rgba(114, 9, 183, 0.1),
+    rgba(247, 37, 133, 0.1)
+  );
+  border-radius: 16px;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+  z-index: -1;
+  filter: blur(20px);
+  animation: neonGlow 3s ease-in-out infinite;
+}
+
+@keyframes neonGlow {
+  0%, 100% { 
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+}
+
+/* ============================================
+   RESPONSIVE SIDEBAR ENHANCEMENTS  
+   Mobile-first adaptive design for taskbar
+   ============================================ */
+
+/* Critical Sidebar Height & Scrolling Fixes */
+.hologram-card {
+  max-height: 100vh !important;
+  overflow-y: auto !important;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 212, 255, 0.5) transparent;
+}
+
+/* Custom scrollbar for sidebar */
+.hologram-card::-webkit-scrollbar {
+  width: 4px;
+}
+
+.hologram-card::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.hologram-card::-webkit-scrollbar-thumb {
+  background: rgba(0, 212, 255, 0.3);
+  border-radius: 2px;
+}
+
+.hologram-card::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 212, 255, 0.5);
+}
+
+/* Ensure user profile stays at bottom */
+.user-profile-fixed {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  background: linear-gradient(to top, rgba(10, 11, 20, 0.98) 0%, rgba(10, 11, 20, 0.95) 70%, transparent 100%);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(0, 212, 255, 0.2);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Navigation scrollable area */
+.nav-scrollable {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding-bottom: 1rem;
+}
+
+/* Mobile specific height fixes */
+@media (max-width: 768px) {
+  .sidebar-mobile-height {
+    height: 100vh !important;
+    max-height: 100vh !important;
+  }
+  
+  /* Ensure touch scrolling works */
+  .nav-scrollable {
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
+  }
+}
+
+/* Prevent layout shifts */
+.sidebar-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+/* Mobile Sidebar Styles */
+@media (max-width: 640px) {
+  /* Compact sidebar for mobile */
+  .hologram-card {
+    min-width: 80px !important;
+  }
+  
+  /* Hide text elements on very small screens */
+  .mobile-hide-text {
+    display: none !important;
+  }
+  
+  /* Ensure icons remain visible and touchable */
+  .mobile-icon-only {
+    min-width: 48px !important;
+    min-height: 48px !important;
+  }
+  
+  /* Compact navigation items */
+  .nav-item-mobile {
+    padding: 8px !important;
+    margin-bottom: 4px !important;
+  }
+  
+  /* Better tooltips for mobile */
+  .tooltip-mobile {
+    position: relative;
+  }
+  
+  .tooltip-mobile::after {
+    content: attr(title);
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    font-size: 12px;
+    margin-left: 8px;
+    border: 1px solid var(--cyber-blue);
+  }
+  
+  .tooltip-mobile:hover::after {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+/* Tablet Styles */
+@media (min-width: 641px) and (max-width: 1023px) {
+  .hologram-card {
+    min-width: 256px !important;
+  }
+}
+
+/* Desktop Styles */
+@media (min-width: 1024px) {
+  .hologram-card {
+    min-width: 320px !important;
+  }
+}
+
+/* Ensure proper scrolling on mobile sidebar */
+@media (max-width: 768px) {
+  .sidebar-scroll {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Better safe areas for notched devices */
+  .sidebar-safe-area {
+    padding-top: max(1rem, env(safe-area-inset-top));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+
+/* Responsive quantum field particles */
+@media (max-width: 768px) {
+  .quantum-particle {
+    width: 2px !important;
+    height: 2px !important;
+    opacity: 0.3 !important;
+  }
+}
+
+/* Enhanced touch targets for mobile */
+@media (max-width: 768px) {
+  .touch-friendly {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+  
+  /* Better button spacing on mobile */
+  .btn-mobile {
+    padding: 12px !important;
+    margin: 4px !important;
+  }
+}
+
+/* Responsive AI orb sizes */
+@media (max-width: 640px) {
+  .ai-orb {
+    width: 40px !important;
+    height: 40px !important;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1023px) {
+  .ai-orb {
+    width: 48px !important;
+    height: 48px !important;
+  }
+}
+
+/* Better focus states for mobile navigation */
+@media (max-width: 768px) {
+  .nav-item:focus {
+    outline: 2px solid var(--cyber-blue);
+    outline-offset: 2px;
+    border-radius: 12px;
+  }
+}
+
+/* Landscape mobile adjustments */
+@media (max-width: 896px) and (orientation: landscape) {
+  .sidebar-landscape {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+  }
+  
+  .logo-section-landscape {
+    padding: 0.75rem !important;
+  }
+  
+  .user-profile-landscape {
+    padding: 0.5rem !important;
+  }
+}
+
+/* Cyber Form Elements - Neural Theme */
+.cyber-input {
+  @apply w-full px-4 py-3 bg-slate-800/20 border border-cyan-500/30 rounded-lg text-white placeholder-cyan-400/60 
+         focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 backdrop-blur-sm 
+         transition-all duration-300;
+}
+
+.cyber-input:focus {
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.15), inset 0 0 20px rgba(0, 212, 255, 0.05);
+}
+
+.cyber-select {
+  @apply w-full px-4 py-3 bg-slate-800/20 border border-cyan-500/30 rounded-lg text-white 
+         focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 backdrop-blur-sm 
+         transition-all duration-300 appearance-none cursor-pointer;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300d4ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 20px;
+}
+
+.cyber-select:focus {
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.15), inset 0 0 20px rgba(0, 212, 255, 0.05);
+}
+
+.cyber-select option {
+  @apply bg-slate-900 text-white;
+}
+
+/* Neural Button Variants */
+.neon-btn-outline {
+  @apply px-6 py-3 bg-transparent border-2 border-cyan-400 text-cyan-400 rounded-lg font-medium 
+         hover:bg-cyan-400/10 hover:shadow-lg hover:shadow-cyan-400/25 focus:outline-none focus:ring-2 
+         focus:ring-cyan-400/50 transition-all duration-300 backdrop-blur-sm;
+}
+
+.neon-btn-outline:hover {
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.3), inset 0 0 30px rgba(0, 212, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.neon-btn-ghost {
+  @apply px-6 py-3 bg-transparent text-cyan-300 rounded-lg font-medium 
+         hover:bg-cyan-400/5 hover:text-cyan-200 focus:outline-none focus:ring-2 
+         focus:ring-cyan-400/30 transition-all duration-300 backdrop-blur-sm;
+}
+
+.neon-btn-ghost:hover {
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
+}
+
+/* Neural Textarea Enhancement */
+textarea.cyber-input {
+  resize: none;
+  min-height: 120px;
+}
+
+textarea.cyber-input:focus {
+  box-shadow: 0 0 25px rgba(0, 212, 255, 0.2), inset 0 0 25px rgba(0, 212, 255, 0.05);
+}
+
+/* Additional Neural Components for Ashley AI Chat */
+.neural-pulse {
+  animation: neuralPulseFast 1.5s ease-in-out infinite;
+}
+
+@keyframes neuralPulseFast {
+  0%, 100% { 
+    opacity: 1; 
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.7; 
+    transform: scale(1.1);
+  }
+}
+
+.ai-orb-small {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--cyber-blue), var(--cyber-purple));
+  position: relative;
+  animation: aiPulseSmall 2s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes aiPulseSmall {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.shadow-glow-blue {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+}
+
+.shadow-glow-cyan {
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+}
+
+/* Primary Neon Button */
+.neon-btn-primary {
+  @apply px-6 py-3 bg-cyan-400 text-slate-900 rounded-lg font-bold 
+         hover:bg-cyan-300 hover:shadow-lg hover:shadow-cyan-400/50 focus:outline-none focus:ring-2 
+         focus:ring-cyan-400/50 transition-all duration-300 backdrop-blur-sm;
+}
+
+.neon-btn-primary:hover {
+  box-shadow: 0 0 40px rgba(0, 212, 255, 0.5), inset 0 0 40px rgba(0, 212, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Chat-specific scrollbar */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 212, 255, 0.3) transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 212, 255, 0.3);
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 212, 255, 0.5);
+}
+
+.scrollbar-track-transparent::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thumb-cyan-500\/30::-webkit-scrollbar-thumb {
+  background-color: rgba(6, 182, 212, 0.3);
+}

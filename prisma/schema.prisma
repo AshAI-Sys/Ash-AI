@@ -1,0 +1,2517 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ==============================================
+// ASH AI CORE ENUMS - Based on CLIENT_UPDATED_PLAN.md
+// ==============================================
+
+enum OrderStatus {
+  INTAKE
+  DESIGN_PENDING
+  DESIGN_APPROVAL
+  CONFIRMED
+  PRODUCTION_PLANNED
+  IN_PROGRESS
+  QC
+  PACKING
+  READY_FOR_DELIVERY
+  DELIVERED
+  CLOSED
+  ON_HOLD
+  CANCELLED
+}
+
+enum ProductMethod {
+  SILKSCREEN
+  SUBLIMATION
+  DTF
+  EMBROIDERY
+}
+
+enum RoutingStepStatus {
+  PLANNED
+  READY
+  IN_PROGRESS
+  DONE
+  BLOCKED
+}
+
+enum WorkcenterType {
+  DESIGN
+  CUTTING
+  PRINTING
+  HEAT_PRESS
+  EMB
+  SEWING
+  QC
+  PACKING
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  APPLY_TEMPLATE
+  CUSTOMIZE_ROUTING
+  STATUS_CHANGE
+  APPROVE
+  REJECT
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  CSR
+  GA
+  GRAPHIC_ARTIST
+  OPERATOR
+  SEWING_OPERATOR
+  SILKSCREEN_OPERATOR
+  SUBLIMATION_OPERATOR
+  DTF_OPERATOR
+  EMBROIDERY_OPERATOR
+  SCREEN_MAKING
+  DRIVER
+  QC
+  QC_INSPECTOR
+  WAREHOUSE
+  WAREHOUSE_STAFF
+  FINISHING_STAFF
+  CLIENT
+  PURCHASER
+  SALES_STAFF
+}
+
+enum ProcessType {
+  CUTTING
+  SEWING
+  PRINTING
+  SILKSCREEN
+  SUBLIMATION
+  DTF
+  EMBROIDERY
+  QC
+  FINISHING
+  PACKING
+}
+
+enum PrintMethod {
+  SILKSCREEN
+  SUBLIMATION
+  DTF
+  EMBROIDERY
+  NONE
+}
+
+// ==============================================
+// STAGE 1: CLIENT & ORDER INTAKE - Core Tables
+// Based on CLIENT_UPDATED_PLAN.md exact specifications
+// ==============================================
+
+// Workspaces for multi-tenancy
+model Workspace {
+  id         String   @id @default(uuid())
+  name       String
+  settings   Json?
+  active     Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relations
+  users               User[]
+  inventory_items     InventoryItem[]
+  ai_insights         AIInsight[]
+  clients             Client[]
+  brands              Brand[]
+  orders              Order[]
+  audit_logs          AuditLog[]
+  machines            Machine[]
+  suppliers           Supplier[]
+  invoices            Invoice[]
+  payments            Payment[]
+  bills               Bill[]
+  channel_settlements ChannelSettlement[]
+  bir_sales_entries   BIRSalesEntry[]
+  bir_purchase_entries BIRPurchaseEntry[]
+  vehicles            Vehicle[]
+  shipments           Shipment[]
+  cutting_plans       CuttingPlan[]
+  cutting_metrics     CuttingMetrics[]
+  sewing_operations   SewingOperation[]
+  piece_rates         PieceRate[]
+  sewing_runs         SewingRun[]
+  bundles             Bundle[]
+  sewing_line_metrics SewingLineMetrics[]
+  finishing_runs      FinishingRun[]
+  finished_units      FinishedUnit[]
+  finishing_cartons   FinishingCarton[]
+  finishing_shipments FinishingShipment[]
+  employees           Employee[]
+  attendance_records  AttendanceRecord[]
+  payroll_records     PayrollRecord[]
+  leave_requests      LeaveRequest[]
+  disciplinary_actions DisciplinaryAction[]
+  performance_reviews PerformanceReview[]
+  maintenance_schedules MaintenanceSchedule[]
+  maintenance_tasks   MaintenanceTask[]
+  equipment_downtime  EquipmentDowntime[]
+  maintenance_parts   MaintenancePart[]
+  maintenance_metrics MaintenanceMetrics[]
+  client_users        ClientUser[]
+  client_payments     ClientPayment[]
+  client_support_tickets ClientSupportTicket[]
+  client_portal_activities ClientPortalActivity[]
+  client_payment_methods ClientPaymentMethod[]
+  items               Item[]
+  operations          Operation[]
+  frames              Frame[]
+  alerts              Alert[]
+  ai_logs             AILog[]
+  tasks               Task[]
+  time_records        TimeRecord[]
+  qc_records          QCRecord[]
+  sync_conflicts      SyncConflict[]
+  wallets             Wallet[]
+
+  @@map("workspaces")
+}
+
+// System users for authentication and staff access
+model User {
+  id               String   @id @default(uuid())
+  workspace_id     String
+  email            String   @unique
+  password         String
+  full_name        String
+  role             Role
+  active           Boolean  @default(true)
+  email_verified   DateTime?
+  two_factor_enabled Boolean @default(false)
+  two_factor_secret String?
+  last_login       DateTime?
+  brand_scope      String?  // Brand access scope
+  hourly_rate      Float?   // Hourly rate for employees
+  profile          Json?    // Additional profile data
+  permissions      Json?    // User permissions
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  // Relations
+  workspace        Workspace @relation(fields: [workspace_id], references: [id])
+  audit_logs       AuditLog[]
+  
+  @@map("users")
+}
+
+// Inventory items for materials and supplies
+model InventoryItem {
+  id           String   @id @default(uuid())
+  workspace_id String
+  name         String
+  sku          String   @unique
+  category     String
+  unit         String
+  quantity     Decimal  @default(0)
+  min_stock    Decimal  @default(0)
+  unit_cost    Decimal  @default(0)
+  active       Boolean  @default(true)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  // Relations
+  workspace    Workspace @relation(fields: [workspace_id], references: [id])
+  
+  @@map("inventory_items")
+}
+
+// AI insights from Ashley
+model AIInsight {
+  id           String   @id @default(uuid())
+  workspace_id String
+  type         String   // CAPACITY/STOCK/ROUTE/QUALITY/COST
+  priority     String   // HIGH/MEDIUM/LOW
+  title        String
+  message      String
+  data         Json?
+  resolved     Boolean  @default(false)
+  created_at   DateTime @default(now())
+
+  // Relations
+  workspace    Workspace @relation(fields: [workspace_id], references: [id])
+  
+  @@map("ai_insights")
+}
+
+// Clients table from CLIENT_UPDATED_PLAN.md
+model Client {
+  id              String   @id @default(uuid())
+  workspace_id    String
+  name            String
+  company         String?
+  emails          Json     @default("[]")
+  phones          Json     @default("[]")
+  billing_address Json?
+  notes           String?
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  // Relations
+  workspace        Workspace        @relation(fields: [workspace_id], references: [id])
+  orders           Order[]
+  design_approvals DesignApproval[]
+  invoices         Invoice[]
+  payments         Payment[]
+  client_users     ClientUser[]
+  client_payments  ClientPayment[]
+  client_payment_methods ClientPaymentMethod[]
+
+  @@map("clients")
+}
+
+// Brands table from CLIENT_UPDATED_PLAN.md
+model Brand {
+  id           String   @id @default(uuid())
+  workspace_id String
+  name         String
+  code         String?
+  settings     Json?    // defaults (pricing, routing, message templates)
+  commission_rules Json? // Commission rules for sales staff
+  return_policies Json?  // Return policies for the brand
+  created_at   DateTime @default(now())
+
+  // Relations
+  workspace           Workspace           @relation(fields: [workspace_id], references: [id])
+  orders              Order[]
+  invoices            Invoice[]
+  bills               Bill[]
+  channel_settlements ChannelSettlement[]
+  piece_rates         PieceRate[]
+
+  @@unique([workspace_id, code])
+  @@map("brands")
+}
+
+// Orders (PO header) from CLIENT_UPDATED_PLAN.md
+model Order {
+  id                   String        @id @default(uuid())
+  workspace_id         String
+  brand_id             String
+  client_id            String
+  po_number            String        @unique // e.g., REEF-2025-000123
+  channel              String?       // Direct / Shopee / etc.
+  product_type         String
+  method               ProductMethod // SILKSCREEN/SUBLIMATION/DTF/EMBROIDERY
+  total_qty            Int
+  size_curve           Json          // {"S":50,"M":120,...}
+  variants             Json?         // [{"color":"Black","qty":300}, ...]
+  addons               Json?
+  target_delivery_date DateTime
+  commercials          Json?         // {unit_price, deposit_pct, terms, tax_mode, currency}
+  clothing_type        String?       // Additional clothing type field
+  order_type           String?       // Type of order
+  status               OrderStatus   @default(INTAKE)
+  created_by           String        // user id
+  created_at           DateTime      @default(now())
+  updated_at           DateTime      @updatedAt
+
+  // Relations
+  workspace         Workspace         @relation(fields: [workspace_id], references: [id])
+  brand             Brand             @relation(fields: [brand_id], references: [id])
+  client            Client            @relation(fields: [client_id], references: [id])
+  routing_steps     RoutingStep[]
+  order_attachments OrderAttachment[]
+  items             OrderItem[]
+  design_assets     DesignAsset[]
+  cutting_plans     CuttingPlan[]
+  qc_inspections    QCInspection[]
+  print_runs        PrintRun[]
+  invoices          Invoice[]
+  po_cost           POCost?
+  shipments         Shipment[]
+  sewing_runs       SewingRun[]
+  bundles           Bundle[]
+  finishing_runs    FinishingRun[]
+  finished_units    FinishedUnit[]
+  finishing_cartons FinishingCarton[]
+  finishing_shipments FinishingShipment[]
+  client_payments   ClientPayment[]
+
+  @@index([workspace_id, brand_id, status, created_at])
+  @@map("orders")
+}
+
+// Order line items with size/color breakdown
+model OrderItem {
+  id         String   @id @default(uuid())
+  order_id   String
+  sku        String   // e.g., "REEF-TEE-BLK-M"
+  product_name String
+  size       String
+  color      String
+  quantity   Int
+  unit_price Float?
+  total_price Float?
+  created_at DateTime @default(now())
+
+  // Relations
+  order      Order      @relation(fields: [order_id], references: [id])
+  cut_pieces CutPiece[]
+
+  @@map("order_items")
+}
+
+// Routing steps (per order) from CLIENT_UPDATED_PLAN.md
+model RoutingStep {
+  id               String            @id @default(uuid())
+  order_id         String
+  name             String            // "Cutting", "Printing"...
+  workcenter       WorkcenterType    // CUTTING/PRINTING/HEAT_PRESS/SEWING/EMB/QC/PACKING/DESIGN
+  sequence         Int
+  depends_on       Json              @default("[]")
+  join_type        String?           // null | AND | OR
+  standard_spec    Json?             // e.g., {"tempC":200,"seconds":60}
+  expected_inputs  Json?
+  expected_outputs Json?
+  can_run_parallel Boolean           @default(false)
+  planned_start    DateTime?
+  planned_end      DateTime?
+  status           RoutingStepStatus @default(PLANNED) // PLANNED/READY/IN_PROGRESS/DONE/BLOCKED
+  created_at       DateTime          @default(now())
+
+  // Relations
+  order         Order         @relation(fields: [order_id], references: [id])
+  print_runs    PrintRun[]
+  sewing_runs   SewingRun[]
+  finishing_runs FinishingRun[]
+
+  @@index([order_id, status, sequence])
+  @@map("routing_steps")
+}
+
+// Attachments from CLIENT_UPDATED_PLAN.md
+model OrderAttachment {
+  id         String   @id @default(uuid())
+  order_id   String
+  type       String   // mockup/separation/digitized/brief
+  file_url   String
+  meta       Json?
+  created_at DateTime @default(now())
+
+  // Relations
+  order Order @relation(fields: [order_id], references: [id])
+
+  @@map("order_attachments")
+}
+
+// Audit (append-only) from CLIENT_UPDATED_PLAN.md
+model AuditLog {
+  id           String      @id @default(uuid())
+  workspace_id String
+  actor_id     String?
+  entity_type  String      // 'order','routing_step','client'
+  entity_id    String
+  action       AuditAction // 'create','update','apply_template','customize_routing'
+  before_data  Json?
+  after_data   Json?
+  created_at   DateTime    @default(now())
+
+  // Relations
+  workspace Workspace @relation(fields: [workspace_id], references: [id])
+  user      User?     @relation(fields: [actor_id], references: [id])
+
+  @@index([workspace_id, entity_type, entity_id, created_at])
+  @@map("audit_logs")
+}
+
+// PO Number Generation Sequence (per brand per year)
+model PONumberSequence {
+  id         String   @id @default(uuid())
+  brand_id   String
+  year       Int
+  sequence   Int      @default(0)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@unique([brand_id, year])
+  @@map("po_number_sequences")
+}
+
+// ==============================================
+// STAGE 2: DESIGN & APPROVAL - Design Asset Management
+// Based on CLIENT_UPDATED_PLAN.md specifications
+// ==============================================
+
+// Design assets with versioning
+model DesignAsset {
+  id              String   @id @default(uuid())
+  order_id        String
+  version         Int      @default(1)
+  type            String   // MOCKUP/ARTWORK/SEPARATION/DIGITIZED
+  file_url        String
+  file_name       String
+  file_size       Int?
+  mime_type       String?
+  complexity_score Float?  // AI complexity rating
+  color_count     Int?
+  print_ready     Boolean  @default(false)
+  approval_status String   @default("PENDING") // PENDING/APPROVED/REJECTED/REVISION_REQUESTED
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  // Relations
+  order           Order             @relation(fields: [order_id], references: [id])
+  approvals       DesignApproval[]
+  revisions       DesignRevision[]
+
+  @@map("design_assets")
+}
+
+// Client design approval workflow
+model DesignApproval {
+  id              String      @id @default(uuid())
+  design_asset_id String
+  client_id       String
+  status          String      // PENDING/APPROVED/REJECTED
+  feedback        String?
+  signature_data  Json?       // E-signature if required
+  approved_at     DateTime?
+  created_at      DateTime    @default(now())
+
+  // Relations
+  design_asset    DesignAsset @relation(fields: [design_asset_id], references: [id])
+  client          Client      @relation(fields: [client_id], references: [id])
+
+  @@map("design_approvals")
+}
+
+// Design revision history
+model DesignRevision {
+  id              String      @id @default(uuid())
+  design_asset_id String
+  revision_notes  String
+  changes_made    Json        // Detailed change log
+  revised_by      String?
+  revised_at      DateTime    @default(now())
+
+  // Relations
+  design_asset    DesignAsset @relation(fields: [design_asset_id], references: [id])
+
+  @@map("design_revisions")
+}
+
+// ==============================================
+// STAGE 3: CUTTING SYSTEM - Fabric & Material Cutting
+// Based on CLIENT_UPDATED_PLAN.md specifications
+// ==============================================
+
+// Cutting plan for optimized fabric layouts
+model CuttingPlan {
+  id                String   @id @default(uuid())
+  workspace_id      String
+  order_id          String
+  plan_name         String
+  fabric_type       String
+  fabric_width_cm   Float
+  fabric_length_cm  Float
+  utilization_pct   Float    // Fabric utilization percentage
+  total_pieces      Int
+  cutting_time_mins Int?     // Estimated cutting time
+  status            String   @default("DRAFT") // DRAFT/APPROVED/IN_PROGRESS/COMPLETED
+  created_by        String?
+  approved_by       String?
+  approved_at       DateTime?
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  // Relations
+  workspace         Workspace     @relation(fields: [workspace_id], references: [id])
+  order             Order         @relation(fields: [order_id], references: [id])
+  cutting_sheets    CuttingSheet[]
+  fabric_cuts       FabricCut[]
+  cutting_metrics   CuttingMetrics[]
+
+  @@map("cutting_plans")
+}
+
+// Individual cutting sheet layouts
+model CuttingSheet {
+  id               String   @id @default(uuid())
+  cutting_plan_id  String
+  sheet_number     Int
+  sheet_width_cm   Float
+  sheet_length_cm  Float
+  pieces_count     Int
+  layout_data      Json     // SVG/coordinates for each piece
+  cutting_sequence Json?    // Optimized cutting path
+  status           String   @default("PENDING") // PENDING/CUTTING/COMPLETED
+  started_at       DateTime?
+  completed_at     DateTime?
+  cut_by           String?
+  notes            String?
+
+  // Relations
+  cutting_plan     CuttingPlan   @relation(fields: [cutting_plan_id], references: [id])
+  cut_pieces       CutPiece[]
+
+  @@map("cutting_sheets")
+}
+
+// Individual fabric cuts/rolls
+model FabricCut {
+  id               String   @id @default(uuid())
+  cutting_plan_id  String
+  fabric_lot       String   // Fabric batch/lot number
+  roll_number      String?
+  color            String
+  width_cm         Float
+  length_used_cm   Float
+  waste_cm         Float    // Fabric waste
+  cost_per_meter   Float?
+  total_cost       Float?
+  cut_at           DateTime @default(now())
+  cut_by           String?
+
+  // Relations
+  cutting_plan     CuttingPlan @relation(fields: [cutting_plan_id], references: [id])
+
+  @@map("fabric_cuts")
+}
+
+// Individual cut pieces tracking
+model CutPiece {
+  id               String   @id @default(uuid())
+  cutting_sheet_id String
+  order_item_id    String   // Links to specific order item
+  piece_name       String   // e.g., "Front Panel Size M"
+  size             String
+  quantity         Int
+  position_x       Float    // Position on cutting sheet
+  position_y       Float
+  dimensions       Json     // Width, height, shape details
+  quality_check    String   @default("PENDING") // PENDING/PASS/FAIL
+  defect_notes     String?
+  cut_at           DateTime @default(now())
+
+  // Relations
+  cutting_sheet    CuttingSheet @relation(fields: [cutting_sheet_id], references: [id])
+  order_item       OrderItem    @relation(fields: [order_item_id], references: [id])
+
+  @@map("cut_pieces")
+}
+
+// Cutting efficiency tracking
+model CuttingMetrics {
+  id                 String   @id @default(uuid())
+  workspace_id       String
+  cutting_plan_id    String
+  operator_name      String
+  shift_date         DateTime
+  total_pieces_cut   Int
+  total_time_mins    Int
+  fabric_utilization Float    // Percentage
+  waste_percentage   Float
+  defect_rate        Float
+  efficiency_score   Float    // Overall efficiency rating
+  notes              String?
+  recorded_at        DateTime @default(now())
+
+  // Relations
+  workspace          Workspace   @relation(fields: [workspace_id], references: [id])
+  cutting_plan       CuttingPlan @relation(fields: [cutting_plan_id], references: [id])
+
+  @@map("cutting_metrics")
+}
+
+// ==============================================
+// STAGE 4: PRINTING SYSTEM - Multi-Method Production
+// Based on CLIENT_UPDATED_PLAN.md specifications
+// ==============================================
+
+// Machine library for all production equipment
+model Machine {
+  id           String   @id @default(uuid())
+  workspace_id String
+  workcenter   WorkcenterType
+  name         String
+  spec         Json?    // bed_size, max_temp, lanes, etc.
+  is_active    Boolean  @default(true)
+  created_at   DateTime @default(now())
+
+  // Relations
+  workspace    Workspace @relation(fields: [workspace_id], references: [id])
+  print_runs   PrintRun[]
+  curing_logs  CuringLog[]
+
+  @@map("machines")
+}
+
+// Print run tracking for all methods
+model PrintRun {
+  id              String   @id @default(uuid())
+  order_id        String
+  routing_step_id String
+  method          ProductMethod // SILKSCREEN/SUBLIMATION/DTF/EMBROIDERY
+  workcenter      WorkcenterType // PRINTING/HEAT_PRESS/EMB
+  machine_id      String?
+  started_at      DateTime?
+  ended_at        DateTime?
+  status          String   @default("CREATED") // CREATED/IN_PROGRESS/PAUSED/DONE/CANCELLED
+  created_by      String
+  created_at      DateTime @default(now())
+
+  // Relations
+  order           Order            @relation(fields: [order_id], references: [id])
+  routing_step    RoutingStep      @relation(fields: [routing_step_id], references: [id])
+  machine         Machine?         @relation(fields: [machine_id], references: [id])
+  outputs         PrintRunOutput[]
+  materials       PrintRunMaterial[]
+  rejects         PrintReject[]
+  silkscreen_prep SilkscreenPrep[]
+  silkscreen_spec SilkscreenSpec[]
+  curing_logs     CuringLog[]
+  sublimation_print SublimationPrint[]
+  heat_press_logs HeatPressLog[]
+  dtf_print       DTFPrint[]
+  dtf_powder_cure DTFPowderCure[]
+  embroidery_run  EmbroideryRun[]
+
+  @@map("print_runs")
+}
+
+// Print run outputs per batch/bundle
+model PrintRunOutput {
+  id         String   @id @default(uuid())
+  run_id     String
+  bundle_id  String?  // Link to cutting bundles
+  qty_good   Int      @default(0)
+  qty_reject Int      @default(0)
+  notes      String?
+  created_at DateTime @default(now())
+
+  // Relations
+  print_run  PrintRun @relation(fields: [run_id], references: [id])
+
+  @@map("print_run_outputs")
+}
+
+// Material consumption tracking
+model PrintRunMaterial {
+  id               String   @id @default(uuid())
+  run_id           String
+  item_id          String   // Reference to inventory item
+  item_name        String   // For tracking purposes
+  uom              String   // g, m2, m, cone, sheet, pcs
+  qty              Float
+  source_batch_id  String?  // inventory_batches reference
+  cost_per_unit    Float?
+  total_cost       Float?
+  created_at       DateTime @default(now())
+
+  // Relations
+  print_run        PrintRun @relation(fields: [run_id], references: [id])
+
+  @@map("print_run_materials")
+}
+
+// Defect/reject tracking
+model PrintReject {
+  id               String   @id @default(uuid())
+  run_id           String
+  bundle_id        String?
+  reason_code      String   // MISALIGNMENT/PEEL/CRACK/GHOST/PUCKERING/etc
+  description      String?
+  qty              Int
+  photo_url        String?
+  cost_attribution String?  // SUPPLIER/STAFF/COMPANY/CLIENT
+  severity         String   @default("MINOR") // MINOR/MAJOR/CRITICAL
+  created_at       DateTime @default(now())
+
+  // Relations
+  print_run        PrintRun @relation(fields: [run_id], references: [id])
+
+  @@map("print_rejects")
+}
+
+// SILKSCREEN-SPECIFIC TABLES
+model SilkscreenPrep {
+  id                String   @id @default(uuid())
+  run_id            String
+  screen_id         String
+  mesh_count        Int
+  emulsion_batch    String?
+  exposure_seconds  Int?
+  registration_notes String?
+  created_at        DateTime @default(now())
+
+  // Relations
+  print_run         PrintRun @relation(fields: [run_id], references: [id])
+
+  @@map("silkscreen_prep")
+}
+
+model SilkscreenSpec {
+  id                  String   @id @default(uuid())
+  run_id              String
+  ink_type            String   // PLASTISOL/WATER/PUFF/ANTI_MIGRATION
+  coats               Int
+  squeegee_durometer  Int?     // 60/70/80
+  floodbar            String?
+  expected_ink_g      Float?   // AI estimation
+  actual_ink_g        Float?
+  created_at          DateTime @default(now())
+
+  // Relations
+  print_run           PrintRun @relation(fields: [run_id], references: [id])
+
+  @@map("silkscreen_specs")
+}
+
+model CuringLog {
+  id          String   @id @default(uuid())
+  run_id      String
+  dryer_id    String?
+  temp_c      Int
+  seconds     Int
+  belt_speed  String?
+  cure_index  Float?   // calculated temp * time index
+  pass_fail   String?  // PASS/FAIL/WARN
+  created_at  DateTime @default(now())
+
+  // Relations
+  print_run   PrintRun @relation(fields: [run_id], references: [id])
+  dryer       Machine? @relation(fields: [dryer_id], references: [id])
+
+  @@map("curing_logs")
+}
+
+// SUBLIMATION-SPECIFIC TABLES
+model SublimationPrint {
+  id         String   @id @default(uuid())
+  run_id     String
+  printer_id String?
+  paper_m2   Float
+  ink_g      Float?
+  created_at DateTime @default(now())
+
+  // Relations
+  print_run  PrintRun @relation(fields: [run_id], references: [id])
+
+  @@map("sublimation_prints")
+}
+
+model HeatPressLog {
+  id         String   @id @default(uuid())
+  run_id     String
+  press_id   String?
+  temp_c     Int
+  seconds    Int
+  pressure   String   // light/medium/firm
+  cycles     Int      @default(1)
+  created_at DateTime @default(now())
+
+  // Relations
+  print_run  PrintRun @relation(fields: [run_id], references: [id])
+
+  @@map("heat_press_logs")
+}
+
+// DTF-SPECIFIC TABLES
+model DTFPrint {
+  id         String   @id @default(uuid())
+  run_id     String
+  film_m2    Float
+  ink_g      Float?
+  created_at DateTime @default(now())
+
+  // Relations
+  print_run  PrintRun @relation(fields: [run_id], references: [id])
+
+  @@map("dtf_prints")
+}
+
+model DTFPowderCure {
+  id         String   @id @default(uuid())
+  run_id     String
+  powder_g   Float
+  temp_c     Int
+  seconds    Int
+  created_at DateTime @default(now())
+
+  // Relations
+  print_run  PrintRun @relation(fields: [run_id], references: [id])
+
+  @@map("dtf_powder_cures")
+}
+
+// EMBROIDERY-SPECIFIC TABLES
+model EmbroideryRun {
+  id                String   @id @default(uuid())
+  run_id            String
+  design_version_id String?
+  stitch_count      Int
+  machine_spm       Int      // stitches per minute
+  stabilizer_type   String?
+  thread_colors     Json?    // ["PMS 186C", "Black", ...]
+  thread_breaks     Int      @default(0)
+  runtime_minutes   Float?
+  created_at        DateTime @default(now())
+
+  // Relations
+  print_run         PrintRun @relation(fields: [run_id], references: [id])
+
+  @@map("embroidery_runs")
+}
+
+// ==============================================
+// STAGE 9: FINANCE SYSTEM - AR/AP with BIR Compliance
+// Based on CLIENT_UPDATED_PLAN.md specifications
+// ==============================================
+
+// Suppliers for AP
+model Supplier {
+  id           String   @id @default(uuid())
+  workspace_id String
+  name         String
+  tin          String?  // Tax Identification Number (BIR)
+  emails       Json     @default("[]")
+  phones       Json     @default("[]")
+  address      Json?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  // Relations
+  workspace    Workspace @relation(fields: [workspace_id], references: [id])
+  bills        Bill[]
+
+  @@map("suppliers")
+}
+
+// Accounts Receivable - Invoices
+model Invoice {
+  id           String   @id @default(uuid())
+  workspace_id String
+  brand_id     String
+  client_id    String
+  order_id     String?  // nullable for consolidated invoices
+  invoice_no   String   @unique // BRAND-YYYY-#####
+  date_issued  DateTime @default(now())
+  due_date     DateTime?
+  currency     String   @default("PHP")
+  tax_mode     String   @default("VAT_INCLUSIVE") // VAT_INCLUSIVE/VAT_EXCLUSIVE/NON_VAT
+  status       String   @default("OPEN") // OPEN/PARTIAL/PAID/VOID
+  subtotal     Float    @default(0)
+  discount     Float    @default(0)
+  vat_amount   Float    @default(0)
+  total        Float    @default(0)
+  balance      Float    @default(0)
+  meta         Json?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  // Relations
+  workspace         Workspace           @relation(fields: [workspace_id], references: [id])
+  brand             Brand               @relation(fields: [brand_id], references: [id])
+  client            Client              @relation(fields: [client_id], references: [id])
+  order             Order?              @relation(fields: [order_id], references: [id])
+  lines             InvoiceLine[]
+  allocations       PaymentAllocation[]
+  bir_sales_entry   BIRSalesEntry?
+  client_payments   ClientPayment[]
+
+  @@index([workspace_id, brand_id, client_id, status, date_issued])
+  @@map("invoices")
+}
+
+// Invoice line items
+model InvoiceLine {
+  id          String  @id @default(uuid())
+  invoice_id  String
+  description String
+  qty         Float
+  uom         String?
+  unit_price  Float
+  tax_rate    Float   @default(12) // VAT percentage
+  line_total  Float
+
+  // Relations
+  invoice     Invoice @relation(fields: [invoice_id], references: [id])
+
+  @@map("invoice_lines")
+}
+
+// Payments received
+model Payment {
+  id           String   @id @default(uuid())
+  workspace_id String
+  payer_type   String   // CLIENT/PLATFORM
+  client_id    String?
+  source       String   // CASH/BANK/GCASH/STRIPE/SHOPEE/TIKTOK
+  ref_no       String?
+  amount       Float
+  currency     String   @default("PHP")
+  received_at  DateTime
+  created_at   DateTime @default(now())
+
+  // Relations
+  workspace    Workspace           @relation(fields: [workspace_id], references: [id])
+  client       Client?             @relation(fields: [client_id], references: [id])
+  allocations  PaymentAllocation[]
+
+  @@index([workspace_id, source, received_at])
+  @@map("payments")
+}
+
+// Payment allocations to invoices
+model PaymentAllocation {
+  id         String  @id @default(uuid())
+  payment_id String
+  invoice_id String
+  amount     Float
+
+  // Relations
+  payment    Payment @relation(fields: [payment_id], references: [id])
+  invoice    Invoice @relation(fields: [invoice_id], references: [id])
+
+  @@index([invoice_id])
+  @@map("payment_allocations")
+}
+
+// Accounts Payable - Bills
+model Bill {
+  id            String   @id @default(uuid())
+  workspace_id  String
+  brand_id      String?
+  supplier_id   String
+  bill_no       String?
+  date_received DateTime
+  due_date      DateTime?
+  currency      String   @default("PHP")
+  subtotal      Float    @default(0)
+  vat_amount    Float    @default(0)
+  total         Float    @default(0)
+  status        String   @default("OPEN") // OPEN/PARTIAL/PAID
+  meta          Json?
+  created_at    DateTime @default(now())
+
+  // Relations
+  workspace           Workspace         @relation(fields: [workspace_id], references: [id])
+  brand               Brand?            @relation(fields: [brand_id], references: [id])
+  supplier            Supplier          @relation(fields: [supplier_id], references: [id])
+  lines               BillLine[]
+  bir_purchase_entry  BIRPurchaseEntry?
+
+  @@index([workspace_id, supplier_id, status, due_date])
+  @@map("bills")
+}
+
+// Bill line items
+model BillLine {
+  id          String  @id @default(uuid())
+  bill_id     String
+  description String
+  qty         Float
+  unit_cost   Float
+  tax_rate    Float   @default(12)
+  line_total  Float
+
+  // Relations
+  bill        Bill    @relation(fields: [bill_id], references: [id])
+
+  @@map("bill_lines")
+}
+
+// Order costing and COGS
+model POCost {
+  id             String   @id @default(uuid())
+  order_id       String   @unique
+  materials_cost Float    @default(0)
+  labor_cost     Float    @default(0)
+  overhead_cost  Float    @default(0)
+  returns_cost   Float    @default(0)
+  cogs           Float    @default(0) // materials + labor + overhead - returns
+  updated_at     DateTime @default(now())
+
+  // Relations
+  order          Order    @relation(fields: [order_id], references: [id])
+
+  @@map("po_costs")
+}
+
+// Channel settlements (e.g., Shopee/TikTok)
+model ChannelSettlement {
+  id             String    @id @default(uuid())
+  workspace_id   String
+  brand_id       String?
+  channel        String    // SHOPEE/TIKTOK/LAZADA
+  period_start   DateTime
+  period_end     DateTime
+  gross_sales    Float
+  platform_fees  Float
+  shipping_fees  Float?
+  ads_spend      Float?
+  net_payout     Float
+  payout_date    DateTime?
+  ref_file_url   String?
+  created_at     DateTime  @default(now())
+
+  // Relations
+  workspace      Workspace @relation(fields: [workspace_id], references: [id])
+  brand          Brand?    @relation(fields: [brand_id], references: [id])
+
+  @@index([workspace_id, brand_id, channel, period_start, period_end])
+  @@map("channel_settlements")
+}
+
+// BIR Sales Book entries for compliance
+model BIRSalesEntry {
+  id              String   @id @default(uuid())
+  workspace_id    String
+  invoice_id      String   @unique
+  date_of_sale    DateTime
+  tin             String?  // Customer TIN
+  customer_name   String
+  address         String?
+  gross_amount    Float
+  exempt_amount   Float    @default(0)
+  zero_rated      Float    @default(0)
+  taxable_amount  Float
+  vat_amount      Float
+  created_at      DateTime @default(now())
+
+  // Relations
+  workspace       Workspace @relation(fields: [workspace_id], references: [id])
+  invoice         Invoice   @relation(fields: [invoice_id], references: [id])
+
+  @@index([workspace_id, date_of_sale])
+  @@map("bir_sales_entries")
+}
+
+// BIR Purchase Book entries
+model BIRPurchaseEntry {
+  id               String   @id @default(uuid())
+  workspace_id     String
+  bill_id          String   @unique
+  date_of_purchase DateTime
+  supplier_tin     String?
+  supplier_name    String
+  invoice_no       String?
+  gross_amount     Float
+  input_vat        Float
+  created_at       DateTime @default(now())
+
+  // Relations
+  workspace        Workspace @relation(fields: [workspace_id], references: [id])
+  bill             Bill      @relation(fields: [bill_id], references: [id])
+
+  @@index([workspace_id, date_of_purchase])
+  @@map("bir_purchase_entries")
+}
+
+// ==============================================
+// STAGE 7: FINISHING & PACKING SYSTEM
+// Based on CLIENT_UPDATED_PLAN.md specifications
+// ==============================================
+
+// Finishing runs for post-sewing operations
+model FinishingRun {
+  id               String    @id @default(uuid())
+  workspace_id     String
+  order_id         String
+  routing_step_id  String
+  operator_id      String    // Employee ID or name
+  started_at       DateTime?
+  ended_at         DateTime?
+  materials        Json?     // [{item_id,uom,qty,batch_id?}]
+  notes            String?
+  status           String    @default("IN_PROGRESS") // IN_PROGRESS, COMPLETED, CANCELLED
+  created_at       DateTime  @default(now())
+
+  // Relations
+  workspace        Workspace    @relation(fields: [workspace_id], references: [id])
+  order            Order        @relation(fields: [order_id], references: [id])
+  routing_step     RoutingStep  @relation(fields: [routing_step_id], references: [id])
+
+  @@index([workspace_id, order_id, status])
+  @@map("finishing_runs")
+}
+
+// Finished goods units ready for packing
+model FinishedUnit {
+  id               String    @id @default(uuid())
+  workspace_id     String
+  order_id         String
+  bundle_id        String?   // Optional link to originating bundle
+  sku              String    // Derived from product+color+size
+  size_code        String
+  color            String?
+  serial           String?   // Optional per-unit serial/barcode
+  retail_barcode   String?   // Retail UPC/EAN barcode
+  packed           Boolean   @default(false)
+  weight_g         Float?    // Individual unit weight in grams
+  created_at       DateTime  @default(now())
+
+  // Relations
+  workspace        Workspace         @relation(fields: [workspace_id], references: [id])
+  order            Order             @relation(fields: [order_id], references: [id])
+  bundle           Bundle?           @relation(fields: [bundle_id], references: [id])
+  carton_contents  CartonContent[]
+
+  @@index([workspace_id, order_id, sku, size_code, packed])
+  @@map("finished_units")
+}
+
+// Cartons for shipping finished goods
+model FinishingCarton {
+  id                String    @id @default(uuid())
+  workspace_id      String
+  order_id          String
+  carton_no         Int       // Sequential number per order
+  length_cm         Int?
+  width_cm          Int?
+  height_cm         Int?
+  tare_weight_kg    Float     @default(0)
+  actual_weight_kg  Float     @default(0)
+  dim_weight_kg     Float     @default(0) // Dimensional weight
+  fill_percent      Float     @default(0)
+  status            String    @default("OPEN") // OPEN, CLOSED
+  qr_code           String?   @unique
+  notes             String?
+  created_at        DateTime  @default(now())
+  closed_at         DateTime?
+
+  // Relations
+  workspace         Workspace           @relation(fields: [workspace_id], references: [id])
+  order             Order               @relation(fields: [order_id], references: [id])
+  carton_contents   CartonContent[]
+  shipment_cartons  ShipmentCarton[]
+
+  @@index([workspace_id, order_id, status])
+  @@map("finishing_cartons")
+}
+
+// Contents of each carton
+model CartonContent {
+  id                String        @id @default(uuid())
+  carton_id         String
+  finished_unit_id  String
+  qty               Int           @default(1)
+  created_at        DateTime      @default(now())
+
+  // Relations
+  carton            FinishingCarton @relation(fields: [carton_id], references: [id])
+  finished_unit     FinishedUnit    @relation(fields: [finished_unit_id], references: [id])
+
+  @@index([carton_id])
+  @@map("carton_contents")
+}
+
+// Shipments linking cartons to delivery
+model FinishingShipment {
+  id                 String    @id @default(uuid())
+  workspace_id       String
+  order_id           String
+  shipment_no        String    // Sequential shipment number
+  consignee_name     String
+  consignee_address  Json      // {street, city, province, postal_code, country}
+  contact_phone      String?
+  method             String    // DRIVER, LALAMOVE, GRAB, 3PL, etc.
+  carrier_ref        String?   // 3PL waybill or booking ID
+  cod_amount         Float?    // Cash on Delivery amount
+  total_weight_kg    Float     @default(0)
+  total_cartons      Int       @default(0)
+  status             String    @default("READY_FOR_PICKUP") // READY_FOR_PICKUP, IN_TRANSIT, DELIVERED, FAILED
+  eta                DateTime?
+  pickup_date        DateTime?
+  delivery_date      DateTime?
+  tracking_number    String?
+  notes              String?
+  created_at         DateTime  @default(now())
+
+  // Relations
+  workspace          Workspace        @relation(fields: [workspace_id], references: [id])
+  order              Order            @relation(fields: [order_id], references: [id])
+  shipment_cartons   ShipmentCarton[]
+
+  @@index([workspace_id, order_id, status, created_at])
+  @@map("finishing_shipments")
+}
+
+// Junction table for shipments and cartons
+model ShipmentCarton {
+  id           String           @id @default(uuid())
+  shipment_id  String
+  carton_id    String
+  created_at   DateTime         @default(now())
+
+  // Relations
+  shipment     FinishingShipment @relation(fields: [shipment_id], references: [id])
+  carton       FinishingCarton   @relation(fields: [carton_id], references: [id])
+
+  @@index([shipment_id])
+  @@index([carton_id])
+  @@map("shipment_cartons")
+}
+
+// ==============================================
+// STAGE 8: DELIVERY SYSTEM - Drivers & 3PL Integration  
+// Based on CLIENT_UPDATED_PLAN.md specifications
+// ==============================================
+
+// Vehicles for driver delivery method
+model Vehicle {
+  id           String   @id @default(uuid())
+  workspace_id String
+  plate_no     String   @unique
+  type         String?  // van/motorcycle/truck
+  fuel_type    String?
+  odo_last     Int?
+  active       Boolean  @default(true)
+  created_at   DateTime @default(now())
+
+  // Relations
+  workspace    Workspace @relation(fields: [workspace_id], references: [id])
+  trips        Trip[]
+
+  @@map("vehicles")
+}
+
+// Shipments from Stage 7
+model Shipment {
+  id                String   @id @default(uuid())
+  workspace_id      String
+  order_id          String
+  consignee_name    String
+  consignee_address Json
+  consignee_phone   String?
+  delivery_method   String   // DRIVER/3PL
+  cod_amount        Float?
+  total_weight      Float?
+  total_pieces      Int?
+  status            String   @default("READY") // READY/ASSIGNED/IN_TRANSIT/DELIVERED/FAILED
+  created_at        DateTime @default(now())
+
+  // Relations
+  workspace         Workspace        @relation(fields: [workspace_id], references: [id])
+  order             Order            @relation(fields: [order_id], references: [id])
+  cartons           Carton[]
+  trips             Trip[]
+  carrier_bookings  CarrierBooking[]
+  pod_records       PODRecord[]
+
+  @@index([workspace_id, status, created_at])
+  @@map("shipments")
+}
+
+// Cartons from Stage 7
+model Carton {
+  id                String    @id @default(uuid())
+  shipment_id       String
+  carton_no         String
+  weight            Float?
+  dimensions        Json?     // {length, width, height}
+  warehouse_out_at  DateTime?
+  created_at        DateTime  @default(now())
+
+  // Relations
+  shipment          Shipment     @relation(fields: [shipment_id], references: [id])
+  stop_cartons      StopCarton[]
+  pod_records       PODRecord[]
+
+  @@index([shipment_id])
+  @@map("cartons")
+}
+
+// Driver trips for in-house delivery
+model Trip {
+  id          String    @id @default(uuid())
+  shipment_id String
+  driver_id   String    // Staff member ID
+  vehicle_id  String
+  started_at  DateTime?
+  ended_at    DateTime?
+  odo_start   Int?
+  odo_end     Int?
+  status      String    @default("PLANNED") // PLANNED/IN_PROGRESS/COMPLETED/CANCELLED
+  created_at  DateTime  @default(now())
+
+  // Relations
+  shipment    Shipment     @relation(fields: [shipment_id], references: [id])
+  vehicle     Vehicle      @relation(fields: [vehicle_id], references: [id])
+  stops       TripStop[]
+  expenses    TripExpense[]
+  gps_pings   GPSPing[]
+
+  @@index([shipment_id, driver_id, status])
+  @@map("trips")
+}
+
+// Trip stops for multi-drop deliveries
+model TripStop {
+  id             String    @id @default(uuid())
+  trip_id        String
+  stop_no        Int
+  consignee_name String?
+  address        Json
+  phone          String?
+  eta            DateTime?
+  arrived_at     DateTime?
+  departed_at    DateTime?
+  status         String    @default("PENDING") // PENDING/DELIVERED/FAILED
+  fail_reason    String?
+  created_at     DateTime  @default(now())
+
+  // Relations
+  trip           Trip         @relation(fields: [trip_id], references: [id])
+  stop_cartons   StopCarton[]
+
+  @@index([trip_id, stop_no, status])
+  @@map("trip_stops")
+}
+
+// Link cartons to specific trip stops
+model StopCarton {
+  id              String    @id @default(uuid())
+  trip_stop_id    String
+  carton_id       String
+  scanned_out_at  DateTime?
+  delivered_at    DateTime?
+  failed_at       DateTime?
+
+  // Relations
+  trip_stop       TripStop  @relation(fields: [trip_stop_id], references: [id])
+  carton          Carton    @relation(fields: [carton_id], references: [id])
+
+  @@index([trip_stop_id, carton_id])
+  @@map("stop_cartons")
+}
+
+// Proof of delivery records
+model PODRecord {
+  id              String   @id @default(uuid())
+  shipment_id     String
+  trip_stop_id    String?  // null for 3PL deliveries
+  carton_id       String?
+  recipient_name  String?
+  signature_url   String?
+  photo_url       String?
+  geo             Json?    // {lat, lon, accuracy}
+  created_at      DateTime @default(now())
+
+  // Relations
+  shipment        Shipment @relation(fields: [shipment_id], references: [id])
+  carton          Carton?  @relation(fields: [carton_id], references: [id])
+
+  @@map("pod_records")
+}
+
+// Driver trip expenses
+model TripExpense {
+  id          String   @id @default(uuid())
+  trip_id     String
+  type        String   // FUEL/TOLL/PARKING/REPAIR/OTHER
+  amount      Float
+  currency    String   @default("PHP")
+  receipt_url String?
+  created_at  DateTime @default(now())
+
+  // Relations
+  trip        Trip     @relation(fields: [trip_id], references: [id])
+
+  @@map("trip_expenses")
+}
+
+// 3PL carrier bookings
+model CarrierBooking {
+  id              String   @id @default(uuid())
+  shipment_id     String
+  provider        String   // LALAMOVE/GRAB/JNT/LBC/NINJA_VAN
+  quote           Json?    // requested/returned rates
+  booking_ref     String?
+  label_url       String?
+  tracking_no     String?
+  status          String   @default("BOOKED") // BOOKED/PICKED_UP/IN_TRANSIT/DELIVERED/FAILED/CANCELLED
+  webhook_payload Json?
+  created_at      DateTime @default(now())
+
+  // Relations
+  shipment        Shipment @relation(fields: [shipment_id], references: [id])
+
+  @@index([shipment_id, provider, status])
+  @@map("carrier_bookings")
+}
+
+// Optional GPS tracking for driver trips
+model GPSPing {
+  id          String   @id @default(uuid())
+  trip_id     String
+  ts          DateTime
+  lat         Float
+  lon         Float
+  speed_kph   Float?
+  battery_pct Int?
+
+  // Relations
+  trip        Trip     @relation(fields: [trip_id], references: [id])
+
+  @@map("gps_pings")
+}
+
+// ==============================================
+// STAGE 5: SEWING SYSTEM - Operations & Piece-Rate Payroll
+// Based on CLIENT_UPDATED_PLAN.md specifications
+// ==============================================
+
+// Sewing operations library per product type
+model SewingOperation {
+  id               String   @id @default(uuid())
+  workspace_id     String
+  product_type     String   // Tee/Hoodie/Jersey/etc
+  name             String   // "Join shoulders", "Attach collar", etc
+  standard_minutes Float    // SMV (Standard Minute Value)
+  piece_rate       Float?   // Pay per piece for this operation
+  depends_on       Json     @default("[]") // Logical operation names
+  complexity       String   @default("MEDIUM") // LOW/MEDIUM/HIGH
+  skill_level      String   @default("BASIC") // BASIC/INTERMEDIATE/ADVANCED
+  quality_points   Json?    // Key quality checkpoints
+  created_at       DateTime @default(now())
+
+  // Relations
+  workspace        Workspace    @relation(fields: [workspace_id], references: [id])
+  sewing_runs      SewingRun[]
+
+  @@map("sewing_operations")
+}
+
+// Piece rates by brand/role (fallback rates)
+model PieceRate {
+  id             String    @id @default(uuid())
+  workspace_id   String
+  brand_id       String?
+  operation_name String
+  rate           Float     // PHP per piece
+  effective_from DateTime
+  effective_to   DateTime?
+  skill_level    String    @default("BASIC")
+  created_at     DateTime  @default(now())
+
+  // Relations
+  workspace      Workspace @relation(fields: [workspace_id], references: [id])
+  brand          Brand?    @relation(fields: [brand_id], references: [id])
+
+  @@map("piece_rates")
+}
+
+// Sewing runs per bundle per operation
+model SewingRun {
+  id                String        @id @default(uuid())
+  workspace_id      String
+  order_id          String
+  routing_step_id   String
+  sewing_operation_id String
+  operator_id       String        // Employee ID or name
+  bundle_id         String?       // Reference to bundle/batch
+  started_at        DateTime?
+  ended_at          DateTime?
+  qty_good          Int           @default(0)
+  qty_reject        Int           @default(0)
+  reject_reason     String?
+  reject_photo_url  String?
+  actual_minutes    Float?        // Actual time spent
+  earned_minutes    Float?        // SMV * qty_good
+  piece_rate_earned Float?        // Piece rate pay earned
+  efficiency_pct    Float?        // Efficiency percentage
+  status            String        @default("CREATED") // CREATED/IN_PROGRESS/PAUSED/DONE/CANCELLED
+  operator_notes    String?
+  supervisor_notes  String?
+  created_at        DateTime      @default(now())
+  updated_at        DateTime      @updatedAt
+
+  // Relations
+  workspace         Workspace     @relation(fields: [workspace_id], references: [id])
+  order             Order         @relation(fields: [order_id], references: [id])
+  routing_step      RoutingStep   @relation(fields: [routing_step_id], references: [id])
+  sewing_operation  SewingOperation @relation(fields: [sewing_operation_id], references: [id])
+  bundle_progress   BundleProgress[]
+
+  @@map("sewing_runs")
+}
+
+// Bundle tracking and progress
+model Bundle {
+  id               String   @id @default(uuid())
+  workspace_id     String
+  order_id         String
+  bundle_no        String   // QR code reference
+  total_qty        Int
+  current_qty      Int      // Remaining quantity
+  cut_pieces_ids   Json     // Array of cut piece IDs
+  status           String   @default("CREATED") // CREATED/IN_SEWING/COMPLETED/REJECTED
+  priority         String   @default("NORMAL") // LOW/NORMAL/HIGH/URGENT
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  // Relations
+  workspace        Workspace       @relation(fields: [workspace_id], references: [id])
+  order            Order           @relation(fields: [order_id], references: [id])
+  bundle_progress  BundleProgress[]
+  finished_units   FinishedUnit[]
+
+  @@unique([workspace_id, bundle_no])
+  @@map("bundles")
+}
+
+// Bundle progress per operation
+model BundleProgress {
+  id               String    @id @default(uuid())
+  bundle_id        String
+  sewing_run_id    String
+  operation_name   String
+  qty_completed    Int       @default(0)
+  qty_rejected     Int       @default(0)
+  completed_at     DateTime?
+  notes            String?
+
+  // Relations
+  bundle           Bundle    @relation(fields: [bundle_id], references: [id])
+  sewing_run       SewingRun @relation(fields: [sewing_run_id], references: [id])
+
+  @@map("bundle_progress")
+}
+
+// Line efficiency and performance tracking
+model SewingLineMetrics {
+  id                    String   @id @default(uuid())
+  workspace_id          String
+  line_name             String
+  shift_date            DateTime
+  operator_id           String
+  operation_name        String
+  total_pieces_sewn     Int
+  total_minutes_worked  Float
+  target_efficiency     Float    @default(85.0) // Target efficiency %
+  actual_efficiency     Float
+  defect_rate           Float
+  rework_pieces         Int      @default(0)
+  downtime_minutes      Float    @default(0)
+  notes                 String?
+  recorded_at           DateTime @default(now())
+
+  // Relations
+  workspace             Workspace @relation(fields: [workspace_id], references: [id])
+
+  @@map("sewing_line_metrics")
+}
+
+// ==============================================
+// STAGE 6: QUALITY CONTROL - QC Inspection System
+// Based on CLIENT_UPDATED_PLAN.md specifications
+// ==============================================
+
+// QC inspections with AQL sampling
+model QCInspection {
+  id              String   @id @default(uuid())
+  order_id        String
+  inspector_id    String   // Staff member who did inspection
+  lot_size        Int      // Total pieces in lot
+  sample_size     Int      // Number of pieces sampled
+  aql_level       String   // e.g., "2.5", "1.0"
+  accept_number   Int      // Max defects allowed
+  reject_number   Int      // Min defects to reject
+  defects_found   Int      @default(0)
+  passed_qty      Int      @default(0)
+  rejected_qty    Int      @default(0)
+  status          String   @default("IN_PROGRESS") // IN_PROGRESS/PASSED/FAILED
+  inspection_type String   // INCOMING/IN_PROCESS/FINAL
+  notes           String?
+  created_at      DateTime @default(now())
+  completed_at    DateTime?
+
+  // Relations
+  order           Order         @relation(fields: [order_id], references: [id])
+  defects         QCDefect[]
+  capa_tasks      CAPATask[]
+
+  @@map("qc_inspections")
+}
+
+// Individual defects found during QC
+model QCDefect {
+  id             String        @id @default(uuid())
+  inspection_id  String
+  defect_type    String        // CRITICAL/MAJOR/MINOR
+  defect_code    String        // e.g., "STAIN", "HOLE", "MISPRINT"
+  description    String
+  location       String?       // Where on the garment
+  quantity       Int           @default(1)
+  photo_url      String?
+  severity_score Int           @default(1)
+  created_at     DateTime      @default(now())
+
+  // Relations
+  inspection     QCInspection  @relation(fields: [inspection_id], references: [id])
+
+  @@map("qc_defects")
+}
+
+// CAPA (Corrective and Preventive Action) tasks
+model CAPATask {
+  id               String        @id @default(uuid())
+  inspection_id    String
+  title            String
+  description      String
+  root_cause       String?
+  corrective_action String?
+  preventive_action String?
+  assigned_to      String?
+  priority         String        @default("MEDIUM") // LOW/MEDIUM/HIGH/CRITICAL
+  status           String        @default("OPEN") // OPEN/IN_PROGRESS/COMPLETED/CLOSED
+  due_date         DateTime?
+  completed_at     DateTime?
+  created_at       DateTime      @default(now())
+
+  // Relations
+  inspection       QCInspection  @relation(fields: [inspection_id], references: [id])
+
+  @@map("capa_tasks")
+}
+
+// ==============================================
+// STAGE 10: HR SYSTEM - Human Resources Management
+// Based on CLIENT_UPDATED_PLAN.md specifications
+// ==============================================
+
+// Employee master data with Philippine compliance fields
+model Employee {
+  id                    String    @id @default(uuid())
+  workspace_id          String
+  employee_no           String    // Company employee ID
+  first_name            String
+  middle_name           String?
+  last_name             String
+  suffix                String?   // Jr., Sr., III, etc.
+  email                 String?   @unique
+  phone                 String?
+  address_line1         String?
+  address_line2         String?
+  city                  String?
+  province              String?
+  postal_code           String?
+  
+  // Government IDs - Philippine compliance
+  sss_number            String?
+  philhealth_number     String?
+  pagibig_number        String?
+  tin_number            String?
+  
+  // Employment details
+  hire_date             DateTime
+  employment_status     String    // REGULAR/PROBATIONARY/CONTRACTUAL/SEASONAL
+  job_title             String
+  department            String
+  immediate_supervisor  String?   // Employee ID of supervisor
+  basic_salary          Float?    // Monthly basic salary
+  daily_rate            Float?    // For daily paid employees
+  hourly_rate           Float?    // For hourly employees
+  allowances            Json?     // {rice: 1500, transportation: 500, etc}
+  
+  // System fields
+  status                String    @default("ACTIVE") // ACTIVE/INACTIVE/TERMINATED
+  termination_date      DateTime?
+  termination_reason    String?
+  created_at            DateTime  @default(now())
+  updated_at            DateTime  @updatedAt
+  
+  // Relations
+  workspace             Workspace           @relation(fields: [workspace_id], references: [id])
+  attendance_records    AttendanceRecord[]
+  payroll_records       PayrollRecord[]
+  leave_requests        LeaveRequest[]
+  disciplinary_actions  DisciplinaryAction[]
+  performance_reviews   PerformanceReview[]
+  
+  @@unique([workspace_id, employee_no])
+  @@map("employees")
+}
+
+// Daily attendance tracking with biometric integration
+model AttendanceRecord {
+  id                String    @id @default(uuid())
+  workspace_id      String
+  employee_id       String
+  attendance_date   DateTime  // Date only
+  time_in           DateTime?
+  time_out          DateTime?
+  break_start       DateTime?
+  break_end         DateTime?
+  regular_hours     Float     @default(0)
+  overtime_hours    Float     @default(0)
+  night_diff_hours  Float     @default(0)
+  holiday_hours     Float     @default(0)
+  status            String    @default("PRESENT") // PRESENT/ABSENT/LATE/UNDERTIME/SICK/VACATION
+  
+  // Deductions and adjustments
+  late_minutes      Int       @default(0)
+  undertime_minutes Int       @default(0)
+  
+  // Device/method of record
+  time_in_method    String?   // BIOMETRIC/MANUAL/SYSTEM
+  time_out_method   String?
+  approved_by       String?   // For manual entries
+  notes             String?
+  
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+  
+  // Relations
+  workspace         Workspace @relation(fields: [workspace_id], references: [id])
+  employee          Employee  @relation(fields: [employee_id], references: [id])
+  
+  @@unique([workspace_id, employee_id, attendance_date])
+  @@map("attendance_records")
+}
+
+// Payroll processing with Philippine tax compliance
+model PayrollRecord {
+  id                        String    @id @default(uuid())
+  workspace_id              String
+  employee_id               String
+  pay_period_start          DateTime
+  pay_period_end            DateTime
+  pay_date                  DateTime?
+  
+  // Earnings breakdown
+  basic_pay                 Float     @default(0)
+  overtime_pay              Float     @default(0)
+  night_differential        Float     @default(0)
+  holiday_pay               Float     @default(0)
+  allowances                Float     @default(0)
+  commission                Float     @default(0)
+  bonus                     Float     @default(0)
+  other_earnings            Float     @default(0)
+  gross_pay                 Float     @default(0)
+  
+  // Government deductions
+  sss_employee              Float     @default(0)
+  sss_employer              Float     @default(0)
+  philhealth_employee       Float     @default(0)
+  philhealth_employer       Float     @default(0)
+  pagibig_employee          Float     @default(0)
+  pagibig_employer          Float     @default(0)
+  withholding_tax           Float     @default(0)
+  
+  // Other deductions
+  loan_deductions           Float     @default(0)
+  other_deductions          Float     @default(0)
+  total_deductions          Float     @default(0)
+  
+  // Final amounts
+  net_pay                   Float     @default(0)
+  employer_cost             Float     @default(0) // Total cost including employer contributions
+  
+  // Status and processing
+  status                    String    @default("DRAFT") // DRAFT/APPROVED/PAID/CANCELLED
+  processed_by              String?
+  approved_by               String?
+  payment_method            String?   // CASH/BANK_TRANSFER/CHECK
+  bank_reference            String?
+  
+  // BIR compliance fields
+  bir_form_number          String?   // For BIR 2316, etc.
+  bir_filing_status        String?   // Filed/Pending
+  
+  created_at               DateTime  @default(now())
+  updated_at               DateTime  @updatedAt
+  
+  // Relations
+  workspace                Workspace @relation(fields: [workspace_id], references: [id])
+  employee                 Employee  @relation(fields: [employee_id], references: [id])
+  
+  @@map("payroll_records")
+}
+
+// Leave management system
+model LeaveRequest {
+  id                String    @id @default(uuid())
+  workspace_id      String
+  employee_id       String
+  leave_type        String    // SICK/VACATION/EMERGENCY/MATERNITY/PATERNITY/BEREAVEMENT
+  start_date        DateTime
+  end_date          DateTime
+  days_requested    Float     // Can be partial days
+  reason            String?
+  
+  // Approval workflow
+  status            String    @default("PENDING") // PENDING/APPROVED/REJECTED/CANCELLED
+  requested_at      DateTime  @default(now())
+  reviewed_by       String?
+  reviewed_at       DateTime?
+  review_comments   String?
+  
+  // Leave balance impact
+  days_deducted     Float?    // Actual days deducted from balance
+  
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+  
+  // Relations
+  workspace         Workspace @relation(fields: [workspace_id], references: [id])
+  employee          Employee  @relation(fields: [employee_id], references: [id])
+  
+  @@map("leave_requests")
+}
+
+// Employee disciplinary actions tracking
+model DisciplinaryAction {
+  id                String    @id @default(uuid())
+  workspace_id      String
+  employee_id       String
+  incident_date     DateTime
+  type              String    // VERBAL_WARNING/WRITTEN_WARNING/SUSPENSION/TERMINATION
+  severity          String    // MINOR/MAJOR/GRAVE
+  description       String
+  investigation_notes String?
+  corrective_measures String?
+  
+  // Workflow
+  reported_by       String
+  investigated_by   String?
+  approved_by       String?
+  status            String    @default("PENDING") // PENDING/APPROVED/DISMISSED
+  
+  // Impact
+  suspension_days   Int?
+  salary_deduction  Float?
+  
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+  
+  // Relations
+  workspace         Workspace @relation(fields: [workspace_id], references: [id])
+  employee          Employee  @relation(fields: [employee_id], references: [id])
+  
+  @@map("disciplinary_actions")
+}
+
+// Performance review system
+model PerformanceReview {
+  id                String    @id @default(uuid())
+  workspace_id      String
+  employee_id       String
+  review_period     String    // Q1_2024, ANNUAL_2024, etc.
+  review_date       DateTime
+  reviewer_id       String    // Employee ID of reviewer
+  
+  // Core metrics (1-5 scale)
+  work_quality      Float?
+  productivity      Float?
+  punctuality       Float?
+  teamwork          Float?
+  initiative        Float?
+  overall_rating    Float?
+  
+  // Qualitative feedback
+  strengths         String?
+  areas_improvement String?
+  goals_next_period String?
+  training_needs    String?
+  
+  // Status
+  status            String    @default("DRAFT") // DRAFT/SUBMITTED/ACKNOWLEDGED
+  employee_comments String?
+  acknowledged_at   DateTime?
+  
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+  
+  // Relations
+  workspace         Workspace @relation(fields: [workspace_id], references: [id])
+  employee          Employee  @relation(fields: [employee_id], references: [id])
+  
+  @@map("performance_reviews")
+}
+
+// ==============================================
+// STAGE 11: MAINTENANCE SYSTEM - Equipment & Facility Management
+// Based on CLIENT_UPDATED_PLAN.md specifications
+// ==============================================
+
+// Maintenance schedules for equipment and facilities
+model MaintenanceSchedule {
+  id                  String    @id @default(uuid())
+  workspace_id        String
+  equipment_type      String    // SEWING_MACHINE/EMBROIDERY/HEAT_PRESS/CUTTING/FACILITY
+  equipment_id        String?   // Link to machine table if applicable
+  schedule_name       String    // e.g., "Monthly Oil Change", "Quarterly Calibration"
+  description         String?
+  frequency_type      String    // DAILY/WEEKLY/MONTHLY/QUARTERLY/YEARLY/USAGE_BASED
+  frequency_value     Int       // e.g., 1 for monthly, 500 for every 500 hours
+  estimated_duration  Int?      // Minutes
+  assigned_to         String?   // Employee ID of technician
+  next_due_date       DateTime
+  priority            String    @default("MEDIUM") // LOW/MEDIUM/HIGH/CRITICAL
+  active              Boolean   @default(true)
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @updatedAt
+
+  // Relations
+  workspace           Workspace           @relation(fields: [workspace_id], references: [id])
+  maintenance_tasks   MaintenanceTask[]
+  
+  @@map("maintenance_schedules")
+}
+
+// Individual maintenance work orders/tasks
+model MaintenanceTask {
+  id                    String    @id @default(uuid())
+  workspace_id          String
+  schedule_id           String?   // Link to schedule if this is scheduled maintenance
+  task_no               String    // Auto-generated task number
+  equipment_type        String    // SEWING_MACHINE/EMBROIDERY/HEAT_PRESS/CUTTING/FACILITY
+  equipment_id          String?   // Link to machine if applicable
+  task_type             String    // SCHEDULED/BREAKDOWN/INSPECTION/UPGRADE
+  priority              String    @default("MEDIUM") // LOW/MEDIUM/HIGH/CRITICAL
+  title                 String
+  description           String?
+  
+  // Assignment and scheduling
+  assigned_to           String?   // Employee ID of technician
+  requested_by          String?   // Employee ID who reported the issue
+  scheduled_date        DateTime?
+  estimated_duration    Int?      // Minutes
+  
+  // Execution tracking
+  started_at            DateTime?
+  completed_at          DateTime?
+  actual_duration       Int?      // Actual minutes spent
+  
+  // Status and resolution
+  status                String    @default("OPEN") // OPEN/IN_PROGRESS/WAITING_PARTS/COMPLETED/CANCELLED
+  resolution_notes      String?
+  parts_used            Json?     // [{part_id, part_name, quantity, cost}]
+  labor_cost            Float?
+  parts_cost            Float?
+  total_cost            Float?
+  
+  // Quality and follow-up
+  quality_check_passed  Boolean?
+  follow_up_required    Boolean   @default(false)
+  next_inspection_date  DateTime?
+  
+  created_at            DateTime  @default(now())
+  updated_at            DateTime  @updatedAt
+
+  // Relations
+  workspace             Workspace           @relation(fields: [workspace_id], references: [id])
+  schedule              MaintenanceSchedule? @relation(fields: [schedule_id], references: [id])
+  
+  @@map("maintenance_tasks")
+}
+
+// Equipment downtime tracking for efficiency analysis
+model EquipmentDowntime {
+  id                String    @id @default(uuid())
+  workspace_id      String
+  equipment_type    String    // SEWING_MACHINE/EMBROIDERY/HEAT_PRESS/CUTTING
+  equipment_id      String?   // Machine ID if applicable
+  downtime_start    DateTime
+  downtime_end      DateTime?
+  duration_minutes  Int?      // Calculated when downtime ends
+  reason_category   String    // BREAKDOWN/MAINTENANCE/SETUP/NO_OPERATOR/NO_MATERIAL
+  reason_details    String?
+  impact_level      String    @default("MEDIUM") // LOW/MEDIUM/HIGH/CRITICAL
+  
+  // Production impact
+  production_loss   Float?    // Estimated pieces/value lost
+  orders_affected   Json?     // Array of order IDs impacted
+  
+  // Resolution
+  maintenance_task_id String? // Link to maintenance task if applicable
+  resolved_by         String? // Employee ID
+  resolution_notes    String?
+  
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+
+  // Relations
+  workspace         Workspace @relation(fields: [workspace_id], references: [id])
+  
+  @@map("equipment_downtime")
+}
+
+// Maintenance inventory - spare parts and consumables
+model MaintenancePart {
+  id                String    @id @default(uuid())
+  workspace_id      String
+  part_number       String    // Manufacturer part number
+  part_name         String
+  description       String?
+  category          String    // ELECTRICAL/MECHANICAL/CONSUMABLE/TOOL
+  compatible_equipment Json?  // Array of equipment types this part works with
+  
+  // Inventory tracking
+  current_stock     Int       @default(0)
+  min_stock_level   Int       @default(1)
+  max_stock_level   Int?
+  unit_cost         Float?
+  supplier_info     Json?     // {name, contact, lead_time}
+  
+  // Usage tracking
+  avg_monthly_usage Float     @default(0)
+  last_used_date    DateTime?
+  total_used_ytd    Int       @default(0)
+  
+  status            String    @default("ACTIVE") // ACTIVE/DISCONTINUED/OBSOLETE
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+
+  // Relations
+  workspace         Workspace @relation(fields: [workspace_id], references: [id])
+  
+  @@unique([workspace_id, part_number])
+  @@map("maintenance_parts")
+}
+
+// Maintenance metrics and KPIs tracking
+model MaintenanceMetrics {
+  id                    String    @id @default(uuid())
+  workspace_id          String
+  metric_date           DateTime  // Daily/weekly/monthly snapshot date
+  period_type           String    // DAY/WEEK/MONTH/QUARTER
+  
+  // Task completion metrics
+  total_tasks           Int       @default(0)
+  completed_tasks       Int       @default(0)
+  overdue_tasks         Int       @default(0)
+  avg_completion_time   Float?    // Hours
+  
+  // Downtime metrics
+  total_downtime_hours  Float     @default(0)
+  planned_downtime      Float     @default(0)
+  unplanned_downtime    Float     @default(0)
+  equipment_availability Float?   // Percentage
+  
+  // Cost metrics
+  total_maintenance_cost Float    @default(0)
+  labor_cost            Float     @default(0)
+  parts_cost            Float     @default(0)
+  external_service_cost Float     @default(0)
+  
+  // Efficiency metrics
+  preventive_vs_reactive Float?   // Ratio of preventive to breakdown maintenance
+  first_time_fix_rate   Float?    // Percentage of tasks completed without rework
+  
+  created_at            DateTime  @default(now())
+
+  // Relations
+  workspace             Workspace @relation(fields: [workspace_id], references: [id])
+  
+  @@unique([workspace_id, metric_date, period_type])
+  @@map("maintenance_metrics")
+}
+
+// ==============================================
+// STAGE 12: CLIENT PORTAL - Enhanced Client Self-Service
+// Based on CLIENT_UPDATED_PLAN.md specifications
+// ==============================================
+
+// Client portal user accounts (separate from main client records)
+model ClientUser {
+  id                String    @id @default(uuid())
+  workspace_id      String
+  client_id         String    // Link to main Client record
+  email             String    @unique
+  password_hash     String
+  first_name        String
+  last_name         String
+  role              String    @default("CLIENT_USER") // CLIENT_USER/CLIENT_ADMIN
+  permissions       Json?     // {orders: "view", invoices: "view_pay", etc}
+  
+  // Account management
+  email_verified    Boolean   @default(false)
+  verification_token String?
+  reset_token       String?
+  reset_token_expires DateTime?
+  last_login        DateTime?
+  login_attempts    Int       @default(0)
+  locked_until      DateTime?
+  
+  // Preferences
+  notification_preferences Json? // {email: true, sms: false, etc}
+  language          String    @default("en")
+  timezone          String    @default("Asia/Manila")
+  
+  status            String    @default("ACTIVE") // ACTIVE/INACTIVE/SUSPENDED
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+  
+  // Relations
+  workspace         Workspace @relation(fields: [workspace_id], references: [id])
+  client            Client    @relation(fields: [client_id], references: [id])
+  portal_sessions   ClientPortalSession[]
+  support_tickets   ClientSupportTicket[]
+  
+  @@map("client_users")
+}
+
+// Client portal login sessions
+model ClientPortalSession {
+  id                String      @id @default(uuid())
+  client_user_id    String
+  session_token     String      @unique
+  ip_address        String?
+  user_agent        String?
+  expires_at        DateTime
+  created_at        DateTime    @default(now())
+  
+  // Relations
+  client_user       ClientUser  @relation(fields: [client_user_id], references: [id])
+  
+  @@map("client_portal_sessions")
+}
+
+// Enhanced payment processing
+model ClientPayment {
+  id                    String    @id @default(uuid())
+  workspace_id          String
+  client_id             String
+  invoice_id            String?   // Link to invoice if paying invoice
+  order_id              String?   // Direct order payment
+  payment_no            String    // Auto-generated payment reference
+  
+  // Payment details
+  amount                Float
+  currency              String    @default("PHP")
+  payment_method        String    // GCASH/PAYMAYA/BANK_TRANSFER/CREDIT_CARD/CASH
+  payment_gateway       String?   // STRIPE/PAYMONGO/GCASH_API/etc
+  gateway_reference     String?   // Gateway transaction ID
+  
+  // Status tracking
+  status                String    @default("PENDING") // PENDING/PROCESSING/COMPLETED/FAILED/REFUNDED
+  paid_at               DateTime?
+  confirmed_at          DateTime?
+  
+  // Gateway response data
+  gateway_response      Json?     // Full response from payment gateway
+  gateway_fees          Float?    // Gateway processing fees
+  net_amount            Float?    // Amount after gateway fees
+  
+  // Reconciliation
+  bank_reference        String?   // Bank confirmation number
+  reconciled_at         DateTime?
+  reconciled_by         String?   // Employee who reconciled
+  
+  // Refund handling
+  refund_amount         Float?
+  refund_reason         String?
+  refunded_at           DateTime?
+  refund_reference      String?
+  
+  created_at            DateTime  @default(now())
+  updated_at            DateTime  @updatedAt
+  
+  // Relations
+  workspace             Workspace @relation(fields: [workspace_id], references: [id])
+  client                Client    @relation(fields: [client_id], references: [id])
+  invoice               Invoice?  @relation(fields: [invoice_id], references: [id])
+  order                 Order?    @relation(fields: [order_id], references: [id])
+  
+  @@map("client_payments")
+}
+
+// Client support ticket system
+model ClientSupportTicket {
+  id                String      @id @default(uuid())
+  workspace_id      String
+  client_user_id    String
+  ticket_no         String      // Auto-generated ticket number
+  
+  // Ticket details
+  subject           String
+  description       String
+  category          String      // ORDER_INQUIRY/PAYMENT_ISSUE/TECHNICAL/COMPLAINT/FEEDBACK
+  priority          String      @default("MEDIUM") // LOW/MEDIUM/HIGH/URGENT
+  
+  // Assignment and handling
+  assigned_to       String?     // Employee ID
+  status            String      @default("OPEN") // OPEN/IN_PROGRESS/WAITING_CLIENT/RESOLVED/CLOSED
+  
+  // Related entities
+  related_order_id  String?
+  related_invoice_id String?
+  
+  // Resolution tracking
+  first_response_at DateTime?
+  resolved_at       DateTime?
+  closed_at         DateTime?
+  resolution_notes  String?
+  client_rating     Int?        // 1-5 rating of support quality
+  
+  created_at        DateTime    @default(now())
+  updated_at        DateTime    @updatedAt
+  
+  // Relations
+  workspace         Workspace   @relation(fields: [workspace_id], references: [id])
+  client_user       ClientUser  @relation(fields: [client_user_id], references: [id])
+  messages          ClientSupportMessage[]
+  
+  @@map("client_support_tickets")
+}
+
+// Support ticket messages/conversation
+model ClientSupportMessage {
+  id                String                @id @default(uuid())
+  ticket_id         String
+  sender_type       String                // CLIENT/EMPLOYEE
+  sender_id         String                // ClientUser ID or Employee ID
+  message           String
+  attachments       Json?                 // Array of file URLs
+  is_internal       Boolean               @default(false) // Internal notes not visible to client
+  created_at        DateTime              @default(now())
+  
+  // Relations
+  ticket            ClientSupportTicket   @relation(fields: [ticket_id], references: [id])
+  
+  @@map("client_support_messages")
+}
+
+// Client portal activity/audit log
+model ClientPortalActivity {
+  id                String      @id @default(uuid())
+  workspace_id      String
+  client_user_id    String?     // Null for system activities
+  activity_type     String      // LOGIN/ORDER_VIEW/PAYMENT/SUPPORT_TICKET/etc
+  description       String
+  ip_address        String?
+  user_agent        String?
+  related_entity_type String?   // order/invoice/payment/ticket
+  related_entity_id String?
+  metadata          Json?       // Additional activity data
+  created_at        DateTime    @default(now())
+  
+  // Relations
+  workspace         Workspace   @relation(fields: [workspace_id], references: [id])
+  
+  @@map("client_portal_activities")
+}
+
+// Client payment methods and preferences
+model ClientPaymentMethod {
+  id                String    @id @default(uuid())
+  workspace_id      String
+  client_id         String
+  method_type       String    // GCASH/PAYMAYA/BANK_ACCOUNT/CREDIT_CARD
+  display_name      String    // e.g., "GCash ending in 1234"
+  
+  // Encrypted payment details
+  encrypted_details Json      // Encrypted payment method details
+  
+  // Gateway tokens (for saved payment methods)
+  gateway_token     String?   // Token from payment gateway
+  gateway_customer_id String? // Customer ID in gateway
+  
+  // Status and verification
+  is_verified       Boolean   @default(false)
+  is_default        Boolean   @default(false)
+  expires_at        DateTime? // For credit cards
+  
+  status            String    @default("ACTIVE") // ACTIVE/INACTIVE/EXPIRED
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+  
+  // Relations
+  workspace         Workspace @relation(fields: [workspace_id], references: [id])
+  client            Client    @relation(fields: [client_id], references: [id])
+  
+  @@map("client_payment_methods")
+}
+
+// ==============================================
+// ADDITIONAL MODELS - Missing models referenced in seed files
+// ==============================================
+
+// Item model for generic items
+model Item {
+  id           String   @id @default(uuid())
+  workspace_id String
+  name         String
+  description  String?
+  category     String?
+  unit         String?
+  sku          String?  @unique
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  // Relations
+  workspace    Workspace @relation(fields: [workspace_id], references: [id])
+
+  @@map("items")
+}
+
+// Operation model for manufacturing operations  
+model Operation {
+  id           String   @id @default(uuid())
+  workspace_id String
+  name         String
+  code         String?  @unique
+  description  String?
+  type         ProcessType
+  standard_time Float?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  // Relations
+  workspace    Workspace @relation(fields: [workspace_id], references: [id])
+
+  @@map("operations")
+}
+
+// Frame model for production frames
+model Frame {
+  id           String   @id @default(uuid())
+  workspace_id String
+  name         String
+  code         String?  @unique
+  size         String?
+  material     String?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  // Relations
+  workspace    Workspace @relation(fields: [workspace_id], references: [id])
+
+  @@map("frames")
+}
+
+// Alert model for system alerts
+model Alert {
+  id           String   @id @default(uuid())
+  workspace_id String
+  type         String
+  message      String
+  severity     String   @default("INFO") // INFO/WARNING/ERROR/CRITICAL
+  resolved     Boolean  @default(false)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  // Relations
+  workspace    Workspace @relation(fields: [workspace_id], references: [id])
+
+  @@map("alerts")
+}
+
+// AI Log model for AI interactions
+model AILog {
+  id           String   @id @default(uuid())
+  workspace_id String
+  type         String
+  input        Json?
+  output       Json?
+  metadata     Json?
+  created_at   DateTime @default(now())
+
+  // Relations
+  workspace    Workspace @relation(fields: [workspace_id], references: [id])
+
+  @@map("ai_logs")
+}
+
+// Task model for general tasks
+model Task {
+  id           String   @id @default(uuid())
+  workspace_id String
+  title        String
+  description  String?
+  status       String   @default("PENDING") // PENDING/IN_PROGRESS/COMPLETED/CANCELLED
+  assigned_to  String?
+  priority     String   @default("MEDIUM") // LOW/MEDIUM/HIGH/URGENT
+  due_date     DateTime?
+  created_by   String?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  // Relations
+  workspace    Workspace @relation(fields: [workspace_id], references: [id])
+  time_records TimeRecord[]
+
+  @@map("tasks")
+}
+
+// Time Record model for time tracking
+model TimeRecord {
+  id           String   @id @default(uuid())
+  workspace_id String
+  task_id      String?
+  employee_id  String?
+  start_time   DateTime
+  end_time     DateTime?
+  duration     Int?     // Duration in minutes
+  notes        String?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  // Relations
+  workspace    Workspace @relation(fields: [workspace_id], references: [id])
+  task         Task?     @relation(fields: [task_id], references: [id])
+
+  @@map("time_records")
+}
+
+// QC Record model for quality control records
+model QCRecord {
+  id           String   @id @default(uuid())
+  workspace_id String
+  order_id     String?
+  inspector_id String?
+  batch_id     String?
+  status       String   @default("PENDING") // PENDING/PASS/FAIL
+  defects      Json?
+  notes        String?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  // Relations
+  workspace    Workspace @relation(fields: [workspace_id], references: [id])
+
+  @@map("qc_records")
+}
+
+// Sync Conflict model for data synchronization conflicts
+model SyncConflict {
+  id           String   @id @default(uuid())
+  workspace_id String
+  entity_type  String
+  entity_id    String
+  conflict_data Json
+  resolved     Boolean  @default(false)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  // Relations
+  workspace    Workspace @relation(fields: [workspace_id], references: [id])
+
+  @@map("sync_conflicts")
+}
+
+// Wallet model for employee wallets/accounts
+model Wallet {
+  id           String   @id @default(uuid())
+  workspace_id String
+  employee_id  String?
+  balance      Float    @default(0)
+  currency     String   @default("PHP")
+  status       String   @default("ACTIVE") // ACTIVE/INACTIVE/SUSPENDED
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  // Relations
+  workspace    Workspace @relation(fields: [workspace_id], references: [id])
+
+  @@map("wallets")
+}
+

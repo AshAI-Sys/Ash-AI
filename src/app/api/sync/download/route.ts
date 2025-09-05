@@ -1,0 +1,157 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { prisma } from '@/lib/prisma';
+import { authOptions } from '@/lib/auth';
+
+export async function GET(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    const { searchParams } = new URL(request.url);
+    const since = parseInt(searchParams.get('since') || '0');
+    const sinceDate = new Date(since);
+
+    const changes = await getChangesForUser(session.user.id, sinceDate);
+
+    return NextResponse.json({
+      success: true,
+      changes: changes,
+      timestamp: Date.now()
+    });
+
+  } catch (error) {
+    console.error('Sync download error:', error);
+    return NextResponse.json(
+      { error: 'Failed to download changes' },
+      { status: 500 }
+    );
+  }
+}
+
+interface SyncChange {
+  timestamp: number;
+  userId: string;
+  entity: string;
+  entityId: string;
+  operation: string;
+  data: Record<string, unknown>;
+}
+
+async function getChangesForUser(userId: string, since: Date) {
+  const changes: SyncChange[] = [];
+
+  const tasks = await prisma.task.findMany({
+    where: {
+      OR: [
+        { assignedTo: userId },
+        { order: { createdById: userId } }
+      ],
+      updatedAt: { gt: since }
+    },
+    include: {
+      order: true
+    }
+  });
+
+  tasks.forEach(task => {
+    changes.push({
+      timestamp: task.updatedAt.getTime(),
+      userId,
+      entity: 'Task',
+      entityId: task.id,
+      operation: 'UPDATE',
+      data: {
+        status: task.status,
+        startedAt: task.startedAt,
+        completedAt: task.completedAt,
+        rejectedAt: task.rejectedAt,
+        rejectReason: task.rejectReason
+      }
+    });
+  });
+
+  const timeRecords = await prisma.timeRecord.findMany({
+    where: {
+      employeeId: userId,
+      createdAt: { gt: since }
+    }
+  });
+
+  timeRecords.forEach(record => {
+    changes.push({
+      timestamp: record.createdAt.getTime(),
+      userId,
+      entity: 'TimeRecord',
+      entityId: record.id,
+      operation: 'CREATE',
+      data: {
+        date: record.date,
+        clockIn: record.clockIn,
+        clockOut: record.clockOut,
+        hoursWorked: record.hoursWorked,
+        notes: record.notes
+      }
+    });
+  });
+
+  const inventoryUpdates = await prisma.stockMovement.findMany({
+    where: {
+      createdAt: { gt: since }
+    },
+    include: {
+      inventory: true
+    }
+  });
+
+  inventoryUpdates.forEach(movement => {
+    changes.push({
+      timestamp: movement.createdAt.getTime(),
+      userId,
+      entity: 'StockMovement',
+      entityId: movement.id,
+      operation: 'CREATE',
+      data: {
+        inventoryId: movement.inventoryId,
+        type: movement.type,
+        quantity: movement.quantity,
+        reason: movement.reason,
+        reference: movement.reference
+      }
+    });
+  });
+
+  const qcRecords = await prisma.qCRecord.findMany({
+    where: {
+      inspectorId: userId,
+      createdAt: { gt: since }
+    }
+  });
+
+  qcRecords.forEach(record => {
+    changes.push({
+      timestamp: record.createdAt.getTime(),
+      userId,
+      entity: 'QCRecord',
+      entityId: record.id,
+      operation: 'CREATE',
+      data: {
+        orderId: record.orderId,
+        taskId: record.taskId,
+        status: record.status,
+        passedQty: record.passedQty,
+        rejectedQty: record.rejectedQty,
+        rejectReason: record.rejectReason,
+        notes: record.notes
+      }
+    });
+  });
+
+  return changes.sort((a, b) => a.timestamp - b.timestamp);
+}

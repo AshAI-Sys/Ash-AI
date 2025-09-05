@@ -1,0 +1,757 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // Changed from sqlite to postgres for Supabase
+  url      = env("DATABASE_URL")
+}
+
+// Enhanced Enums based on Ashley AI specification
+enum Role {
+  ADMIN
+  MANAGER
+  GRAPHIC_ARTIST
+  SCREEN_MAKING
+  SILKSCREEN_OPERATOR
+  SUBLIMATION_OPERATOR
+  DTF_OPERATOR
+  EMBROIDERY_OPERATOR
+  CUTTING_OPERATOR
+  SEWING_OPERATOR
+  QC_INSPECTOR
+  FINISHING_STAFF
+  WAREHOUSE_STAFF
+  PURCHASER
+  DRIVER
+  LIVE_SELLER
+  CSR
+  BOOKKEEPER
+  INTERN_IE
+  INTERN_MULTIMEDIA
+  INTERN_ACCOUNTING
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  PAUSED
+  COMPLETED
+  REJECTED
+  ON_HOLD
+}
+
+enum OrderStatus {
+  DRAFT
+  CONFIRMED
+  IN_PRODUCTION
+  READY_FOR_QC
+  QC_PASSED
+  QC_FAILED
+  READY_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+}
+
+enum ProcessType {
+  SILKSCREEN
+  DTF
+  SUBLIMATION
+  EMBROIDERY
+}
+
+enum AlertSeverity {
+  P1
+  P2
+  P3
+}
+
+enum AlertStatus {
+  OPEN
+  ACK
+  RESOLVED
+  IGNORED
+}
+
+enum AlertCategory {
+  PRODUCTION
+  FINANCE
+  INVENTORY
+  HR
+  DATA
+}
+
+enum TransactionType {
+  RECEIVE
+  CONSUME
+  RETURN
+  ADJUST
+  TRANSFER
+}
+
+enum WalletType {
+  BANK
+  GCASH
+  CASH_REGISTER
+  PETTY_CASH
+}
+
+enum ExpenseType {
+  LALAMOVE
+  GAS
+  WATER_DISPENSER
+  SHIPPING_FEE
+  BASURA
+  TRANSFER_FUNDS
+  SAMPLE_FEE
+  DOWNPAYMENT
+  SOFI_PAYMENT
+  NBS
+  REFUND
+  RENTAL_FEE
+  PRINTWORK
+  TOOLS
+  ADS
+  UTILITIES
+}
+
+// Enhanced User model with Ashley AI features
+model User {
+  id              String   @id @default(uuid())
+  email           String   @unique
+  full_name       String
+  password        String
+  role            Role
+  brand_scope     String[] // Array of brand IDs user can access
+  hourly_rate     Float?
+  is_subcontractor Boolean @default(false)
+  active          Boolean  @default(true)
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  // Relations
+  assigned_tasks    Task[]
+  created_orders    Order[] @relation("CreatedBy")
+  qc_records        QCRecord[]
+  time_records      TimeRecord[]
+  live_seller_sessions LiveSellerSession[]
+  sewing_assignments SewingAssignment[]
+  payroll_lines     PayrollLine[]
+  inventory_transactions InventoryTransaction[]
+  driver_logs       DriverLog[]
+  alert_audits      AlertAudit[]
+  ai_logs           AILog[]
+
+  @@map("users")
+}
+
+// Enhanced Brand model
+model Brand {
+  id                String @id @default(uuid())
+  name              String @unique
+  code              String @unique
+  commission_rules  Json?
+  return_policies   Json?
+  active            Boolean @default(true)
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  // Relations
+  orders          Order[]
+  items           Item[]
+  brand_costs     BrandCost[]
+  sales_reports   SalesReport[]
+
+  @@map("brands")
+}
+
+// Enhanced Order model with Ashley AI features
+model Order {
+  id              String      @id @default(uuid())
+  po_no           String      @unique
+  brand_id        String
+  client          String
+  design_name     String
+  clothing_type   String
+  order_type      String?
+  deadline        DateTime?
+  priority        Int         @default(0)
+  size_breakdown  Json
+  mockup_url      String?
+  process_type    ProcessType
+  sewing_style    String
+  notes           String?
+  status          OrderStatus @default(DRAFT)
+  created_by_id   String
+  created_at      DateTime    @default(now())
+  updated_at      DateTime    @updatedAt
+
+  // Relations
+  brand           Brand @relation(fields: [brand_id], references: [id])
+  created_by      User  @relation("CreatedBy", fields: [created_by_id], references: [id])
+  
+  tasks           Task[]
+  order_images    OrderImage[]
+  order_costs     OrderCost[]
+  qc_records      QCRecord[]
+  deliveries      Delivery[]
+  sewing_assignments SewingAssignment[]
+  driver_logs     DriverLog[]
+
+  @@map("orders")
+}
+
+// New Order Images model
+model OrderImage {
+  id        String @id @default(uuid())
+  order_id  String
+  type      String // 'mockup' | 'placement' | 'artwork'
+  file_url  String
+  meta      Json?
+  created_at DateTime @default(now())
+
+  order     Order @relation(fields: [order_id], references: [id])
+
+  @@map("order_images")
+}
+
+// Enhanced Task model
+model Task {
+  id                  String     @id @default(uuid())
+  order_id            String
+  step                String
+  assigned_role       Role?
+  assigned_to         String?
+  status              TaskStatus @default(PENDING)
+  priority            Int        @default(0)
+  due_at              DateTime?
+  started_at          DateTime?
+  completed_at        DateTime?
+  lead_time_minutes   Int?
+  notes               String?
+  estimated_hours     Float?
+  title               String
+  task_type           String
+  created_at          DateTime   @default(now())
+  updated_at          DateTime   @updatedAt
+
+  // Relations
+  order               Order  @relation(fields: [order_id], references: [id])
+  assignee            User?  @relation(fields: [assigned_to], references: [id])
+  
+  task_costs          TaskCost[]
+  qc_records          QCRecord[]
+  task_logs           TaskLog[]
+
+  @@map("tasks")
+}
+
+// New Task Logs model for audit trail
+model TaskLog {
+  id          String @id @default(uuid())
+  task_id     String
+  actor_id    String
+  action      String
+  details     Json?
+  created_at  DateTime @default(now())
+
+  task        Task @relation(fields: [task_id], references: [id])
+
+  @@map("task_logs")
+}
+
+// New Frames model for screen making
+model Frame {
+  id            String    @id @default(uuid())
+  code          String    @unique
+  size_cm_w     Float
+  size_cm_h     Float
+  mesh_count    Int
+  location      String?
+  last_used_at  DateTime?
+  last_order_id String?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+
+  @@map("frames")
+}
+
+// New Operations model for sewing
+model Operation {
+  id                String   @id @default(uuid())
+  code              String   @unique
+  label             String
+  default_rate_per_pc Float
+  apparel_type      String[]
+  groupings         String[]
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  sewing_assignments SewingAssignment[]
+  payroll_lines     PayrollLine[]
+
+  @@map("operations")
+}
+
+// New Sewing Assignment model
+model SewingAssignment {
+  id                String @id @default(uuid())
+  order_id          String
+  operation_id      String
+  assignee_type     String // 'operator' | 'subcon'
+  assignee_id       String
+  qty_assigned      Int
+  qty_done          Int    @default(0)
+  pay_rate          Float
+  payroll_period_id String?
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  order             Order     @relation(fields: [order_id], references: [id])
+  operation         Operation @relation(fields: [operation_id], references: [id])
+  assignee          User      @relation(fields: [assignee_id], references: [id])
+  payroll_period    PayrollPeriod? @relation(fields: [payroll_period_id], references: [id])
+
+  @@map("sewing_assignments")
+}
+
+// New Payroll models
+model PayrollPeriod {
+  id         String @id @default(uuid())
+  start_date DateTime
+  end_date   DateTime
+  status     String @default("OPEN")
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  sewing_assignments SewingAssignment[]
+  payroll_lines     PayrollLine[]
+
+  @@map("payroll_periods")
+}
+
+model PayrollLine {
+  id           String @id @default(uuid())
+  assignee_id  String
+  operation_id String
+  qty          Int
+  rate         Float
+  amount       Float
+  order_id     String?
+  period_id    String
+  created_at   DateTime @default(now())
+
+  assignee     User          @relation(fields: [assignee_id], references: [id])
+  operation    Operation     @relation(fields: [operation_id], references: [id])
+  period       PayrollPeriod @relation(fields: [period_id], references: [id])
+
+  @@map("payroll_lines")
+}
+
+// Enhanced Inventory system
+model Item {
+  id              String  @id @default(uuid())
+  sku             String  @unique
+  name            String
+  unit            String  // 'kg' | 'pc' | 'm' | 'l'
+  track_by_weight Boolean @default(false)
+  brand_id        String?
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  brand           Brand?  @relation(fields: [brand_id], references: [id])
+  
+  purchase_request_items PurchaseRequestItem[]
+  inventory_batches     InventoryBatch[]
+
+  @@map("items")
+}
+
+// New Purchase Request models
+model PurchaseRequest {
+  id           String @id @default(uuid())
+  requester_id String
+  status       String @default("DRAFT")
+  notes        String?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  items        PurchaseRequestItem[]
+
+  @@map("purchase_requests")
+}
+
+model PurchaseRequestItem {
+  id                        String @id @default(uuid())
+  pr_id                     String
+  item_id                   String
+  expected_qty              Float
+  unit                      String
+  expected_unit_price       Float
+  driver_proposed_unit_price Float?
+  supplier_name             String?
+  approved_unit_price       Float?
+  created_at                DateTime @default(now())
+  updated_at                DateTime @updatedAt
+
+  purchase_request          PurchaseRequest @relation(fields: [pr_id], references: [id])
+  item                      Item @relation(fields: [item_id], references: [id])
+  inventory_batches         InventoryBatch[]
+
+  @@map("purchase_request_items")
+}
+
+// Enhanced Inventory Batch system with QR
+model InventoryBatch {
+  id                String    @id @default(uuid())
+  item_id           String
+  pr_item_id        String?
+  supplier_name     String?
+  lot_code          String?
+  received_qty      Float
+  balance_qty       Float
+  unit              String
+  landed_unit_cost  Float
+  qr_tag_id         String?
+  received_at       DateTime?
+  is_active         Boolean   @default(true)
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+
+  item              Item @relation(fields: [item_id], references: [id])
+  pr_item           PurchaseRequestItem? @relation(fields: [pr_item_id], references: [id])
+  qr_tag            QRTag? @relation(fields: [qr_tag_id], references: [id])
+  
+  inventory_transactions InventoryTransaction[]
+
+  @@map("inventory_batches")
+}
+
+// New QR Tag model
+model QRTag {
+  id           String @id @default(uuid())
+  batch_id     String? @unique
+  payload      Json
+  signature    String
+  created_at   DateTime @default(now())
+
+  inventory_batch InventoryBatch?
+
+  @@map("qr_tags")
+}
+
+// New Inventory Transaction model
+model InventoryTransaction {
+  id         String          @id @default(uuid())
+  batch_id   String
+  trx_type   TransactionType
+  qty        Float
+  unit       String
+  actor_id   String
+  note       String?
+  created_at DateTime        @default(now())
+
+  batch      InventoryBatch @relation(fields: [batch_id], references: [id])
+  actor      User          @relation(fields: [actor_id], references: [id])
+
+  @@map("inventory_transactions")
+}
+
+// Enhanced Supplier model
+model Supplier {
+  id              String @id @default(uuid())
+  name            String
+  contacts        Json?
+  rating          Float?
+  pricing_history Json?
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  @@map("suppliers")
+}
+
+// New Subcontractor model
+model Subcontractor {
+  id                   String @id @default(uuid())
+  name                 String
+  capacity_per_day     Int?
+  rating               Float?
+  price_per_operation  Json?
+  preferred_processes  String[]
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
+
+  @@map("subcontractors")
+}
+
+// Enhanced Vehicle and Driver system
+model Vehicle {
+  id          String @id @default(uuid())
+  plate       String @unique
+  type        String
+  fuel_type   String?
+  active      Boolean @default(true)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  driver_logs DriverLog[]
+  deliveries  Delivery[]
+
+  @@map("vehicles")
+}
+
+model DriverLog {
+  id           String    @id @default(uuid())
+  driver_id    String
+  vehicle_id   String
+  purpose      String
+  start_time   DateTime
+  end_time     DateTime?
+  from_location String?
+  to_location  String?
+  fuel_liters  Float?
+  fuel_cost    Float?
+  toll_cost    Float?
+  repairs_cost Float?
+  vendor       String?
+  order_id     String?
+  created_at   DateTime  @default(now())
+
+  driver       User    @relation(fields: [driver_id], references: [id])
+  vehicle      Vehicle @relation(fields: [vehicle_id], references: [id])
+  order        Order?  @relation(fields: [order_id], references: [id])
+
+  @@map("driver_logs")
+}
+
+// Enhanced Sales and Brand models
+model SalesReport {
+  id             String   @id @default(uuid())
+  brand_id       String
+  design         String
+  date           DateTime
+  qty            Int
+  channel        String
+  commission_cost Float   @default(0)
+  ad_spend       Float   @default(0)
+  returns_qty    Int     @default(0)
+  net_sales      Float
+  created_at     DateTime @default(now())
+
+  brand          Brand   @relation(fields: [brand_id], references: [id])
+
+  @@map("sales_reports")
+}
+
+// Enhanced Finance models
+model Wallet {
+  id          String     @id @default(uuid())
+  type        WalletType
+  label       String
+  balance     Float      @default(0)
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+
+  wallet_transactions WalletTransaction[]
+  expenses           Expense[]
+
+  @@map("wallets")
+}
+
+model WalletTransaction {
+  id             String   @id @default(uuid())
+  wallet_id      String
+  type           String   // CREDIT | DEBIT | TRANSFER
+  amount         Float
+  description    String
+  reference      String?
+  balance_before Float
+  balance_after  Float
+  created_at     DateTime @default(now())
+
+  wallet         Wallet   @relation(fields: [wallet_id], references: [id])
+
+  @@map("wallet_transactions")
+}
+
+model Expense {
+  id               String      @id @default(uuid())
+  date             DateTime
+  type             ExpenseType
+  amount           Float
+  wallet_id        String
+  linked_order_id  String?
+  brand_id         String?
+  notes            String?
+  created_at       DateTime    @default(now())
+
+  wallet           Wallet      @relation(fields: [wallet_id], references: [id])
+
+  @@map("expenses")
+}
+
+// Ashley AI System Models
+model AILog {
+  id          String   @id @default(uuid())
+  agent       String   // 'ashley' | 'kai' | 'mira' | 'nova' | 'aria' | 'orion' | 'leo'
+  input       Json
+  output      Json
+  confidence  Float?
+  accepted    Boolean  @default(false)
+  actor_id    String?
+  created_at  DateTime @default(now())
+
+  actor       User?    @relation(fields: [actor_id], references: [id])
+
+  @@map("ai_logs")
+}
+
+model Alert {
+  id             String        @id @default(uuid())
+  severity       AlertSeverity
+  category       AlertCategory
+  title          String
+  summary        String
+  impact         Json?
+  signals        Json?
+  recommendation String?
+  actions        Json?
+  links          Json?
+  status         AlertStatus   @default(OPEN)
+  entity_ref     Json?
+  resolved_at    DateTime?
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
+
+  alert_audits   AlertAudit[]
+
+  @@map("alerts")
+}
+
+model AlertAudit {
+  id        String @id @default(uuid())
+  alert_id  String
+  action    String // ACK | RESOLVE | IGNORE
+  actor_id  String
+  note      String?
+  created_at DateTime @default(now())
+
+  alert     Alert @relation(fields: [alert_id], references: [id])
+  actor     User  @relation(fields: [actor_id], references: [id])
+
+  @@map("alert_audit")
+}
+
+// Keep existing models with enhancements
+model QCRecord {
+  id              String   @id @default(uuid())
+  order_id        String?
+  task_id         String?
+  inspector_id    String
+  passed          Boolean  @default(false)
+  passed_qty      Int      @default(0)
+  rejected_qty    Int      @default(0)
+  reject_reason   String?
+  notes           String?
+  photo_urls      Json?
+  created_at      DateTime @default(now())
+
+  order           Order?   @relation(fields: [order_id], references: [id])
+  task            Task?    @relation(fields: [task_id], references: [id])
+  inspector       User     @relation(fields: [inspector_id], references: [id])
+
+  @@map("qc_records")
+}
+
+model OrderCost {
+  id          String @id @default(uuid())
+  order_id    String
+  category    String // MATERIAL | LABOR | UTILITIES | REJECTS | OVERHEAD
+  description String
+  amount      Float
+  created_at  DateTime @default(now())
+
+  order       Order  @relation(fields: [order_id], references: [id])
+
+  @@map("order_costs")
+}
+
+model TaskCost {
+  id          String @id @default(uuid())
+  task_id     String
+  category    String
+  description String
+  amount      Float
+  created_at  DateTime @default(now())
+
+  task        Task   @relation(fields: [task_id], references: [id])
+
+  @@map("task_costs")
+}
+
+model BrandCost {
+  id          String   @id @default(uuid())
+  brand_id    String
+  category    String
+  description String
+  amount      Float
+  date        DateTime
+  created_at  DateTime @default(now())
+
+  brand       Brand    @relation(fields: [brand_id], references: [id])
+
+  @@map("brand_costs")
+}
+
+model TimeRecord {
+  id           String    @id @default(uuid())
+  employee_id  String
+  date         DateTime
+  clock_in     DateTime?
+  clock_out    DateTime?
+  hours_worked Float     @default(0)
+  notes        String?
+  created_at   DateTime  @default(now())
+
+  employee     User      @relation(fields: [employee_id], references: [id])
+
+  @@map("time_records")
+}
+
+model LiveSellerSession {
+  id               String    @id @default(uuid())
+  seller_id        String
+  platform         String
+  brand_id         String?
+  start_time       DateTime
+  end_time         DateTime?
+  reported_sales   Int       @default(0)
+  reported_revenue Float     @default(0)
+  actual_sales     Int?
+  actual_revenue   Float?
+  notes            String?
+  proof_urls       Json?
+  created_at       DateTime  @default(now())
+
+  seller           User      @relation(fields: [seller_id], references: [id])
+
+  @@map("live_seller_sessions")
+}
+
+model Delivery {
+  id           String    @id @default(uuid())
+  order_id     String
+  vehicle_id   String
+  driver_id    String?
+  status       String    @default("SCHEDULED")
+  scheduled_at DateTime?
+  started_at   DateTime?
+  completed_at DateTime?
+  notes        String?
+  created_at   DateTime  @default(now())
+
+  order        Order     @relation(fields: [order_id], references: [id])
+  vehicle      Vehicle   @relation(fields: [vehicle_id], references: [id])
+
+  @@map("deliveries")
+}

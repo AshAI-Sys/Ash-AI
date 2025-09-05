@@ -1,0 +1,178 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { prisma } from '@/lib/prisma';
+import { authOptions } from '@/lib/auth';
+
+export async function POST(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    const { changes } = await request.json();
+    const conflicts: Record<string, unknown>[] = [];
+    const processedChanges: Record<string, unknown>[] = [];
+
+    for (const change of changes) {
+      try {
+        const conflict = await processChange(change, session.user.id);
+        if (conflict) {
+          conflicts.push(conflict);
+        } else {
+          processedChanges.push(change);
+        }
+      } catch (error) {
+        console.error('Error processing change:', error);
+      }
+    }
+
+    await logAuditTrail(session.user.id, processedChanges);
+
+    return NextResponse.json({
+      success: true,
+      processed: processedChanges.length,
+      conflicts: conflicts
+    });
+
+  } catch (error) {
+    console.error('Sync upload error:', error);
+    return NextResponse.json(
+      { error: 'Sync failed' },
+      { status: 500 }
+    );
+  }
+}
+
+interface ChangeData {
+  entity: string;
+  entityId: string;
+  operation: string;
+  data: Record<string, unknown>;
+  timestamp: number;
+}
+
+async function processChange(change: ChangeData, userId: string) {
+  const { entity, entityId, operation, data, timestamp } = change;
+
+  switch (entity.toLowerCase()) {
+    case 'task':
+      return await processTaskChange(entityId, operation, data, timestamp, userId);
+    case 'timerecord':
+      return await processTimeRecordChange(entityId, operation, data, timestamp, userId);
+    case 'stockmovement':
+      return await processStockMovementChange(entityId, operation, data, timestamp, userId);
+    default:
+      console.warn(`Unknown entity type: ${entity}`);
+      return null;
+  }
+}
+
+async function processTaskChange(entityId: string, operation: string, data: Record<string, unknown>, timestamp: number, userId: string) {
+  switch (operation) {
+    case 'CREATE':
+      await prisma.task.create({
+        data: {
+          ...data,
+          id: entityId,
+          assignedTo: userId
+        }
+      });
+      break;
+    
+    case 'UPDATE':
+      const existingTask = await prisma.task.findUnique({
+        where: { id: entityId }
+      });
+
+      if (!existingTask) {
+        return null;
+      }
+
+      if (existingTask.updatedAt.getTime() > timestamp) {
+        return await prisma.syncConflict.create({
+          data: {
+            entity: 'Task',
+            entityId,
+            field: 'updatedAt',
+            localValue: new Date(timestamp),
+            serverValue: existingTask.updatedAt
+          }
+        });
+      }
+
+      await prisma.task.update({
+        where: { id: entityId },
+        data: data
+      });
+      break;
+  }
+
+  return null;
+}
+
+async function processTimeRecordChange(entityId: string, operation: string, data: Record<string, unknown>, timestamp: number, _userId: string) {
+  switch (operation) {
+    case 'CREATE':
+      await prisma.timeRecord.create({
+        data: {
+          ...data,
+          id: entityId,
+          employeeId: userId
+        }
+      });
+      break;
+    
+    case 'UPDATE':
+      await prisma.timeRecord.update({
+        where: { id: entityId },
+        data: data
+      });
+      break;
+  }
+
+  return null;
+}
+
+async function processStockMovementChange(entityId: string, operation: string, data: Record<string, unknown>, _timestamp: number, _userId: string) {
+  switch (operation) {
+    case 'CREATE':
+      await prisma.stockMovement.create({
+        data: {
+          ...data,
+          id: entityId
+        }
+      });
+
+      await prisma.inventoryItem.update({
+        where: { id: data.inventoryId },
+        data: {
+          quantity: {
+            increment: data.type === 'IN' ? data.quantity : -data.quantity
+          }
+        }
+      });
+      break;
+  }
+
+  return null;
+}
+
+async function logAuditTrail(userId: string, changes: Record<string, unknown>[]) {
+  for (const change of changes) {
+    await prisma.auditLog.create({
+      data: {
+        userId,
+        action: change.operation,
+        entity: change.entity,
+        entityId: change.entityId,
+        newValues: change.data,
+        timestamp: new Date(change.timestamp)
+      }
+    });
+  }
+}

@@ -1,0 +1,128 @@
+import { NextRequest, NextResponse } from "next/server"
+import { prisma } from "@/lib/prisma"
+
+export async function GET(request: NextRequest) {
+  try {
+    // Authentication check
+    const session = await getServerSession(authOptions)
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const { searchParams } = new URL(request.url)
+    const type = searchParams.get("type")
+    const active = searchParams.get("active")
+    
+    const where: any = {}
+    
+    if (type) {
+      where.accountType = type
+    }
+    
+    if (active !== null) {
+      where.isActive = active === "true"
+    }
+
+    const accounts = await prisma.chartOfAccount.findMany({
+      where,
+      include: {
+        parent: true,
+        children: {
+          include: {
+            children: true
+          }
+        },
+        _count: {
+          select: {
+            journalEntries: true,
+            budgetLines: true
+          }
+        }
+      },
+      orderBy: {
+        accountCode: "asc"
+      }
+    })
+
+    return NextResponse.json({
+      success: true,
+      data: accounts
+    })
+
+  } catch (error) {
+    console.error("Error fetching chart of accounts:", error)
+    return NextResponse.json(
+      { success: false, error: "Failed to fetch accounts" },
+      { status: 500 }
+    )
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    // Authentication check
+    const session = await getServerSession(authOptions)
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    // Authorization check - admin/manager only
+    if (![Role.ADMIN, Role.MANAGER].includes(session.user.role as Role)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+    const body = await request.json()
+    const {
+      accountCode,
+      accountName,
+      parentId,
+      accountType,
+      category,
+      description
+    } = body
+
+    if (!accountCode || !accountName || !accountType) {
+      return NextResponse.json(
+        { success: false, error: "Account code, name, and type are required" },
+        { status: 400 }
+      )
+    }
+
+    // Check if account code already exists
+    const existingAccount = await prisma.chartOfAccount.findUnique({
+      where: { accountCode }
+    })
+
+    if (existingAccount) {
+      return NextResponse.json(
+        { success: false, error: "Account code already exists" },
+        { status: 409 }
+      )
+    }
+
+    const account = await prisma.chartOfAccount.create({
+      data: {
+        accountCode,
+        accountName,
+        parentId: parentId || null,
+        accountType,
+        category: category || accountType,
+        description,
+        isSystem: false
+      },
+      include: {
+        parent: true,
+        children: true
+      }
+    })
+
+    return NextResponse.json({
+      success: true,
+      data: account
+    })
+
+  } catch (error) {
+    console.error("Error creating account:", error)
+    return NextResponse.json(
+      { success: false, error: "Failed to create account" },
+      { status: 500 }
+    )
+  }
+}

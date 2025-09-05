@@ -1,0 +1,225 @@
+/* ASH AI - Professional Design System */
+
+:root {
+  /* Primary Brand Colors */
+  --ash-primary-50: #f0f4ff;
+  --ash-primary-100: #e0e9ff;
+  --ash-primary-200: #c7d8ff;
+  --ash-primary-300: #a5c0ff;
+  --ash-primary-400: #8199ff;
+  --ash-primary-500: #6366f1;
+  --ash-primary-600: #4f46e5;
+  --ash-primary-700: #4338ca;
+  --ash-primary-800: #3730a3;
+  --ash-primary-900: #312e81;
+
+  /* Secondary Brand Colors - Manufacturing Theme */
+  --ash-secondary-50: #f8fafc;
+  --ash-secondary-100: #f1f5f9;
+  --ash-secondary-200: #e2e8f0;
+  --ash-secondary-300: #cbd5e1;
+  --ash-secondary-400: #94a3b8;
+  --ash-secondary-500: #64748b;
+  --ash-secondary-600: #475569;
+  --ash-secondary-700: #334155;
+  --ash-secondary-800: #1e293b;
+  --ash-secondary-900: #0f172a;
+
+  /* Accent Colors */
+  --ash-accent-success: #10b981;
+  --ash-accent-warning: #f59e0b;
+  --ash-accent-error: #ef4444;
+  --ash-accent-info: #3b82f6;
+  
+  /* Gradient Backgrounds */
+  --ash-gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --ash-gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --ash-gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --ash-gradient-manufacturing: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  
+  /* Shadows */
+  --ash-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --ash-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -1px rgb(0 0 0 / 0.06);
+  --ash-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.05);
+  --ash-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 10px 10px -5px rgb(0 0 0 / 0.04);
+  --ash-shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  
+  /* Glass Morphism */
+  --ash-glass-bg: rgba(255, 255, 255, 0.25);
+  --ash-glass-border: rgba(255, 255, 255, 0.18);
+  --ash-glass-backdrop: blur(16px);
+  
+  /* Animations */
+  --ash-transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --ash-transition-normal: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --ash-transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Typography */
+  --ash-font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --ash-font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --ash-font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+}
+
+/* Dark mode variables */
+[data-theme="dark"] {
+  --ash-primary-50: #0f172a;
+  --ash-primary-100: #1e293b;
+  --ash-primary-200: #334155;
+  --ash-primary-300: #475569;
+  --ash-primary-400: #64748b;
+  --ash-primary-500: #94a3b8;
+  --ash-primary-600: #cbd5e1;
+  --ash-primary-700: #e2e8f0;
+  --ash-primary-800: #f1f5f9;
+  --ash-primary-900: #f8fafc;
+  
+  --ash-glass-bg: rgba(0, 0, 0, 0.25);
+  --ash-glass-border: rgba(255, 255, 255, 0.1);
+}
+
+/* Utility Classes */
+.ash-gradient-text {
+  background: var(--ash-gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.ash-glass {
+  background: var(--ash-glass-bg);
+  backdrop-filter: var(--ash-glass-backdrop);
+  border: 1px solid var(--ash-glass-border);
+}
+
+.ash-glow {
+  box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+}
+
+.ash-animate-float {
+  animation: ashFloat 6s ease-in-out infinite;
+}
+
+.ash-animate-pulse-slow {
+  animation: ashPulseSlow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Keyframes */
+@keyframes ashFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes ashPulseSlow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes ashSlideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes ashScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Component Styles */
+.ash-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: var(--ash-shadow-lg);
+  transition: var(--ash-transition-normal);
+}
+
+.ash-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--ash-shadow-2xl);
+}
+
+.ash-button-primary {
+  background: var(--ash-gradient-primary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-weight: 600;
+  transition: var(--ash-transition-fast);
+  box-shadow: var(--ash-shadow-md);
+}
+
+.ash-button-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--ash-shadow-lg);
+}
+
+.ash-input {
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background: rgba(99, 102, 241, 0.05);
+  transition: var(--ash-transition-fast);
+}
+
+.ash-input:focus {
+  border-color: var(--ash-primary-500);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+/* Loading States */
+.ash-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: ashSkeleton 1.5s infinite;
+}
+
+@keyframes ashSkeleton {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Status Indicators */
+.ash-status-success {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+.ash-status-warning {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+}
+
+.ash-status-error {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+}
+
+.ash-status-processing {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .ash-card {
+    border-radius: 12px;
+    box-shadow: var(--ash-shadow-md);
+  }
+  
+  .ash-button-primary {
+    padding: 10px 20px;
+    border-radius: 8px;
+  }
+}

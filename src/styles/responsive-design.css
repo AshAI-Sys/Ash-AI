@@ -1,0 +1,673 @@
+/* Comprehensive Responsive Design System for ASH AI */
+
+/* Base responsive utilities */
+.responsive-container {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Device-specific breakpoints */
+/* Mobile phones: 0-767px */
+/* Tablets: 768-1023px */
+/* Laptops/Small desktops: 1024-1439px */
+/* Large desktops: 1440px+ */
+
+/* =================================
+   MOBILE PHONES (0-767px)
+   ================================= */
+@media (max-width: 767px) {
+  .responsive-container {
+    padding: 0 0.75rem;
+  }
+  
+  /* Dashboard optimizations */
+  .mobile-dashboard {
+    padding: 1rem 0;
+  }
+  
+  .mobile-header {
+    padding: 1rem 0.75rem;
+    margin-bottom: 1rem;
+  }
+  
+  .mobile-header h1 {
+    font-size: 1.75rem;
+    line-height: 1.3;
+    margin-bottom: 0.5rem;
+  }
+  
+  .mobile-header p {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+  
+  /* Stats cards - single column on mobile */
+  .stats-grid-mobile {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .stats-card-mobile {
+    padding: 1rem;
+    border-radius: 0.75rem;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Design cards - single column */
+  .designs-grid-mobile {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .design-card-mobile {
+    padding: 1rem;
+    border-radius: 0.75rem;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Mobile-optimized buttons */
+  .btn-mobile {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    border-radius: 0.5rem;
+    min-height: 44px;
+    min-width: 44px;
+    touch-action: manipulation;
+  }
+  
+  /* Mobile action buttons */
+  .mobile-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  
+  .mobile-actions .btn-mobile {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  /* Mobile modals */
+  .modal-mobile {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: white;
+    z-index: 50;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease-out;
+  }
+  
+  @keyframes slideUp {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+  
+  .modal-mobile .modal-header {
+    position: sticky;
+    top: 0;
+    background: white;
+    padding: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    z-index: 51;
+  }
+  
+  /* Mobile forms */
+  .form-mobile input,
+  .form-mobile select,
+  .form-mobile textarea {
+    padding: 0.875rem;
+    font-size: 16px; /* Prevent iOS zoom */
+    border-radius: 0.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  
+  /* Mobile navigation */
+  .nav-mobile {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 0.5rem;
+    z-index: 50;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+  
+  .nav-item-mobile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem;
+    color: #64748b;
+    text-decoration: none;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    font-size: 0.75rem;
+  }
+  
+  .nav-item-mobile.active {
+    background: rgba(99, 102, 241, 0.1);
+    color: #6366f1;
+  }
+  
+  .nav-item-mobile svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  /* Mobile FAB */
+  .fab-mobile {
+    position: fixed;
+    bottom: 80px;
+    right: 1rem;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    color: white;
+    z-index: 40;
+    transition: all 0.3s ease;
+    touch-action: manipulation;
+  }
+  
+  .fab-mobile:active {
+    transform: scale(0.9);
+  }
+}
+
+/* =================================
+   TABLETS (768px-1023px)
+   ================================= */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .responsive-container {
+    padding: 0 1.5rem;
+    max-width: 768px;
+  }
+  
+  /* Tablet dashboard */
+  .tablet-dashboard {
+    padding: 1.5rem 0;
+  }
+  
+  .tablet-header {
+    padding: 1.5rem 0;
+    margin-bottom: 1.5rem;
+  }
+  
+  .tablet-header h1 {
+    font-size: 2.25rem;
+    line-height: 1.2;
+    margin-bottom: 0.75rem;
+  }
+  
+  /* Stats cards - 2 columns on tablet */
+  .stats-grid-tablet {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .stats-card-tablet {
+    padding: 1.25rem;
+    border-radius: 0.875rem;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Design cards - 2 columns on tablet */
+  .designs-grid-tablet {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+  
+  .design-card-tablet {
+    padding: 1.25rem;
+    border-radius: 0.875rem;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Tablet buttons */
+  .btn-tablet {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.875rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+  }
+  
+  /* Tablet modals */
+  .modal-tablet {
+    max-width: 600px;
+    margin: 2rem auto;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+  }
+  
+  /* Tablet forms */
+  .form-tablet input,
+  .form-tablet select,
+  .form-tablet textarea {
+    padding: 0.875rem 1rem;
+    font-size: 0.875rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Tablet layout helpers */
+  .tablet-flex {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .tablet-flex > * {
+    flex: 1;
+    min-width: 200px;
+  }
+}
+
+/* =================================
+   LAPTOPS & SMALL DESKTOPS (1024px-1439px)
+   ================================= */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .responsive-container {
+    padding: 0 2rem;
+    max-width: 1200px;
+  }
+  
+  /* Laptop dashboard */
+  .laptop-dashboard {
+    padding: 2rem 0;
+  }
+  
+  .laptop-header {
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: between;
+    align-items: flex-start;
+  }
+  
+  .laptop-header h1 {
+    font-size: 2.5rem;
+    line-height: 1.1;
+    margin-bottom: 0.75rem;
+  }
+  
+  /* Stats cards - 4 columns on laptop */
+  .stats-grid-laptop {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem;
+    margin-bottom: 2.5rem;
+  }
+  
+  .stats-card-laptop {
+    padding: 1.5rem;
+    border-radius: 1rem;
+    background: white;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .stats-card-laptop:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Design cards - 3 columns on laptop */
+  .designs-grid-laptop {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  
+  .design-card-laptop {
+    padding: 1.5rem;
+    border-radius: 1rem;
+    background: white;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+  }
+  
+  .design-card-laptop:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Laptop buttons */
+  .btn-laptop {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+  
+  .btn-laptop:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Laptop modals */
+  .modal-laptop {
+    max-width: 800px;
+    margin: 3rem auto;
+    border-radius: 1.25rem;
+    overflow: hidden;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+  }
+  
+  /* Laptop forms */
+  .form-laptop {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  .form-laptop input,
+  .form-laptop select,
+  .form-laptop textarea {
+    padding: 0.875rem 1rem;
+    font-size: 0.875rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+  }
+  
+  .form-laptop input:focus,
+  .form-laptop select:focus,
+  .form-laptop textarea:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
+  
+  /* Laptop sidebar */
+  .laptop-sidebar {
+    width: 280px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    z-index: 30;
+  }
+  
+  .laptop-main {
+    margin-left: 280px;
+    min-height: 100vh;
+  }
+}
+
+/* =================================
+   LARGE DESKTOPS (1440px+)
+   ================================= */
+@media (min-width: 1440px) {
+  .responsive-container {
+    padding: 0 2.5rem;
+    max-width: 1400px;
+  }
+  
+  /* Desktop dashboard */
+  .desktop-dashboard {
+    padding: 2.5rem 0;
+  }
+  
+  .desktop-header {
+    padding: 2.5rem 0;
+    margin-bottom: 2.5rem;
+    display: flex;
+    justify-content: between;
+    align-items: flex-start;
+  }
+  
+  .desktop-header h1 {
+    font-size: 3rem;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+  
+  /* Stats cards - 4 columns with larger spacing */
+  .stats-grid-desktop {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+  
+  .stats-card-desktop {
+    padding: 2rem;
+    border-radius: 1.25rem;
+    background: white;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .stats-card-desktop:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Design cards - 4 columns on large desktop */
+  .designs-grid-desktop {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+  }
+  
+  .design-card-desktop {
+    padding: 2rem;
+    border-radius: 1.25rem;
+    background: white;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+  }
+  
+  .design-card-desktop:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Desktop modals */
+  .modal-desktop {
+    max-width: 1000px;
+    margin: 4rem auto;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+  }
+  
+  /* Desktop forms */
+  .form-desktop {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  
+  /* Desktop sidebar */
+  .desktop-sidebar {
+    width: 320px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    z-index: 30;
+  }
+  
+  .desktop-main {
+    margin-left: 320px;
+    min-height: 100vh;
+  }
+}
+
+/* =================================
+   UTILITY CLASSES
+   ================================= */
+.hide-mobile {
+  display: block;
+}
+
+.show-mobile {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .hide-mobile {
+    display: none;
+  }
+  
+  .show-mobile {
+    display: block;
+  }
+}
+
+.hide-tablet {
+  display: block;
+}
+
+.show-tablet {
+  display: none;
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .hide-tablet {
+    display: none;
+  }
+  
+  .show-tablet {
+    display: block;
+  }
+}
+
+.hide-laptop {
+  display: block;
+}
+
+.show-laptop {
+  display: none;
+}
+
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .hide-laptop {
+    display: none;
+  }
+  
+  .show-laptop {
+    display: block;
+  }
+}
+
+.hide-desktop {
+  display: block;
+}
+
+.show-desktop {
+  display: none;
+}
+
+@media (min-width: 1440px) {
+  .hide-desktop {
+    display: none;
+  }
+  
+  .show-desktop {
+    display: block;
+  }
+}
+
+/* Text size utilities */
+.text-responsive {
+  font-size: 0.875rem;
+}
+
+@media (min-width: 768px) {
+  .text-responsive {
+    font-size: 0.875rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .text-responsive {
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 1440px) {
+  .text-responsive {
+    font-size: 1rem;
+  }
+}
+
+/* Spacing utilities */
+.p-responsive {
+  padding: 1rem;
+}
+
+@media (min-width: 768px) {
+  .p-responsive {
+    padding: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .p-responsive {
+    padding: 1.5rem;
+  }
+}
+
+@media (min-width: 1440px) {
+  .p-responsive {
+    padding: 2rem;
+  }
+}
+
+/* Animation performance optimizations */
+@media (prefers-reduced-motion: reduce) {
+  .stats-card-laptop:hover,
+  .stats-card-desktop:hover,
+  .design-card-laptop:hover,
+  .design-card-desktop:hover,
+  .btn-laptop:hover {
+    transform: none;
+  }
+}
