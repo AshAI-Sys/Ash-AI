@@ -41,21 +41,31 @@ export class SecureDatabase {
       throw new Error('DATABASE_URL environment variable is required')
     }
 
-    // Add security parameters to connection string
-    const url = new URL(baseUrl)
-    
-    // Enable SSL/TLS encryption
-    url.searchParams.set('sslmode', 'require')
-    url.searchParams.set('sslcert', process.env.DB_SSL_CERT || '')
-    url.searchParams.set('sslkey', process.env.DB_SSL_KEY || '')
-    url.searchParams.set('sslrootcert', process.env.DB_SSL_ROOT_CERT || '')
-    
-    // Connection security settings
-    url.searchParams.set('connect_timeout', '10')
-    url.searchParams.set('pool_timeout', '10')
-    url.searchParams.set('socket_timeout', '20')
-    
-    return url.toString()
+    // For file-based databases (SQLite), return as-is
+    if (baseUrl.startsWith('file:')) {
+      return baseUrl
+    }
+
+    try {
+      // Add security parameters to connection string for remote databases
+      const url = new URL(baseUrl)
+      
+      // Enable SSL/TLS encryption
+      url.searchParams.set('sslmode', 'require')
+      url.searchParams.set('sslcert', process.env.DB_SSL_CERT || '')
+      url.searchParams.set('sslkey', process.env.DB_SSL_KEY || '')
+      url.searchParams.set('sslrootcert', process.env.DB_SSL_ROOT_CERT || '')
+      
+      // Connection security settings
+      url.searchParams.set('connect_timeout', '10')
+      url.searchParams.set('pool_timeout', '10')
+      url.searchParams.set('socket_timeout', '20')
+      
+      return url.toString()
+    } catch (error) {
+      // If URL parsing fails, return original string (for file:// URLs or other formats)
+      return baseUrl
+    }
   }
 
   private setupSecurityLogging(): void {
