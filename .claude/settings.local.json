@@ -170,7 +170,13 @@
       "Bash(PORT=3020 npm run dev)",
       "Bash(npx vercel:*)",
       "Bash(git config:*)",
-      "Bash(git init:*)"
+      "Bash(git init:*)",
+      "Bash(git remote add:*)",
+      "Bash(git branch:*)",
+      "Bash(git remote set-url:*)",
+      "Bash(git push:*)",
+      "Bash(gh auth:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []

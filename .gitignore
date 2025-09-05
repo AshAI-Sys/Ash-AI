@@ -71,3 +71,5 @@ Thumbs.db
 auth_secret.txt
 secrets/
 credentials/
+
+.vercel
