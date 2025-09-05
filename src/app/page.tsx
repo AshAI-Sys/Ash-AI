@@ -148,8 +148,8 @@ export default function Home() {
             <Link href="#features" className="text-cyan-300 hover:text-white transition-colors">Features</Link>
             <Link href="#pricing" className="text-cyan-300 hover:text-white transition-colors">Pricing</Link>
             <Link href="#about" className="text-cyan-300 hover:text-white transition-colors">About</Link>
-            <Link href="/auth/signin">
-              <Button className="neon-btn">Access Portal</Button>
+            <Link href="/demo">
+              <Button className="neon-btn">Access Demo</Button>
             </Link>
           </div>
         </div>
@@ -181,7 +181,7 @@ export default function Home() {
           </p>
 
           <div className="flex flex-col md:flex-row items-center justify-center gap-6 mb-16">
-            <Link href="/auth/signin">
+            <Link href="/demo">
               <Button className="neon-btn text-lg px-8 py-4 h-auto">
                 Start Free Trial
                 <ArrowRight className="ml-2 w-5 h-5" />
