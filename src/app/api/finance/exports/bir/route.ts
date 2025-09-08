@@ -162,7 +162,7 @@ export async function GET(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error generating BIR export:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to generate BIR export' },
@@ -257,7 +257,7 @@ export async function POST(request: NextRequest) {
       }
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating BIR export:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to create BIR export' },
@@ -381,7 +381,7 @@ export async function OPTIONS(request: NextRequest) {
       })
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching BIR export summary:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch BIR export summary' },

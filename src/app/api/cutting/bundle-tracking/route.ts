@@ -218,7 +218,7 @@ export async function POST(request: NextRequest) {
       valid_next_actions: getValidNextStates(validatedData.new_status)
     }, { status: 200 })
 
-  } catch (error) {
+  } catch (_error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({
         success: false,
@@ -310,7 +310,7 @@ export async function PUT(request: NextRequest) {
       errors
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Batch bundle update error:', error)
     return NextResponse.json({
       success: false,
@@ -389,7 +389,7 @@ export async function GET(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Get bundle tracking error:', error)
     return NextResponse.json({
       success: false,
@@ -448,7 +448,7 @@ async function calculateBundleMetrics(bundleId: string, bundle: any) {
     }
 
     return metrics
-  } catch (error) {
+  } catch (_error) {
     console.warn('Failed to calculate bundle metrics:', error)
     return {}
   }
@@ -515,7 +515,7 @@ async function emitBundleEvent(eventType: string, data: any) {
         created_at: new Date()
       }
     })
-  } catch (error) {
+  } catch (_error) {
     console.error('Failed to emit bundle event:', error)
   }
 }

@@ -142,7 +142,7 @@ export async function GET(
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching bundle details:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch bundle details' },
@@ -287,7 +287,7 @@ export async function POST(
       bundle_progress: updated_progress
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error updating bundle operation:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to update bundle operation' },

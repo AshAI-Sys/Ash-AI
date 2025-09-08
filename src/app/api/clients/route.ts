@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Client fetch error:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch clients' },
@@ -204,7 +204,7 @@ export async function POST(request: NextRequest) {
       }
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { success: false, error: 'Invalid data', details: error.errors },

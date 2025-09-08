@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
       backupPath
     });
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Backup creation error:', error);
     return NextResponse.json(
       { error: 'Backup creation failed' },
@@ -83,7 +83,7 @@ export async function GET(_request: NextRequest) {
       backups
     });
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Backup list error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch backups' },

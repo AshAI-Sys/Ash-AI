@@ -103,7 +103,7 @@ export async function GET(request: NextRequest) {
       runs: mockRuns
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching sewing runs:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch sewing runs' },
@@ -154,7 +154,7 @@ export async function POST(request: NextRequest) {
       run: newRun
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating sewing run:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to create sewing run' },
@@ -206,7 +206,7 @@ export async function PUT(request: NextRequest) {
       run: run
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error updating sewing run:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to update sewing run' },

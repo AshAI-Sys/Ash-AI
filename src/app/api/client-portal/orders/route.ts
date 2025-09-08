@@ -7,7 +7,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import jwt from 'jsonwebtoken'
 
-const JWT_SECRET = process.env.NEXTAUTH_SECRET || 'fallback-secret-key'
+const JWT_SECRET = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET or NEXTAUTH_SECRET environment variable is required for production')
+}
 
 /**
  * GET /api/client-portal/orders - Get client's orders
@@ -205,7 +208,7 @@ export async function GET(request: NextRequest) {
       summary: summaryStats
     })
 
-  } catch (error) {
+  } catch (_error) {
     if (error instanceof jwt.JsonWebTokenError) {
       return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
     }
@@ -411,7 +414,7 @@ function calculateEstimatedCompletion(order: any, routingSteps: any[]): Date {
   const estimatedDays = remainingSteps * avgDaysPerStep
   
   const now = new Date()
-  return new Date(now.getTime() + estimatedDays * 24 * 60 * 60 * 1000)
+  return new Date(new Date(now).getTime() + estimatedDays * 24 * 60 * 60 * 1000)
 }
 
 async function getOrderSummaryStats(clientId: string, workspaceId: string) {

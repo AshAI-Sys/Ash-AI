@@ -142,7 +142,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<DesignUpl
           .resize(400, 400, { fit: 'inside', withoutEnlargement: true })
           .jpeg({ quality: 85 })
           .toFile(thumbnailFullPath)
-      } catch (error) {
+      } catch (_error) {
         console.warn('Failed to generate thumbnail:', error)
       }
     }
@@ -167,7 +167,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<DesignUpl
         order: order,
         buffer: buffer
       })
-    } catch (error) {
+    } catch (_error) {
       console.warn('Ashley AI analysis failed:', error)
       ashleyAnalysis = {
         risk: 'AMBER',
@@ -299,7 +299,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<DesignUpl
       }
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Design upload error:', error)
     return NextResponse.json({
       success: false,
@@ -323,7 +323,7 @@ async function emitDesignEvent(eventType: string, data: any) {
         created_at: new Date()
       }
     })
-  } catch (error) {
+  } catch (_error) {
     console.error('Failed to emit design event:', error)
   }
 }

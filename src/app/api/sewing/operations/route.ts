@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
       operations: mockOperations
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching sewing operations:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch sewing operations' },
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
       operation: newOperation
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating sewing operation:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to create sewing operation' },

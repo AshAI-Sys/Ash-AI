@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
       finishing_runs
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching finishing runs:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch finishing runs' },
@@ -198,7 +198,7 @@ export async function POST(request: NextRequest) {
       warnings: ashley_check.risk === 'AMBER' ? ashley_check.issues : []
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating finishing run:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to create finishing run' },
@@ -279,7 +279,7 @@ export async function PUT(request: NextRequest) {
       finishing_run: updated_run
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error updating finishing run:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to update finishing run' },

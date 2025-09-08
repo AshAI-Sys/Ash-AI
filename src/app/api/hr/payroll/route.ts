@@ -136,7 +136,7 @@ export async function GET(request: NextRequest) {
         },
         summary: {
           days_covered: Math.ceil(
-            (record.pay_period_end.getTime() - record.pay_period_start.getTime()) 
+            (new Date(record.pay_period_end).getTime() - new Date(record.pay_period_start).getTime()) 
             / (1000 * 60 * 60 * 24)
           ),
           total_government_deductions: record.sss_employee + record.philhealth_employee + record.pagibig_employee + record.withholding_tax,
@@ -150,7 +150,7 @@ export async function GET(request: NextRequest) {
       payroll_records: records_with_summary
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching payroll records:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch payroll records' },
@@ -428,7 +428,7 @@ export async function POST(request: NextRequest) {
       }
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error processing payroll:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to process payroll' },

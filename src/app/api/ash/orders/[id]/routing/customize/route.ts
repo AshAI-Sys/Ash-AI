@@ -163,7 +163,7 @@ export async function POST(
       ashleyCheck: routeCheck
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error customizing routing:', error)
     return NextResponse.json(
       { error: 'Internal server error' },

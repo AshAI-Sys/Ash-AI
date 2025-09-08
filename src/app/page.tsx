@@ -135,8 +135,8 @@ export default function Home() {
       <nav className="relative z-20 p-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="ai-orb w-12 h-12">
-              <img src="/Ash-AI.png" alt="ASH AI" className="w-6 h-6 object-contain z-10 relative" />
+            <div className="ai-orb w-16 h-16">
+              <img src="/Ash-AI.png" alt="ASH AI" className="w-14 h-14 object-cover rounded-full z-10 relative filter brightness-125 shadow-lg shadow-cyan-500/40" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-white">ASH AI</h1>
@@ -361,8 +361,8 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <div className="ai-orb w-10 h-10">
-                  <img src="/Ash-AI.png" alt="ASH AI" className="w-5 h-5 object-contain z-10 relative" />
+                <div className="ai-orb w-12 h-12">
+                  <img src="/Ash-AI.png" alt="ASH AI" className="w-10 h-10 object-cover rounded-full z-10 relative filter brightness-125 shadow-lg shadow-cyan-500/40" />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-white">ASH AI</h3>

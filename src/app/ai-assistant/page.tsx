@@ -1,7 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import Layout from '@/components/Layout'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
+import EnhancedLayout from '@/components/EnhancedLayout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -32,7 +35,7 @@ interface AIInsight {
   category: 'production' | 'finance' | 'inventory' | 'orders' | 'users' | 'system'
   confidence: number
   actionRequired: boolean
-  data?: any
+  data?: Record<string, unknown>
 }
 
 interface AIMetric {
@@ -44,7 +47,7 @@ interface AIMetric {
   trend: 'up' | 'down' | 'stable'
   category: string
   description: string
-  icon: any
+  icon: React.ComponentType<{ className?: string }>
 }
 
 const AI_INSIGHTS: AIInsight[] = [
@@ -186,8 +189,46 @@ const AI_METRICS: AIMetric[] = [
 ]
 
 export default function AIAssistantPage() {
+  const { data: session, status } = useSession()
+  const router = useRouter()
   const [selectedInsight, setSelectedInsight] = useState<AIInsight | null>(null)
   const [neuralMode, setNeuralMode] = useState<'overview' | 'detailed' | 'predictive'>('overview')
+
+  useEffect(() => {
+    if (status === 'loading') return
+    
+    if (!session) {
+      router.push('/auth/signin')
+      return
+    }
+  }, [session, status, router])
+
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen neural-bg flex items-center justify-center">
+        <div className="text-center">
+          <div className="relative mb-8 mx-auto w-20 h-20">
+            <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/30 to-teal-400/30 rounded-full blur-xl animate-pulse"></div>
+            <div className="absolute inset-2 bg-gradient-to-br from-cyan-500/40 to-teal-400/40 rounded-full border border-cyan-400/50 animate-pulse"></div>
+            <div className="relative w-full h-full rounded-full bg-gradient-to-br from-slate-900 to-slate-800 border-2 border-cyan-500/60 flex items-center justify-center shadow-xl shadow-cyan-500/20 animate-pulse">
+              <img 
+                src="/Ash-AI.png" 
+                alt="ASH AI Logo" 
+                className="w-10 h-10 object-contain z-10 relative filter brightness-110 contrast-110" 
+              />
+              <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/20 to-teal-400/20 rounded-full animate-pulse"></div>
+            </div>
+          </div>
+          <h1 className="text-3xl font-bold glitch-text text-white mb-4 drop-shadow-lg" data-text="ASH AI">ASH AI</h1>
+          <p className="text-cyan-300 font-medium">Initializing Ashley AI...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!session) {
+    return null
+  }
 
   const getInsightIcon = (type: string) => {
     switch (type) {
@@ -221,7 +262,7 @@ export default function AIAssistantPage() {
   }
 
   return (
-    <Layout>
+    <EnhancedLayout>
       <div className="neural-bg min-h-screen relative">
         <div className="quantum-field">
           {Array.from({ length: 15 }).map((_, i) => (
@@ -516,6 +557,6 @@ export default function AIAssistantPage() {
           </div>
         </div>
       </div>
-    </Layout>
+    </EnhancedLayout>
   )
 }

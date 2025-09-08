@@ -98,7 +98,7 @@ export async function GET(
 
     return NextResponse.json({ inspection })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching inspection:', error)
     return NextResponse.json({ 
       error: 'Internal server error',
@@ -209,7 +209,7 @@ export async function PUT(
       inspection: updatedInspection
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error updating inspection:', error)
     return NextResponse.json({ 
       error: 'Internal server error',

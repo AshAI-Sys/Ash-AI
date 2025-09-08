@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
       data: cartons
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error fetching cartons:", error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch cartons" },
@@ -172,7 +172,7 @@ export async function POST(request: NextRequest) {
       data: result
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error creating carton:", error)
     return NextResponse.json(
       { success: false, error: "Failed to create carton" },
@@ -272,7 +272,7 @@ export async function PATCH(request: NextRequest) {
       data: result
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error updating carton:", error)
     return NextResponse.json(
       { success: false, error: "Failed to update carton" },

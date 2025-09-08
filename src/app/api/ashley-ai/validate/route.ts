@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       advisories
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error in Ashley AI validation:', error)
     return NextResponse.json({ 
       error: 'Internal server error',

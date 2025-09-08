@@ -2,6 +2,8 @@
 @import "../styles/design-tokens.css";
 @import "../styles/mobile-enhancements.css";
 @import "../styles/responsive-design.css";
+@import "../styles/professional-theme.css";
+@import "../styles/mobile-optimizations.css";
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 

@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
       }))
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching trips:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch trips' },
@@ -298,7 +298,7 @@ export async function POST(request: NextRequest) {
       } : null
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating trip:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to create trip' },
@@ -426,7 +426,7 @@ export async function PUT(request: NextRequest) {
       trip: updated_trip
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error updating trip:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to update trip' },

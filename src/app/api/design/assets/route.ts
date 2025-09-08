@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ assets: transformedAssets })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching design assets:', error)
     return NextResponse.json({ 
       error: 'Internal server error' 
@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
       message: `Design asset "${asset.name}" created successfully`
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating design asset:', error)
     return NextResponse.json({ 
       error: 'Internal server error',

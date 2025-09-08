@@ -2178,6 +2178,7 @@ create table gps_pings (
 POST /shipments           // (Stage 7 already)
 → 201 { shipment_id }
 
+
 POST /shipments/{id}/assign-driver
 Body { driver_id, vehicle_id, stops:[{consignee,address,phone,carton_ids[]}] }
 → 200 { trip_id }

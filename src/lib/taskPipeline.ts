@@ -276,7 +276,7 @@ export class TaskPipelineService {
           .slice(i)
           .reduce((sum, s) => sum + s.estimatedHours, 0)
         
-        taskDueDate = new Date(dueDate.getTime() - (totalHoursFromEnd * 60 * 60 * 1000))
+        taskDueDate = new Date(new Date(dueDate).getTime() - (totalHoursFromEnd * 60 * 60 * 1000))
       }
 
       const task = {

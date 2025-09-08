@@ -59,7 +59,7 @@ export async function GET(
 
     return NextResponse.json({ task })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching task:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -287,7 +287,7 @@ export async function PATCH(
       orderStatusUpdated: orderStatusUpdate
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error updating task:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -330,7 +330,7 @@ export async function DELETE(
       message: 'Task deleted successfully'
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error deleting task:', error)
     return NextResponse.json(
       { error: 'Internal server error' },

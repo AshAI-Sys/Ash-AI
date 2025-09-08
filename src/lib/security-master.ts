@@ -135,7 +135,7 @@ export class SecurityMaster {
         issues: allIssues
       }
 
-    } catch (error) {
+    } catch (_error) {
       console.error('[SECURITY_MASTER] Failed to initialize security system:', error)
       return {
         success: false,
@@ -156,7 +156,7 @@ export class SecurityMaster {
       }
 
       return audit
-    } catch (error) {
+    } catch (_error) {
       return {
         score: 0,
         issues: [`Environment validation failed: ${error}`]
@@ -174,7 +174,7 @@ export class SecurityMaster {
       }
 
       return audit
-    } catch (error) {
+    } catch (_error) {
       return {
         score: 0,
         issues: [`Database security initialization failed: ${error}`]
@@ -216,7 +216,7 @@ export class SecurityMaster {
       }
 
       return { score, issues }
-    } catch (error) {
+    } catch (_error) {
       return {
         score: 0,
         issues: [`Authentication security initialization failed: ${error}`]
@@ -253,7 +253,7 @@ export class SecurityMaster {
           name: 'John Doe',
           phoneNumber: '+1234567890'
         })
-      } catch (error) {
+      } catch (_error) {
         issues.push('Schema validation not working properly')
         score -= 15
       }
@@ -264,7 +264,7 @@ export class SecurityMaster {
       }
 
       return { score, issues }
-    } catch (error) {
+    } catch (_error) {
       return {
         score: 0,
         issues: [`Input security initialization failed: ${error}`]
@@ -302,7 +302,7 @@ export class SecurityMaster {
 
       console.log(`[MONITORING_SECURITY] Security monitoring audit score: ${score}/100`)
       return { score, issues }
-    } catch (error) {
+    } catch (_error) {
       return {
         score: 0,
         issues: [`Security monitoring initialization failed: ${error}`]
@@ -411,7 +411,7 @@ export class SecurityMaster {
         status: 'PASS' as const,
         message: 'Configuration integrity verified'
       })
-    } catch (error) {
+    } catch (_error) {
       checks.push({
         name: 'Environment Integrity',
         status: 'FAIL' as const,
@@ -427,7 +427,7 @@ export class SecurityMaster {
         status: 'PASS' as const,
         message: 'Secure database connection verified'
       })
-    } catch (error) {
+    } catch (_error) {
       checks.push({
         name: 'Database Security',
         status: 'FAIL' as const,

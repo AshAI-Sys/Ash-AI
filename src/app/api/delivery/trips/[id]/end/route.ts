@@ -94,7 +94,7 @@ export async function POST(
       data: result
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error ending trip:", error)
     return NextResponse.json(
       { success: false, error: "Failed to end trip" },

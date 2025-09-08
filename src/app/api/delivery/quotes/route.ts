@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error generating delivery quotes:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to generate delivery quotes' },
@@ -128,7 +128,7 @@ export async function GET(request: NextRequest) {
       message: 'Saved quotes feature not yet implemented. Use POST to generate new quotes.'
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching saved quotes:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch saved quotes' },

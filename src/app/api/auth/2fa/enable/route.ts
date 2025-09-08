@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
       message: '2FA enabled successfully'
     });
 
-  } catch (error) {
+  } catch (_error) {
     console.error('2FA enable error:', error);
     return NextResponse.json(
       { error: 'Failed to enable 2FA' },

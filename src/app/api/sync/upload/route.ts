@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
         } else {
           processedChanges.push(change);
         }
-      } catch (error) {
+      } catch (_error) {
         console.error('Error processing change:', error);
       }
     }
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       conflicts: conflicts
     });
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Sync upload error:', error);
     return NextResponse.json(
       { error: 'Sync failed' },
@@ -93,7 +93,7 @@ async function processTaskChange(entityId: string, operation: string, data: Reco
         return null;
       }
 
-      if (existingTask.updatedAt.getTime() > timestamp) {
+      if (new Date(existingTask.updatedAt).getTime() > timestamp) {
         return await prisma.syncConflict.create({
           data: {
             entity: 'Task',

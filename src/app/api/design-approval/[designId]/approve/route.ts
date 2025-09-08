@@ -60,7 +60,7 @@ export async function POST(
       message: `Design ${approvalType === 'lock_for_production' ? 'locked for production' : 'approved'} successfully`
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Design approval error:', error)
     return NextResponse.json(
       { error: 'Failed to process design approval' },
@@ -117,7 +117,7 @@ export async function PUT(
       message: `Design ${action} completed successfully`
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Design update error:', error)
     return NextResponse.json(
       { error: 'Failed to update design' },

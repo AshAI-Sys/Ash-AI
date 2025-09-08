@@ -104,7 +104,7 @@ export async function GET(request: NextRequest) {
       data: enrichedKpis
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error fetching KPIs:", error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch KPIs" },
@@ -176,7 +176,7 @@ export async function POST(request: NextRequest) {
       data: kpi
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error creating KPI:", error)
     return NextResponse.json(
       { success: false, error: "Failed to create KPI" },

@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get("category")
     const impact = searchParams.get("impact")
     const status = searchParams.get("status")
-    const assignedTo = searchParams.get("assignedTo")
+    const assignedTo = searchParams.get("assigned_to")
     
     const where: {
       category?: string
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     }
     
     if (assignedTo) {
-      where.assignedTo = assignedTo
+      where.assigned_to = assignedTo
     }
 
     const insights = await prisma.businessInsight.findMany({
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
       orderBy: [
         { impact: "desc" },
         { confidence: "desc" },
-        { createdAt: "desc" }
+        { created_at: "desc" }
       ]
     })
 
@@ -66,13 +66,13 @@ export async function GET(request: NextRequest) {
         summary: {
           total: insights.length,
           highImpact: insights.filter(i => i.impact === "HIGH").length,
-          unassigned: insights.filter(i => !i.assignedTo).length,
+          unassigned: insights.filter(i => !i.assigned_to).length,
           new: insights.filter(i => i.status === "NEW").length
         }
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error fetching insights:", error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch insights" },
@@ -147,7 +147,7 @@ export async function POST(request: NextRequest) {
       data: insight
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error creating insight:", error)
     return NextResponse.json(
       { success: false, error: "Failed to create insight" },
@@ -219,7 +219,7 @@ async function generateAIInsights() {
 
     return mockInsights
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error generating AI insights:", error)
     return []
   }

@@ -142,7 +142,7 @@ export async function GET(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching QC items:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -234,7 +234,7 @@ export async function POST(request: NextRequest) {
       taskId: task.id
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error starting QC inspection:', error)
     return NextResponse.json(
       { error: 'Internal server error' },

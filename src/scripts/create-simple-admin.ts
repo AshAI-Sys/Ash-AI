@@ -20,9 +20,21 @@ async function createTestUser() {
     // Hash password
     const hashedPassword = await bcrypt.hash('admin123', 12)
 
+    // Create or get default workspace
+    const workspace = await db.workspace.upsert({
+      where: { name: 'Default Workspace' },
+      update: {},
+      create: {
+        name: 'Default Workspace',
+        slug: 'default',
+        owner_email: 'admin@ashui.com'
+      }
+    })
+
     // Create test admin user (simplified to match actual schema)
     const user = await db.user.create({
       data: {
+        workspace_id: workspace.id,
         email: 'admin@ashui.com',
         password: hashedPassword,
         full_name: 'ASH AI Administrator',
@@ -46,8 +58,8 @@ async function createTestUser() {
 
     await db.$disconnect()
     return user
-  } catch (error) {
-    console.error('❌ Error creating test user:', error)
+  } catch (_error) {
+    console.error('❌ Error creating test user:', _error)
     await db.$disconnect()
     process.exit(1)
   }

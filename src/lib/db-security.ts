@@ -62,7 +62,7 @@ export class SecureDatabase {
       url.searchParams.set('socket_timeout', '20')
       
       return url.toString()
-    } catch (error) {
+    } catch (_error) {
       // If URL parsing fails, return original string (for file:// URLs or other formats)
       return baseUrl
     }
@@ -136,7 +136,7 @@ export class SecureDatabase {
       }
 
       return result
-    } catch (error) {
+    } catch (_error) {
       console.error(`[DB_ERROR] Database operation failed:`, error)
       throw new Error('Database operation failed')
     }
@@ -262,7 +262,7 @@ export class DataEncryption {
       if (result[field]) {
         try {
           result[field] = this.decrypt(result[field])
-        } catch (error) {
+        } catch (_error) {
           console.error(`Failed to decrypt field ${field}:`, error)
           result[field] = '[ENCRYPTED]'
         }

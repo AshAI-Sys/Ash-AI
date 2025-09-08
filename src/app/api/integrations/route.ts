@@ -115,7 +115,7 @@ export async function GET(request: NextRequest) {
       data: enrichedIntegrations
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error fetching integrations:", error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch integrations" },
@@ -217,7 +217,7 @@ export async function POST(request: NextRequest) {
       connectionTest
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error creating integration:", error)
     return NextResponse.json(
       { success: false, error: "Failed to create integration" },
@@ -264,7 +264,7 @@ async function testIntegrationConnection(type: string, provider: string, config:
       }
     }
 
-  } catch (error) {
+  } catch (_error) {
     return {
       success: false,
       error: `Connection test failed: ${error.message}`,

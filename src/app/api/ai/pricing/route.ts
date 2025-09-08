@@ -22,8 +22,8 @@ export async function GET(req: NextRequest) {
     const suggestions = await aiService.getPricingSuggestions(orderIds)
 
     return NextResponse.json(suggestions)
-  } catch (error) {
-    console.error('Error getting pricing suggestions:', error)
+  } catch (_error) {
+    console.error('Error getting pricing suggestions:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

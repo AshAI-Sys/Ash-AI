@@ -157,7 +157,7 @@ export async function POST(request: NextRequest) {
       message: `Order ${poNumber} created successfully`
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating order:', error)
     return NextResponse.json({ 
       error: 'Internal server error',

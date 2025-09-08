@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import ResponsiveLayout from '@/components/ResponsiveLayout'
+import EnhancedLayout from '@/components/EnhancedLayout'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -66,6 +66,10 @@ interface ForecastData {
     value: number
     confidence: number
     factors: string[]
+    stockoutRisk?: string
+    materialsAtRisk?: string[]
+    projectedRevenue?: number
+    totalValue?: number
   }
 }
 
@@ -79,8 +83,7 @@ export default function AnalyticsPage() {
   const [refreshing, setRefreshing] = useState(false)
 
   const canViewAnalytics = session?.user.role === Role.ADMIN || 
-                          session?.user.role === Role.MANAGER ||
-                          session?.user.role === Role.ANALYST
+                          session?.user.role === Role.MANAGER
 
   useEffect(() => {
     if (status === 'loading') return
@@ -226,9 +229,10 @@ export default function AnalyticsPage() {
           accuracy: 0.89,
           status: "COMPLETED",
           prediction: {
-            projectedRevenue: 9240000,
-            projectedOrders: 156,
-            confidence: "high"
+            value: 9240000,
+            confidence: 89,
+            factors: ["Seasonal trends", "Historical data", "Market analysis"],
+            projectedRevenue: 9240000
           }
         },
         {
@@ -239,6 +243,9 @@ export default function AnalyticsPage() {
           accuracy: 0.94,
           status: "COMPLETED",
           prediction: {
+            value: 1310000,
+            confidence: 94,
+            factors: ["Current stock levels", "Order pipeline", "Lead times"],
             stockoutRisk: "medium",
             materialsAtRisk: ["DTF Film", "Cotton Fabric"],
             totalValue: 1310000
@@ -250,8 +257,8 @@ export default function AnalyticsPage() {
       setInsights(mockInsights)
       setForecasts(mockForecasts)
       setLoading(false)
-    } catch (error) {
-      console.error("Error fetching analytics data:", error)
+    } catch (_error) {
+      console.error("Error fetching analytics data:", _error)
       setLoading(false)
     }
   }
@@ -296,19 +303,19 @@ export default function AnalyticsPage() {
 
   if (status === 'loading' || loading) {
     return (
-      <ResponsiveLayout>
+      <EnhancedLayout>
         <div className="min-h-screen gradient-mesh relative overflow-hidden">
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
           </div>
         </div>
-      </ResponsiveLayout>
+      </EnhancedLayout>
     )
   }
 
   if (!session || !canViewAnalytics) {
     return (
-      <ResponsiveLayout>
+      <EnhancedLayout>
         <div className="min-h-screen gradient-mesh relative overflow-hidden">
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             <div className="absolute top-20 left-10 w-32 h-32 gradient-purple rounded-full opacity-20 float morph-shape"></div>
@@ -326,12 +333,12 @@ export default function AnalyticsPage() {
             </div>
           </div>
         </div>
-      </ResponsiveLayout>
+      </EnhancedLayout>
     )
   }
 
   return (
-    <ResponsiveLayout>
+    <EnhancedLayout>
       <div className="min-h-screen gradient-mesh relative overflow-hidden">
         {/* Floating background shapes */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -370,7 +377,7 @@ export default function AnalyticsPage() {
 
           {/* KPI Overview */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 slide-in-left">
-            {kpis.map((kpi, _index) => (
+            {kpis.map((kpi) => (
               <div key={kpi.id} className={`glass-card p-6 rounded-3xl hover-scale ${getKPIBgColor(kpi)} border border-white/10`}>
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
@@ -527,7 +534,7 @@ export default function AnalyticsPage() {
                             {forecast.type === "SALES" && (
                               <div className="pt-3 border-t border-white/10">
                                 <div className="text-lg font-bold text-green-400 mb-1">
-                                  ₱{forecast.prediction.projectedRevenue.toLocaleString()}
+                                  ₱{forecast.prediction.projectedRevenue?.toLocaleString() || '0'}
                                 </div>
                                 <div className="text-sm text-white/60">Projected Revenue</div>
                               </div>
@@ -536,10 +543,10 @@ export default function AnalyticsPage() {
                             {forecast.type === "INVENTORY" && (
                               <div className="pt-3 border-t border-white/10">
                                 <div className="text-lg font-bold text-yellow-400 mb-1">
-                                  {forecast.prediction.materialsAtRisk.length} Materials at Risk
+                                  {forecast.prediction.materialsAtRisk?.length || 0} Materials at Risk
                                 </div>
                                 <div className="text-sm text-white/60">
-                                  {forecast.prediction.materialsAtRisk.join(", ")}
+                                  {forecast.prediction.materialsAtRisk?.join(", ") || "None"}
                                 </div>
                               </div>
                             )}
@@ -571,7 +578,7 @@ export default function AnalyticsPage() {
                         { name: "Quality Metrics", icon: Shield, description: "Quality control analysis" },
                         { name: "Customer Analytics", icon: Users, description: "Customer satisfaction trends" },
                         { name: "Operational Efficiency", icon: Activity, description: "Process optimization insights" }
-                      ].map((report, _index) => (
+                      ].map((report) => (
                         <Button
                           key={report.name}
                           variant="outline"
@@ -626,6 +633,6 @@ export default function AnalyticsPage() {
           </div>
         </div>
       </div>
-    </ResponsiveLayout>
+    </EnhancedLayout>
   )
 }

@@ -21,8 +21,8 @@ export async function GET(req: NextRequest) {
     const suggestions = await aiService.getAssignmentSuggestions(taskIds)
 
     return NextResponse.json(suggestions)
-  } catch (error) {
-    console.error('Error getting assignment suggestions:', error)
+  } catch (_error) {
+    console.error('Error getting assignment suggestions:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -49,12 +49,8 @@ export async function POST(req: NextRequest) {
     const updatedTask = await db.task.update({
       where: { id: taskId },
       data: { 
-        assignedTo: assigneeId,
+        assigned_to: assigneeId,
         status: 'PENDING' // Keep as pending until work starts
-      },
-      include: {
-        assignee: true,
-        order: true
       }
     })
 
@@ -62,8 +58,8 @@ export async function POST(req: NextRequest) {
       success: true,
       task: updatedTask
     })
-  } catch (error) {
-    console.error('Error applying assignment suggestion:', error)
+  } catch (_error) {
+    console.error('Error applying assignment suggestion:', _error)
     return NextResponse.json(
       { error: 'Failed to apply assignment' },
       { status: 500 }

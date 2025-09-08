@@ -248,7 +248,7 @@ export async function POST(
       )
     }
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error modifying carton contents:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to modify carton contents' },

@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
       data: shipments
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error fetching shipments:", error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch shipments" },
@@ -198,7 +198,7 @@ export async function POST(request: NextRequest) {
               }
             })
           }
-        } catch (error) {
+        } catch (_error) {
           console.warn("3PL integration failed, continuing with manual shipment:", error)
         }
       }
@@ -211,7 +211,7 @@ export async function POST(request: NextRequest) {
       data: result
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error creating shipment:", error)
     return NextResponse.json(
       { success: false, error: "Failed to create shipment" },
@@ -310,7 +310,7 @@ export async function PATCH(request: NextRequest) {
       data: result
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error updating shipment:", error)
     return NextResponse.json(
       { success: false, error: "Failed to update shipment" },

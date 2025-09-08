@@ -73,7 +73,7 @@ export async function GET(
       .filter(lr => lr.status === 'PENDING').length
 
     const recent_disciplinary = employee.disciplinary_actions
-      .filter(da => da.incident_date.getTime() > Date.now() - (365 * 24 * 60 * 60 * 1000))
+      .filter(da => new Date(da.incident_date).getTime() > Date.now() - (365 * 24 * 60 * 60 * 1000))
       .length
 
     return NextResponse.json({
@@ -86,13 +86,13 @@ export async function GET(
           pending_leave_requests: pending_leaves,
           recent_disciplinary_actions: recent_disciplinary,
           years_of_service: Math.floor(
-            (Date.now() - employee.hire_date.getTime()) / (365 * 24 * 60 * 60 * 1000)
+            (Date.now() - new Date(employee.hire_date).getTime()) / (365 * 24 * 60 * 60 * 1000)
           )
         }
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching employee details:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch employee details' },
@@ -271,7 +271,7 @@ export async function PUT(
       message: 'Employee updated successfully'
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error updating employee:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to update employee' },
@@ -330,7 +330,7 @@ export async function DELETE(
       employee_id: id,
       termination_reason,
       employment_duration_months: Math.floor(
-        (new Date(termination_date).getTime() - existing_employee.hire_date.getTime()) 
+        (new Date(termination_date).getTime() - new Date(existing_employee.hire_date).getTime()) 
         / (30 * 24 * 60 * 60 * 1000)
       )
     })
@@ -381,7 +381,7 @@ export async function DELETE(
       warnings: ashley_check.risk === 'AMBER' ? ashley_check.issues : []
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error terminating employee:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to terminate employee' },

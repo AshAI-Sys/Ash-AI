@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
 
   try {
     // Get client information for security logging
-    clientIP = request.ip || request.headers.get('x-forwarded-for') || 'unknown'
+    clientIP = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
     const userAgent = request.headers.get('user-agent') || 'unknown'
 
     // Session validation
@@ -41,8 +41,8 @@ export async function POST(request: NextRequest) {
 
     userId = session.user.id
 
-    // Role-based access control
-    if (![Role.ADMIN, Role.MANAGER].includes(session.user.role as Role)) {
+    // Role-based access control - Allow more roles to access AI
+    if (!['ADMIN', 'MANAGER', 'CSR', 'GA', 'GRAPHIC_ARTIST', 'SALES_STAFF'].includes(session.user.role as Role)) {
       await auditLog.log({
         action: 'ai_access_denied',
         userId,
@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
         await auditLog.log({
           action: 'ai_prompt_injection_attempt',
           userId,
-          ip: clientIP,
+          ip: clientIP || 'unknown',
           success: false,
           error: 'Suspicious prompt detected'
         })
@@ -162,7 +162,7 @@ export async function POST(request: NextRequest) {
             const endDate = new Date(data.endDate)
             
             // Validate date range (max 90 days)
-            if (endDate.getTime() - startDate.getTime() > 90 * 24 * 60 * 60 * 1000) {
+            if (new Date(endDate).getTime() - new Date(startDate).getTime() > 90 * 24 * 60 * 60 * 1000) {
               return NextResponse.json({ error: 'Date range too large' }, { 
                 status: 400,
                 headers: securityHeaders
@@ -238,14 +238,14 @@ export async function POST(request: NextRequest) {
         }
       })
 
-    } catch (aiError) {
+    } catch (_aiError) {
       // Log AI-specific errors
       await auditLog.log({
         action: `ai_${action}_error`,
         userId,
         ip: clientIP,
         success: false,
-        error: aiError instanceof Error ? aiError.message : 'AI processing error'
+        error: _aiError instanceof Error ? _aiError.message : 'AI processing error'
       })
 
       return NextResponse.json({
@@ -256,19 +256,19 @@ export async function POST(request: NextRequest) {
       })
     }
 
-  } catch (error) {
+  } catch (_error) {
     // Log unexpected errors
     await auditLog.log({
       action: 'ai_unexpected_error',
       userId,
       ip: clientIP,
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: _error instanceof Error ? _error.message : 'Unknown error'
     })
 
-    console.error('Ashley AI API error:', error)
+    console.error('Ashley AI API error:', _error)
     return NextResponse.json({
-      error: sanitizeError(error, process.env.NODE_ENV === 'development')
+      error: sanitizeError(_error, process.env.NODE_ENV === 'development')
     }, { 
       status: 500,
       headers: securityHeaders
@@ -357,7 +357,7 @@ async function generateChatResponse(message: string, context: {
 export async function GET(request: NextRequest) {
   try {
     // Get client information
-    const _clientIP = request.ip || request.headers.get('x-forwarded-for') || 'unknown'
+    const _clientIP = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
     const _userAgent = request.headers.get('user-agent') || 'unknown'
 
     // Session validation
@@ -369,8 +369,8 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // Role-based access control
-    if (![Role.ADMIN, Role.MANAGER].includes(session.user.role as Role)) {
+    // Role-based access control - Allow more roles to access AI
+    if (!['ADMIN', 'MANAGER', 'CSR', 'GA', 'GRAPHIC_ARTIST', 'SALES_STAFF'].includes(session.user.role as Role)) {
       return NextResponse.json({ error: 'Forbidden' }, { 
         status: 403,
         headers: securityHeaders
@@ -416,10 +416,10 @@ export async function GET(request: NextRequest) {
       headers: securityHeaders
     })
 
-  } catch (error) {
-    console.error('Ashley AI GET error:', error)
+  } catch (_error) {
+    console.error('Ashley AI GET error:', _error)
     return NextResponse.json({
-      error: sanitizeError(error, process.env.NODE_ENV === 'development')
+      error: sanitizeError(_error, process.env.NODE_ENV === 'development')
     }, { 
       status: 500,
       headers: securityHeaders

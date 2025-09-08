@@ -119,7 +119,7 @@ export async function GET(request: NextRequest) {
       )
     })
 
-  } catch (error) {
+  } catch (_error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({
         success: false,
@@ -190,7 +190,7 @@ export async function POST(request: NextRequest) {
       forecast: customForecast
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating custom forecast:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to create custom forecast' },
@@ -329,7 +329,7 @@ function generateForecastPeriods(horizon: string): Date[] {
   }
 
   for (let i = 1; i <= count; i++) {
-    periods.push(new Date(startDate.getTime() + (i * increment)))
+    periods.push(new Date(new Date(startDate).getTime() + (i * increment)))
   }
 
   return periods

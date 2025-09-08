@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
       cartons: cartons_with_summary
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching cartons:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch cartons' },
@@ -224,7 +224,7 @@ export async function POST(request: NextRequest) {
       warnings: ashley_check.risk === 'AMBER' ? ashley_check.issues : []
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating carton:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to create carton' },

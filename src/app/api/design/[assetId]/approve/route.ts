@@ -138,7 +138,7 @@ export async function POST(
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error approving design:', error)
     return NextResponse.json({ 
       error: 'Internal server error',

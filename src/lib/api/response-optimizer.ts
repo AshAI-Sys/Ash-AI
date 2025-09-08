@@ -195,7 +195,7 @@ export function validateRequest<T>(
   try {
     const validatedData = schema.parse(data);
     return { success: true, data: validatedData };
-  } catch (error) {
+  } catch (_error) {
     if (error instanceof z.ZodError) {
       const errorMessage = error.errors
         .map(err => `${err.path.join('.')}: ${err.message}`)
@@ -211,7 +211,7 @@ export async function withErrorHandling<T>(
 ): Promise<T | NextResponse> {
   try {
     return await handler();
-  } catch (error) {
+  } catch (_error) {
     console.error('API Error:', error);
     
     if (error instanceof z.ZodError) {

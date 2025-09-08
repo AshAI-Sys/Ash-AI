@@ -309,9 +309,9 @@ async function initializeAshSystem() {
     console.log('3. Configure Ashley AI parameters for your specific needs')
     console.log('4. Set up production workstations')
 
-  } catch (error) {
-    console.error('❌ Error initializing ASH system:', error)
-    throw error
+  } catch (_error) {
+    console.error('❌ Error initializing ASH system:', _error)
+    throw _error
   } finally {
     await prisma.$disconnect()
   }

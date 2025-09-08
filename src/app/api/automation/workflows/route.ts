@@ -153,7 +153,7 @@ export async function GET(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Workflow fetch error:', error)
     return NextResponse.json(
       { error: 'Failed to fetch workflows' },
@@ -245,7 +245,7 @@ export async function POST(request: NextRequest) {
       message: 'Workflow created successfully'
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Workflow creation error:', error)
     return NextResponse.json(
       { error: 'Failed to create workflow' },
@@ -324,7 +324,7 @@ export async function PUT(request: NextRequest) {
       message: 'Workflow updated successfully'
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Workflow update error:', error)
     return NextResponse.json(
       { error: 'Failed to update workflow' },
@@ -394,7 +394,7 @@ export async function DELETE(request: NextRequest) {
       message: 'Workflow deleted successfully'
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Workflow deletion error:', error)
     return NextResponse.json(
       { error: 'Failed to delete workflow' },
@@ -487,7 +487,7 @@ async function executeWorkflowAsync(workflow: any, execution: any, triggerData: 
           status: 'SUCCESS',
           result
         })
-      } catch (error) {
+      } catch (_error) {
         actionResults.push({
           action_type: action.type,
           status: 'FAILED',
@@ -513,7 +513,7 @@ async function executeWorkflowAsync(workflow: any, execution: any, triggerData: 
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     await secureDb.getPrisma().workflowExecution.update({
       where: { id: execution.id },
       data: {

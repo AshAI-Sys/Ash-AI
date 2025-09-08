@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
       }))
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching cutting plans:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch cutting plans' },
@@ -276,7 +276,7 @@ export async function POST(request: NextRequest) {
       warnings: ashley_check.risk === 'AMBER' ? ashley_check.issues : []
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating cutting plan:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to create cutting plan' },
@@ -373,7 +373,7 @@ export async function PUT(request: NextRequest) {
       cutting_plan: updated_plan
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error updating cutting plan:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to update cutting plan' },

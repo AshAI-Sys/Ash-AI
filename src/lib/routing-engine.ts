@@ -360,7 +360,7 @@ export class RoutingEngine {
     }
     
     if (!feasible) {
-      risks.push(`Delivery date not achievable - need ${workDays} days, have ${Math.ceil((targetDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} days`)
+      risks.push(`Delivery date not achievable - need ${workDays} days, have ${Math.ceil((new Date(targetDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} days`)
     }
     
     return {
@@ -406,7 +406,7 @@ export class RoutingEngine {
     
     // Timeline warnings
     const targetDate = new Date(context.targetDeliveryDate)
-    const _daysAvailable = Math.ceil((targetDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+    const _daysAvailable = Math.ceil((new Date(targetDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
     
     if (recommended) {
       const criticalPath = this.calculateCriticalPath(recommended, context.quantity, targetDate)

@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
       data: payrolls
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error fetching payroll:", error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch payroll" },
@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
       data: payroll
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error creating payroll:", error)
     return NextResponse.json(
       { success: false, error: "Failed to create payroll" },

@@ -144,7 +144,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       requires_new_approval: !!newDesign
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error processing design revision:', error)
     return NextResponse.json(
       { error: 'Failed to process revision' },
@@ -198,7 +198,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       revision_count: revisions.length
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching revision history:', error)
     return NextResponse.json(
       { error: 'Failed to fetch revision history' },

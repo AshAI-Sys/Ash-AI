@@ -88,7 +88,7 @@ export async function GET(request: NextRequest) {
       data: expenses
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error fetching expenses:", error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch expenses" },
@@ -189,7 +189,7 @@ export async function POST(request: NextRequest) {
       data: expense
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error creating expense:", error)
     return NextResponse.json(
       { success: false, error: "Failed to create expense" },

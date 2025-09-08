@@ -189,7 +189,7 @@ export async function GET(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Alert fetch error:', error)
     return NextResponse.json(
       { error: 'Failed to fetch alerts' },
@@ -215,7 +215,7 @@ export async function POST(request: NextRequest) {
       return await createAlert(sanitizedBody, user, request)
     }
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Alert creation error:', error)
     return NextResponse.json(
       { error: 'Failed to create alert' },
@@ -281,7 +281,7 @@ export async function PUT(request: NextRequest) {
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
     }
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Alert action error:', error)
     return NextResponse.json(
       { error: 'Failed to perform alert action' },
@@ -549,7 +549,7 @@ async function evaluateAlertRule(alertRule: any) {
       }
     }
 
-  } catch (error) {
+  } catch (_error) {
     console.error(`Failed to evaluate alert rule ${alertRule.id}:`, error)
   }
 }
@@ -568,7 +568,7 @@ async function sendAlertNotifications(alert: any, workspace: any) {
     for (const recipientId of recipients) {
       try {
         await sendAlertNotification(alert, recipientId, channel, workspace)
-      } catch (error) {
+      } catch (_error) {
         console.error(`Failed to send alert notification via ${channel} to ${recipientId}:`, error)
       }
     }
@@ -605,8 +605,8 @@ async function sendEscalationNotifications(alert: any, newSeverity: string) {
 // Helper functions
 async function getAlertStatistics(workspaceId: string) {
   const now = new Date()
-  const last24h = new Date(now.getTime() - 24 * 60 * 60 * 1000)
-  const last7d = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+  const last24h = new Date(new Date(now).getTime() - 24 * 60 * 60 * 1000)
+  const last7d = new Date(new Date(now).getTime() - 7 * 24 * 60 * 60 * 1000)
 
   const [
     totalAlerts,

@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
       data: enrichedWebhooks
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error fetching webhooks:", error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch webhooks" },
@@ -253,7 +253,7 @@ export async function POST(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error creating webhook:", error)
     return NextResponse.json(
       { success: false, error: "Failed to create webhook" },
@@ -364,7 +364,7 @@ async function testWebhookDelivery(webhook: any) {
       signature: `sha256=${signature}`
     }
 
-  } catch (error) {
+  } catch (_error) {
     return {
       success: false,
       message: `Test webhook delivery error: ${error.message}`,

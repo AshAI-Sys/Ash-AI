@@ -14,14 +14,14 @@ export async function POST(request: NextRequest) {
 
     // Managers, admins, and production roles can access Kai
     const allowedRoles = [
-      Role.ADMIN, 
-      Role.MANAGER,
-      Role.SILKSCREEN_OPERATOR,
-      Role.DTF_OPERATOR,
-      Role.SUBLIMATION_OPERATOR,
-      Role.EMBROIDERY_OPERATOR,
-      Role.SEWING_OPERATOR,
-      Role.QC_INSPECTOR
+      'ADMIN', 
+      'MANAGER',
+      'SILKSCREEN_OPERATOR',
+      'DTF_OPERATOR',
+      'SUBLIMATION_OPERATOR',
+      'EMBROIDERY_OPERATOR',
+      'SEWING_OPERATOR',
+      'QC_INSPECTOR'
     ]
 
     if (!allowedRoles.includes(session.user.role as Role)) {
@@ -54,13 +54,15 @@ export async function POST(request: NextRequest) {
 
       case 'analyzeBottlenecks':
         // Analyze production bottlenecks
-        const kai = await import('@/lib/ai/ashley-agents').then(m => m.createAgent('kai', session.user.id))
+        const { KaiAgent } = await import('@/lib/ai/ashley-agents')
+        const kai = new KaiAgent(session.user.id)
         result = await kai.analyzeBottlenecks(data)
         break
 
       case 'optimizeCapacity':
         // Optimize production capacity
-        const kaiCapacity = await import('@/lib/ai/ashley-agents').then(m => m.createAgent('kai', session.user.id))
+        const { KaiAgent: KaiAgentCapacity } = await import('@/lib/ai/ashley-agents')
+        const kaiCapacity = new KaiAgentCapacity(session.user.id)
         result = await kaiCapacity.optimizeCapacity(data)
         break
 
@@ -75,8 +77,8 @@ export async function POST(request: NextRequest) {
       timestamp: new Date().toISOString()
     })
 
-  } catch (error) {
-    console.error('Kai AI API error:', error)
+  } catch (_error) {
+    console.error('Kai AI API error:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -105,8 +107,8 @@ export async function GET(_request: NextRequest) {
       description: 'AI Industrial Engineer - Production optimization and efficiency'
     })
 
-  } catch (error) {
-    console.error('Kai AI API error:', error)
+  } catch (_error) {
+    console.error('Kai AI API error:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

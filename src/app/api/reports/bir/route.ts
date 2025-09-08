@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
       generatedAt: new Date().toISOString()
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('BIR report generation error:', error)
     
     if (error instanceof z.ZodError) {
@@ -154,7 +154,7 @@ async function handleFormGeneration(body: any) {
       generatedAt: new Date().toISOString()
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('BIR form generation error:', error)
     return NextResponse.json(
       { 
@@ -227,7 +227,7 @@ export async function GET(request: NextRequest) {
       exportFormats: ['JSON', 'EXCEL']
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('BIR report API error:', error)
     return NextResponse.json(
       { 

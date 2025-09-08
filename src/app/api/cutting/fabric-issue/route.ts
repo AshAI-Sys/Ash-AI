@@ -200,7 +200,7 @@ export async function POST(request: NextRequest) {
       ]
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({
         success: false,
@@ -293,7 +293,7 @@ export async function GET(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Get fabric issues error:', error)
     return NextResponse.json({
       success: false,
@@ -416,7 +416,7 @@ async function emitFabricEvent(eventType: string, data: any) {
         created_at: new Date()
       }
     })
-  } catch (error) {
+  } catch (_error) {
     console.error('Failed to emit fabric event:', error)
   }
 }

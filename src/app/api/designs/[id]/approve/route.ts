@@ -146,7 +146,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       order_advanced: status === 'APPROVED' && updatedDesign.print_ready
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error processing design approval:', error)
     return NextResponse.json(
       { error: 'Failed to process approval' },
@@ -200,7 +200,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       approvals
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching approval status:', error)
     return NextResponse.json(
       { error: 'Failed to fetch approval status' },

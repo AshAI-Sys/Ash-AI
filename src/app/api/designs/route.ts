@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
       designs
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching designs:', error)
     return NextResponse.json(
       { error: 'Failed to fetch designs' },
@@ -167,7 +167,7 @@ export async function POST(request: NextRequest) {
       design
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error uploading design:', error)
     return NextResponse.json(
       { error: 'Failed to upload design' },
@@ -244,7 +244,7 @@ export async function PATCH(request: NextRequest) {
       design: updatedDesign
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error updating design:', error)
     return NextResponse.json(
       { error: 'Failed to update design' },

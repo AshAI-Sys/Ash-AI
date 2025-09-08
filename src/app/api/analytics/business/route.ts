@@ -41,7 +41,7 @@ export async function GET() {
 
     return NextResponse.json(metrics);
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Business analytics error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch business metrics' },

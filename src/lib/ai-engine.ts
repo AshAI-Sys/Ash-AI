@@ -178,12 +178,12 @@ export class ASHAIEngine {
 
     const targetDate = new Date(order.targetDeliveryDate)
     const created = new Date(order.createdAt)
-    const timeToDelivery = (targetDate.getTime() - created.getTime()) / (1000 * 60 * 60 * 24)
+    const timeToDelivery = (new Date(targetDate).getTime() - new Date(created).getTime()) / (1000 * 60 * 60 * 24)
 
     // Time pressure analysis
     const prediction = this.predictDeliveryDate(order)
     const predictedDate = new Date(prediction.estimatedDate)
-    const daysDifference = (targetDate.getTime() - predictedDate.getTime()) / (1000 * 60 * 60 * 24)
+    const daysDifference = (new Date(targetDate).getTime() - new Date(predictedDate).getTime()) / (1000 * 60 * 60 * 24)
 
     if (daysDifference < 0) {
       riskScore += 40
@@ -437,7 +437,7 @@ export class ASHAIEngine {
     const targetDate = new Date(order.targetDeliveryDate)
     const prediction = this.predictDeliveryDate(order)
     const predictedDate = new Date(prediction.estimatedDate)
-    const daysDiff = (targetDate.getTime() - predictedDate.getTime()) / (1000 * 60 * 60 * 24)
+    const daysDiff = (new Date(targetDate).getTime() - new Date(predictedDate).getTime()) / (1000 * 60 * 60 * 24)
 
     if (daysDiff < 3) {
       basePrice *= 1.2

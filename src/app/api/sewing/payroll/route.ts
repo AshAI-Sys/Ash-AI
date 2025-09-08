@@ -66,8 +66,8 @@ export async function GET(request: NextRequest) {
       payroll_records
     })
 
-  } catch (error) {
-    console.error('Error fetching payroll records:', error)
+  } catch (_error) {
+    console.error('Error fetching payroll records:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch payroll records' },
       { status: 500 }
@@ -252,8 +252,8 @@ export async function POST(request: NextRequest) {
       }
     }, { status: 201 })
 
-  } catch (error) {
-    console.error('Error generating payroll:', error)
+  } catch (_error) {
+    console.error('Error generating payroll:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to generate payroll' },
       { status: 500 }
@@ -329,8 +329,8 @@ export async function PUT(request: NextRequest) {
       updated_count: updated_records.count
     })
 
-  } catch (error) {
-    console.error('Error updating payroll:', error)
+  } catch (_error) {
+    console.error('Error updating payroll:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to update payroll' },
       { status: 500 }

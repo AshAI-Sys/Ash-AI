@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ templates })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching routing templates:', error)
     return NextResponse.json({ 
       error: 'Internal server error' 
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
       message: `Routing template "${template.name}" created successfully` 
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating routing template:', error)
     return NextResponse.json({ 
       error: 'Internal server error',

@@ -98,7 +98,7 @@ export async function GET(
           steps: template.steps,
           category: template.category
         })
-      } catch (error) {
+      } catch (_error) {
         console.error('Error analyzing template:', error)
       }
     }
@@ -128,7 +128,7 @@ export async function GET(
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching routing template:', error)
     return NextResponse.json(
       { error: 'Failed to fetch routing template' },
@@ -338,7 +338,7 @@ export async function PATCH(
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({
         success: false,
@@ -436,7 +436,7 @@ export async function DELETE(
       message: 'Routing template deleted successfully'
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error deleting routing template:', error)
     return NextResponse.json({
       success: false,

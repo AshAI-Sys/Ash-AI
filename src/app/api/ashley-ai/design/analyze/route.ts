@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
       analysis
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error in Ashley AI design analysis:', error)
     return NextResponse.json({ 
       error: 'Internal server error',

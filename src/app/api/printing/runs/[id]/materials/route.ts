@@ -58,7 +58,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching run materials:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch materials' },
@@ -162,7 +162,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       material
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error logging material usage:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to log material usage' },

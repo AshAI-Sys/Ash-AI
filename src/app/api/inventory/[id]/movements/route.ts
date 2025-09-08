@@ -46,7 +46,7 @@ export async function GET(
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching stock movements:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -210,7 +210,7 @@ export async function POST(
       alertStatus
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error recording stock movement:', error)
     return NextResponse.json(
       { error: 'Internal server error' },

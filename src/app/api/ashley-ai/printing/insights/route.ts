@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error generating Ashley AI printing insights:', error)
     return NextResponse.json({ 
       error: 'Internal server error' 
@@ -348,7 +348,7 @@ function generatePrintingAlerts(insights: any, printRuns: any[]) {
   const longRunningJobs = printRuns.filter(run => 
     run.status === 'IN_PROGRESS' && 
     run.startedAt && 
-    (now.getTime() - new Date(run.startedAt).getTime()) > 8 * 60 * 60 * 1000 // 8 hours
+    (new Date(now).getTime() - new Date(run.startedAt).getTime()) > 8 * 60 * 60 * 1000 // 8 hours
   )
   
   if (longRunningJobs.length > 0) {

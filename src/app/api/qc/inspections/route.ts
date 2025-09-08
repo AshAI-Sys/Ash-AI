@@ -104,7 +104,7 @@ export async function GET(request: NextRequest) {
       analytics
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching QC inspections:', error)
     return NextResponse.json({ 
       error: 'Internal server error',
@@ -249,7 +249,7 @@ export async function POST(request: NextRequest) {
       }
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating QC inspection:', error)
     return NextResponse.json({ 
       error: 'Internal server error',

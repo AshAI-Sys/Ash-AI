@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
       data: accounts
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error fetching chart of accounts:", error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch accounts" },
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
       data: account
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error creating account:", error)
     return NextResponse.json(
       { success: false, error: "Failed to create account" },

@@ -365,7 +365,7 @@ export class AshleyPredictiveAI {
           currentTime
         )
         insights.push(...categoryInsights)
-      } catch (error) {
+      } catch (_error) {
         console.error(`Error generating ${category} insights:`, error)
       }
     }

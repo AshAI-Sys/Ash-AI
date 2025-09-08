@@ -31,7 +31,7 @@ export class AuditLogger {
           sessionId: entry.sessionId || null
         }
       })
-    } catch (error) {
+    } catch (_error) {
       console.error('Error logging audit event:', error)
       // Don't throw - audit logging shouldn't break business logic
     }

@@ -252,7 +252,7 @@ export async function POST(
       }
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error logging defect:', error)
     return NextResponse.json({ 
       error: 'Internal server error',

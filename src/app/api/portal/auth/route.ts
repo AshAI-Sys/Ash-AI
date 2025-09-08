@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     
     // Get client IP for rate limiting
-    const clientIP = request.ip || request.headers.get('x-forwarded-for') || 'unknown'
+    const clientIP = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
     const {
       action, // LOGIN, REGISTER, FORGOT_PASSWORD, RESET_PASSWORD, VERIFY_EMAIL
       email,
@@ -71,8 +71,8 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         )
     }
-  } catch (error) {
-    console.error('Portal auth error:', error)
+  } catch (_error) {
+    console.error('Portal auth error:', _error)
     return NextResponse.json(
       { success: false, error: 'Authentication failed' },
       { status: 500 }
@@ -344,7 +344,10 @@ async function handleRegister(workspace_id: string, client_id: string, email: st
   })
 
   // TODO: Send verification email (integrate with email service)
-  console.log(`Verification token for ${email}: ${verification_token}`)
+  // SECURITY: Never log sensitive tokens in production
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`Verification token for ${email}: ${verification_token}`)
+  }
 
   return NextResponse.json({
     success: true,
@@ -389,7 +392,10 @@ async function handleForgotPassword(email: string) {
   })
 
   // TODO: Send password reset email
-  console.log(`Reset token for ${email}: ${reset_token}`)
+  // SECURITY: Never log sensitive tokens in production
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`Reset token for ${email}: ${reset_token}`)
+  }
 
   return NextResponse.json({
     success: true,
@@ -537,15 +543,15 @@ export async function GET(request: NextRequest) {
         }
       })
 
-    } catch (jwt_error) {
+    } catch (_jwt_error) {
       return NextResponse.json(
         { authenticated: false, error: 'Invalid token' },
         { status: 401 }
       )
     }
 
-  } catch (error) {
-    console.error('Error checking session:', error)
+  } catch (_error) {
+    console.error('Error checking session:', _error)
     return NextResponse.json(
       { authenticated: false, error: 'Session validation failed' },
       { status: 500 }

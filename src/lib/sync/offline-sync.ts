@@ -63,8 +63,8 @@ export class OfflineSync {
       } else {
         throw new Error(result.error);
       }
-    } catch (error) {
-      console.error('Sync failed:', error);
+    } catch (_error) {
+      console.error('Sync failed:', _error);
       return { success: false, conflicts: [] };
     }
   }
@@ -81,8 +81,8 @@ export class OfflineSync {
       } else {
         throw new Error(result.error);
       }
-    } catch (error) {
-      console.error('Download changes failed:', error);
+    } catch (_error) {
+      console.error('Download changes failed:', _error);
       return [];
     }
   }
@@ -117,8 +117,8 @@ export class OfflineSync {
 
       const result = await response.json();
       return result.success;
-    } catch (error) {
-      console.error('Conflict resolution failed:', error);
+    } catch (_error) {
+      console.error('Conflict resolution failed:', _error);
       return false;
     }
   }
@@ -137,8 +137,8 @@ export class OfflineSync {
       if (downloadChanges.length > 0) {
         await this.applyServerChanges(downloadChanges);
       }
-    } catch (error) {
-      console.error('Auto sync failed:', error);
+    } catch (_error) {
+      console.error('Auto sync failed:', _error);
     }
   }
 
@@ -146,8 +146,8 @@ export class OfflineSync {
     for (const change of changes) {
       try {
         await this.applyChange(change);
-      } catch (error) {
-        console.error(`Failed to apply change for ${change.entity}:${change.entityId}`, error);
+      } catch (_error) {
+        console.error(`Failed to apply change for ${change.entity}:${change.entityId}`, _error);
       }
     }
   }

@@ -207,7 +207,7 @@ export async function POST(request: NextRequest) {
       ]
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({
         success: false,
@@ -324,7 +324,7 @@ export async function PUT(request: NextRequest) {
       ]
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({
         success: false,
@@ -411,7 +411,7 @@ export async function GET(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Get lay plans error:', error)
     return NextResponse.json({
       success: false,
@@ -505,7 +505,7 @@ async function emitCuttingEvent(eventType: string, data: any) {
         created_at: new Date()
       }
     })
-  } catch (error) {
+  } catch (_error) {
     console.error('Failed to emit cutting event:', error)
   }
 }

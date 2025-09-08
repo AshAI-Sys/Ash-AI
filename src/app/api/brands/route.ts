@@ -13,17 +13,13 @@ export async function GET(_request: NextRequest) {
     }
 
     const brands = await prisma.brand.findMany({
-      where: {
-        active: true
-      },
       orderBy: {
         name: 'asc'
       },
       include: {
         _count: {
           select: {
-            orders: true,
-            inventory: true
+            orders: true
           }
         }
       }
@@ -33,8 +29,8 @@ export async function GET(_request: NextRequest) {
       brands
     })
 
-  } catch (error) {
-    console.error('Error fetching brands:', error)
+  } catch (_error) {
+    console.error('Error fetching brands:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -87,7 +83,7 @@ export async function POST(request: NextRequest) {
       data: {
         name,
         code: code.toUpperCase(),
-        active: true
+        workspace_id: 'default'
       }
     })
 
@@ -96,8 +92,8 @@ export async function POST(request: NextRequest) {
       brand
     }, { status: 201 })
 
-  } catch (error) {
-    console.error('Error creating brand:', error)
+  } catch (_error) {
+    console.error('Error creating brand:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

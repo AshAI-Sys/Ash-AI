@@ -264,7 +264,7 @@ export async function POST(request: NextRequest) {
       next_actions: nextActions
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({
         success: false,
@@ -361,7 +361,7 @@ export async function PUT(request: NextRequest) {
       }
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Rework creation error:', error)
     return NextResponse.json({
       success: false,
@@ -448,7 +448,7 @@ export async function GET(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Get QC inspections error:', error)
     return NextResponse.json({
       success: false,
@@ -561,7 +561,7 @@ async function emitQCEvent(eventType: string, data: any) {
         created_at: new Date()
       }
     })
-  } catch (error) {
+  } catch (_error) {
     console.error('Failed to emit QC event:', error)
   }
 }

@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
   let userId: string | undefined
 
   try {
-    const clientIP = request.ip || request.headers.get('x-forwarded-for') || 'unknown'
+    const clientIP = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
     const userAgent = request.headers.get('user-agent') || 'unknown'
 
     // Session validation
@@ -193,7 +193,7 @@ export async function POST(request: NextRequest) {
   let userId: string | undefined
 
   try {
-    const clientIP = request.ip || request.headers.get('x-forwarded-for') || 'unknown'
+    const clientIP = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
     const userAgent = request.headers.get('user-agent') || 'unknown'
 
     // Session validation
@@ -288,7 +288,7 @@ export async function POST(request: NextRequest) {
 
         case 'resolve':
           // Only admins and managers can resolve alerts
-          if (![Role.ADMIN, Role.MANAGER].includes(session.user.role as Role)) {
+          if (!['ADMIN', 'MANAGER'].includes(session.user.role)) {
             await auditLog.log({
               action: 'alert_resolve_denied',
               userId,
@@ -424,7 +424,7 @@ export async function PUT(request: NextRequest) {
     if (authHeader !== `Bearer ${expectedToken}`) {
       await auditLog.log({
         action: 'alert_cron_unauthorized',
-        ip: request.ip || 'unknown',
+        ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
         success: false,
         error: 'Invalid cron authorization'
       })

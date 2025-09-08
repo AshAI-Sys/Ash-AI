@@ -120,7 +120,7 @@ export async function GET(request: NextRequest) {
               estimated_lead_time: analysis.estimatedLeadTime
             }
           }
-        } catch (error) {
+        } catch (_error) {
           console.error('Error analyzing template:', template.id, error)
           return {
             ...template,
@@ -140,7 +140,7 @@ export async function GET(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching routing templates:', error)
     return NextResponse.json(
       { error: 'Failed to fetch routing templates' },
@@ -272,7 +272,7 @@ export async function POST(request: NextRequest) {
       }
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({
         success: false,

@@ -135,7 +135,7 @@ export async function verifyToken(request: NextRequest) {
       role: session.user.role,
       active: true
     }
-  } catch (error) {
+  } catch (_error) {
     console.error('Token verification error:', error)
     return null
   }

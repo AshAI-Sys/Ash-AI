@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
       finished_units
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching finished units:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch finished units' },
@@ -190,7 +190,7 @@ export async function POST(request: NextRequest) {
       warnings: ashley_check.risk === 'AMBER' ? ashley_check.issues : []
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating finished units:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to create finished units' },

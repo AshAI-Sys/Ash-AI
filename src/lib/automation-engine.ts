@@ -118,7 +118,7 @@ export class AutomationEngine {
     for (const rule of matchingRules) {
       try {
         await this.executeRule(rule, event)
-      } catch (error) {
+      } catch (_error) {
         console.error(`Failed to execute automation rule ${rule.id}:`, error)
         await this.logExecutionError(rule.id, error)
       }
@@ -164,7 +164,7 @@ export class AutomationEngine {
       // Update rule statistics
       await this.updateRuleStats(rule.id, true)
 
-    } catch (error) {
+    } catch (_error) {
       execution.status = 'FAILED'
       execution.error_message = error instanceof Error ? error.message : String(error)
       execution.execution_time_ms = Date.now() - startTime
@@ -274,7 +274,7 @@ export class AutomationEngine {
     for (const channel of deliveryPlan.channels) {
       try {
         await this.sendViaChannel(channel, personalizedContent, recipient, deliveryPlan.timing)
-      } catch (error) {
+      } catch (_error) {
         console.error(`Failed to send via ${channel}:`, error)
         // Try fallback channel if available
         if (deliveryPlan.fallback_channel) {

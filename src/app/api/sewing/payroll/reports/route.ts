@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
         )
     }
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error generating payroll report:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to generate payroll report' },

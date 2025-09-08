@@ -49,8 +49,8 @@ export function withRBAC(config: ProtectedRouteConfig) {
 
         return await handler(request, { ...context, user, target });
 
-      } catch (error) {
-        console.error('RBAC middleware error:', error);
+      } catch (_error) {
+        console.error('RBAC middleware error:', _error);
         return NextResponse.json(
           { error: 'Authorization check failed' },
           { status: 500 }
@@ -160,7 +160,7 @@ export async function auditAction(
         sessionId: request?.cookies.get('next-auth.session-token')?.value || 'unknown'
       }
     });
-  } catch (error) {
-    console.error('Audit logging failed:', error);
+  } catch (_error) {
+    console.error('Audit logging failed:', _error);
   }
 }

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db, createAuditLog } from '@/lib/db'
-import { Prisma } from '@prisma/client'
 
 // GET /api/ash/clients - Fetch clients based on CLIENT_UPDATED_PLAN.md
 export async function GET(request: NextRequest) {
@@ -44,8 +43,8 @@ export async function GET(request: NextRequest) {
       clients
     })
 
-  } catch (error) {
-    console.error('Error fetching clients:', error)
+  } catch (_error) {
+    console.error('Error fetching clients:', _error)
     return NextResponse.json(
       { error: 'Failed to fetch clients' },
       { status: 500 }
@@ -120,8 +119,8 @@ export async function POST(request: NextRequest) {
       client
     }, { status: 201 })
 
-  } catch (error) {
-    console.error('Error creating client:', error)
+  } catch (_error) {
+    console.error('Error creating client:', _error)
     return NextResponse.json(
       { error: 'Failed to create client' },
       { status: 500 }

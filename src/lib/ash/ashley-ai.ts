@@ -111,7 +111,7 @@ export async function validateOrderIntake(data: OrderIntakeData): Promise<Ashley
 
     return assessment
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Ashley AI Error:', error)
     
     return {
@@ -141,7 +141,7 @@ async function analyzeCapacityConstraints(
   capacityData: any
 ) {
   const deliveryWindow = Math.ceil(
-    (data.targetDeliveryDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+    (new Date(data.targetDeliveryDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
   )
 
   // Simulate capacity analysis based on method
@@ -236,7 +236,7 @@ async function analyzeRoutingComplexity(
 async function analyzeDeliveryFeasibility(data: OrderIntakeData, assessment: AshleyAssessment) {
   const leadTime = getTypicalLeadTime(data.method, data.totalQty)
   const availableTime = Math.ceil(
-    (data.targetDeliveryDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+    (new Date(data.targetDeliveryDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
   )
 
   if (availableTime < leadTime) {
@@ -473,7 +473,7 @@ export async function validateAshleyRoutingOptimization(input: RoutingOptimizati
     // Identify parallel processing opportunities
     result.parallelOpportunities = identifyParallelOpportunities(input.steps)
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Routing optimization error:', error)
     result.bottlenecks.push({
       step: 'ANALYSIS',
@@ -725,7 +725,7 @@ async function logAshleyDecision(functionName: string, input: any, output: any) 
         model_version: output.modelVersion || 'ashley-v2.1.3'
       }
     })
-  } catch (error) {
+  } catch (_error) {
     console.error('Failed to log Ashley decision:', error)
   }
 }

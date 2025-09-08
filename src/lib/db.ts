@@ -29,22 +29,21 @@ export async function checkDatabaseHealth(): Promise<boolean> {
   try {
     await db.$queryRaw`SELECT 1`;
     return true;
-  } catch (error) {
-    console.error('Database health check failed:', error);
+  } catch (_error) {
+    console.error('Database health check failed:', _error);
     return false;
   }
 }
 
 // Transaction wrapper with retry logic
 export async function withTransaction<T>(
-  operation: (tx: PrismaClient) => Promise<T>,
+  operation: (tx: Omit<PrismaClient, "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends">) => Promise<T>,
   maxRetries = 3
 ): Promise<T> {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       return await db.$transaction(operation, {
         timeout: 30000, // 30 seconds
-        isolationLevel: 'ReadCommitted',
       });
     } catch (error: unknown) {
       console.error(`Transaction attempt ${attempt} failed:`, error);
@@ -89,12 +88,12 @@ export async function createAuditLog(params: {
         entity_type: params.entity_type,
         entity_id: params.entity_id,
         action: params.action,
-        before_data: params.before_data ? JSON.stringify(params.before_data) : null,
-        after_data: params.after_data ? JSON.stringify(params.after_data) : null,
+        before_data: params.before_data ? JSON.stringify(params.before_data) : undefined,
+        after_data: params.after_data ? JSON.stringify(params.after_data) : undefined,
       },
     });
-  } catch (error) {
-    console.error('Failed to create audit log:', error);
+  } catch (_error) {
+    console.error('Failed to create audit log:', _error);
     // Don't throw - audit logging shouldn't break the main operation
   }
 }

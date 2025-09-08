@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result)
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Inventory optimization error:', error)
     return NextResponse.json(
       { error: 'Failed to perform inventory optimization' },
@@ -392,15 +392,15 @@ function getDateFromPeriod(period: string): Date {
   const now = new Date()
   switch (period) {
     case '30d':
-      return new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+      return new Date(new Date(now).getTime() - 30 * 24 * 60 * 60 * 1000)
     case '90d':
-      return new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000)
+      return new Date(new Date(now).getTime() - 90 * 24 * 60 * 60 * 1000)
     case '6m':
-      return new Date(now.getTime() - 180 * 24 * 60 * 60 * 1000)
+      return new Date(new Date(now).getTime() - 180 * 24 * 60 * 60 * 1000)
     case '1y':
-      return new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000)
+      return new Date(new Date(now).getTime() - 365 * 24 * 60 * 60 * 1000)
     default:
-      return new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000)
+      return new Date(new Date(now).getTime() - 90 * 24 * 60 * 60 * 1000)
   }
 }
 

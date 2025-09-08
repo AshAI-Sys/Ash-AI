@@ -99,7 +99,7 @@ export async function GET(request: NextRequest) {
       timestamp: new Date().toISOString()
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('My Queue API error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -181,7 +181,7 @@ export async function POST(request: NextRequest) {
       timestamp: now.toISOString()
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('My Queue batch action error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },

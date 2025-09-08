@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
       timestamp: Date.now()
     });
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Sync download error:', error);
     return NextResponse.json(
       { error: 'Failed to download changes' },
@@ -62,7 +62,7 @@ async function getChangesForUser(userId: string, since: Date) {
 
   tasks.forEach(task => {
     changes.push({
-      timestamp: task.updatedAt.getTime(),
+      timestamp: new Date(task.updatedAt).getTime(),
       userId,
       entity: 'Task',
       entityId: task.id,
@@ -86,7 +86,7 @@ async function getChangesForUser(userId: string, since: Date) {
 
   timeRecords.forEach(record => {
     changes.push({
-      timestamp: record.createdAt.getTime(),
+      timestamp: new Date(record.createdAt).getTime(),
       userId,
       entity: 'TimeRecord',
       entityId: record.id,
@@ -112,7 +112,7 @@ async function getChangesForUser(userId: string, since: Date) {
 
   inventoryUpdates.forEach(movement => {
     changes.push({
-      timestamp: movement.createdAt.getTime(),
+      timestamp: new Date(movement.createdAt).getTime(),
       userId,
       entity: 'StockMovement',
       entityId: movement.id,
@@ -136,7 +136,7 @@ async function getChangesForUser(userId: string, since: Date) {
 
   qcRecords.forEach(record => {
     changes.push({
-      timestamp: record.createdAt.getTime(),
+      timestamp: new Date(record.createdAt).getTime(),
       userId,
       entity: 'QCRecord',
       entityId: record.id,

@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       return handleReconcile(body)
     }
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Reconciliation error:', error)
     
     if (error instanceof z.ZodError) {
@@ -125,7 +125,7 @@ async function handleReconcile(body: any) {
         })
       }
 
-    } catch (error) {
+    } catch (_error) {
       results.push({ 
         saleId, 
         status: 'error', 

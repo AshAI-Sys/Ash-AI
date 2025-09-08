@@ -101,7 +101,7 @@ export class InputSanitizer {
       }
       
       return url.toString()
-    } catch (error) {
+    } catch (_error) {
       throw new Error('Invalid URL format')
     }
   }
@@ -330,7 +330,7 @@ export class CSRFProtection {
         .digest('hex')
       
       return signature === expectedSignature
-    } catch (error) {
+    } catch (_error) {
       return false
     }
   }

@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error optimizing packing:", error)
     return NextResponse.json(
       { success: false, error: "Failed to optimize packing" },

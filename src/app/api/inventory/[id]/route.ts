@@ -90,7 +90,7 @@ export async function GET(
       purchaseHistory: item.purchaseItems
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching inventory item:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -178,7 +178,7 @@ export async function PATCH(
       item: updatedItem
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error updating inventory item:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -244,7 +244,7 @@ export async function DELETE(
       message: 'Inventory item deleted successfully'
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error deleting inventory item:', error)
     return NextResponse.json(
       { error: 'Internal server error' },

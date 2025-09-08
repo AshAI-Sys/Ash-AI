@@ -135,7 +135,7 @@ export function calculateARBuckets(invoices: Array<{
     if (invoice.balance <= 0) return
 
     const due_date = invoice.due_date || invoice.date_issued
-    const days_overdue = Math.floor((today.getTime() - due_date.getTime()) / (1000 * 60 * 60 * 24))
+    const days_overdue = Math.floor((new Date(today).getTime() - new Date(due_date).getTime()) / (1000 * 60 * 60 * 24))
 
     buckets.total += invoice.balance
 
@@ -325,7 +325,7 @@ function calculateRecurringOccurrences(
   expense: { frequency: 'MONTHLY' | 'WEEKLY' | 'DAILY', next_due: Date },
   forecast_date: Date
 ): number {
-  const days_until_forecast = Math.ceil((forecast_date.getTime() - expense.next_due.getTime()) / (1000 * 60 * 60 * 24))
+  const days_until_forecast = Math.ceil((new Date(forecast_date).getTime() - new Date(expense.next_due).getTime()) / (1000 * 60 * 60 * 24))
   
   if (days_until_forecast <= 0) return 0
 

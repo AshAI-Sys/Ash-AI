@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
       attendance_records: records_with_summary
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching attendance records:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch attendance records' },
@@ -228,7 +228,7 @@ export async function POST(request: NextRequest) {
           const time_in = new Date(attendance_record.time_in)
           const time_out = action_timestamp
           
-          let total_minutes = Math.floor((time_out.getTime() - time_in.getTime()) / (1000 * 60))
+          let total_minutes = Math.floor((new Date(time_out).getTime() - new Date(time_in).getTime()) / (1000 * 60))
           
           // Subtract break time if applicable
           if (attendance_record.break_start && attendance_record.break_end) {
@@ -252,7 +252,7 @@ export async function POST(request: NextRequest) {
           scheduled_time_in.setHours(8, 0, 0, 0) // Assume 8 AM start
           
           if (time_in > scheduled_time_in) {
-            update_data.late_minutes = Math.floor((time_in.getTime() - scheduled_time_in.getTime()) / (1000 * 60))
+            update_data.late_minutes = Math.floor((new Date(time_in).getTime() - new Date(scheduled_time_in).getTime()) / (1000 * 60))
           }
           
           if (regular_minutes < standard_minutes) {
@@ -319,7 +319,7 @@ export async function POST(request: NextRequest) {
       warnings: ashley_check.risk === 'AMBER' ? ashley_check.issues : []
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error recording attendance:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to record attendance' },

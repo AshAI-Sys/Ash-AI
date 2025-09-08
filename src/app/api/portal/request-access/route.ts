@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
       where: {
         emails: {
           path: '$',
-          array_contains: normalizedEmail
+          array_starts_with: normalizedEmail
         }
       },
       include: {
@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
       message: 'Access link sent! Please check your email (including spam folder). The link will expire in 24 hours.'
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error processing access request:', error)
     
     // Generic response for security
@@ -160,7 +160,7 @@ export async function GET() {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching access info:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch access info' },

@@ -121,12 +121,12 @@ export async function GET() {
       const priorityOrder = { HIGH: 3, MEDIUM: 2, LOW: 1 }
       const priorityDiff = priorityOrder[b.priority] - priorityOrder[a.priority]
       if (priorityDiff !== 0) return priorityDiff
-      return b.createdAt.getTime() - a.createdAt.getTime()
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     })
 
     return NextResponse.json(insights)
-  } catch (error) {
-    console.error('Error getting AI insights:', error)
+  } catch (_error) {
+    console.error('Error getting AI insights:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

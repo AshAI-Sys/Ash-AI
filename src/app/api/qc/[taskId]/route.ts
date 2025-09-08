@@ -215,7 +215,7 @@ export async function POST(
       nextStep: status === 'PASS' || status === 'PARTIAL' ? 'FINISHING' : 'REWORK'
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error completing QC inspection:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -284,7 +284,7 @@ export async function GET(
       qcHistory: task.qcRecords
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching QC details:', error)
     return NextResponse.json(
       { error: 'Internal server error' },

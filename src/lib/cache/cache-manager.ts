@@ -323,7 +323,7 @@ export class BrowserCache {
     
     try {
       localStorage.setItem(`cache:${key}`, JSON.stringify(item));
-    } catch (error) {
+    } catch (_error) {
       console.warn('Failed to set browser cache:', error);
     }
   }
@@ -344,7 +344,7 @@ export class BrowserCache {
       }
       
       return item.data;
-    } catch (error) {
+    } catch (_error) {
       console.warn('Failed to get browser cache:', error);
       return null;
     }

@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
       data: entries
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error fetching journal entries:", error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch journal entries" },
@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
       data: result
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error creating journal entry:", error)
     return NextResponse.json(
       { success: false, error: "Failed to create journal entry" },

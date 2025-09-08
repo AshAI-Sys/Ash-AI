@@ -436,7 +436,7 @@ export class QueryOptimizer {
   }
 
   static async getAnalyticsData(dateRange: { from: Date; to: Date }) {
-    const cacheKey = `analytics:${dateRange.from.getTime()}:${dateRange.to.getTime()}`;
+    const cacheKey = `analytics:${new Date(dateRange.from).getTime()}:${new Date(dateRange.to).getTime()}`;
     const cached = this.getFromCache(cacheKey);
     if (cached) return cached;
 

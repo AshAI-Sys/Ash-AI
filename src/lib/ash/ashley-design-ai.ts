@@ -97,7 +97,7 @@ export async function validateAshleyDesignAsset(input: DesignAnalysisInput): Pro
     // Generate smart recommendations
     generateDesignRecommendations(input, analysis)
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Ashley Design AI analysis error:', error)
     analysis.risk = 'AMBER'
     analysis.confidence = 0.4
@@ -168,7 +168,7 @@ async function analyzeImageTechnicals(input: DesignAnalysisInput, analysis: Desi
       })
     }
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Technical analysis error:', error)
     analysis.issues.push({
       type: 'METADATA_READ_ERROR',
@@ -254,7 +254,7 @@ async function validateScreenPrint(input: DesignAnalysisInput, analysis: DesignA
       })
     }
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Screen print validation error:', error)
   }
 }
@@ -319,7 +319,7 @@ async function validateDTF(input: DesignAnalysisInput, analysis: DesignAnalysisR
         ]
       })
     }
-  } catch (error) {
+  } catch (_error) {
     console.error('DTF validation error:', error)
   }
 }
@@ -507,7 +507,7 @@ async function validateFileIntegrity(input: DesignAnalysisInput, analysis: Desig
       // Try to read the image to verify integrity
       await sharp(input.buffer).metadata()
     }
-  } catch (error) {
+  } catch (_error) {
     analysis.technical_analysis.file_integrity = false
     analysis.issues.push({
       type: 'FILE_CORRUPTION',
@@ -538,7 +538,7 @@ async function analyzeArtworkQuality(input: DesignAnalysisInput, analysis: Desig
         recommendation: 'Consider using higher quality source image'
       })
     }
-  } catch (error) {
+  } catch (_error) {
     console.error('Artwork quality analysis error:', error)
   }
 }

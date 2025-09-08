@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       response
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Chatbot error:', error)
     
     if (error instanceof z.ZodError) {

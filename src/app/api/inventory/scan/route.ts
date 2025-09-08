@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
         )
     }
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error processing scan:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -337,7 +337,7 @@ export async function GET(request: NextRequest) {
       count: recentActivity.length
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching scan history:', error)
     return NextResponse.json(
       { error: 'Internal server error' },

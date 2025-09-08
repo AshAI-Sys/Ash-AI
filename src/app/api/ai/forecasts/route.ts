@@ -21,8 +21,8 @@ export async function GET(req: NextRequest) {
     const forecasts = await aiService.forecastProjectCompletion(orderIds)
 
     return NextResponse.json(forecasts)
-  } catch (error) {
-    console.error('Error getting project forecasts:', error)
+  } catch (_error) {
+    console.error('Error getting project forecasts:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

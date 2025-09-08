@@ -111,7 +111,7 @@ export async function GET(request: NextRequest) {
       bundles: bundles_with_progress
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching sewing bundles:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch sewing bundles' },
@@ -292,7 +292,7 @@ export async function POST(request: NextRequest) {
       warnings: ashley_check.risk === 'AMBER' ? ashley_check.issues : []
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating sewing bundle:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to create sewing bundle' },
@@ -375,7 +375,7 @@ export async function PUT(request: NextRequest) {
       bundle: updated_bundle
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error updating bundle:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to update bundle' },

@@ -162,7 +162,7 @@ export async function GET(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Order fetch error:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch orders' },
@@ -360,7 +360,7 @@ export async function POST(request: NextRequest) {
       estimatedCompletion: TaskPipelineService.getEstimatedCompletionTime(printMethod)
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating order:', error)
     return NextResponse.json(
       { error: 'Internal server error' },

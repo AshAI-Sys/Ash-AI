@@ -7,7 +7,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import jwt from 'jsonwebtoken'
 
-const JWT_SECRET = process.env.NEXTAUTH_SECRET || 'fallback-secret-key'
+const JWT_SECRET = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET or NEXTAUTH_SECRET environment variable is required for production')
+}
 
 /**
  * GET /api/client-portal/dashboard - Get client dashboard data
@@ -283,7 +286,7 @@ function calculateOrderInsights(orders: any[]) {
       if (delivery && delivery.completed_at) {
         const targetDate = new Date(order.target_delivery_date)
         const actualDate = new Date(delivery.completed_at)
-        const daysDiff = Math.floor((actualDate.getTime() - targetDate.getTime()) / (1000 * 60 * 60 * 24))
+        const daysDiff = Math.floor((new Date(actualDate).getTime() - new Date(targetDate).getTime()) / (1000 * 60 * 60 * 24))
         
         if (daysDiff <= 0) insights.delivery_performance.on_time++
         else if (daysDiff > 0) insights.delivery_performance.delayed++
@@ -360,7 +363,7 @@ function generateQuickActions(orders: any[], pendingApprovals: any[]) {
 
   const urgentOrders = orders.filter(o => {
     const deliveryDate = new Date(o.target_delivery_date)
-    const daysUntilDelivery = Math.ceil((deliveryDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+    const daysUntilDelivery = Math.ceil((new Date(deliveryDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
     return daysUntilDelivery <= 7 && !['DELIVERED', 'CLOSED'].includes(o.status)
   })
 

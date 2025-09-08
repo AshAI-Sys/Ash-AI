@@ -297,7 +297,7 @@ export class ProductionPipelineManager {
       const step = pipeline[i]
       
       // Calculate start time for this step
-      const stepStart = new Date(currentDate.getTime() - (step.estimatedHours * 60 * 60 * 1000))
+      const stepStart = new Date(new Date(currentDate).getTime() - (step.estimatedHours * 60 * 60 * 1000))
       
       tasks.unshift({
         dueDate: new Date(currentDate),
@@ -306,7 +306,7 @@ export class ProductionPipelineManager {
       })
 
       // Move deadline back for next step (with 2-hour buffer)
-      currentDate = new Date(stepStart.getTime() - (2 * 60 * 60 * 1000))
+      currentDate = new Date(new Date(stepStart).getTime() - (2 * 60 * 60 * 1000))
     }
 
     return tasks

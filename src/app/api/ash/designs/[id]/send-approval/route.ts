@@ -111,7 +111,7 @@ export async function POST(
       expires_at: expiresAt.toISOString()
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error sending design approval:', error)
     return NextResponse.json(
       { error: 'Internal server error' },

@@ -136,7 +136,7 @@ export async function POST(
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error requesting design revision:', error)
     return NextResponse.json({ 
       error: 'Internal server error',

@@ -198,7 +198,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       remaining_unallocated: payment.amount - total_allocated
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error allocating payment:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to allocate payment' },
@@ -276,7 +276,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       available_invoices
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching payment allocation details:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch payment details' },

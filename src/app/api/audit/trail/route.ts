@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
       totalCount: auditTrail.length
     });
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Audit trail error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch audit trail' },

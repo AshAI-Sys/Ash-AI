@@ -287,7 +287,7 @@ export function calculateDeliveryMetrics(deliveries: Array<{
   const total_delivery_time = successful_deliveries
     .filter(d => d.delivered_at)
     .reduce((sum, d) => {
-      const hours = (d.delivered_at!.getTime() - d.promised_date.getTime()) / (1000 * 60 * 60)
+      const hours = (d.delivered_at!.getTime() - new Date(d.promised_date).getTime()) / (1000 * 60 * 60)
       return sum + Math.abs(hours)
     }, 0)
 

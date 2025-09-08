@@ -3,7 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-import Layout from '@/components/Layout'
+import EnhancedLayout from '@/components/EnhancedLayout'
 import { EnterpriseDashboard } from '@/components/EnterpriseDashboard'
 
 export default function DashboardPage() {
@@ -67,8 +67,8 @@ export default function DashboardPage() {
   }
 
   return (
-    <Layout>
+    <EnhancedLayout>
       <EnterpriseDashboard />
-    </Layout>
+    </EnhancedLayout>
   )
 }

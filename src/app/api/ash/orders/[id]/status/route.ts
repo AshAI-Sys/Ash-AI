@@ -98,7 +98,7 @@ export async function GET(
       status_history: statusHistory
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching order status:', error)
     return NextResponse.json(
       { error: 'Failed to fetch order status' },
@@ -162,7 +162,7 @@ export async function POST(
       new_status: result.newStatus
     })
 
-  } catch (error) {
+  } catch (_error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({
         success: false,

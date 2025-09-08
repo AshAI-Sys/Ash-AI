@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching tasks:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -175,7 +175,7 @@ export async function POST(request: NextRequest) {
       task
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating task:', error)
     return NextResponse.json(
       { error: 'Internal server error' },

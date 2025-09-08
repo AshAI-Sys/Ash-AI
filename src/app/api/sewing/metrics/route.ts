@@ -210,7 +210,7 @@ export async function GET(request: NextRequest) {
         period: {
           start_date: start_date.toISOString(),
           end_date: end_date.toISOString(),
-          days: Math.ceil((end_date.getTime() - start_date.getTime()) / (24 * 60 * 60 * 1000))
+          days: Math.ceil((new Date(end_date).getTime() - new Date(start_date).getTime()) / (24 * 60 * 60 * 1000))
         },
         overall: overall_metrics,
         operator_performance,
@@ -220,7 +220,7 @@ export async function GET(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching sewing metrics:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch sewing metrics' },
@@ -343,7 +343,7 @@ export async function POST(request: NextRequest) {
       }
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating line metrics:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to create line metrics' },

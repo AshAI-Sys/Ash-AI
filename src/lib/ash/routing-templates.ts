@@ -56,7 +56,7 @@ export class RoutingTemplateService {
     let stepDuration = 60 // Default 1 hour per step
     if (targetDate && totalEstimatedMinutes > 0) {
       const availableMinutes = Math.max(
-        (targetDate.getTime() - currentDate.getTime()) / (1000 * 60),
+        (new Date(targetDate).getTime() - new Date(currentDate).getTime()) / (1000 * 60),
         totalEstimatedMinutes
       )
       stepDuration = availableMinutes / templateSteps.length
@@ -64,7 +64,7 @@ export class RoutingTemplateService {
 
     for (const stepData of templateSteps) {
       const plannedStart = new Date(currentDate)
-      const plannedEnd = new Date(currentDate.getTime() + (stepData.estimatedMinutes || stepDuration) * 60 * 1000)
+      const plannedEnd = new Date(new Date(currentDate).getTime() + (stepData.estimatedMinutes || stepDuration) * 60 * 1000)
       
       const step = await tx.routingStep.create({
         data: {

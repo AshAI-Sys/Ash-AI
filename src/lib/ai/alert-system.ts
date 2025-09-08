@@ -58,7 +58,7 @@ export const ALERT_RULES: AlertRule[] = [
       for (const order of orders) {
         if (order.deadline) {
           const estimatedCompletionTime = calculateETA(order.tasks)
-          const timeDiff = estimatedCompletionTime.getTime() - order.deadline.getTime()
+          const timeDiff = new Date(estimatedCompletionTime).getTime() - new Date(order.deadline).getTime()
           if (timeDiff > 6 * 60 * 60 * 1000) { // 6 hours in milliseconds
             return true
           }
@@ -98,8 +98,8 @@ export const ALERT_RULES: AlertRule[] = [
     enabled: true,
     condition: async (data) => {
       const now = new Date()
-      const threeDaysAgo = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000)
-      const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+      const threeDaysAgo = new Date(new Date(now).getTime() - 3 * 24 * 60 * 60 * 1000)
+      const thirtyDaysAgo = new Date(new Date(now).getTime() - 30 * 24 * 60 * 60 * 1000)
 
       const recent3Days = await prisma.qCRecord.aggregate({
         where: {
@@ -347,7 +347,7 @@ export class AlertEngine {
           const alert = await this.createAlert(rule, alertPayload)
           alerts.push(alert)
         }
-      } catch (error) {
+      } catch (_error) {
         console.error(`Error processing alert rule ${rule.id}:`, error)
       }
     }
@@ -409,7 +409,7 @@ export class AlertEngine {
     const riskyOrder = orders.find(order => {
       if (order.deadline) {
         const eta = calculateETA(order.tasks)
-        return eta.getTime() > order.deadline.getTime() + (6 * 60 * 60 * 1000)
+        return new Date(eta).getTime() > new Date(order.deadline).getTime() + (6 * 60 * 60 * 1000)
       }
       return false
     })
@@ -428,8 +428,8 @@ export class AlertEngine {
   private async getRejectSpikeData() {
     // Implementation for reject spike data gathering
     const now = new Date()
-    const threeDaysAgo = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000)
-    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+    const threeDaysAgo = new Date(new Date(now).getTime() - 3 * 24 * 60 * 60 * 1000)
+    const thirtyDaysAgo = new Date(new Date(now).getTime() - 30 * 24 * 60 * 60 * 1000)
 
     const recent3Days = await prisma.qCRecord.aggregate({
       where: { created_at: { gte: threeDaysAgo } },
@@ -549,7 +549,7 @@ function calculateETA(tasks: Array<Record<string, unknown>>): Date {
 function calculateDelayHours(order: Record<string, unknown>): number {
   if (!order.deadline) return 0
   const eta = calculateETA(order.tasks)
-  return Math.max(0, (eta.getTime() - order.deadline.getTime()) / (60 * 60 * 1000))
+  return Math.max(0, (new Date(eta).getTime() - new Date(order.deadline).getTime()) / (60 * 60 * 1000))
 }
 
 function calculateOrderMargin(order: Record<string, unknown>, totalCosts: number): number {

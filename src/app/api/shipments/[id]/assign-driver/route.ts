@@ -128,7 +128,7 @@ export async function POST(
       data: result
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error assigning driver:", error)
     return NextResponse.json(
       { success: false, error: error instanceof Error ? error.message : "Failed to assign driver" },

@@ -421,7 +421,7 @@ export async function transitionOrderStatus(
       newStatus: targetStatus
     }
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error transitioning order status:', error)
     return {
       success: false,

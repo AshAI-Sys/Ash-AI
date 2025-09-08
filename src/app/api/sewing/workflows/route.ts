@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
       totalOrders: Object.keys(workflowsByOrder).length
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching workflows:', error)
     return NextResponse.json({ 
       error: 'Internal server error',
@@ -202,7 +202,7 @@ export async function POST(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error optimizing workflow:', error)
     return NextResponse.json({ 
       error: 'Internal server error',

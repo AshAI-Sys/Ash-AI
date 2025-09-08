@@ -114,7 +114,7 @@ export async function GET(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching inventory:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -225,7 +225,7 @@ export async function POST(request: NextRequest) {
       item
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating inventory item:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -307,7 +307,7 @@ export async function PUT(request: NextRequest) {
       results
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error in bulk update:', error)
     return NextResponse.json(
       { error: 'Internal server error' },

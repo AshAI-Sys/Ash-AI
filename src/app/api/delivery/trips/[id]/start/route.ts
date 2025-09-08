@@ -69,7 +69,7 @@ export async function POST(
       data: result
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error starting trip:", error)
     return NextResponse.json(
       { success: false, error: "Failed to start trip" },

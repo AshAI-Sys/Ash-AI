@@ -16,7 +16,7 @@ export interface ConflictData {
   field: string;
   localValue: unknown;
   serverValue: unknown;
-  createdAt: Date;
+  created_at: Date;
 }
 
 export class ConflictResolver {
@@ -33,7 +33,7 @@ export class ConflictResolver {
         resolved: false,
         ...where
       },
-      orderBy: { createdAt: 'asc' }
+      orderBy: { created_at: 'asc' }
     });
 
     return conflicts.map(conflict => ({
@@ -43,13 +43,13 @@ export class ConflictResolver {
       field: conflict.field,
       localValue: conflict.localValue,
       serverValue: conflict.serverValue,
-      createdAt: conflict.createdAt
+      created_at: conflict.created_at
     }));
   }
 
   static async resolveConflict(
     resolution: ConflictResolution,
-    userId: string
+    user_id: string
   ): Promise<{ success: boolean; error?: string }> {
     try {
       const conflict = await prisma.syncConflict.findUnique({
@@ -113,7 +113,7 @@ export class ConflictResolver {
 
       return { success: true };
 
-    } catch (error) {
+    } catch (_error) {
       console.error('Conflict resolution failed:', error);
       return { 
         success: false, 
@@ -125,7 +125,7 @@ export class ConflictResolver {
   static async resolveAllConflicts(
     conflictIds: string[],
     defaultResolution: 'LOCAL' | 'SERVER',
-    userId: string
+    user_id: string
   ): Promise<{ resolved: number; failed: number; errors: string[] }> {
     let resolved = 0;
     let failed = 0;
@@ -152,7 +152,7 @@ export class ConflictResolver {
   private static async applyResolution(
     conflict: { entity: string; entityId: string; field: string },
     finalData: unknown,
-    userId: string
+    user_id: string
   ): Promise<void> {
     const { entity, entityId, field } = conflict;
 
@@ -178,7 +178,7 @@ export class ConflictResolver {
     taskId: string,
     field: string,
     value: unknown,
-    userId: string
+    user_id: string
   ): Promise<void> {
     const updateData: Record<string, unknown> = {};
     updateData[field] = value;
@@ -205,7 +205,7 @@ export class ConflictResolver {
     recordId: string,
     field: string,
     value: unknown,
-    userId: string
+    user_id: string
   ): Promise<void> {
     const updateData: Record<string, unknown> = {};
     updateData[field] = value;
@@ -232,7 +232,7 @@ export class ConflictResolver {
     itemId: string,
     field: string,
     value: unknown,
-    userId: string
+    user_id: string
   ): Promise<void> {
     const updateData: Record<string, unknown> = {};
     updateData[field] = value;
@@ -259,7 +259,7 @@ export class ConflictResolver {
     recordId: string,
     field: string,
     value: unknown,
-    userId: string
+    user_id: string
   ): Promise<void> {
     const updateData: Record<string, unknown> = {};
     updateData[field] = value;
@@ -282,17 +282,17 @@ export class ConflictResolver {
     );
   }
 
-  private static async getUserTaskIds(userId: string): Promise<string[]> {
+  private static async getUserTaskIds(user_id: string): Promise<string[]> {
     const tasks = await prisma.task.findMany({
-      where: { assignedTo: userId },
+      where: { assigned_to: userId },
       select: { id: true }
     });
     return tasks.map(task => task.id);
   }
 
-  private static async getUserTimeRecordIds(userId: string): Promise<string[]> {
+  private static async getUserTimeRecordIds(user_id: string): Promise<string[]> {
     const records = await prisma.timeRecord.findMany({
-      where: { employeeId: userId },
+      where: { employee_id: userId },
       select: { id: true }
     });
     return records.map(record => record.id);
@@ -328,7 +328,7 @@ export class ConflictResolver {
     return null;
   }
 
-  static async autoResolveConflicts(userId: string): Promise<{ resolved: number; remaining: number }> {
+  static async autoResolveConflicts(user_id: string): Promise<{ resolved: number; remaining: number }> {
     const conflicts = await this.getConflicts(userId);
     let resolved = 0;
 
@@ -362,9 +362,9 @@ export class ConflictResolver {
       where: { resolved: false },
       select: {
         entity: true,
-        createdAt: true
+        created_at: true
       },
-      orderBy: { createdAt: 'asc' }
+      orderBy: { created_at: 'asc' }
     });
 
     const byEntity: Record<string, number> = {};
@@ -375,7 +375,7 @@ export class ConflictResolver {
     return {
       total: conflicts.length,
       byEntity,
-      oldestConflict: conflicts.length > 0 ? conflicts[0].createdAt : undefined
+      oldestConflict: conflicts.length > 0 ? conflicts[0].created_at : undefined
     };
   }
 }

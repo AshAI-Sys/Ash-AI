@@ -126,7 +126,7 @@ export async function GET(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching portal orders:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch orders' },
@@ -197,7 +197,7 @@ export async function POST(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error in portal order access:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to process request' },

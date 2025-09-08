@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
     const records_with_summary = downtime_records.map(record => {
       const is_ongoing = !record.downtime_end
       const actual_duration = is_ongoing 
-        ? Math.floor((Date.now() - record.downtime_start.getTime()) / (1000 * 60))
+        ? Math.floor((Date.now() - new Date(record.downtime_start).getTime()) / (1000 * 60))
         : record.duration_minutes
 
       // Calculate impact metrics
@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
           cost_impact,
           has_maintenance_task: !!record.maintenance_task_id,
           is_resolved: !!record.resolved_by,
-          days_since_start: Math.floor((Date.now() - record.downtime_start.getTime()) / (1000 * 60 * 60 * 24))
+          days_since_start: Math.floor((Date.now() - new Date(record.downtime_start).getTime()) / (1000 * 60 * 60 * 24))
         }
       }
     })
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
       downtime_records: records_with_summary
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching downtime records:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch downtime records' },
@@ -253,7 +253,7 @@ export async function POST(request: NextRequest) {
       warnings: ashley_check.risk === 'AMBER' ? ashley_check.issues : []
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error recording equipment downtime:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to record equipment downtime' },
@@ -315,7 +315,7 @@ export async function PUT(request: NextRequest) {
 
     // Calculate duration in minutes
     const duration_minutes = Math.floor(
-      (end_time.getTime() - existing_record.downtime_start.getTime()) / (1000 * 60)
+      (new Date(end_time).getTime() - new Date(existing_record.downtime_start).getTime()) / (1000 * 60)
     )
 
     // Update downtime record
@@ -360,7 +360,7 @@ export async function PUT(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error ending equipment downtime:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to end equipment downtime' },

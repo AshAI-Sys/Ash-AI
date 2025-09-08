@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
     // Add summary data
     const schedules_with_summary = schedules.map(schedule => {
       const days_until_due = Math.ceil(
-        (schedule.next_due_date.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+        (new Date(schedule.next_due_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
       )
 
       const completed_tasks = schedule.maintenance_tasks.filter(t => t.status === 'COMPLETED').length
@@ -121,7 +121,7 @@ export async function GET(request: NextRequest) {
       schedules: schedules_with_summary
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching maintenance schedules:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch maintenance schedules' },
@@ -268,7 +268,7 @@ export async function POST(request: NextRequest) {
       warnings: ashley_check.risk === 'AMBER' ? ashley_check.issues : []
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating maintenance schedule:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to create maintenance schedule' },
@@ -365,7 +365,7 @@ export async function PUT(request: NextRequest) {
       message: 'Maintenance schedule updated successfully'
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error updating maintenance schedule:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to update maintenance schedule' },

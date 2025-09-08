@@ -119,7 +119,7 @@ export async function GET(request: NextRequest) {
       data: enrichedRules
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error fetching automation rules:", error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch automation rules" },
@@ -269,7 +269,7 @@ export async function POST(request: NextRequest) {
       testResult
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error creating automation rule:", error)
     return NextResponse.json(
       { success: false, error: "Failed to create automation rule" },
@@ -455,7 +455,7 @@ async function testAutomationRule(rule: any) {
       actionResults
     }
 
-  } catch (error) {
+  } catch (_error) {
     return {
       success: false,
       message: `Test automation rule execution error: ${error.message}`,
@@ -479,7 +479,7 @@ function evaluateConditions(conditions: any, data: any) {
       results.some(result => result)
     
     return { matched, results }
-  } catch (error) {
+  } catch (_error) {
     return { matched: false, error: error.message }
   }
 }
@@ -578,7 +578,7 @@ async function executeAction(action: any, inputData: any) {
           message: `Action ${action.type} executed`
         }
     }
-  } catch (error) {
+  } catch (_error) {
     return {
       success: false,
       message: `Action execution failed: ${error.message}`

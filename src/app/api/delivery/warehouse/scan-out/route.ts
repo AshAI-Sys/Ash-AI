@@ -175,7 +175,7 @@ export async function POST(request: NextRequest) {
       error: result.success ? null : result.message
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error scanning out carton:", error)
     return NextResponse.json(
       { success: false, error: error instanceof Error ? error.message : "Failed to scan out carton" },
@@ -232,7 +232,7 @@ export async function GET(request: NextRequest) {
       data: scanOutRecords
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error fetching scan-out records:", error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch scan-out records" },

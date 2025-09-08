@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
       quoteNumber: order.orderNumber
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Quote submission error:', error)
     
     if (error instanceof z.ZodError) {
@@ -145,7 +145,7 @@ export async function GET() {
       quotes: recentQuotes
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Get quotes error:', error)
     return NextResponse.json(
       { 

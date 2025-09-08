@@ -174,7 +174,7 @@ export class ThreatDetectionEngine {
       return null
     }
 
-    const ipKey = `bf_${request.ip}`
+    const ipKey = `bf_${(request.headers?.get('x-forwarded-for') || request.headers?.get('x-real-ip') || 'unknown')}`
     const currentAttempts = this.attackPatterns.get(ipKey) || 0
     this.attackPatterns.set(ipKey, currentAttempts + 1)
 
@@ -187,7 +187,7 @@ export class ThreatDetectionEngine {
     }, 15 * 60 * 1000) // 15 minutes
 
     if (currentAttempts > 10) {
-      this.blockedIPs.add(request.ip)
+      this.blockedIPs.add((request.headers?.get('x-forwarded-for') || request.headers?.get('x-real-ip') || 'unknown'))
       return {
         type: 'BRUTE_FORCE_ATTACK',
         severity: 'CRITICAL',
@@ -198,7 +198,7 @@ export class ThreatDetectionEngine {
         }
       }
     } else if (currentAttempts > 5) {
-      this.suspiciousIPs.add(request.ip)
+      this.suspiciousIPs.add((request.headers?.get('x-forwarded-for') || request.headers?.get('x-real-ip') || 'unknown'))
       return {
         type: 'MULTIPLE_LOGIN_ATTEMPTS',
         severity: 'MEDIUM',
@@ -285,7 +285,7 @@ export class ThreatDetectionEngine {
   }
 
   private detectRateLimitViolation(request: any): Partial<SecurityEvent> | null {
-    const rateLimitKey = `rl_${request.ip}_${request.path}`
+    const rateLimitKey = `rl_${(request.headers?.get('x-forwarded-for') || request.headers?.get('x-real-ip') || 'unknown')}_${request.path}`
     const currentRequests = this.attackPatterns.get(rateLimitKey) || 0
     this.attackPatterns.set(rateLimitKey, currentRequests + 1)
 

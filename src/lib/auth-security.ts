@@ -109,8 +109,8 @@ class SessionSecurity {
   
   static isSessionValid(session: { createdAt: Date; lastActive: Date }): boolean {
     const now = Date.now()
-    const created = session.createdAt.getTime()
-    const lastActive = session.lastActive.getTime()
+    const created = new Date(session.createdAt).getTime()
+    const lastActive = new Date(session.lastActive).getTime()
     
     // Check if session has expired
     if (now - created > this.MAX_SESSION_AGE) {
@@ -126,7 +126,7 @@ class SessionSecurity {
   }
   
   static shouldRotateSession(session: { createdAt: Date }): boolean {
-    const sessionAge = Date.now() - session.createdAt.getTime()
+    const sessionAge = Date.now() - new Date(session.createdAt).getTime()
     return sessionAge > (this.MAX_SESSION_AGE / 4) // Rotate after 6 hours
   }
 }

@@ -117,7 +117,7 @@ export async function GET(request: NextRequest) {
       data: enrichedWorkflows
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error fetching workflows:", error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch workflows" },
@@ -206,7 +206,7 @@ export async function POST(request: NextRequest) {
       testResult
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error creating workflow:", error)
     return NextResponse.json(
       { success: false, error: "Failed to create workflow" },
@@ -401,7 +401,7 @@ async function testWorkflow(workflow: any) {
       totalDuration
     }
 
-  } catch (error) {
+  } catch (_error) {
     return {
       success: false,
       message: `Test workflow execution error: ${error.message}`,

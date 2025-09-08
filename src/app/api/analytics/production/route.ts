@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
       quality: qualityMetrics
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Production analytics error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -77,11 +77,11 @@ export async function GET(request: NextRequest) {
 
 async function getProductionMetrics(startDate: Date, department?: string | null) {
   const taskFilter: {
-    createdAt: { gte: Date };
+    created_at: { gte: Date };
     status: { in: TaskStatus[] };
     taskType?: { in: string[] };
   } = {
-    createdAt: { gte: startDate },
+    created_at: { gte: startDate },
     status: { in: [TaskStatus.COMPLETED, TaskStatus.IN_PROGRESS] }
   }
 
@@ -96,7 +96,7 @@ async function getProductionMetrics(startDate: Date, department?: string | null)
     }
     
     if (departmentTaskTypes[department]) {
-      taskFilter.taskType = { in: departmentTaskTypes[department] }
+      taskFilter.task_type = { in: departmentTaskTypes[department] }
     }
   }
 
@@ -122,9 +122,9 @@ async function getProductionMetrics(startDate: Date, department?: string | null)
 
 async function getTaskMetrics(startDate: Date, department?: string | null) {
   const whereClause: {
-    createdAt: { gte: Date };
+    created_at: { gte: Date };
     assignedUser?: { role: { in: Role[] } };
-  } = { createdAt: { gte: startDate } }
+  } = { created_at: { gte: startDate } }
   
   if (department) {
     const departmentRoles: { [key: string]: Role[] } = {
@@ -136,7 +136,7 @@ async function getTaskMetrics(startDate: Date, department?: string | null) {
     }
     
     if (departmentRoles[department]) {
-      whereClause.assignedUser = { role: { in: departmentRoles[department] } }
+      whereClause.assigned_user = { role: { in: departmentRoles[department] } }
     }
   }
 
@@ -147,7 +147,7 @@ async function getTaskMetrics(startDate: Date, department?: string | null) {
   })
 
   const tasksByType = await prisma.task.groupBy({
-    by: ['taskType'],
+    by: ['task_type'],
     where: whereClause,
     _count: { id: true },
     orderBy: { _count: { id: 'desc' } },
@@ -166,7 +166,7 @@ async function getTaskMetrics(startDate: Date, department?: string | null) {
       count: item._count.id
     })),
     byType: tasksByType.map(item => ({
-      type: item.taskType,
+      type: item.task_type,
       count: item._count.id
     })),
     byPriority: tasksByPriority.map(item => ({
@@ -180,19 +180,19 @@ async function getOrderMetrics(startDate: Date) {
   const [ordersByStatus, revenueData, averageOrderValue] = await Promise.all([
     prisma.order.groupBy({
       by: ['status'],
-      where: { createdAt: { gte: startDate } },
+      where: { created_at: { gte: startDate } },
       _count: { id: true }
     }),
     prisma.order.aggregate({
       where: { 
-        createdAt: { gte: startDate },
+        created_at: { gte: startDate },
         status: { in: [OrderStatus.DELIVERED, OrderStatus.QC_PASSED] }
       },
       _sum: { totalAmount: true },
       _count: { id: true }
     }),
     prisma.order.aggregate({
-      where: { createdAt: { gte: startDate } },
+      where: { created_at: { gte: startDate } },
       _avg: { totalAmount: true }
     })
   ])
@@ -212,12 +212,12 @@ async function getBottleneckAnalysis(startDate: Date) {
   // Find tasks that are overdue or taking longer than expected
   const overdueTasks = await prisma.task.findMany({
     where: {
-      createdAt: { gte: startDate },
+      created_at: { gte: startDate },
       status: { in: [TaskStatus.IN_PROGRESS, TaskStatus.PENDING] },
       dueDate: { lt: new Date() }
     },
     include: {
-      assignedUser: { select: { name: true, role: true } },
+      assigned_user: { select: { name: true, role: true } },
       order: { select: { orderNumber: true } }
     },
     orderBy: { dueDate: 'asc' },
@@ -226,9 +226,9 @@ async function getBottleneckAnalysis(startDate: Date) {
 
   // Identify role-based bottlenecks
   const roleBottlenecks = await prisma.task.groupBy({
-    by: ['taskType'],
+    by: ['task_type'],
     where: {
-      createdAt: { gte: startDate },
+      created_at: { gte: startDate },
       status: TaskStatus.PENDING
     },
     _count: { id: true },
@@ -242,13 +242,13 @@ async function getBottleneckAnalysis(startDate: Date) {
       id: task.id,
       title: task.title,
       orderNumber: task.order?.orderNumber,
-      assignedTo: task.assignedUser?.name,
-      role: task.assignedUser?.role,
+      assigned_to: task.assigned_user?.name,
+      role: task.assigned_user?.role,
       dueDate: task.dueDate,
       daysOverdue: Math.ceil((new Date().getTime() - new Date(task.dueDate).getTime()) / (1000 * 3600 * 24))
     })),
     roleBottlenecks: roleBottlenecks.map(item => ({
-      taskType: item.taskType,
+      task_type: item.task_type,
       pendingCount: item._count.id,
       avgEstimatedHours: item._avg.estimatedHours || 0
     }))
@@ -280,7 +280,7 @@ async function getCapacityMetrics(startDate: Date, department?: string | null) {
     include: {
       assignedTasks: {
         where: {
-          createdAt: { gte: startDate },
+          created_at: { gte: startDate },
           status: { in: [TaskStatus.IN_PROGRESS, TaskStatus.PENDING] }
         }
       }
@@ -294,7 +294,7 @@ async function getCapacityMetrics(startDate: Date, department?: string | null) {
     const utilization = Math.min((workload / capacity) * 100, 100)
 
     return {
-      userId: user.id,
+      user_id: user.id,
       name: user.name,
       role: user.role,
       activeTasks,
@@ -319,14 +319,14 @@ async function getCapacityMetrics(startDate: Date, department?: string | null) {
 async function getQualityMetrics(startDate: Date) {
   const [qcRecords, qcStats] = await Promise.all([
     prisma.qCRecord.findMany({
-      where: { createdAt: { gte: startDate } },
+      where: { created_at: { gte: startDate } },
       include: {
         task: { select: { order: { select: { orderNumber: true } } } }
       }
     }),
     prisma.qCRecord.groupBy({
       by: ['passed'],
-      where: { createdAt: { gte: startDate } },
+      where: { created_at: { gte: startDate } },
       _count: { id: true }
     })
   ])
@@ -357,7 +357,7 @@ async function getAverageCompletionTime(startDate: Date, _department?: string | 
   const completedTasks = await prisma.task.findMany({
     where: whereClause,
     select: {
-      createdAt: true,
+      created_at: true,
       completedAt: true
     }
   })
@@ -366,7 +366,7 @@ async function getAverageCompletionTime(startDate: Date, _department?: string | 
 
   const totalHours = completedTasks.reduce((sum, task) => {
     if (task.completedAt) {
-      const hours = (new Date(task.completedAt).getTime() - new Date(task.createdAt).getTime()) / (1000 * 60 * 60)
+      const hours = (new Date(task.completedAt).getTime() - new Date(task.created_at).getTime()) / (1000 * 60 * 60)
       return sum + hours
     }
     return sum

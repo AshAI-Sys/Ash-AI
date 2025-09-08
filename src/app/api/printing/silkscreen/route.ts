@@ -162,7 +162,7 @@ export async function POST(request: NextRequest) {
       } : undefined
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error in silkscreen operation:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to log silkscreen operation' },
@@ -245,7 +245,7 @@ export async function GET(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching silkscreen data:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch silkscreen data' },

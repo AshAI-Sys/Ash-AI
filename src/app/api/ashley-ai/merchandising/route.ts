@@ -209,7 +209,7 @@ export async function POST(request: NextRequest) {
         )
     }
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Ashley AI Merchandising API error:', error)
     return NextResponse.json(
       { 
@@ -329,8 +329,8 @@ async function getClientPreferences(client_id: string, orderHistory: OrderHistor
 function calculateOrderFrequency(orders: OrderHistoryItem[]): string {
   if (orders.length < 2) return 'NEW_CLIENT'
   
-  const sortedOrders = orders.sort((a, b) => b.created_at.getTime() - a.created_at.getTime())
-  const daysBetween = (sortedOrders[0].created_at.getTime() - sortedOrders[1].created_at.getTime()) / (1000 * 60 * 60 * 24)
+  const sortedOrders = orders.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+  const daysBetween = (new Date(sortedOrders[0].created_at).getTime() - new Date(sortedOrders[1].created_at).getTime()) / (1000 * 60 * 60 * 24)
   
   if (daysBetween < 30) return 'FREQUENT'
   if (daysBetween < 90) return 'REGULAR'
@@ -368,7 +368,7 @@ async function logAshleyInsight(data: {
         created_at: new Date()
       }
     })
-  } catch (error) {
+  } catch (_error) {
     console.error('Failed to log Ashley insight:', error)
   }
 }

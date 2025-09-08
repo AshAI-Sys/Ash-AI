@@ -102,7 +102,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error fetching integration:", error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch integration" },
@@ -203,7 +203,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       connectionTest
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error updating integration:", error)
     return NextResponse.json(
       { success: false, error: "Failed to update integration" },
@@ -291,7 +291,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       data: deactivatedIntegration
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error deleting integration:", error)
     return NextResponse.json(
       { success: false, error: "Failed to delete integration" },
@@ -330,7 +330,7 @@ async function testIntegrationConnection(type: string, provider: string, config:
       }
     }
 
-  } catch (error) {
+  } catch (_error) {
     return {
       success: false,
       error: `Connection test failed: ${error.message}`,

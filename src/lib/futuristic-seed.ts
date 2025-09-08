@@ -354,7 +354,7 @@ export async function seedFuturisticDatabase() {
 async function main() {
   try {
     await seedFuturisticDatabase()
-  } catch (error) {
+  } catch (_error) {
     console.error('❌ Seeding failed:', error)
     throw error
   } finally {

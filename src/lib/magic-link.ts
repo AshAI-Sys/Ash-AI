@@ -72,7 +72,7 @@ export async function generateMagicLink(
       expires_at
     }
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error generating magic link:', error)
     return { success: false, error: 'Failed to generate magic link' }
   }
@@ -130,7 +130,7 @@ export async function validateMagicLink(token: string): Promise<MagicLinkValidat
       workspace_id: client.workspace_id
     }
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error validating magic link:', error)
     return { valid: false, error: 'Token validation failed' }
   }
@@ -166,7 +166,7 @@ export async function sendMagicLinkEmail(
 
     return true
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error sending magic link email:', error)
     return false
   }

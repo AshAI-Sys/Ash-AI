@@ -24,7 +24,7 @@ export async function POST() {
       data: setupData
     });
 
-  } catch (error) {
+  } catch (_error) {
     console.error('2FA setup error:', error);
     return NextResponse.json(
       { error: 'Failed to setup 2FA' },

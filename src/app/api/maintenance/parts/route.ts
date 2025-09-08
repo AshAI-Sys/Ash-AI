@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
 
       // Calculate reorder suggestion
       const months_since_last_use = part.last_used_date
-        ? Math.floor((Date.now() - part.last_used_date.getTime()) / (1000 * 60 * 60 * 24 * 30))
+        ? Math.floor((Date.now() - new Date(part.last_used_date).getTime()) / (1000 * 60 * 60 * 24 * 30))
         : null
 
       const suggested_reorder_qty = part.avg_monthly_usage > 0
@@ -89,7 +89,7 @@ export async function GET(request: NextRequest) {
       maintenance_parts: parts_with_summary
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching maintenance parts:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch maintenance parts' },
@@ -211,7 +211,7 @@ export async function POST(request: NextRequest) {
       warnings: ashley_check.risk === 'AMBER' ? ashley_check.issues : []
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating maintenance part:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to create maintenance part' },
@@ -311,7 +311,7 @@ export async function PUT(request: NextRequest) {
         
         // Update average monthly usage (simplified calculation)
         const months_since_creation = Math.max(1, Math.floor(
-          (Date.now() - existing_part.created_at.getTime()) / (1000 * 60 * 60 * 24 * 30)
+          (Date.now() - new Date(existing_part.created_at).getTime()) / (1000 * 60 * 60 * 24 * 30)
         ))
         update_data.avg_monthly_usage = update_data.total_used_ytd / months_since_creation
         break
@@ -380,7 +380,7 @@ export async function PUT(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error updating maintenance part:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to update maintenance part' },

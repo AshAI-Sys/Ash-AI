@@ -53,8 +53,8 @@ export async function GET() {
 
     return NextResponse.json({ insights });
 
-  } catch (error) {
-    console.error('Ashley insights error:', error);
+  } catch (_error) {
+    console.error('Ashley insights error:', _error);
     return NextResponse.json(
       { error: 'Failed to fetch insights' },
       { status: 500 }

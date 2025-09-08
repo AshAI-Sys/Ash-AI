@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
       }))
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching 3PL bookings:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch 3PL bookings' },
@@ -212,7 +212,7 @@ export async function POST(request: NextRequest) {
       warnings: ashley_check.risk === 'AMBER' ? ashley_check.issues : []
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating 3PL booking:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to create 3PL booking' },
@@ -318,7 +318,7 @@ export async function PUT(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error updating 3PL booking:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to update 3PL booking' },
@@ -388,7 +388,7 @@ export async function OPTIONS(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error getting 3PL quotes:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to get 3PL quotes' },

@@ -237,7 +237,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(dashboardData)
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Dashboard API error:', error)
     return NextResponse.json(
       { error: 'Failed to fetch dashboard data' },

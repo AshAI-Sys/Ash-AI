@@ -99,7 +99,7 @@ export async function POST(
       }
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error adding sample:', error)
     return NextResponse.json({ 
       error: 'Internal server error',

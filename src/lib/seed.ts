@@ -27,8 +27,10 @@ async function main() {
   // 🧠 Create AI-Enhanced User Accounts
   console.log('🧠 Creating AI-Enhanced User Accounts...')
   
-  const admin = await prisma.user.create({
-    data: {
+  const admin = await prisma.user.upsert({
+    where: { email: 'admin@ash-ai.com' },
+    update: {},
+    create: {
       email: 'admin@ash-ai.com',
       full_name: 'ASH AI System Administrator',
       password: hashedPassword,
@@ -44,8 +46,10 @@ async function main() {
     },
   })
 
-  const manager = await prisma.user.create({
-    data: {
+  const manager = await prisma.user.upsert({
+    where: { email: 'manager@ash-ai.com' },
+    update: {},
+    create: {
       email: 'manager@ash-ai.com',
       full_name: 'Neural Production Manager',
       password: hashedPassword,
@@ -61,8 +65,10 @@ async function main() {
     },
   })
 
-  const ashley_ai = await prisma.user.create({
-    data: {
+  const ashley_ai = await prisma.user.upsert({
+    where: { email: 'ashley@ash-ai.com' },
+    update: {},
+    create: {
       email: 'ashley@ash-ai.com',
       full_name: 'Ashley - AI Production Assistant',
       password: hashedPassword,
@@ -77,8 +83,10 @@ async function main() {
     },
   })
 
-  await prisma.user.create({
-    data: {
+  await prisma.user.upsert({
+    where: { email: 'designer@example.com' },
+    update: {},
+    create: {
       email: 'designer@example.com',
       full_name: 'Graphic Artist',
       password: hashedPassword,
@@ -87,8 +95,10 @@ async function main() {
     },
   })
 
-  await prisma.user.create({
-    data: {
+  await prisma.user.upsert({
+    where: { email: 'sewing@example.com' },
+    update: {},
+    create: {
       email: 'sewing@example.com',
       full_name: 'Sewing Operator',
       password: hashedPassword,
@@ -97,8 +107,10 @@ async function main() {
     },
   })
 
-  await prisma.user.create({
-    data: {
+  await prisma.user.upsert({
+    where: { email: 'qc@example.com' },
+    update: {},
+    create: {
       email: 'qc@example.com',
       full_name: 'QC Inspector',
       password: hashedPassword,
@@ -107,80 +119,110 @@ async function main() {
     },
   })
 
-  const reefer = await prisma.brand.create({
-    data: {
+  const reefer = await prisma.brand.upsert({
+    where: { 
+      workspace_id_code: {
+        workspace_id: workspaceId,
+        code: 'REF'
+      }
+    },
+    update: {},
+    create: {
       workspace_id: workspaceId,
       name: 'Reefer',
       code: 'REF',
     },
   })
 
-  const sorbetes = await prisma.brand.create({
-    data: {
+  const sorbetes = await prisma.brand.upsert({
+    where: { 
+      workspace_id_code: {
+        workspace_id: workspaceId,
+        code: 'SOR'
+      }
+    },
+    update: {},
+    create: {
       workspace_id: workspaceId,
       name: 'Sorbetes',
       code: 'SOR',
     },
   })
 
-  await prisma.inventoryItem.createMany({
-    data: [
-      {
-        workspace_id: workspaceId,
-        name: 'White Cotton T-Shirt',
-        sku: 'CT-WHT-001',
-        category: 'Apparel',
-        quantity: 100,
-        unit: 'pieces',
-        unit_cost: 5.50,
-      },
-      {
-        workspace_id: workspaceId,
-        name: 'Black Cotton T-Shirt',
-        sku: 'CT-BLK-001',
-        category: 'Apparel',
-        quantity: 75,
-        unit: 'pieces',
-        unit_cost: 5.50,
-      },
-      {
-        workspace_id: workspaceId,
-        name: 'Screen Printing Ink - Blue',
-        sku: 'INK-BLU-001',
-        category: 'Printing Materials',
-        quantity: 50,
-        unit: 'bottles',
-        unit_cost: 12.00,
-      },
-    ],
+  console.log('📦 Creating Inventory Items...')
+  await prisma.inventoryItem.upsert({
+    where: { sku: 'CT-WHT-001' },
+    update: {},
+    create: {
+      workspace_id: workspaceId,
+      name: 'White Cotton T-Shirt',
+      sku: 'CT-WHT-001',
+      category: 'Apparel',
+      quantity: 100,
+      unit: 'pieces',
+      unit_cost: 5.50,
+    },
   })
 
-  await prisma.wallet.createMany({
-    data: [
-      {
-        workspace_id: workspaceId,
-        balance: 50000.00,
-      },
-      {
-        workspace_id: workspaceId,
-        balance: 15000.00,
-      },
-    ],
+  await prisma.inventoryItem.upsert({
+    where: { sku: 'CT-BLK-001' },
+    update: {},
+    create: {
+      workspace_id: workspaceId,
+      name: 'Black Cotton T-Shirt',
+      sku: 'CT-BLK-001',
+      category: 'Apparel',
+      quantity: 75,
+      unit: 'pieces',
+      unit_cost: 5.50,
+    },
   })
 
-  await prisma.vehicle.createMany({
-    data: [
-      {
-        workspace_id: workspaceId,
-        plate_no: 'ABC-123',
-        type: 'Van',
-      },
-      {
-        workspace_id: workspaceId,
-        plate_no: 'DEF-456',
-        type: 'Motorcycle',
-      },
-    ],
+  await prisma.inventoryItem.upsert({
+    where: { sku: 'INK-BLU-001' },
+    update: {},
+    create: {
+      workspace_id: workspaceId,
+      name: 'Screen Printing Ink - Blue',
+      sku: 'INK-BLU-001',
+      category: 'Printing Materials',
+      quantity: 50,
+      unit: 'bottles',
+      unit_cost: 12.00,
+    },
+  })
+
+  console.log('💰 Creating Wallets...')
+  // Check if wallets already exist
+  const walletCount = await prisma.wallet.count({ where: { workspace_id: workspaceId } })
+  if (walletCount === 0) {
+    await prisma.wallet.createMany({
+      data: [
+        { workspace_id: workspaceId, balance: 50000.00 },
+        { workspace_id: workspaceId, balance: 15000.00 },
+      ],
+    })
+  }
+
+  console.log('🚗 Creating Vehicles...')
+  await prisma.vehicle.upsert({
+    where: { plate_no: 'ABC-123' },
+    update: {},
+    create: {
+      workspace_id: workspaceId,
+      plate_no: 'ABC-123',
+      type: 'Van',
+    },
+  })
+
+  await prisma.vehicle.upsert({
+    where: { plate_no: 'DEF-456' },
+    update: {},
+    create: {
+      workspace_id: workspaceId,
+      plate_no: 'DEF-456',
+      type: 'Motorcycle',
+    },
   })
 
   console.log('Seed data created successfully!')

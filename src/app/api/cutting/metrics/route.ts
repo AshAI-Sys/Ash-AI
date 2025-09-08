@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
       summary
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching cutting metrics:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch cutting metrics' },
@@ -216,7 +216,7 @@ export async function POST(request: NextRequest) {
       }
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating cutting metrics:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to create cutting metrics' },
@@ -351,7 +351,7 @@ export async function OPTIONS(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching cutting dashboard:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch cutting dashboard' },

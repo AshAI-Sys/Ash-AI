@@ -61,11 +61,11 @@ export async function GET(request: NextRequest) {
     // Add summary data
     const payments_with_summary = payments.map(payment => {
       const days_since_payment = payment.paid_at 
-        ? Math.floor((Date.now() - payment.paid_at.getTime()) / (1000 * 60 * 60 * 24))
+        ? Math.floor((Date.now() - new Date(payment.paid_at).getTime()) / (1000 * 60 * 60 * 24))
         : null
 
       const processing_time = payment.paid_at && payment.created_at
-        ? Math.floor((payment.paid_at.getTime() - payment.created_at.getTime()) / (1000 * 60))
+        ? Math.floor((new Date(payment.paid_at).getTime() - new Date(payment.created_at).getTime()) / (1000 * 60))
         : null
 
       return {
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
       payments: payments_with_summary
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching payments:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch payments' },
@@ -309,7 +309,7 @@ export async function POST(request: NextRequest) {
       warnings: ashley_check.risk === 'AMBER' ? ashley_check.issues : []
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating payment:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to create payment' },
@@ -488,7 +488,7 @@ export async function PUT(request: NextRequest) {
       message: `Payment ${action.toLowerCase()}ed successfully`
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error updating payment:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to update payment' },

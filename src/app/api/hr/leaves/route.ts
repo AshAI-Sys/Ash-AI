@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
       ].filter(Boolean).join(' ')
 
       const days_span = Math.ceil(
-        (request.end_date.getTime() - request.start_date.getTime()) / (1000 * 60 * 60 * 24)
+        (new Date(request.end_date).getTime() - new Date(request.start_date).getTime()) / (1000 * 60 * 60 * 24)
       ) + 1
 
       return {
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
       leave_requests: requests_with_summary
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching leave requests:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch leave requests' },
@@ -200,7 +200,7 @@ export async function POST(request: NextRequest) {
       days_requested,
       remaining_balance,
       request_timing: {
-        days_in_advance: Math.floor((leave_start.getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
+        days_in_advance: Math.floor((new Date(leave_start).getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
         is_weekend_adjacent: leave_start.getDay() === 1 || leave_end.getDay() === 5,
         is_holiday_period: false // Could check against holiday calendar
       }
@@ -258,7 +258,7 @@ export async function POST(request: NextRequest) {
       warnings: ashley_check.risk === 'AMBER' ? ashley_check.issues : []
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating leave request:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to create leave request' },
@@ -394,7 +394,7 @@ export async function PUT(request: NextRequest) {
       message: `Leave request ${action.toLowerCase()}d successfully`
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error reviewing leave request:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to review leave request' },

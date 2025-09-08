@@ -1,6 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
+import EnhancedLayout from '@/components/EnhancedLayout'
+import ProductionStages from '@/components/ProductionStages'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -20,7 +25,18 @@ import {
 import { RealTimeProductionMonitor } from '@/components/production/RealTimeProductionMonitor'
 
 export default function ProductionPage() {
-  const [activeTab, setActiveTab] = useState('monitor')
+  const { data: session, status } = useSession()
+  const router = useRouter()
+  const [activeTab, setActiveTab] = useState('stages')
+
+  useEffect(() => {
+    if (status === 'loading') return
+    
+    if (!session) {
+      router.push('/auth/signin')
+      return
+    }
+  }, [session, status, router])
 
   // Mock production summary data
   const productionSummary = {
@@ -32,8 +48,36 @@ export default function ProductionPage() {
     onTimeDelivery: 94.2
   }
 
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen neural-bg flex items-center justify-center">
+        <div className="text-center">
+          <div className="relative mb-8 mx-auto w-20 h-20">
+            <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/30 to-teal-400/30 rounded-full blur-xl animate-pulse"></div>
+            <div className="absolute inset-2 bg-gradient-to-br from-cyan-500/40 to-teal-400/40 rounded-full border border-cyan-400/50 animate-pulse"></div>
+            <div className="relative w-full h-full rounded-full bg-gradient-to-br from-slate-900 to-slate-800 border-2 border-cyan-500/60 flex items-center justify-center shadow-xl shadow-cyan-500/20 animate-pulse">
+              <img 
+                src="/Ash-AI.png" 
+                alt="ASH AI Logo" 
+                className="w-10 h-10 object-contain z-10 relative filter brightness-110 contrast-110" 
+              />
+              <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/20 to-teal-400/20 rounded-full animate-pulse"></div>
+            </div>
+          </div>
+          <h1 className="text-3xl font-bold glitch-text text-white mb-4 drop-shadow-lg" data-text="ASH AI">ASH AI</h1>
+          <p className="text-cyan-300 font-medium">Loading Production System...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!session) {
+    return null
+  }
+
   return (
-    <div className="neural-bg min-h-screen">
+    <EnhancedLayout>
+      <div className="neural-bg min-h-screen">
       {/* Quantum Field Background */}
       <div className="quantum-field">
         {Array.from({ length: 12 }).map((_, i) => (
@@ -156,6 +200,10 @@ export default function ProductionPage() {
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="bg-black/20 border border-cyan-500/30">
+            <TabsTrigger value="stages" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400">
+              <Settings className="w-4 h-4 mr-2" />
+              Production Stages
+            </TabsTrigger>
             <TabsTrigger value="monitor" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400">
               <Activity className="w-4 h-4 mr-2" />
               Live Monitor
@@ -173,6 +221,10 @@ export default function ProductionPage() {
               Team
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="stages">
+            <ProductionStages />
+          </TabsContent>
 
           <TabsContent value="monitor">
             <RealTimeProductionMonitor />
@@ -244,7 +296,8 @@ export default function ProductionPage() {
             </Card>
           </TabsContent>
         </Tabs>
+        </div>
       </div>
-    </div>
+    </EnhancedLayout>
   )
 }

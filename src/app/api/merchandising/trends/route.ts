@@ -165,7 +165,7 @@ export async function GET(request: NextRequest) {
       recommendations: generateActionableRecommendations(trendsData, ashleyInsights)
     })
 
-  } catch (error) {
+  } catch (_error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({
         success: false,

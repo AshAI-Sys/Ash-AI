@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
       message: 'Conflict resolved successfully'
     });
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Conflict resolution error:', error);
     return NextResponse.json(
       { error: 'Failed to resolve conflict' },
@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
       summary
     });
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Get conflicts error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch conflicts' },

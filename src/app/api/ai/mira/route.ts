@@ -12,11 +12,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Managers, admins, and finance roles can access Mira
+    // Managers and admins can access Mira
     const allowedRoles = [
-      Role.ADMIN, 
-      Role.MANAGER,
-      Role.BOOKKEEPER
+      'ADMIN', 
+      'MANAGER'
     ]
 
     if (!allowedRoles.includes(session.user.role as Role)) {
@@ -42,25 +41,29 @@ export async function POST(request: NextRequest) {
 
       case 'forecastCashFlow':
         // Forecast cash flow
-        const mira = await import('@/lib/ai/ashley-agents').then(m => m.createAgent('mira', session.user.id))
+        const { MiraAgent } = await import('@/lib/ai/ashley-agents')
+        const mira = new MiraAgent(session.user.id)
         result = await mira.forecastCashFlow(data)
         break
 
       case 'optimizePricing':
         // Optimize pricing strategy
-        const miraPrice = await import('@/lib/ai/ashley-agents').then(m => m.createAgent('mira', session.user.id))
+        const { MiraAgent: MiraAgentPrice } = await import('@/lib/ai/ashley-agents')
+        const miraPrice = new MiraAgentPrice(session.user.id)
         result = await miraPrice.optimizePricing(data)
         break
 
       case 'analyzeCosts':
         // Analyze cost breakdown
-        const miraCost = await import('@/lib/ai/ashley-agents').then(m => m.createAgent('mira', session.user.id))
+        const { MiraAgent: MiraAgentCost } = await import('@/lib/ai/ashley-agents')
+        const miraCost = new MiraAgentCost(session.user.id)
         result = await miraCost.analyzeCosts(data)
         break
 
       case 'budgetAnalysis':
         // Budget vs actual analysis
-        const miraBudget = await import('@/lib/ai/ashley-agents').then(m => m.createAgent('mira', session.user.id))
+        const { MiraAgent: MiraAgentBudget } = await import('@/lib/ai/ashley-agents')
+        const miraBudget = new MiraAgentBudget(session.user.id)
         result = await miraBudget.budgetAnalysis(data)
         break
 
@@ -75,8 +78,8 @@ export async function POST(request: NextRequest) {
       timestamp: new Date().toISOString()
     })
 
-  } catch (error) {
-    console.error('Mira AI API error:', error)
+  } catch (_error) {
+    console.error('Mira AI API error:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -106,8 +109,8 @@ export async function GET(_request: NextRequest) {
       description: 'AI Finance Analyst - Cost analysis, pricing, and financial forecasting'
     })
 
-  } catch (error) {
-    console.error('Mira AI API error:', error)
+  } catch (_error) {
+    console.error('Mira AI API error:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

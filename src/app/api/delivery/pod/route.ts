@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
       warnings: ashley_check.risk === 'AMBER' ? ashley_check.issues : []
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating POD record:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to create POD record' },
@@ -243,7 +243,7 @@ export async function GET(request: NextRequest) {
       }))
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching POD records:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch POD records' },
@@ -329,7 +329,7 @@ export async function PUT(request: NextRequest) {
       pod_record: updated_record
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error updating POD record:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to update POD record' },

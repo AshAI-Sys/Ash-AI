@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
       const recentDowntime = machine.downtime?.length || 0
       const totalDowntimeHours = machine.downtime?.reduce((sum, dt) => {
         if (dt.endTime) {
-          return sum + ((dt.endTime.getTime() - dt.startTime.getTime()) / (1000 * 60 * 60))
+          return sum + ((new Date(dt.endTime).getTime() - new Date(dt.startTime).getTime()) / (1000 * 60 * 60))
         }
         return sum
       }, 0) || 0
@@ -134,7 +134,7 @@ export async function GET(request: NextRequest) {
       summary
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching machines:', error)
     return NextResponse.json({ 
       error: 'Internal server error' 
@@ -243,7 +243,7 @@ export async function POST(request: NextRequest) {
       }
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating machine:', error)
     return NextResponse.json({ 
       error: 'Internal server error',
@@ -261,7 +261,7 @@ function calculateMachineUtilization(printRuns: any[]): number {
   
   const totalUsedHours = printRuns.reduce((sum, run) => {
     if (run.startedAt && run.endedAt) {
-      const hours = (run.endedAt.getTime() - run.startedAt.getTime()) / (1000 * 60 * 60)
+      const hours = (new Date(run.endedAt).getTime() - new Date(run.startedAt).getTime()) / (1000 * 60 * 60)
       return sum + hours
     }
     return sum

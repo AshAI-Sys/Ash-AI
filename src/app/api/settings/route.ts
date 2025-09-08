@@ -96,7 +96,7 @@ export async function GET(request: NextRequest) {
       settings: systemSettings
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching settings:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch settings' },
@@ -149,7 +149,7 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     )
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error saving settings:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to save settings' },

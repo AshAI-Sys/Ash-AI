@@ -292,10 +292,10 @@ export default function OrdersPage() {
               </Button>
               <Button 
                 onClick={() => router.push('/orders/new')}
-                className="neon-btn hover:scale-105 transition-all duration-300"
+                className="neon-btn-primary hover:scale-105 transition-all duration-300 shadow-lg"
               >
                 <Plus className="w-5 h-5 mr-3" />
-                Create Order
+                New Order
               </Button>
             </div>
           </div>

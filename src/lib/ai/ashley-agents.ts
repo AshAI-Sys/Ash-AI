@@ -4,9 +4,9 @@
 import OpenAI from 'openai'
 import { prisma } from '@/lib/prisma'
 
-// Mock OpenAI for development if no API key
-const openai = process.env.OPENAI_API_KEY 
-  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+// Initialize OpenAI with the correct API key
+const openai = (process.env.ASH_OPENAI_API_KEY || process.env.OPENAI_API_KEY)
+  ? new OpenAI({ apiKey: process.env.ASH_OPENAI_API_KEY || process.env.OPENAI_API_KEY })
   : null
 
 // AI Agent Types
@@ -129,8 +129,8 @@ export class AIAgentBase {
         userId: this.userId,
         timestamp: new Date().toISOString()
       })
-    } catch (error) {
-      console.error('Failed to log AI interaction:', error)
+    } catch (_error) {
+      console.error('Failed to log AI interaction:', _error)
     }
   }
 
@@ -155,8 +155,8 @@ export class AIAgentBase {
       })
 
       return response.choices[0]
-    } catch (error) {
-      console.error(`AI Agent ${this.agent} error:`, error)
+    } catch (_error) {
+      console.error(`AI Agent ${this.agent} error:`, _error)
       // Return fallback response instead of throwing
       return {
         message: {
@@ -308,6 +308,46 @@ export class KaiAgent extends AIAgentBase {
 
     return response
   }
+
+  async analyzeBottlenecks(data?: Record<string, unknown>) {
+    const messages = [
+      { role: 'system', content: this.getSystemPrompt() },
+      {
+        role: 'user',
+        content: `Analyze current production bottlenecks. Consider pending tasks, user workloads, and capacity constraints. Data: ${JSON.stringify(data, null, 2)}`
+      }
+    ]
+
+    const response = await this.callOpenAI(messages)
+    
+    await this.logInteraction(
+      { action: 'analyzeBottlenecks', data },
+      response,
+      0.8
+    )
+
+    return response
+  }
+
+  async optimizeCapacity(data?: Record<string, unknown>) {
+    const messages = [
+      { role: 'system', content: this.getSystemPrompt() },
+      {
+        role: 'user',
+        content: `Optimize production capacity and resource allocation. Consider current workloads, skills, and priorities. Data: ${JSON.stringify(data, null, 2)}`
+      }
+    ]
+
+    const response = await this.callOpenAI(messages)
+    
+    await this.logInteraction(
+      { action: 'optimizeCapacity', data },
+      response,
+      0.8
+    )
+
+    return response
+  }
 }
 
 // Mira - Finance Analyst Agent
@@ -341,6 +381,86 @@ export class MiraAgent extends AIAgentBase {
     
     await this.logInteraction(
       { action: 'analyzeProfitability', orderId },
+      response,
+      0.85
+    )
+
+    return response
+  }
+
+  async forecastCashFlow(data?: Record<string, unknown>) {
+    const messages = [
+      { role: 'system', content: this.getSystemPrompt() },
+      {
+        role: 'user',
+        content: `Forecast cash flow based on current orders, invoices, and payment schedules. Data: ${JSON.stringify(data, null, 2)}`
+      }
+    ]
+
+    const response = await this.callOpenAI(messages)
+    
+    await this.logInteraction(
+      { action: 'forecastCashFlow', data },
+      response,
+      0.85
+    )
+
+    return response
+  }
+
+  async optimizePricing(data?: Record<string, unknown>) {
+    const messages = [
+      { role: 'system', content: this.getSystemPrompt() },
+      {
+        role: 'user',
+        content: `Analyze pricing strategy and recommend optimizations. Consider costs, margins, and market positioning. Data: ${JSON.stringify(data, null, 2)}`
+      }
+    ]
+
+    const response = await this.callOpenAI(messages)
+    
+    await this.logInteraction(
+      { action: 'optimizePricing', data },
+      response,
+      0.85
+    )
+
+    return response
+  }
+
+  async analyzeCosts(data?: Record<string, unknown>) {
+    const messages = [
+      { role: 'system', content: this.getSystemPrompt() },
+      {
+        role: 'user',
+        content: `Analyze cost structure and identify optimization opportunities. Consider material, labor, and overhead costs. Data: ${JSON.stringify(data, null, 2)}`
+      }
+    ]
+
+    const response = await this.callOpenAI(messages)
+    
+    await this.logInteraction(
+      { action: 'analyzeCosts', data },
+      response,
+      0.85
+    )
+
+    return response
+  }
+
+  async budgetAnalysis(data?: Record<string, unknown>) {
+    const messages = [
+      { role: 'system', content: this.getSystemPrompt() },
+      {
+        role: 'user',
+        content: `Perform budget analysis and variance reporting. Compare actual vs. planned expenses. Data: ${JSON.stringify(data, null, 2)}`
+      }
+    ]
+
+    const response = await this.callOpenAI(messages)
+    
+    await this.logInteraction(
+      { action: 'budgetAnalysis', data },
       response,
       0.85
     )

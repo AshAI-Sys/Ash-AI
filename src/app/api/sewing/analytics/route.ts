@@ -19,11 +19,11 @@ export async function GET(request: NextRequest) {
     let startDate: Date
 
     switch (period) {
-      case '1d': startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000); break
-      case '7d': startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); break
-      case '30d': startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000); break
-      case '90d': startDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000); break
-      default: startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+      case '1d': startDate = new Date(new Date(now).getTime() - 24 * 60 * 60 * 1000); break
+      case '7d': startDate = new Date(new Date(now).getTime() - 7 * 24 * 60 * 60 * 1000); break
+      case '30d': startDate = new Date(new Date(now).getTime() - 30 * 24 * 60 * 60 * 1000); break
+      case '90d': startDate = new Date(new Date(now).getTime() - 90 * 24 * 60 * 60 * 1000); break
+      default: startDate = new Date(new Date(now).getTime() - 7 * 24 * 60 * 60 * 1000)
     }
 
     // Base query conditions
@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
       totalRuns: runs.length
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching sewing analytics:', error)
     return NextResponse.json({ 
       error: 'Internal server error',

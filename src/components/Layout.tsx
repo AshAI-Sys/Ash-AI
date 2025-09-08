@@ -238,9 +238,9 @@ function Layout({ children }: LayoutProps) {
             {/* Logo container */}
             <div className="relative w-full h-full rounded-full bg-gradient-to-br from-slate-900 to-slate-800 border-2 border-cyan-500/60 flex items-center justify-center shadow-xl shadow-cyan-500/20">
               <img 
-                src="/Ash-AI.png" 
+                src="/ash-ai-logo-hero.svg" 
                 alt="ASH AI Logo" 
-                className="w-8 h-8 object-contain z-10 relative filter brightness-110 contrast-110 animate-pulse" 
+                className="w-20 h-8 object-contain z-10 relative filter brightness-125 contrast-125 animate-pulse shadow-lg shadow-cyan-500/40" 
               />
               {/* Inner pulse effect */}
               <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/10 to-cyan-400/20 rounded-full animate-pulse"></div>
@@ -288,31 +288,27 @@ function Layout({ children }: LayoutProps) {
       <div className="absolute inset-0 circuit-pattern opacity-20"></div>
       {/* Responsive Futuristic AI Sidebar */}
       <div className="w-20 sm:w-64 lg:w-80 hologram-card sidebar-container backdrop-blur-2xl shadow-2xl border-r border-cyan-500/30 relative z-10 transition-all duration-300">
-        {/* Beautiful Animated Background */}
-        <div className="absolute inset-0 opacity-10">
-          <div className={`absolute top-0 right-0 w-80 h-80 bg-gradient-to-br ${currentRole?.gradient} rounded-full -translate-y-40 translate-x-40 animate-pulse blur-3xl`} />
-          <div className={`absolute bottom-0 left-0 w-60 h-60 bg-gradient-to-tr ${currentRole?.gradient} rounded-full translate-y-32 -translate-x-32 animate-pulse blur-2xl`} />
-          <div className={`absolute top-1/2 left-1/2 w-40 h-40 bg-gradient-to-r ${currentRole?.gradient} rounded-full -translate-x-1/2 -translate-y-1/2 animate-pulse blur-xl opacity-50`} />
-        </div>
+        {/* Solid Color Background */}
+        <div className="absolute inset-0 bg-slate-900/95"></div>
 
         {/* Enhanced Futuristic AI Logo Section */}
         <div className="relative p-4 sm:p-6 lg:p-10 border-b border-cyan-500/30 data-stream">
           <div className="flex items-center gap-3 sm:gap-5">
-            {/* Enhanced Logo Container */}
-            <div className="relative ai-orb group shrink-0 w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16">
+            {/* Enhanced Logo Container - Now Horizontal for New Logo - BIGGER SIZE */}
+            <div className="relative group shrink-0 w-40 h-16 sm:w-44 sm:h-18 lg:w-48 lg:h-20">
               {/* Outer glow ring */}
-              <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/20 to-cyan-400/30 rounded-full blur-lg group-hover:blur-xl transition-all duration-500"></div>
+              <div className="absolute inset-0 bg-cyan-400/20 rounded-2xl blur-lg group-hover:blur-xl transition-all duration-500"></div>
               {/* Middle ring */}
-              <div className="absolute inset-1 bg-gradient-to-br from-cyan-400/30 to-cyan-500/40 rounded-full border border-cyan-400/50 group-hover:border-cyan-300/70 transition-all duration-300"></div>
+              <div className="absolute inset-1 bg-cyan-500/30 rounded-2xl border border-cyan-400/50 group-hover:border-cyan-300/70 transition-all duration-300"></div>
               {/* Logo container */}
-              <div className="relative w-full h-full rounded-full bg-gradient-to-br from-slate-900 to-slate-800 border-2 border-cyan-500/60 flex items-center justify-center group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 shadow-xl shadow-cyan-500/20">
+              <div className="relative w-full h-full rounded-2xl bg-slate-800/90 border-2 border-cyan-500/60 flex items-center justify-center group-hover:scale-105 transition-all duration-500 shadow-xl shadow-cyan-500/20 backdrop-blur-sm">
                 <img 
-                  src="/Ash-AI.png" 
+                  src="/ash-ai-logo-hero.svg" 
                   alt="ASH AI Logo" 
-                  className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 object-contain z-10 relative filter brightness-110 contrast-110 group-hover:brightness-125 transition-all duration-300" 
+                  className="w-36 h-14 sm:w-40 sm:h-16 lg:w-44 lg:h-18 object-contain z-10 relative filter brightness-125 contrast-125 group-hover:brightness-150 group-hover:scale-105 transition-all duration-300" 
                 />
                 {/* Inner pulse effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/10 to-cyan-400/20 rounded-full opacity-0 group-hover:opacity-100 animate-pulse transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/10 to-cyan-400/20 rounded-2xl opacity-0 group-hover:opacity-100 animate-pulse transition-opacity duration-300"></div>
               </div>
               {/* Status indicator */}
               <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-cyan-400 to-cyan-500 rounded-full border-2 border-slate-900 animate-pulse flex items-center justify-center">
@@ -388,10 +384,10 @@ function Layout({ children }: LayoutProps) {
                   title={item.name}
                 >
                   {/* Futuristic hover background effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-cyan-500/30 opacity-0 group-hover:opacity-100 transition-all duration-500 rounded-2xl" />
+                  <div className="absolute inset-0 bg-cyan-500/25 opacity-0 group-hover:opacity-100 transition-all duration-500 rounded-2xl" />
                   <div className="absolute inset-0 border border-cyan-500/0 group-hover:border-cyan-500/30 transition-all duration-300 rounded-2xl" />
                   
-                  <div className="relative w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400/10 to-cyan-500/10 group-hover:from-cyan-400/20 group-hover:to-cyan-500/20 transition-all duration-500 shadow-lg group-hover:shadow-xl group-hover:scale-110 border border-cyan-500/20 shrink-0">
+                  <div className="relative w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-2xl bg-cyan-500/10 group-hover:bg-cyan-500/20 transition-all duration-500 shadow-lg group-hover:shadow-xl group-hover:scale-110 border border-cyan-500/20 shrink-0">
                     <Icon className="w-5 h-5 sm:w-6 sm:h-6 relative z-10 text-cyan-400 group-hover:text-white transition-colors duration-300" />
                   </div>
                   
@@ -402,14 +398,14 @@ function Layout({ children }: LayoutProps) {
                   {item.badge && (
                     <div className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-bold shadow-lg transition-all duration-300 border shrink-0 ${
                       item.badge === 'LIVE' 
-                        ? 'bg-gradient-to-r from-cyan-400/10 to-cyan-400/20 text-cyan-300 animate-pulse border-cyan-400/50 shadow-cyan-400/30' 
+                        ? 'bg-cyan-400/15 text-cyan-300 animate-pulse border-cyan-400/50 shadow-cyan-400/30' 
                         : item.badge === 'NEW'
-                        ? 'bg-gradient-to-r from-cyan-400/20 to-cyan-500/30 text-cyan-300 border-cyan-400/50 shadow-cyan-400/30'
+                        ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400/50 shadow-cyan-400/30'
                         : item.badge === 'HOT'
-                        ? 'bg-gradient-to-r from-cyan-400/20 to-cyan-500/30 text-cyan-300 border-cyan-400/50 shadow-cyan-400/30'
+                        ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400/50 shadow-cyan-400/30'
                         : item.badge === 'BETA'
-                        ? 'bg-gradient-to-r from-cyan-400/20 to-cyan-500/30 text-cyan-300 border-cyan-400/50 shadow-cyan-400/30'
-                        : 'bg-gradient-to-r from-cyan-400/20 to-cyan-500/30 text-cyan-300 border-cyan-400/50 group-hover:text-white'
+                        ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400/50 shadow-cyan-400/30'
+                        : 'bg-cyan-500/20 text-cyan-300 border-cyan-400/50 group-hover:text-white'
                     } hidden sm:flex items-center justify-center`}>
                       <span className="hidden sm:inline">{item.badge}</span>
                       <span className="sm:hidden w-2 h-2 rounded-full bg-current animate-pulse"></span>

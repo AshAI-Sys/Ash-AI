@@ -200,7 +200,7 @@ export async function POST(request: NextRequest) {
       files: uploadedFiles
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error uploading files:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -227,7 +227,7 @@ export async function GET(request: NextRequest) {
       files: []
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching uploaded files:', error)
     return NextResponse.json(
       { error: 'Internal server error' },

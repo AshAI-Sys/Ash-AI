@@ -62,6 +62,15 @@ enum AuditAction {
   STATUS_CHANGE
   APPROVE
   REJECT
+  GENERATE_PAYROLL
+  UPDATE_PAYROLL_STATUS
+}
+
+enum TaskStatus {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
 }
 
 enum Role {
@@ -1527,6 +1536,9 @@ model SewingRun {
   piece_rate_earned Float?        // Piece rate pay earned
   efficiency_pct    Float?        // Efficiency percentage
   status            String        @default("CREATED") // CREATED/IN_PROGRESS/PAUSED/DONE/CANCELLED
+  operation_name    String?       // Cache operation name for reporting
+  defect_rate       Float?        // Defect rate percentage
+  piece_rate_payroll_id String?   // Link to payroll record
   operator_notes    String?
   supervisor_notes  String?
   created_at        DateTime      @default(now())
@@ -2395,14 +2407,32 @@ model Alert {
   type         String
   message      String
   severity     String   @default("INFO") // INFO/WARNING/ERROR/CRITICAL
+  status       String   @default("ACTIVE") // ACTIVE/ACKNOWLEDGED/RESOLVED
   resolved     Boolean  @default(false)
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
+  resolved_at  DateTime?
 
   // Relations
-  workspace    Workspace @relation(fields: [workspace_id], references: [id])
+  workspace    Workspace     @relation(fields: [workspace_id], references: [id])
+  audits       AlertAudit[]
 
   @@map("alerts")
+}
+
+// Alert audit model for tracking alert actions
+model AlertAudit {
+  id         String   @id @default(uuid())
+  alert_id   String
+  action     String   // ACK, RESOLVE, CREATE, etc.
+  actor_id   String
+  note       String?
+  created_at DateTime @default(now())
+
+  // Relations
+  alert      Alert    @relation(fields: [alert_id], references: [id])
+
+  @@map("alert_audits")
 }
 
 // AI Log model for AI interactions

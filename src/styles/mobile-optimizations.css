@@ -1,0 +1,179 @@
+/* Mobile-First Responsive Optimizations */
+
+/* Base mobile styles */
+@media (max-width: 768px) {
+  /* Layout adjustments */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  /* Dashboard grid optimizations */
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  /* Card spacing */
+  .card {
+    margin-bottom: 1rem;
+  }
+  
+  /* Typography scaling */
+  .dashboard-title {
+    font-size: 1.5rem;
+  }
+  
+  /* Navigation improvements */
+  .nav-menu {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 280px;
+    height: 100vh;
+    background: var(--neural-dark);
+    transition: left 0.3s ease;
+    z-index: 50;
+  }
+  
+  .nav-menu.open {
+    left: 0;
+  }
+  
+  /* Mobile sidebar overlay */
+  .mobile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 40;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  
+  .mobile-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+  
+  /* Form optimizations */
+  .form-input {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  /* Button adjustments */
+  .button {
+    min-height: 44px; /* Touch target size */
+    padding: 12px 20px;
+  }
+  
+  /* Table responsiveness */
+  .responsive-table {
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  /* Chart containers */
+  .chart-container {
+    overflow-x: auto;
+  }
+  
+  /* Modal adjustments */
+  .modal {
+    margin: 1rem;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  .dashboard-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .stat-card {
+    text-align: center;
+  }
+  
+  /* Compact navigation */
+  .nav-item {
+    padding: 8px 12px;
+  }
+  
+  /* Smaller text on very small screens */
+  .text-sm {
+    font-size: 0.75rem;
+  }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+  .hover-effect {
+    transform: none !important;
+  }
+  
+  .interactive-element {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Larger tap targets */
+  button, 
+  a, 
+  [role="button"] {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* High DPI screens */
+@media (-webkit-min-device-pixel-ratio: 2) {
+  .logo {
+    image-rendering: -webkit-optimize-contrast;
+  }
+}
+
+/* Landscape mode adjustments */
+@media (orientation: landscape) and (max-height: 500px) {
+  .mobile-header {
+    height: 50px;
+  }
+  
+  .nav-menu {
+    padding-top: 50px;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Dark mode respecting system preference */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0b14;
+    --foreground: #ffffff;
+  }
+}

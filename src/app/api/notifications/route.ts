@@ -167,7 +167,7 @@ export async function GET(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Notification fetch error:', error)
     return NextResponse.json(
       { error: 'Failed to fetch notifications' },
@@ -250,7 +250,7 @@ export async function POST(request: NextRequest) {
       message: 'Notification created successfully'
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Notification creation error:', error)
     return NextResponse.json(
       { error: 'Failed to create notification' },
@@ -326,7 +326,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
     }
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Notification update error:', error)
     return NextResponse.json(
       { error: 'Failed to update notification' },
@@ -386,7 +386,7 @@ export async function PATCH(request: NextRequest) {
       message: 'Notification preferences updated successfully'
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Notification preferences error:', error)
     return NextResponse.json(
       { error: 'Failed to update notification preferences' },
@@ -409,7 +409,7 @@ async function deliverNotification(notification: any) {
       for (const recipient of filteredRecipients) {
         try {
           await deliverThroughChannel(notification, recipient, channel)
-        } catch (error) {
+        } catch (_error) {
           console.error(`Failed to deliver notification ${notification.id} to ${recipient.id} via ${channel}:`, error)
         }
       }
@@ -424,7 +424,7 @@ async function deliverNotification(notification: any) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error(`Failed to deliver notification ${notification.id}:`, error)
     
     // Update status to failed

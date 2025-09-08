@@ -97,7 +97,7 @@ export async function GET(request: NextRequest) {
       maintenance_tasks: tasks_with_summary
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching maintenance tasks:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch maintenance tasks' },
@@ -301,7 +301,7 @@ export async function POST(request: NextRequest) {
       warnings: ashley_check.risk === 'AMBER' ? ashley_check.issues : []
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating maintenance task:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to create maintenance task' },
@@ -381,7 +381,7 @@ export async function PUT(request: NextRequest) {
         // Calculate actual duration if task was started
         if (existing_task.started_at) {
           update_data.actual_duration = Math.floor(
-            (now.getTime() - existing_task.started_at.getTime()) / (1000 * 60)
+            (new Date(now).getTime() - new Date(existing_task.started_at).getTime()) / (1000 * 60)
           )
         }
         
@@ -494,7 +494,7 @@ export async function PUT(request: NextRequest) {
       message: `Maintenance task ${action.toLowerCase().replace('_', ' ')}d successfully`
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error updating maintenance task:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to update maintenance task' },

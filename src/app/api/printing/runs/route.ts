@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching print runs:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch print runs' },
@@ -241,7 +241,7 @@ export async function POST(request: NextRequest) {
       ashley_assessment: ashley_validation
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating print run:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to create print run' },

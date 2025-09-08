@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     console.log(`🎯 Admin ${session.user.full_name} (${session.user.email}) is initializing ASH AI system for workspace: ${workspace_id}`)
 
     // Run the initialization
-    const result = await initializeAshSystem(workspace_id)
+    const _result = await initializeAshSystem(workspace_id)
 
     return NextResponse.json({
       success: true,
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
       }
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('❌ ASH AI System initialization failed:', error)
     
     return NextResponse.json({
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
 /**
  * GET /api/ash/init - Check system initialization status
  */
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     
@@ -97,7 +97,7 @@ export async function GET(request: NextRequest) {
         : ['Run POST /api/ash/init to initialize the system', 'Ensure you have ADMIN privileges']
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error checking system status:', error)
     
     return NextResponse.json({

@@ -144,7 +144,7 @@ export class AshleyAI {
         }
       }
 
-    } catch (error) {
+    } catch (_error) {
       console.error('Ashley AI assessment error:', error)
       assessment.confidence = 0.5
       assessment.insights.push({
@@ -236,7 +236,7 @@ export class AshleyAI {
           })
         }
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Stock availability check error:', error)
     }
 
@@ -429,7 +429,7 @@ export class AshleyAI {
     }
 
     const totalRequiredMinutes = capacityAnalysis.reduce((sum, analysis) => sum + analysis.requiredMinutes, 0)
-    const availableMinutes = (params.targetDate.getTime() - Date.now()) / (1000 * 60)
+    const availableMinutes = (new Date(params.targetDate).getTime() - Date.now()) / (1000 * 60)
 
     if (totalRequiredMinutes > availableMinutes) {
       return {

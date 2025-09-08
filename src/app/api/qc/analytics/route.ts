@@ -19,11 +19,11 @@ export async function GET(request: NextRequest) {
     let startDate: Date
 
     switch (period) {
-      case '7d': startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); break
-      case '30d': startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000); break
-      case '90d': startDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000); break
-      case '1y': startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000); break
-      default: startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+      case '7d': startDate = new Date(new Date(now).getTime() - 7 * 24 * 60 * 60 * 1000); break
+      case '30d': startDate = new Date(new Date(now).getTime() - 30 * 24 * 60 * 60 * 1000); break
+      case '90d': startDate = new Date(new Date(now).getTime() - 90 * 24 * 60 * 60 * 1000); break
+      case '1y': startDate = new Date(new Date(now).getTime() - 365 * 24 * 60 * 60 * 1000); break
+      default: startDate = new Date(new Date(now).getTime() - 30 * 24 * 60 * 60 * 1000)
     }
 
     // Get all completed inspections in the period
@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
       totalInspections: inspections.length
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching QC analytics:', error)
     return NextResponse.json({ 
       error: 'Internal server error',
@@ -152,7 +152,7 @@ function calculateTrendMetrics(inspections: any[], period: string) {
   let currentDate = new Date(startDate)
   
   while (currentDate <= endDate) {
-    const periodEnd = new Date(currentDate.getTime() + groupSize * 24 * 60 * 60 * 1000)
+    const periodEnd = new Date(new Date(currentDate).getTime() + groupSize * 24 * 60 * 60 * 1000)
     const periodInspections = sortedInspections.filter(i => {
       const inspectionDate = new Date(i.closedAt)
       return inspectionDate >= currentDate && inspectionDate < periodEnd

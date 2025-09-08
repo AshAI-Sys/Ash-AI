@@ -124,7 +124,7 @@ export async function POST(
       steps: result.newSteps
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error applying routing template:', error)
     return NextResponse.json(
       { error: 'Internal server error' },

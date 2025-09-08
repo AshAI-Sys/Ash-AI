@@ -70,8 +70,8 @@ async function createTestUser() {
 
     await db.$disconnect()
     return user
-  } catch (error) {
-    console.error('❌ Error creating test user:', error)
+  } catch (_error) {
+    console.error('❌ Error creating test user:', _error)
     await db.$disconnect()
     process.exit(1)
   }

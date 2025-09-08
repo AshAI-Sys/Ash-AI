@@ -100,7 +100,7 @@ export async function GET(
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Client fetch error:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch client' },
@@ -186,7 +186,7 @@ export async function PUT(
       data: updatedClient
     })
 
-  } catch (error) {
+  } catch (_error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { success: false, error: 'Invalid data', details: error.errors },
@@ -261,7 +261,7 @@ export async function DELETE(
       message: 'Client deleted successfully'
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Client deletion error:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to delete client' },

@@ -52,9 +52,9 @@ export async function GET(request: NextRequest) {
     // Add summary data
     const tickets_with_summary = tickets.map(ticket => {
       const latest_message = ticket.messages[0]
-      const days_open = Math.floor((Date.now() - ticket.created_at.getTime()) / (1000 * 60 * 60 * 24))
+      const days_open = Math.floor((Date.now() - new Date(ticket.created_at).getTime()) / (1000 * 60 * 60 * 24))
       const response_time = ticket.first_response_at
-        ? Math.floor((ticket.first_response_at.getTime() - ticket.created_at.getTime()) / (1000 * 60))
+        ? Math.floor((new Date(ticket.first_response_at).getTime() - new Date(ticket.created_at).getTime()) / (1000 * 60))
         : null
 
       return {
@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
       tickets: tickets_with_summary
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching support tickets:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch support tickets' },
@@ -277,7 +277,7 @@ export async function POST(request: NextRequest) {
       warnings: ashley_check.risk === 'AMBER' ? ashley_check.issues : []
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating support ticket:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to create support ticket' },
@@ -466,7 +466,7 @@ export async function PUT(request: NextRequest) {
         )
     }
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error updating support ticket:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to update support ticket' },

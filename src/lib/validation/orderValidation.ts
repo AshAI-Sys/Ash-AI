@@ -4,7 +4,7 @@ import { JSDOM } from 'jsdom'
 
 // Initialize DOMPurify for server-side use
 const window = new JSDOM('').window
-const purify = DOMPurify(window as unknown as Window)
+const purify = DOMPurify(window)
 
 // Sanitization utilities
 export const sanitizeString = (input: string | undefined | null): string => {
@@ -60,7 +60,7 @@ export const orderValidationSchema = z.object({
     (date) => {
       const parsed = new Date(date)
       const now = new Date()
-      return parsed > now && parsed <= new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000)
+      return parsed > now && parsed <= new Date(new Date(now).getTime() + 365 * 24 * 60 * 60 * 1000)
     },
     'Delivery date must be in the future and within 1 year'
   ),

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { Role, TaskStatus } from '@prisma/client'
+import { Role } from '@prisma/client'
 
 export interface ProductionAlert {
   id: string
@@ -12,7 +12,7 @@ export interface ProductionAlert {
   description: string
   affectedEntity: string
   actionRequired: string
-  createdAt: Date
+  created_at: Date
   data?: unknown
 }
 
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Only managers and admins can access alerts
-    if (![Role.ADMIN, Role.MANAGER].includes(session.user.role as Role)) {
+    if (!['ADMIN', 'MANAGER'].includes(session.user.role as Role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
     filteredAlerts.sort((a, b) => {
       const severityDiff = severityOrder[b.severity] - severityOrder[a.severity]
       if (severityDiff !== 0) return severityDiff
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     })
 
     return NextResponse.json({
@@ -65,8 +65,8 @@ export async function GET(request: NextRequest) {
       }
     })
 
-  } catch (error) {
-    console.error('Production alerts error:', error)
+  } catch (_error) {
+    console.error('Production alerts error:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -81,18 +81,22 @@ async function generateProductionAlerts(): Promise<ProductionAlert[]> {
   // Check for overdue tasks
   const overdueTasks = await prisma.task.findMany({
     where: {
-      status: { in: [TaskStatus.IN_PROGRESS, TaskStatus.PENDING] },
-      dueDate: { lt: now }
+      status: { in: ['IN_PROGRESS', 'PENDING'] },
+      due_date: { lt: now }
     },
     include: {
-      assignedUser: { select: { name: true, role: true } },
-      order: { select: { orderNumber: true, clientName: true } }
+      workspace: {
+        select: {
+          id: true,
+          name: true
+        }
+      }
     },
-    orderBy: { dueDate: 'asc' }
+    orderBy: { due_date: 'asc' }
   })
 
   overdueTasks.forEach(task => {
-    const daysOverdue = Math.ceil((now.getTime() - new Date(task.dueDate).getTime()) / (1000 * 3600 * 24))
+    const daysOverdue = Math.ceil((new Date(now).getTime() - new Date(task.due_date!).getTime()) / (1000 * 3600 * 24))
     
     let severity: ProductionAlert['severity'] = 'LOW'
     if (daysOverdue > 5) severity = 'CRITICAL'
@@ -104,17 +108,15 @@ async function generateProductionAlerts(): Promise<ProductionAlert[]> {
       type: 'OVERDUE',
       severity,
       title: `Task Overdue: ${task.title}`,
-      description: `Task is ${daysOverdue} day(s) overdue for order ${task.order?.orderNumber}`,
+      description: `Task "${task.title}" is ${daysOverdue} day(s) overdue`,
       affectedEntity: `Task ${task.id}`,
-      actionRequired: `Contact ${task.assignedUser?.name} (${task.assignedUser?.role}) to resolve delay`,
-      createdAt: now,
+      actionRequired: `Contact ${task.assigned_to || 'unassigned'} to resolve delay`,
+      created_at: now,
       data: {
         taskId: task.id,
-        orderId: task.orderId,
-        orderNumber: task.order?.orderNumber,
-        clientName: task.order?.clientName,
-        assignedTo: task.assignedUser?.name,
-        role: task.assignedUser?.role,
+        title: task.title,
+        assigned_to: task.assigned_to,
+        workspace: task.workspace?.name,
         daysOverdue
       }
     })
@@ -122,10 +124,10 @@ async function generateProductionAlerts(): Promise<ProductionAlert[]> {
 
   // Check for bottlenecks (roles with many pending tasks)
   const roleBottlenecks = await prisma.task.groupBy({
-    by: ['taskType'],
+    by: ['assigned_to'],
     where: {
-      status: TaskStatus.PENDING,
-      createdAt: { gte: new Date(now.getTime() - 24 * 60 * 60 * 1000) } // Last 24 hours
+      status: 'PENDING',
+      created_at: { gte: new Date(new Date(now).getTime() - 24 * 60 * 60 * 1000) } // Last 24 hours
     },
     _count: { id: true },
     having: { id: { _count: { gt: 5 } } }, // More than 5 pending tasks
@@ -138,16 +140,16 @@ async function generateProductionAlerts(): Promise<ProductionAlert[]> {
     else if (bottleneck._count.id > 10) severity = 'HIGH'
 
     alerts.push({
-      id: `bottleneck-${bottleneck.taskType}`,
+      id: `bottleneck-${bottleneck.assigned_to || 'unassigned'}`,
       type: 'BOTTLENECK',
       severity,
-      title: `Production Bottleneck: ${bottleneck.taskType}`,
-      description: `${bottleneck._count.id} pending tasks in ${bottleneck.taskType} department`,
-      affectedEntity: bottleneck.taskType,
+      title: `Production Bottleneck: ${bottleneck.assigned_to || 'Unassigned'}`,
+      description: `${bottleneck._count.id} pending tasks assigned to ${bottleneck.assigned_to || 'unassigned users'}`,
+      affectedEntity: bottleneck.assigned_to || 'unassigned',
       actionRequired: 'Consider reallocating resources or hiring temporary staff',
-      createdAt: now,
+      created_at: now,
       data: {
-        taskType: bottleneck.taskType,
+        assigned_to: bottleneck.assigned_to,
         pendingCount: bottleneck._count.id
       }
     })
@@ -157,13 +159,13 @@ async function generateProductionAlerts(): Promise<ProductionAlert[]> {
   const recentQCFailures = await prisma.qCRecord.findMany({
     where: {
       passed: false,
-      createdAt: { gte: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) } // Last 7 days
+      created_at: { gte: new Date(new Date(now).getTime() - 7 * 24 * 60 * 60 * 1000) } // Last 7 days
     },
     include: {
       task: {
         include: {
           order: { select: { orderNumber: true } },
-          assignedUser: { select: { name: true, role: true } }
+          assigned_user: { select: { name: true, role: true } }
         }
       }
     }
@@ -179,22 +181,22 @@ async function generateProductionAlerts(): Promise<ProductionAlert[]> {
 
     if (qcFailureRate > 10) {
       alerts.push({
-        id: `quality-${now.getTime()}`,
+        id: `quality-${new Date(now).getTime()}`,
         type: 'QUALITY',
         severity,
         title: `High Quality Failure Rate`,
         description: `QC failure rate is ${qcFailureRate.toFixed(1)}% (${recentQCFailures.length} failures in last 7 days)`,
         affectedEntity: 'Quality Control',
         actionRequired: 'Review production processes and provide additional training',
-        createdAt: now,
+        created_at: now,
         data: {
           failureRate: qcFailureRate,
           recentFailures: recentQCFailures.length,
           failures: recentQCFailures.map(f => ({
-            orderId: f.task.orderId,
+            order_id: f.task.order_id,
             orderNumber: f.task.order?.orderNumber,
-            taskType: f.task.taskType,
-            assignedTo: f.task.assignedUser?.name
+            task_type: f.task.task_type,
+            assigned_to: f.task.assigned_user?.name
           }))
         }
       })
@@ -217,9 +219,9 @@ async function generateProductionAlerts(): Promise<ProductionAlert[]> {
       description: `${user.name} has ${user.utilization.toFixed(0)}% capacity utilization (${user.activeTasks} active tasks)`,
       affectedEntity: user.name,
       actionRequired: 'Redistribute tasks or provide additional support',
-      createdAt: now,
+      created_at: now,
       data: {
-        userId: user.id,
+        user_id: user.id,
         userName: user.name,
         role: user.role,
         utilization: user.utilization,
@@ -251,7 +253,7 @@ async function generateProductionAlerts(): Promise<ProductionAlert[]> {
       description: `${item.name} has ${item.quantity} units remaining (reorder point: ${item.reorderPoint})`,
       affectedEntity: item.name,
       actionRequired: 'Order new stock immediately to avoid production delays',
-      createdAt: now,
+      created_at: now,
       data: {
         itemId: item.id,
         itemName: item.name,
@@ -270,11 +272,11 @@ async function calculateQCFailureRate(): Promise<number> {
   
   const [totalQC, failedQC] = await Promise.all([
     prisma.qCRecord.count({
-      where: { createdAt: { gte: last7Days } }
+      where: { created_at: { gte: last7Days } }
     }),
     prisma.qCRecord.count({
       where: { 
-        createdAt: { gte: last7Days },
+        created_at: { gte: last7Days },
         passed: false 
       }
     })
@@ -290,12 +292,12 @@ async function getOverloadedUsers() {
       role: { 
         in: [
           Role.GRAPHIC_ARTIST,
-          Role.SILKSCREEN_OPERATOR,
-          Role.SUBLIMATION_OPERATOR,
-          Role.DTF_OPERATOR,
-          Role.EMBROIDERY_OPERATOR,
-          Role.SEWING_OPERATOR,
-          Role.QC_INSPECTOR,
+          'SILKSCREEN_OPERATOR',
+          'SUBLIMATION_OPERATOR',
+          'DTF_OPERATOR',
+          'EMBROIDERY_OPERATOR',
+          'SEWING_OPERATOR',
+          'QC_INSPECTOR',
           Role.FINISHING_STAFF
         ] 
       }

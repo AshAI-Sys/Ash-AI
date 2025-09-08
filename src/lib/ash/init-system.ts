@@ -30,7 +30,7 @@ export async function initializeAshSystem(workspace_id: string = 'default') {
       success: true,
       message: 'ASH AI System initialized with sample data'
     }
-  } catch (error) {
+  } catch (_error) {
     console.error('❌ Failed to initialize ASH AI System:', error)
     throw error
   }

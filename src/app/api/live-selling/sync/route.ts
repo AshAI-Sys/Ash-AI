@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
 
         syncedCount++
 
-      } catch (error) {
+      } catch (_error) {
         errorCount++
         errors.push(`Sale ${saleData.saleId}: ${error instanceof Error ? error.message : 'Unknown error'}`)
       }
@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Live selling sync error:', error)
     
     if (error instanceof z.ZodError) {
@@ -197,7 +197,7 @@ export async function GET(request: NextRequest) {
       summary
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Get platform sales error:', error)
     return NextResponse.json(
       { 

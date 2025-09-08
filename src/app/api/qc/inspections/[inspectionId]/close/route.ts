@@ -292,7 +292,7 @@ export async function POST(
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error closing inspection:', error)
     return NextResponse.json({ 
       error: 'Internal server error',

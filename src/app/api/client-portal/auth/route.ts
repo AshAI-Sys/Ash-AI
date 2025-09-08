@@ -15,7 +15,10 @@ const loginSchema = z.object({
   remember_me: z.boolean().optional().default(false)
 })
 
-const JWT_SECRET = process.env.NEXTAUTH_SECRET || 'fallback-secret-key'
+const JWT_SECRET = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET or NEXTAUTH_SECRET environment variable is required for production')
+}
 
 /**
  * POST /api/client-portal/auth - Client portal login
@@ -161,7 +164,7 @@ export async function POST(request: NextRequest) {
 
     return response
 
-  } catch (error) {
+  } catch (_error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({
         success: false,
@@ -215,7 +218,7 @@ export async function DELETE(request: NextRequest) {
 
     return response
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Client portal logout error:', error)
     return NextResponse.json({
       success: false,
@@ -287,7 +290,7 @@ export async function GET(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     if (error instanceof jwt.JsonWebTokenError) {
       return NextResponse.json({
         success: false,
@@ -322,7 +325,7 @@ async function logSecurityEvent(event: string, clientId: string, metadata: any) 
         }
       }
     })
-  } catch (error) {
+  } catch (_error) {
     console.error('Failed to log security event:', error)
   }
 }

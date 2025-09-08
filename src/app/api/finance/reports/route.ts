@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
       data: reports
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error fetching financial reports:", error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch reports" },
@@ -129,7 +129,7 @@ export async function POST(request: NextRequest) {
       data: report
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error generating report:", error)
     return NextResponse.json(
       { success: false, error: "Failed to generate report" },

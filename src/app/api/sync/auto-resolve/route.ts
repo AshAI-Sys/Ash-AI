@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
       remaining: result.remaining
     });
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Auto-resolve conflicts error:', error);
     return NextResponse.json(
       { error: 'Failed to auto-resolve conflicts' },

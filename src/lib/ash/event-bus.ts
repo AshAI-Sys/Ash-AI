@@ -59,7 +59,7 @@ export class AshEventBus {
       // For real-time processing, trigger immediate handlers
       await AshEventBus.processEvent(eventType, payload)
 
-    } catch (error) {
+    } catch (_error) {
       console.error('Error emitting ASH event:', error)
     }
   }
@@ -110,7 +110,7 @@ export class AshEventBus {
           // Log unhandled events for monitoring
           console.log(`Unhandled ASH event: ${eventType}`)
       }
-    } catch (error) {
+    } catch (_error) {
       console.error(`Error processing event ${eventType}:`, error)
     }
   }
@@ -193,7 +193,7 @@ export class AshEventBus {
         order_id: orderId
       })
 
-    } catch (error) {
+    } catch (_error) {
       console.error('Error processing design approval:', error)
     }
   }
@@ -508,7 +508,7 @@ export class AshEventBus {
           break
         }
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error checking stage completion:', error)
     }
   }
@@ -523,7 +523,7 @@ export class AshEventBus {
         // This would update productivity metrics in the database
         console.log(`ASH: Updated productivity metrics for operator ${operatorId} in ${workcenter}`)
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error updating productivity metrics:', error)
     }
   }
@@ -561,7 +561,7 @@ export class AshEventBus {
                 processed_at: new Date()
               }
             })
-          } catch (error) {
+          } catch (_error) {
             await prisma.systemEvent.update({
               where: { id: event.id },
               data: { 
@@ -571,7 +571,7 @@ export class AshEventBus {
             })
           }
         }
-      } catch (error) {
+      } catch (_error) {
         console.error('Error in background event processing:', error)
       }
     }, intervalMs)

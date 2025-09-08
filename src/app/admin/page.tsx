@@ -84,7 +84,7 @@ export default function AdminPage() {
             return (
               <button
                 key={section.key}
-                onClick={() => setActiveSection(section.key as string)}
+                onClick={() => setActiveSection(section.key as typeof activeSection)}
                 className={`flex-shrink-0 px-4 py-2 rounded-md font-medium transition-all text-sm whitespace-nowrap ${
                   activeSection === section.key
                     ? 'bg-white dark:bg-gray-700 shadow-sm'

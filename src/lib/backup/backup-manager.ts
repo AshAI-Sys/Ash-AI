@@ -66,7 +66,7 @@ export class BackupManager {
 
       return filePath;
 
-    } catch (error) {
+    } catch (_error) {
       await prisma.backupJob.update({
         where: { id: job.id },
         data: {
@@ -139,7 +139,7 @@ export class BackupManager {
       if (backup.filePath) {
         try {
           await fs.unlink(backup.filePath);
-        } catch (error) {
+        } catch (_error) {
           console.warn(`Failed to delete backup file: ${backup.filePath}`, error);
         }
       }
@@ -260,7 +260,7 @@ export class BackupManager {
       
       console.log(`Data exported to: ${filePath}`);
       
-    } catch (error) {
+    } catch (_error) {
       console.error('Export to Google Sheets failed:', error);
       throw error;
     }

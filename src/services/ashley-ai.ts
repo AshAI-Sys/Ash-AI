@@ -124,7 +124,7 @@ class AshleyAI {
   ): Promise<void> {
     const deliveryDate = new Date(request.targetDeliveryDate)
     const today = new Date()
-    const daysDiff = Math.ceil((deliveryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+    const daysDiff = Math.ceil((new Date(deliveryDate).getTime() - new Date(today).getTime()) / (1000 * 60 * 60 * 24))
 
     // Rush order detection
     if (daysDiff < 7) {

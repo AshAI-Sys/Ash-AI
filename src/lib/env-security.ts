@@ -82,7 +82,7 @@ export class EnvironmentSecurity {
       console.log('[ENV_SECURITY] Environment validation successful')
       
       return env
-    } catch (error) {
+    } catch (_error) {
       console.error('[ENV_SECURITY] Environment validation failed:', error)
       
       // In production, terminate the application
@@ -365,7 +365,7 @@ export class ConfigurationMonitor {
           // Could implement automatic restart or alerting here
         }
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('[CONFIG_MONITOR] Integrity check failed:', error)
     }
   }
@@ -374,7 +374,7 @@ export class ConfigurationMonitor {
 // Initialize environment validation on import
 try {
   EnvironmentSecurity.validateEnvironment()
-} catch (error) {
+} catch (_error) {
   // Allow the error to be handled by the application
   console.error('[ENV_SECURITY] Failed to validate environment on import:', error)
 }

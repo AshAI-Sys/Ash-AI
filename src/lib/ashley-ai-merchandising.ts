@@ -191,7 +191,7 @@ export class AshleyMerchandisingAI {
       expected_impact: string
     }>
   }> {
-    const lastOrderDate = Math.max(...order_history.map(o => o.created_at.getTime()))
+    const lastOrderDate = Math.max(...order_history.map(o => new Date(o.created_at).getTime()))
     const daysSinceLastOrder = (Date.now() - lastOrderDate) / (1000 * 60 * 60 * 24)
     
     const avgOrderFrequency = this.calculateAverageOrderFrequency(order_history)
@@ -249,7 +249,7 @@ export class AshleyMerchandisingAI {
     
     // Calculate confidence based on multiple factors
     let confidence = 0
-    let reasons: string[] = []
+    const reasons: string[] = []
     let type: 'HIGH_PERFORMER' | 'SEASONAL_OPPORTUNITY' | 'TREND_MATCH' = 'HIGH_PERFORMER'
     
     // High performer analysis
@@ -390,11 +390,11 @@ export class AshleyMerchandisingAI {
   private static calculateAverageOrderFrequency(orders: OrderHistoryItem[]): number {
     if (orders.length < 2) return 30 // Default 30 days
     
-    const sortedOrders = orders.sort((a, b) => a.created_at.getTime() - b.created_at.getTime())
+    const sortedOrders = orders.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
     let totalDays = 0
     
     for (let i = 1; i < sortedOrders.length; i++) {
-      const daysBetween = (sortedOrders[i].created_at.getTime() - sortedOrders[i-1].created_at.getTime()) / (1000 * 60 * 60 * 24)
+      const daysBetween = (sortedOrders[i], new Date(created_at).getTime() - sortedOrders[i-1], new Date(created_at).getTime()) / (1000 * 60 * 60 * 24)
       totalDays += daysBetween
     }
     
@@ -404,7 +404,7 @@ export class AshleyMerchandisingAI {
   private static analyzeOrderValueTrend(orders: OrderHistoryItem[]): number {
     if (orders.length < 3) return 0
     
-    const sortedOrders = orders.sort((a, b) => a.created_at.getTime() - b.created_at.getTime())
+    const sortedOrders = orders.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
     const firstHalf = sortedOrders.slice(0, Math.floor(sortedOrders.length / 2))
     const secondHalf = sortedOrders.slice(Math.floor(sortedOrders.length / 2))
     

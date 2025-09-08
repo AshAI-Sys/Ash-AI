@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
       design_checks_initiated: true
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating design version:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -163,7 +163,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(designs)
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching designs:', error)
     return NextResponse.json(
       { error: 'Internal server error' },

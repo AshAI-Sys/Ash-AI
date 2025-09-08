@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
       total: defectCodes.length
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching defect codes:', error)
     return NextResponse.json({ 
       error: 'Internal server error',
@@ -143,7 +143,7 @@ export async function POST(request: NextRequest) {
       defectCode
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating defect code:', error)
     return NextResponse.json({ 
       error: 'Internal server error',

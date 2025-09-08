@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       backupCodeUsed: verification.backupCodeUsed
     });
 
-  } catch (error) {
+  } catch (_error) {
     console.error('2FA verify error:', error);
     return NextResponse.json(
       { error: 'Failed to verify token' },

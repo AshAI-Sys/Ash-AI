@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
       data: forecasts
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error fetching forecasts:", error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch forecasts" },
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
       data: forecast
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error creating forecast:", error)
     return NextResponse.json(
       { success: false, error: "Failed to create forecast" },
@@ -177,7 +177,7 @@ async function generateForecast(type: string, period: string, _algorithm: string
       accuracy: Math.round(accuracy * 1000) / 1000 // Round to 3 decimal places
     }
     
-  } catch (error) {
+  } catch (_error) {
     console.error("Error generating forecast:", error)
     throw error
   }

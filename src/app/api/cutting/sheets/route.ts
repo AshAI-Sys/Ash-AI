@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
       }))
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching cutting sheets:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch cutting sheets' },
@@ -224,7 +224,7 @@ export async function POST(request: NextRequest) {
       warnings: ashley_check.risk === 'AMBER' ? ashley_check.issues : []
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error starting cutting sheet:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to start cutting sheet' },
@@ -378,7 +378,7 @@ export async function PUT(request: NextRequest) {
       cutting_sheet: result_sheet
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error updating cutting sheet:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to update cutting sheet' },

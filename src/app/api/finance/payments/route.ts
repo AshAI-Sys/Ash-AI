@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
       summary
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching payments:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch payments' },
@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
       payment
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error recording payment:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to record payment' },

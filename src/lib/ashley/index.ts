@@ -74,7 +74,7 @@ export class AshleyAI {
       analysis.suggestions.push(...aiSuggestions);
 
       return analysis;
-    } catch (error) {
+    } catch (_error) {
       console.error('Ashley order intake analysis failed:', error);
       return {
         ...analysis,
@@ -116,7 +116,7 @@ export class AshleyAI {
       }
 
       return analysis;
-    } catch (error) {
+    } catch (_error) {
       console.error('Ashley design analysis failed:', error);
       return {
         ...analysis,
@@ -153,7 +153,7 @@ export class AshleyAI {
       }
 
       return optimization;
-    } catch (error) {
+    } catch (_error) {
       console.error('Ashley cutting optimization failed:', error);
       throw new Error('Cutting optimization failed');
     }
@@ -214,7 +214,7 @@ export class AshleyAI {
       }
 
       return analysis;
-    } catch (error) {
+    } catch (_error) {
       console.error('Ashley quality analysis failed:', error);
       throw new Error('Quality analysis failed');
     }
@@ -230,7 +230,7 @@ export class AshleyAI {
     try {
       const horizonDays = params.horizonDays || 90;
       const endDate = new Date();
-      const startDate = new Date(endDate.getTime() - horizonDays * 24 * 60 * 60 * 1000);
+      const startDate = new Date(new Date(endDate).getTime() - horizonDays * 24 * 60 * 60 * 1000);
 
       // Get design performance data
       const design = await db.designAsset.findUnique({
@@ -265,7 +265,7 @@ export class AshleyAI {
       };
 
       return recommendation;
-    } catch (error) {
+    } catch (_error) {
       console.error('Ashley reprint recommendation failed:', error);
       throw new Error('Reprint recommendation failed');
     }
@@ -328,7 +328,7 @@ export class AshleyAI {
       if (aiSuggestions) {
         suggestions.push(...aiSuggestions.slice(0, 3));
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('AI suggestion generation failed:', error);
     }
 
@@ -361,13 +361,13 @@ export class AshleyAI {
     const now = new Date();
     switch (timeframe) {
       case 'DAILY':
-        return new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        return new Date(new Date(now).getTime() - 24 * 60 * 60 * 1000);
       case 'WEEKLY':
-        return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        return new Date(new Date(now).getTime() - 7 * 24 * 60 * 60 * 1000);
       case 'MONTHLY':
-        return new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        return new Date(new Date(now).getTime() - 30 * 24 * 60 * 60 * 1000);
       default:
-        return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        return new Date(new Date(now).getTime() - 7 * 24 * 60 * 60 * 1000);
     }
   }
 
@@ -388,7 +388,7 @@ export class AshleyAI {
       });
 
       return response.choices[0]?.message?.content?.split('\n').filter(s => s.trim()).slice(0, 3) || [];
-    } catch (error) {
+    } catch (_error) {
       console.error('AI quality suggestion generation failed:', error);
       return ['Review operator training programs', 'Implement additional quality checkpoints'];
     }

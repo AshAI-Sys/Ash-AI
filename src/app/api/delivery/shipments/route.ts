@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
       }))
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching shipments:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch shipments' },
@@ -252,7 +252,7 @@ export async function POST(request: NextRequest) {
       warnings: ashley_check.risk === 'AMBER' ? ashley_check.issues : []
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating shipment:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to create shipment' },
@@ -349,7 +349,7 @@ export async function PUT(request: NextRequest) {
       shipment: updated_shipment
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error updating shipment:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to update shipment' },

@@ -50,9 +50,9 @@ export class AuditLogger {
         await this.alertSecurityTeam(event, context);
       }
 
-    } catch (error) {
-      console.error('Audit logging failed:', error);
-      await this.fallbackLogging(event, context, error);
+    } catch (_error) {
+      console.error('Audit logging failed:', _error);
+      await this.fallbackLogging(event, context, _error);
     }
   }
 
@@ -308,7 +308,7 @@ export class AuditLogger {
   private static extractIpAddress(context: AuditContext): string {
     if (context.ipAddress) return context.ipAddress;
     if (context.request) {
-      return context.request.ip || 
+      return context.request.headers.get('x-forwarded-for') || 
              context.request.headers.get('x-forwarded-for') || 
              context.request.headers.get('x-real-ip') ||
              'unknown';
@@ -348,7 +348,7 @@ export class AuditLogger {
   private static async fallbackLogging(
     event: AuditEvent,
     context: AuditContext,
-    error: any
+    _error: any
   ): Promise<void> {
     const logEntry = {
       timestamp: new Date().toISOString(),
@@ -358,7 +358,7 @@ export class AuditLogger {
         ipAddress: this.extractIpAddress(context),
         userAgent: this.extractUserAgent(context)
       },
-      error: error.message
+      error: _error.message
     };
 
     console.error('AUDIT LOG (FALLBACK):', JSON.stringify(logEntry));

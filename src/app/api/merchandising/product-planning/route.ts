@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result)
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Product planning error:', error)
     return NextResponse.json(
       { error: 'Failed to generate product planning analysis' },

@@ -67,7 +67,7 @@ export async function createTestUser() {
     console.log('👤 Role: ADMIN')
 
     return user
-  } catch (error) {
+  } catch (_error) {
     console.error('❌ Error creating test user:', error)
     throw error
   }

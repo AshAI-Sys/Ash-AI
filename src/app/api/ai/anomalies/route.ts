@@ -18,8 +18,8 @@ export async function GET() {
     const anomalies = await aiService.detectAnomalies()
 
     return NextResponse.json(anomalies)
-  } catch (error) {
-    console.error('Error detecting anomalies:', error)
+  } catch (_error) {
+    console.error('Error detecting anomalies:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

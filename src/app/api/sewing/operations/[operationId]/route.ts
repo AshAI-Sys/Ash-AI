@@ -90,7 +90,7 @@ export async function GET(
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching sewing operation:', error)
     return NextResponse.json({ 
       error: 'Internal server error',
@@ -177,7 +177,7 @@ export async function PUT(
       operation: updatedOperation
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error updating sewing operation:', error)
     return NextResponse.json({ 
       error: 'Internal server error',
@@ -249,7 +249,7 @@ export async function DELETE(
       message: 'Sewing operation deactivated successfully'
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error deleting sewing operation:', error)
     return NextResponse.json({ 
       error: 'Internal server error',

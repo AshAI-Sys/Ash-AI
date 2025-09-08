@@ -198,7 +198,7 @@ export const validateInput = <T>(schema: z.ZodSchema<T>, input: unknown): { succ
   try {
     const data = schema.parse(input)
     return { success: true, data }
-  } catch (error) {
+  } catch (_error) {
     if (error instanceof z.ZodError) {
       return { 
         success: false, 

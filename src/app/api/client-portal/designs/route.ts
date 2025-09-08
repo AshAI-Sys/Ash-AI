@@ -8,7 +8,10 @@ import { prisma } from '@/lib/prisma'
 import jwt from 'jsonwebtoken'
 import { z } from 'zod'
 
-const JWT_SECRET = process.env.NEXTAUTH_SECRET || 'fallback-secret-key'
+const JWT_SECRET = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET or NEXTAUTH_SECRET environment variable is required for production')
+}
 
 const approvalSchema = z.object({
   asset_id: z.string().min(1, 'Asset ID is required'),
@@ -148,7 +151,7 @@ export async function GET(request: NextRequest) {
       summary: summaryStats
     })
 
-  } catch (error) {
+  } catch (_error) {
     if (error instanceof jwt.JsonWebTokenError) {
       return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
     }
@@ -272,7 +275,7 @@ export async function POST(request: NextRequest) {
       summary: summaryStats
     })
 
-  } catch (error) {
+  } catch (_error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({
         success: false,
@@ -371,7 +374,7 @@ async function createApprovalNotification(asset: any, action: string, feedback?:
         }
       }
     })
-  } catch (error) {
+  } catch (_error) {
     console.error('Failed to create approval notification:', error)
   }
 }
@@ -400,7 +403,7 @@ async function createDesignRevisionTask(asset: any, requestedChanges?: string[])
         }
       }
     })
-  } catch (error) {
+  } catch (_error) {
     console.error('Failed to create design revision task:', error)
   }
 }

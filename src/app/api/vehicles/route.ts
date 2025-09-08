@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
       data: vehicles
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error fetching vehicles:", error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch vehicles" },
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
       data: vehicle
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error creating vehicle:", error)
     return NextResponse.json(
       { success: false, error: "Failed to create vehicle" },
@@ -141,7 +141,7 @@ export async function PATCH(request: NextRequest) {
       data: updatedVehicle
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error updating vehicle:", error)
     return NextResponse.json(
       { success: false, error: "Failed to update vehicle" },
@@ -203,7 +203,7 @@ export async function DELETE(request: NextRequest) {
       message: "Vehicle deactivated successfully"
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error("Error deleting vehicle:", error)
     return NextResponse.json(
       { success: false, error: "Failed to delete vehicle" },

@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
       summary
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching invoices:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch invoices' },
@@ -273,7 +273,7 @@ export async function POST(request: NextRequest) {
       }
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating invoice:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to create invoice' },

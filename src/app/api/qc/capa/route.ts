@@ -109,7 +109,7 @@ export async function GET(request: NextRequest) {
       total: capaTasks.length
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching CAPA tasks:', error)
     return NextResponse.json({ 
       error: 'Internal server error',
@@ -297,7 +297,7 @@ export async function POST(request: NextRequest) {
       }
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating CAPA task:', error)
     return NextResponse.json({ 
       error: 'Internal server error',

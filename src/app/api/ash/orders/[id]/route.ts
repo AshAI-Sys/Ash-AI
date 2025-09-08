@@ -168,7 +168,7 @@ export async function GET(
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching order details:', error)
     return NextResponse.json(
       { error: 'Failed to fetch order details' },
@@ -240,7 +240,7 @@ export async function PATCH(
       order: updatedOrder
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error updating order:', error)
     return NextResponse.json(
       { error: 'Failed to update order' },
@@ -274,5 +274,5 @@ function calculateEstimatedCompletion(order: any): Date {
   const remainingSteps = order.routing_steps.filter((step: any) => step.status !== 'DONE').length
   const daysPerStep = 1.5 // Average days per step
   
-  return new Date(now.getTime() + remainingSteps * daysPerStep * 24 * 60 * 60 * 1000)
+  return new Date(new Date(now).getTime() + remainingSteps * daysPerStep * 24 * 60 * 60 * 1000)
 }

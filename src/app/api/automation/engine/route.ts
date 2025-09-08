@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
         )
     }
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Automation Engine API error:', error)
     return NextResponse.json(
       { 
@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
         )
     }
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Automation Engine GET API error:', error)
     return NextResponse.json(
       { error: 'Failed to fetch automation data' },
@@ -196,7 +196,7 @@ async function createAutomationRule(params: any, workspace_id: string) {
       message: 'Automation rule created successfully'
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating automation rule:', error)
     return NextResponse.json(
       { error: 'Failed to create automation rule' },
@@ -251,7 +251,7 @@ async function triggerAutomationEvent(params: any, workspace_id: string) {
       event_id: `evt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error triggering automation event:', error)
     return NextResponse.json(
       { error: 'Failed to trigger automation event' },
@@ -302,7 +302,7 @@ async function sendSmartNotification(params: any, workspace_id: string) {
       estimated_delivery: schedule_for || new Date().toISOString()
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error sending smart notification:', error)
     return NextResponse.json(
       { error: 'Failed to send notification' },
@@ -344,7 +344,7 @@ async function scheduleSmartReminder(params: any, workspace_id: string) {
       message: 'Smart reminder scheduled with AI optimization'
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error scheduling smart reminder:', error)
     return NextResponse.json(
       { error: 'Failed to schedule reminder' },
@@ -364,7 +364,7 @@ async function getAutomationRecommendations(params: any, workspace_id: string) {
       analysis_date: new Date().toISOString()
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error getting automation recommendations:', error)
     return NextResponse.json(
       { error: 'Failed to get recommendations' },
@@ -403,7 +403,7 @@ async function getAutomationRules(workspace_id: string) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching automation rules:', error)
     return NextResponse.json(
       { error: 'Failed to fetch automation rules' },
@@ -443,7 +443,7 @@ async function getRecentExecutions(workspace_id: string) {
       stats
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching recent executions:', error)
     return NextResponse.json(
       { error: 'Failed to fetch executions' },
@@ -496,7 +496,7 @@ async function getAutomationAnalytics(workspace_id: string) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching automation analytics:', error)
     return NextResponse.json(
       { error: 'Failed to fetch analytics' },
@@ -520,7 +520,7 @@ async function getNotificationTemplates(workspace_id: string) {
       templates
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching notification templates:', error)
     return NextResponse.json(
       { error: 'Failed to fetch templates' },

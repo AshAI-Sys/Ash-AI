@@ -105,7 +105,7 @@ export async function GET(request: NextRequest) {
       totalRates: pieceRates.length
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching piece rates:', error)
     return NextResponse.json({ 
       error: 'Internal server error',
@@ -238,7 +238,7 @@ export async function POST(request: NextRequest) {
       pieceRate
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating piece rate:', error)
     return NextResponse.json({ 
       error: 'Internal server error',
@@ -300,7 +300,7 @@ export async function PUT(request: NextRequest) {
               ]
             },
             data: {
-              effectiveTo: new Date(fromDate.getTime() - 1)
+              effectiveTo: new Date(new Date(fromDate).getTime() - 1)
             }
           })
 
@@ -329,7 +329,7 @@ export async function PUT(request: NextRequest) {
             pieceRateId: pieceRate.id
           })
 
-        } catch (error) {
+        } catch (_error) {
           errors.push({ 
             operationName: update.operationName, 
             error: error instanceof Error ? error.message : 'Unknown error' 
@@ -362,7 +362,7 @@ export async function PUT(request: NextRequest) {
       errors: errors.length > 0 ? errors : undefined
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error bulk updating piece rates:', error)
     return NextResponse.json({ 
       error: 'Internal server error',

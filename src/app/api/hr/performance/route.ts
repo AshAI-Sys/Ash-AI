@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
           average_rating,
           ratings_completed: ratings.length,
           total_ratings: 5,
-          is_overdue: review.status === 'DRAFT' && new Date() > new Date(review.review_date.getTime() + 7 * 24 * 60 * 60 * 1000),
+          is_overdue: review.status === 'DRAFT' && new Date() > new Date(new Date(review.review_date).getTime() + 7 * 24 * 60 * 60 * 1000),
           needs_acknowledgment: review.status === 'SUBMITTED' && !review.acknowledged_at
         }
       }
@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
       performance_reviews: reviews_with_summary
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error fetching performance reviews:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch performance reviews' },
@@ -205,7 +205,7 @@ export async function POST(request: NextRequest) {
         overall_rating
       },
       employment_duration_months: Math.floor(
-        (new Date().getTime() - employee.hire_date.getTime()) / (30 * 24 * 60 * 60 * 1000)
+        (new Date().getTime() - new Date(employee.hire_date).getTime()) / (30 * 24 * 60 * 60 * 1000)
       )
     })
 
@@ -266,7 +266,7 @@ export async function POST(request: NextRequest) {
       warnings: ashley_check.risk === 'AMBER' ? ashley_check.issues : []
     }, { status: 201 })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error creating performance review:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to create performance review' },
@@ -417,7 +417,7 @@ export async function PUT(request: NextRequest) {
       message: `Performance review ${action.toLowerCase()}d successfully`
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Error updating performance review:', error)
     return NextResponse.json(
       { success: false, error: 'Failed to update performance review' },
