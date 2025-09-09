@@ -121,8 +121,8 @@ export function FixedEnterpriseDashboard() {
   }
 
   return (
-    <div className="min-h-screen p-6">
-      {/* Header Section */}
+    <div className="p-6">
+      {/* Header Section - Simplified to avoid conflict with main layout */}
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
@@ -132,24 +132,6 @@ export function FixedEnterpriseDashboard() {
             <p className="text-slate-400">
               Here's what's happening with your apparel production today.
             </p>
-          </div>
-          <div className="flex items-center space-x-4">
-            <div className="text-right">
-              <p className="text-sm text-slate-400">
-                {new Date().toLocaleDateString('en-PH', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
-              </p>
-              <p className="text-lg font-semibold text-white">
-                {new Date().toLocaleTimeString('en-PH', {
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })}
-              </p>
-            </div>
           </div>
         </div>
       </div>

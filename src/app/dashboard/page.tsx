@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import EnhancedLayout from '@/components/EnhancedLayout'
-import { FixedEnterpriseDashboard } from '@/components/FixedEnterpriseDashboard'
+import { EnterpriseDashboard } from '@/components/EnterpriseDashboard'
 
 export default function DashboardPage() {
   const { data: session, status } = useSession()
@@ -68,7 +68,7 @@ export default function DashboardPage() {
 
   return (
     <EnhancedLayout>
-      <FixedEnterpriseDashboard />
+      <EnterpriseDashboard />
     </EnhancedLayout>
   )
 }
