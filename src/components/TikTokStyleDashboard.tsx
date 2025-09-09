@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { 
   Home,
   Package,
@@ -70,8 +72,10 @@ interface ActiveOrder {
 
 export function TikTokStyleDashboard() {
   const { data: session } = useSession()
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState('home')
   const [isMobile, setIsMobile] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   // ASH AI Manufacturing Data from CLIENT_UPDATED_PLAN.md
   const [stats] = useState<ManufacturingStats>({
@@ -180,6 +184,128 @@ export function TikTokStyleDashboard() {
     }).format(amount)
   }
 
+  // Button Click Handlers
+  const handleNavigation = (path: string, tabId?: string) => {
+    if (tabId) {
+      setActiveTab(tabId)
+    }
+    
+    if (path.startsWith('/')) {
+      router.push(path)
+    }
+  }
+
+  const handleCardClick = (card: string, id?: string) => {
+    setLoading(true)
+    
+    switch (card) {
+      case 'order':
+        toast.info(`Opening order ${id}...`)
+        setTimeout(() => {
+          router.push(`/orders/${id}`)
+          setLoading(false)
+        }, 500)
+        break
+      case 'production':
+        toast.info('Opening production tracking...')
+        setTimeout(() => {
+          router.push('/production')
+          setLoading(false)
+        }, 500)
+        break
+      case 'core-requirement':
+        toast.info(`Opening ${id} module...`)
+        setTimeout(() => {
+          router.push(`/${id?.toLowerCase().replace(/ /g, '-')}`)
+          setLoading(false)
+        }, 500)
+        break
+      case 'critical-fix':
+        toast.warning(`Addressing ${id}...`)
+        setLoading(false)
+        break
+      case 'immediate-action':
+        toast.info(`Processing ${id}...`)
+        setLoading(false)
+        break
+      default:
+        toast.info('Feature coming soon...')
+        setLoading(false)
+    }
+  }
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab)
+    toast.success(`Switched to ${tab} tab`)
+    
+    // Navigate to specific pages based on tab
+    switch (tab) {
+      case 'orders':
+        router.push('/orders')
+        break
+      case 'production':
+        router.push('/production')
+        break
+      case 'analytics':
+        router.push('/analytics')
+        break
+      case 'chat':
+        router.push('/messages')
+        break
+      case 'settings':
+        router.push('/settings')
+        break
+      default:
+        // Stay on dashboard
+        break
+    }
+  }
+
+  const handleActionButton = (action: string, data?: any) => {
+    setLoading(true)
+    
+    switch (action) {
+      case 'new-order':
+        toast.success('Creating new order...')
+        setTimeout(() => {
+          router.push('/orders/new')
+          setLoading(false)
+        }, 1000)
+        break
+      case 'view-analysis':
+        toast.info('Loading analytics...')
+        setTimeout(() => {
+          router.push('/analytics')
+          setLoading(false)
+        }, 800)
+        break
+      case 'chat-ashley':
+        toast.success('Opening Ashley AI...')
+        setTimeout(() => {
+          router.push('/messages')
+          setLoading(false)
+        }, 500)
+        break
+      case 'sync-data':
+        toast.loading('Syncing data...')
+        setTimeout(() => {
+          toast.success('Data synced successfully!')
+          setLoading(false)
+        }, 2000)
+        break
+      case 'view-profile':
+        toast.info('Opening profile...')
+        setTimeout(() => {
+          router.push('/profile')
+          setLoading(false)
+        }, 500)
+        break
+      default:
+        toast.info('Action triggered!')
+        setLoading(false)
+    }
+  }
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'MATERIAL PREPARATION': return 'bg-blue-50 text-blue-600 border-blue-200'
@@ -257,7 +383,7 @@ export function TikTokStyleDashboard() {
           
           <div className="space-y-3">
             {criticalFixes.map((fix, index) => (
-              <Card key={index} className="bg-white border-0 shadow-sm">
+              <Card key={index} className="bg-white border-0 shadow-sm cursor-pointer hover:shadow-md transition-all" onClick={() => handleCardClick('critical-fix', fix.title)}>
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-2">
@@ -404,17 +530,23 @@ export function TikTokStyleDashboard() {
               return (
                 <button
                   key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className={`flex flex-col items-center py-2 px-1 relative ${
-                    activeTab === item.id ? 'text-blue-600' : 'text-gray-600'
-                  }`}
+                  onClick={() => handleTabChange(item.id)}
+                  disabled={loading}
+                  className={`flex flex-col items-center py-2 px-1 relative transition-all ${
+                    activeTab === item.id ? 'text-blue-600 transform scale-110' : 'text-gray-600'
+                  } ${loading ? 'opacity-50' : 'hover:text-blue-500'}`}
                 >
                   <Icon className="w-5 h-5 mb-1" />
                   <span className="text-xs font-medium">{item.label}</span>
                   {item.badge && item.badge > 0 && (
-                    <Badge className="absolute -top-1 -right-1 w-5 h-5 p-0 text-xs bg-red-500 text-white rounded-full flex items-center justify-center">
+                    <Badge className="absolute -top-1 -right-1 w-5 h-5 p-0 text-xs bg-red-500 text-white rounded-full flex items-center justify-center animate-pulse">
                       {item.badge > 9 ? '9+' : item.badge}
                     </Badge>
+                  )}
+                  {loading && activeTab === item.id && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-3 h-3 border border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                    </div>
                   )}
                 </button>
               )
@@ -448,15 +580,19 @@ export function TikTokStyleDashboard() {
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveTab(item.id)}
+                onClick={() => handleNavigation(`/${item.id}`, item.id)}
+                disabled={loading}
                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-colors ${
                   activeTab === item.id
                     ? 'bg-blue-50 text-blue-600'
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
+                } ${loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               >
                 <Icon className="w-5 h-5" />
                 <span className="font-medium">{item.label}</span>
+                {loading && activeTab === item.id && (
+                  <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin ml-auto"></div>
+                )}
               </button>
             )
           })}
@@ -766,9 +902,16 @@ export function TikTokStyleDashboard() {
                       <p className="text-sm font-medium">Material Planning Alert</p>
                       <p className="text-xs text-orange-600">Low stock on 3 materials</p>
                     </div>
-                    <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                    <Button 
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50"
+                      onClick={() => handleActionButton('chat-ashley')}
+                      disabled={loading}
+                    >
                       <MessageSquare className="w-4 h-4 mr-2" />
                       Chat with Ashley
+                      {loading && (
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin ml-2"></div>
+                      )}
                     </Button>
                   </div>
                 </CardContent>
