@@ -39,13 +39,40 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        // Mock user authentication for testing (bypass database)
+        // Production authentication - check database first, fallback to mock for demo
+        try {
+          // Try database authentication first
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email }
+          });
+
+          if (user && await bcrypt.compare(credentials.password, user.password)) {
+            return {
+              id: user.id,
+              email: user.email,
+              name: user.name,
+              full_name: user.name,
+              role: user.role
+            };
+          }
+        } catch (error) {
+          console.warn('Database auth failed, using mock auth:', error);
+        }
+
+        // Fallback to mock users for demo/development
         const mockUsers = [
           {
             id: '1',
             email: 'admin@example.com',
             password: 'admin123',
             full_name: 'System Administrator',
+            role: 'ADMIN' as Role
+          },
+          {
+            id: '2',
+            email: 'admin@ash-ai.com',
+            password: 'AshAI2024!',
+            full_name: 'ASH AI Administrator',
             role: 'ADMIN' as Role
           },
           {

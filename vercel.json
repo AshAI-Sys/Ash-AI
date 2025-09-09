@@ -1,35 +1,28 @@
 {
-  "version": 2,
-  "name": "ash-ai-erp",
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/next"
-    }
-  ],
-  "regions": ["iad1"],
+  "name": "ash-ai-erp-system",
+  "public": true,
+  "env": {
+    "DATABASE_URL": "postgresql://ash_ai:ash_ai_secure_2024@localhost:5432/ash_ai_production?schema=public",
+    "NEXTAUTH_SECRET": "ash_ai_quantum_secure_2024_neural_network_production_key",
+    "NEXTAUTH_URL": "https://ash-ai-erp-system.vercel.app",
+    "ASH_JWT_SECRET": "ashley_ai_production_auth_quantum_encryption_2024",
+    "JWT_SECRET": "ashley_ai_production_auth_quantum_encryption_2024",
+    "ASH_ENCRYPTION_KEY": "ash_ai_neural_quantum_encrypt_prod_32",
+    "NODE_ENV": "production",
+    "ASH_DEBUG_MODE": "false",
+    "ASH_MOCK_PAYMENTS": "false",
+    "ASH_SEED_DATABASE": "true",
+    "ASH_APP_URL": "https://ash-ai-erp-system.vercel.app",
+    "ASH_ENABLE_AI_FEATURES": "true",
+    "ASH_THEME_MODE": "futuristic",
+    "ASH_ANIMATIONS_ENABLED": "true",
+    "ASH_ENABLE_OFFLINE_PWA": "true"
+  },
   "functions": {
-    "app/api/**/*.js": {
+    "src/app/api/**/*.ts": {
       "maxDuration": 30
     }
   },
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "X-Frame-Options",
-          "value": "DENY"
-        },
-        {
-          "key": "X-XSS-Protection",
-          "value": "1; mode=block"
-        }
-      ]
-    }
-  ]
+  "regions": ["sin1"],
+  "framework": "nextjs"
 }

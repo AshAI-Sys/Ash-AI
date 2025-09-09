@@ -13,7 +13,7 @@ export const db =
     log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
     datasources: {
       db: {
-        url: process.env.ASH_DATABASE_URL,
+        url: process.env.DATABASE_URL || process.env.ASH_DATABASE_URL,
       },
     },
   });
@@ -46,7 +46,7 @@ export async function withTransaction<T>(
         timeout: 30000, // 30 seconds
       });
     } catch (error: unknown) {
-      console.error(`Transaction attempt ${attempt} failed:`, _error);
+      console.error(`Transaction attempt ${attempt} failed:`, error);
       
       // Don't retry on certain errors
       if (
@@ -54,7 +54,7 @@ export async function withTransaction<T>(
         (error.code === 'P2002' || // Unique constraint violation
          error.code === 'P2025')   // Record not found
       ) {
-        throw _error;
+        throw error;
       }
       
       if (attempt === maxRetries) {
@@ -92,8 +92,8 @@ export async function createAuditLog(params: {
         after_data: params.after_data ? JSON.stringify(params.after_data) : undefined,
       },
     });
-  } catch (_error) {
-    console.error('Failed to create audit log:', _error);
+  } catch (error) {
+    console.error('Failed to create audit log:', error);
     // Don't throw - audit logging shouldn't break the main operation
   }
 }
