@@ -159,44 +159,46 @@ export function UnifiedDashboard() {
   }
 
   return (
-    <div className="p-6 max-w-full">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-white mb-2">
-              ASH AI Command Center
-            </h1>
-            <p className="text-slate-400">
-              Unified control panel for all your apparel production needs
-            </p>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Badge className="bg-green-500/20 text-green-400 border-green-500/20">
-              System Operational
-            </Badge>
-            <div className="text-right">
-              <p className="text-sm text-slate-400">
-                {new Date().toLocaleDateString('en-PH', {
-                  weekday: 'short',
-                  month: 'short',
-                  day: 'numeric'
-                })}
+    <div className="p-6 max-w-full flex gap-6">
+      {/* Main Content Area */}
+      <div className="flex-1">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-white mb-2">
+                ASH AI Command Center
+              </h1>
+              <p className="text-slate-400">
+                Unified control panel for all your apparel production needs
               </p>
-              <p className="text-lg font-semibold text-white">
-                {new Date().toLocaleTimeString('en-PH', {
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })}
-              </p>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Badge className="bg-green-500/20 text-green-400 border-green-500/20">
+                System Operational
+              </Badge>
+              <div className="text-right">
+                <p className="text-sm text-slate-400">
+                  {new Date().toLocaleDateString('en-PH', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric'
+                  })}
+                </p>
+                <p className="text-lg font-semibold text-white">
+                  {new Date().toLocaleTimeString('en-PH', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
       {/* Unified Tabs Interface */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5 mb-6 bg-slate-800/50 border border-cyan-500/20">
+        <TabsList className="grid w-full grid-cols-4 mb-6 bg-slate-800/50 border border-cyan-500/20">
           <TabsTrigger value="overview" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400">
             <BarChart3 className="w-4 h-4 mr-2" />
             Overview
@@ -208,10 +210,6 @@ export function UnifiedDashboard() {
           <TabsTrigger value="production" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400">
             <Settings className="w-4 h-4 mr-2" />
             Production
-          </TabsTrigger>
-          <TabsTrigger value="ai-chat" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400">
-            <Brain className="w-4 h-4 mr-2" />
-            Ashley AI
           </TabsTrigger>
           <TabsTrigger value="analytics" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400">
             <TrendingUp className="w-4 h-4 mr-2" />
@@ -402,50 +400,6 @@ export function UnifiedDashboard() {
           </div>
         </TabsContent>
 
-        {/* AI Chat Tab */}
-        <TabsContent value="ai-chat" className="space-y-6">
-          <div className="flex items-center space-x-4 mb-6">
-            <div className="p-3 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-full">
-              <Brain className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-white">Ashley AI Assistant</h2>
-              <p className="text-slate-400">Your intelligent production optimization partner</p>
-            </div>
-          </div>
-
-          <Card className="hologram-card h-96">
-            <CardContent className="p-6 h-full flex flex-col">
-              <div className="flex-1 overflow-y-auto mb-4 space-y-4">
-                {chatMessages.map((msg) => (
-                  <div key={msg.id} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-xs p-3 rounded-lg ${
-                      msg.type === 'user' 
-                        ? 'bg-gradient-to-r from-cyan-500 to-teal-500 text-white' 
-                        : 'bg-slate-800 text-white border border-purple-500/20'
-                    }`}>
-                      <p className="text-sm">{msg.message}</p>
-                      <p className="text-xs opacity-70 mt-1">{msg.timestamp}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              
-              <div className="flex space-x-2">
-                <Input
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Ask Ashley AI about production optimization..."
-                  onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                  className="flex-1 bg-slate-800 border-cyan-500/20 text-white placeholder-slate-400"
-                />
-                <Button onClick={sendMessage} className="bg-gradient-to-r from-cyan-500 to-purple-500">
-                  <MessageSquare className="w-4 h-4" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
         {/* Analytics Tab */}
         <TabsContent value="analytics" className="space-y-6">
@@ -494,6 +448,64 @@ export function UnifiedDashboard() {
           </div>
         </TabsContent>
       </Tabs>
+      </div>
+
+      {/* Always Visible AI Chat Sidebar */}
+      <div className="w-80 flex-shrink-0">
+        <Card className="hologram-card h-full sticky top-6">
+          <CardHeader className="pb-3">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-full">
+                <Brain className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <CardTitle className="text-white text-lg">Ashley AI</CardTitle>
+                <CardDescription className="text-xs">Always here to help</CardDescription>
+              </div>
+              <div className="ml-auto">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-4 h-96 flex flex-col">
+            <div className="flex-1 overflow-y-auto mb-4 space-y-3">
+              {chatMessages.map((msg) => (
+                <div key={msg.id} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`max-w-[250px] p-3 rounded-lg text-sm ${
+                    msg.type === 'user' 
+                      ? 'bg-gradient-to-r from-cyan-500 to-teal-500 text-white' 
+                      : 'bg-slate-800 text-white border border-purple-500/20'
+                  }`}>
+                    <p>{msg.message}</p>
+                    <p className="text-xs opacity-70 mt-1">{msg.timestamp}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <div className="flex space-x-2">
+              <Input
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder="Ask Ashley AI..."
+                onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                className="flex-1 bg-slate-800 border-cyan-500/20 text-white placeholder-slate-400 text-sm"
+              />
+              <Button 
+                onClick={sendMessage} 
+                size="sm"
+                className="bg-gradient-to-r from-cyan-500 to-purple-500 px-3"
+              >
+                <MessageSquare className="w-4 h-4" />
+              </Button>
+            </div>
+            
+            <div className="mt-2 text-center">
+              <p className="text-xs text-slate-500">AI assistant for production optimization</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }
