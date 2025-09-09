@@ -1,11 +1,11 @@
-// Ashley AI Alerts API Route - SECURE VERSION
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { alertEngine } from '@/lib/ai/alert-system'
 import { prisma } from '@/lib/prisma'
-import { Role } from '@prisma/client'
 import { 
+// Ashley AI Alerts API Route - SECURE VERSION
   validateInput, 
   schemas, 
   rateLimit, 

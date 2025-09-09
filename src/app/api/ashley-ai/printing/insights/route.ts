@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 
 // GET /api/ashley-ai/printing/insights - Get Ashley AI printing insights and recommendations
@@ -21,8 +23,8 @@ export async function GET(request: NextRequest) {
     startDate.setDate(startDate.getDate() - daysBack)
 
     // Build where clause for print runs
-    const where: { createdAt: { gte: Date }; method?: string; machineId?: string } = {
-      createdAt: { gte: startDate }
+    const where: { created_at: { gte: Date }; method?: string; machineId?: string } = {
+      created_at: { gte: startDate }
     }
     
     if (method) where.method = method
@@ -74,7 +76,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error generating Ashley AI printing insights:', error)
+    console.error('Error generating Ashley AI printing insights:', _error)
     return NextResponse.json({ 
       error: 'Internal server error' 
     }, { status: 500 })

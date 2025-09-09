@@ -1,8 +1,11 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db } from '@/lib/db'
 // Portal Orders API
 // Based on CLIENT_UPDATED_PLAN.md Stage 12 specifications
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
 
 // GET /api/portal/orders - Get client's orders with production status
 export async function GET(request: NextRequest) {
@@ -54,7 +57,7 @@ export async function GET(request: NextRequest) {
         },
         design_assets: {
           where: {
-            approval_status: { in: ['PENDING', 'REJECTED'] } // Only show assets needing attention
+            approval_status: { in: ['OPEN', 'REJECTED'] } // Only show assets needing attention
           },
           select: {
             id: true,
@@ -99,7 +102,7 @@ export async function GET(request: NextRequest) {
       }
 
       // Check for pending approvals
-      const pending_approvals = order.design_assets.filter(asset => asset.approval_status === 'PENDING')
+      const pending_approvals = order.design_assets.filter(asset => asset.approval_status === 'OPEN')
       const rejected_designs = order.design_assets.filter(asset => asset.approval_status === 'REJECTED')
 
       return {
@@ -127,7 +130,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching portal orders:', error)
+    console.error('Error fetching portal orders:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch orders' },
       { status: 500 }
@@ -198,7 +201,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error in portal order access:', error)
+    console.error('Error in portal order access:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to process request' },
       { status: 500 }

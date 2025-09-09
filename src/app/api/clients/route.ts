@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
-import { Role } from '@prisma/client'
 
 // Futuristic Client Management API with AI Integration
 const clientSchema = z.object({
@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Client fetch error:', error)
+    console.error('Client fetch error:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch clients' },
       { status: 500 }
@@ -212,7 +212,7 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    console.error('Client creation error:', error)
+    console.error('Client creation error:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to create client' },
       { status: 500 }

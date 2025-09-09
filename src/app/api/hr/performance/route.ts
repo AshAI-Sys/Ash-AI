@@ -1,9 +1,12 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db } from '@/lib/db'
+import { validateAshleyAI } from '@/lib/ashley-ai'
 // HR Performance Review API for Stage 10 HR System
 // Based on CLIENT_UPDATED_PLAN.md specifications
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { validateAshleyAI } from '@/lib/ashley-ai'
 
 // GET /api/hr/performance - Get performance reviews
 export async function GET(request: NextRequest) {
@@ -94,7 +97,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching performance reviews:', error)
+    console.error('Error fetching performance reviews:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch performance reviews' },
       { status: 500 }
@@ -267,7 +270,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating performance review:', error)
+    console.error('Error creating performance review:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to create performance review' },
       { status: 500 }
@@ -418,7 +421,7 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error updating performance review:', error)
+    console.error('Error updating performance review:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to update performance review' },
       { status: 500 }

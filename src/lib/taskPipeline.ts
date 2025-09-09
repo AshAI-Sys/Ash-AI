@@ -288,7 +288,7 @@ export class TaskPipelineService {
         dueDate: taskDueDate,
         priority: pipeline.steps.length - i, // Earlier tasks have higher priority
         dependencies: step.dependencies || [],
-        status: i === 0 ? 'PENDING' : 'BLOCKED', // First task is pending, rest are blocked
+        status: i === 0 ? 'OPEN' : 'BLOCKED', // First task is pending, rest are blocked
         canOutsource: step.canOutsource || false,
         requiresMaterials: step.requiresMaterials || [],
         qualityCheckpoints: step.qualityCheckpoints || []

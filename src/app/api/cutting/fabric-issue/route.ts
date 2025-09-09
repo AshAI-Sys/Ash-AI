@@ -6,8 +6,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
 import { Role } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 
 const fabricIssueSchema = z.object({
@@ -209,7 +209,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    console.error('Fabric issue error:', error)
+    console.error('Fabric issue error:', _error)
     return NextResponse.json({
       success: false,
       error: 'Failed to issue fabric'
@@ -294,7 +294,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Get fabric issues error:', error)
+    console.error('Get fabric issues error:', _error)
     return NextResponse.json({
       success: false,
       error: 'Failed to retrieve fabric issues'
@@ -412,11 +412,11 @@ async function emitFabricEvent(eventType: string, data: any) {
         entity_type: 'fabric_issue',
         entity_id: data.issue_id,
         data: data,
-        status: 'PENDING',
+        status: 'OPEN',
         created_at: new Date()
       }
     })
   } catch (_error) {
-    console.error('Failed to emit fabric event:', error)
+    console.error('Failed to emit fabric event:', _error)
   }
 }

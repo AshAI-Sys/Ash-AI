@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
 import { Role } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import { AshEventBus } from '@/lib/ash/event-bus'
 import { AuditLogger } from '@/lib/ash/audit'
 import { RoutingTemplateService } from '@/lib/ash/routing-templates'
@@ -125,7 +125,7 @@ export async function POST(
     })
 
   } catch (_error) {
-    console.error('Error applying routing template:', error)
+    console.error('Error applying routing template:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

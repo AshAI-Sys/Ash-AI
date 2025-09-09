@@ -6,8 +6,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
 import { Role } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 import { transitionOrderStatus, getValidTransitions } from '@/lib/ash/order-state-machine'
 
@@ -99,7 +99,7 @@ export async function GET(
     })
 
   } catch (_error) {
-    console.error('Error fetching order status:', error)
+    console.error('Error fetching order status:', _error)
     return NextResponse.json(
       { error: 'Failed to fetch order status' },
       { status: 500 }
@@ -171,7 +171,7 @@ export async function POST(
       }, { status: 400 })
     }
 
-    console.error('Error transitioning order status:', error)
+    console.error('Error transitioning order status:', _error)
     return NextResponse.json({
       success: false,
       error: 'Failed to transition order status'

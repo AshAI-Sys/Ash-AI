@@ -3,10 +3,7 @@
 
 export interface AutomationRule {
   id: string
-  name: string
-  description: string
-  workspace_id: string
-  trigger_type: TriggerType
+  type: TriggerType
   trigger_conditions: TriggerCondition[]
   actions: AutomationAction[]
   is_active: boolean
@@ -88,7 +85,7 @@ export interface AutomationExecution {
   rule_id: string
   trigger_data: any
   executed_at: Date
-  status: 'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELLED'
+  status: 'OPEN' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELLED'
   actions_executed: number
   actions_total: number
   error_message?: string
@@ -119,7 +116,7 @@ export class AutomationEngine {
       try {
         await this.executeRule(rule, event)
       } catch (_error) {
-        console.error(`Failed to execute automation rule ${rule.id}:`, error)
+        console.error(`Failed to execute automation rule ${rule.id}:`, _error)
         await this.logExecutionError(rule.id, error)
       }
     }
@@ -170,7 +167,7 @@ export class AutomationEngine {
       execution.execution_time_ms = Date.now() - startTime
 
       await this.updateRuleStats(rule.id, false)
-      throw error
+      throw _error
     }
 
     // Log execution
@@ -275,7 +272,7 @@ export class AutomationEngine {
       try {
         await this.sendViaChannel(channel, personalizedContent, recipient, deliveryPlan.timing)
       } catch (_error) {
-        console.error(`Failed to send via ${channel}:`, error)
+        console.error(`Failed to send via ${channel}:`, _error)
         // Try fallback channel if available
         if (deliveryPlan.fallback_channel) {
           await this.sendViaChannel(deliveryPlan.fallback_channel, personalizedContent, recipient)
@@ -413,7 +410,7 @@ export class AutomationEngine {
   }
 
   private static async logExecutionError(rule_id: string, error: any): Promise<void> {
-    console.error(`❌ Automation rule ${rule_id} failed:`, error)
+    console.error(`❌ Automation rule ${rule_id} failed:`, _error)
   }
 
   private static async getNotificationTemplate(template_id: string): Promise<NotificationTemplate | null> {

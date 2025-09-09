@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 
 // GET /api/qc/inspections/[inspectionId] - Get inspection details
@@ -99,7 +101,7 @@ export async function GET(
     return NextResponse.json({ inspection })
 
   } catch (_error) {
-    console.error('Error fetching inspection:', error)
+    console.error('Error fetching inspection:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'
@@ -210,7 +212,7 @@ export async function PUT(
     })
 
   } catch (_error) {
-    console.error('Error updating inspection:', error)
+    console.error('Error updating inspection:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'

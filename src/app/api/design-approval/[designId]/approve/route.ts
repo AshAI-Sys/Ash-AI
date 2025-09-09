@@ -61,7 +61,7 @@ export async function POST(
     })
 
   } catch (_error) {
-    console.error('Design approval error:', error)
+    console.error('Design approval error:', _error)
     return NextResponse.json(
       { error: 'Failed to process design approval' },
       { status: 500 }
@@ -118,7 +118,7 @@ export async function PUT(
     })
 
   } catch (_error) {
-    console.error('Design update error:', error)
+    console.error('Design update error:', _error)
     return NextResponse.json(
       { error: 'Failed to update design' },
       { status: 500 }

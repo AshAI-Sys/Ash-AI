@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 
 // GET /api/design/assets - Get all design assets
@@ -38,11 +40,11 @@ export async function GET(request: NextRequest) {
             client: { select: { name: true } }
           }
         },
-        createdBy: {
+        created_by: {
           select: { name: true }
         }
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { created_at: 'desc' }
     })
 
     // Transform for API response
@@ -57,15 +59,15 @@ export async function GET(request: NextRequest) {
       status: asset.status,
       type: asset.type,
       fileUrl: asset.fileUrl,
-      createdBy: asset.createdBy?.name || 'Unknown',
-      createdAt: asset.createdAt,
-      updatedAt: asset.updatedAt
+      created_by: asset.createdBy?.name || 'Unknown',
+      created_at: asset.createdAt,
+      updated_at: asset.updatedAt
     }))
 
     return NextResponse.json({ assets: transformedAssets })
 
   } catch (_error) {
-    console.error('Error fetching design assets:', error)
+    console.error('Error fetching design assets:', _error)
     return NextResponse.json({ 
       error: 'Internal server error' 
     }, { status: 500 })
@@ -160,7 +162,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating design asset:', error)
+    console.error('Error creating design asset:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'

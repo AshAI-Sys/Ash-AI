@@ -1,4 +1,7 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from "@/lib/prisma"
 
 export async function GET(request: NextRequest) {
@@ -34,7 +37,7 @@ export async function GET(request: NextRequest) {
             periodType: periodType
           } : {},
           orderBy: {
-            createdAt: "desc"
+            created_at: "desc"
           },
           take: periodType ? (periodType === "DAILY" ? 30 : periodType === "WEEKLY" ? 12 : 6) : 5
         },
@@ -105,7 +108,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error("Error fetching KPIs:", error)
+    console.error("Error fetching KPIs:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch KPIs" },
       { status: 500 }
@@ -177,7 +180,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error("Error creating KPI:", error)
+    console.error("Error creating KPI:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to create KPI" },
       { status: 500 }

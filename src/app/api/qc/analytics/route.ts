@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 
 // GET /api/qc/analytics - Get comprehensive QC analytics and trend analysis
@@ -95,7 +97,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching QC analytics:', error)
+    console.error('Error fetching QC analytics:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'

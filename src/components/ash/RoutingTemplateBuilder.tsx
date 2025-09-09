@@ -23,7 +23,7 @@ import {
   DropResult
 } from '@hello-pangea/dnd'
 import {
-  Plus,
+    Plus,
   Trash2,
   Copy,
   Save,

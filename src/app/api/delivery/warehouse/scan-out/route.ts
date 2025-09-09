@@ -1,4 +1,7 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from "@/lib/prisma"
 
 export async function POST(request: NextRequest) {
@@ -176,7 +179,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error("Error scanning out carton:", error)
+    console.error("Error scanning out carton:", _error)
     return NextResponse.json(
       { success: false, error: error instanceof Error ? error.message : "Failed to scan out carton" },
       { status: 500 }
@@ -233,7 +236,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error("Error fetching scan-out records:", error)
+    console.error("Error fetching scan-out records:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch scan-out records" },
       { status: 500 }

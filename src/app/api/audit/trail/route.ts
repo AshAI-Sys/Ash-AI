@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client';
 import { AuditLogger } from '@/lib/audit/audit-logger';
 import { RoleBasedAccessControl } from '@/lib/auth/permissions';
-import { authOptions } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   try {
@@ -73,7 +74,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (_error) {
-    console.error('Audit trail error:', error);
+    console.error('Audit trail error:', _error);
     return NextResponse.json(
       { error: 'Failed to fetch audit trail' },
       { status: 500 }

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 
 // POST /api/qc/inspections/[inspectionId]/close - Close QC inspection with final disposition
@@ -130,7 +132,7 @@ export async function POST(
             taskType: 'REWORK',
             description: `Rework: ${defect.defectCode.description} (${defect.defectCode.code})`,
             priority: defect.severity === 'CRITICAL' ? 5 : 3,
-            status: 'PENDING' as any,
+            status: 'OPEN' as any,
             metadata: {
               sourceInspectionId: inspectionId,
               defectId: defect.id,
@@ -179,7 +181,7 @@ export async function POST(
             ownerId: inspection.createdBy,
             priority: inspection.defects.some(d => d.severity === 'CRITICAL') ? 'HIGH' : 'MEDIUM',
             dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days
-            createdBy: session.user.id
+            created_by: session.user.id
           }
         })
       }
@@ -293,7 +295,7 @@ export async function POST(
     })
 
   } catch (_error) {
-    console.error('Error closing inspection:', error)
+    console.error('Error closing inspection:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'

@@ -31,8 +31,8 @@ export async function initializeAshSystem(workspace_id: string = 'default') {
       message: 'ASH AI System initialized with sample data'
     }
   } catch (_error) {
-    console.error('❌ Failed to initialize ASH AI System:', error)
-    throw error
+    console.error('❌ Failed to initialize ASH AI System:', _error)
+    throw _error
   }
 }
 
@@ -333,7 +333,7 @@ async function createRoutingTemplates() {
           workcenter: WorkcenterType.DESIGN,
           sequence: 1,
           standard_spec: { review_time_hours: 3, color_matching_required: true },
-          expected_outputs: { ga_files: 1, print_layout: 1 }
+          expected_outputs: { ga_files: 1, print_}
         },
         {
           name: 'Sublimation Printing',

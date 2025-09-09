@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
             select: { id: true, name: true, code: true }
           },
           stockMovements: {
-            orderBy: { createdAt: 'desc' },
+            orderBy: { created_at: 'desc' },
             take: 5
           },
           usageRecords: {
@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
         _count: { category: true }
       }),
       recentMovements: await prisma.stockMovement.findMany({
-        orderBy: { createdAt: 'desc' },
+        orderBy: { created_at: 'desc' },
         take: 10,
         include: {
           inventory: {
@@ -115,7 +115,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching inventory:', error)
+    console.error('Error fetching inventory:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -226,7 +226,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating inventory item:', error)
+    console.error('Error creating inventory item:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -308,7 +308,7 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error in bulk update:', error)
+    console.error('Error in bulk update:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

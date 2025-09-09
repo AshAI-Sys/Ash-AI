@@ -5,7 +5,7 @@ export interface OrderData {
   id: string
   status: string
   totalQty: number
-  createdAt: string
+  created_at: string
   targetDeliveryDate: string
   method: string
   complexity: number
@@ -176,7 +176,7 @@ export class ASHAIEngine {
     const riskFactors: string[] = []
     const mitigations: string[] = []
 
-    const targetDate = new Date(order.targetDeliveryDate)
+    const _targetDate = new Date(order.targetDeliveryDate)
     const created = new Date(order.createdAt)
     const timeToDelivery = (new Date(targetDate).getTime() - new Date(created).getTime()) / (1000 * 60 * 60 * 24)
 
@@ -325,7 +325,7 @@ export class ASHAIEngine {
     // Delivery predictions
     const urgentOrders = orders.filter(order => {
       const prediction = this.predictDeliveryDate(order)
-      const targetDate = new Date(order.targetDeliveryDate)
+      const _targetDate = new Date(order.targetDeliveryDate)
       const predictedDate = new Date(prediction.estimatedDate)
       return targetDate < predictedDate
     })
@@ -434,7 +434,7 @@ export class ASHAIEngine {
     }
 
     // Rush order premium
-    const targetDate = new Date(order.targetDeliveryDate)
+    const _targetDate = new Date(order.targetDeliveryDate)
     const prediction = this.predictDeliveryDate(order)
     const predictedDate = new Date(prediction.estimatedDate)
     const daysDiff = (new Date(targetDate).getTime() - new Date(predictedDate).getTime()) / (1000 * 60 * 60 * 24)

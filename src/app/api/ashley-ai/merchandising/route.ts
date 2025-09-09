@@ -1,9 +1,12 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db } from '@/lib/db'
+import { AshleyMerchandisingAI, OrderHistoryItem, MarketTrendData } from '@/lib/ashley-ai-merchandising'
 // Ashley AI Merchandising API - Stage 13 Implementation
 // Provides AI-powered reprint recommendations and theme suggestions
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { AshleyMerchandisingAI, OrderHistoryItem, MarketTrendData } from '@/lib/ashley-ai-merchandising'
 
 export async function POST(request: NextRequest) {
   try {
@@ -210,7 +213,7 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (_error) {
-    console.error('Ashley AI Merchandising API error:', error)
+    console.error('Ashley AI Merchandising API error:', _error)
     return NextResponse.json(
       { 
         success: false,
@@ -369,7 +372,7 @@ async function logAshleyInsight(data: {
       }
     })
   } catch (_error) {
-    console.error('Failed to log Ashley insight:', error)
+    console.error('Failed to log Ashley insight:', _error)
   }
 }
 

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 
 export async function GET() {
@@ -42,7 +42,7 @@ export async function GET() {
     return NextResponse.json(metrics);
 
   } catch (_error) {
-    console.error('Business analytics error:', error);
+    console.error('Business analytics error:', _error);
     return NextResponse.json(
       { error: 'Failed to fetch business metrics' },
       { status: 500 }

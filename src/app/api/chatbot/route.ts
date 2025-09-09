@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { z } from 'zod'
 
 const chatSchema = z.object({
@@ -31,7 +34,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Chatbot error:', error)
+    console.error('Chatbot error:', _error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(

@@ -1,7 +1,10 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 // Sewing Runs API - Mock Data for Testing
 // Based on CLIENT_UPDATED_PLAN.md specifications
 
-import { NextRequest, NextResponse } from 'next/server'
 
 // Mock sewing runs data for testing
 const mockRuns = [
@@ -104,7 +107,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching sewing runs:', error)
+    console.error('Error fetching sewing runs:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch sewing runs' },
       { status: 500 }
@@ -155,7 +158,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating sewing run:', error)
+    console.error('Error creating sewing run:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to create sewing run' },
       { status: 500 }
@@ -207,7 +210,7 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error updating sewing run:', error)
+    console.error('Error updating sewing run:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to update sewing run' },
       { status: 500 }

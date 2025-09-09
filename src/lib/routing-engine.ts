@@ -405,7 +405,7 @@ export class RoutingEngine {
     }
     
     // Timeline warnings
-    const targetDate = new Date(context.targetDeliveryDate)
+    const _targetDate = new Date(context.targetDeliveryDate)
     const _daysAvailable = Math.ceil((new Date(targetDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
     
     if (recommended) {

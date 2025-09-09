@@ -1,8 +1,11 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db } from '../../../../lib/db'
 // Sewing Payroll API for Stage 5 Piece-Rate System
 // Based on CLIENT_UPDATED_PLAN.md specifications
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '../../../../lib/db'
 
 // GET /api/sewing/payroll - Get piece-rate payroll records
 export async function GET(request: NextRequest) {
@@ -231,7 +234,7 @@ export async function POST(request: NextRequest) {
           sss_employee: 0,
           total_deductions,
           net_pay,
-          status: 'PENDING'
+          status: 'OPEN'
         }
       })
 

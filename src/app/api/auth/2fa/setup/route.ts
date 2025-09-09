@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { TwoFactorAuth } from '@/lib/auth/two-factor';
 import { authOptions } from '@/lib/auth';
 
@@ -25,7 +25,7 @@ export async function POST() {
     });
 
   } catch (_error) {
-    console.error('2FA setup error:', error);
+    console.error('2FA setup error:', _error);
     return NextResponse.json(
       { error: 'Failed to setup 2FA' },
       { status: 500 }

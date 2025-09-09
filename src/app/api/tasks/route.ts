@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
           order: {
             include: {
               brand: true,
-              createdBy: {
+              created_by: {
                 select: { id: true, name: true }
               }
             }
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
         orderBy: [
           { priority: 'desc' },
           { dueDate: 'asc' },
-          { createdAt: 'desc' }
+          { created_at: 'desc' }
         ],
         skip: (page - 1) * limit,
         take: limit
@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching tasks:', error)
+    console.error('Error fetching tasks:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -176,7 +176,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating task:', error)
+    console.error('Error creating task:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

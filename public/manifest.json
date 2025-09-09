@@ -6,10 +6,19 @@
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#3b82f6",
-  "orientation": "portrait-primary",
+  "orientation": "any",
   "categories": ["productivity", "business", "manufacturing"],
   "lang": "en-US",
   "scope": "/",
+  "capture_links": "existing-client-navigate",
+  "display_override": ["window-controls-overlay", "minimal-ui", "standalone", "browser"],
+  "protocol_handlers": [
+    {
+      "protocol": "web+ashai",
+      "url": "/order/%s"
+    }
+  ],
+  "handle_links": "preferred",
   "icons": [
     {
       "src": "/icon-192.png",

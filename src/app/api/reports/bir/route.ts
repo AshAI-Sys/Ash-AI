@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { birComplianceService } from '@/lib/bir-compliance'
 import { z } from 'zod'
 
@@ -89,7 +92,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('BIR report generation error:', error)
+    console.error('BIR report generation error:', _error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -155,7 +158,7 @@ async function handleFormGeneration(body: any) {
     })
 
   } catch (_error) {
-    console.error('BIR form generation error:', error)
+    console.error('BIR form generation error:', _error)
     return NextResponse.json(
       { 
         success: false, 
@@ -228,7 +231,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('BIR report API error:', error)
+    console.error('BIR report API error:', _error)
     return NextResponse.json(
       { 
         success: false, 

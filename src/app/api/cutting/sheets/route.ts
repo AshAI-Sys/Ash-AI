@@ -1,10 +1,13 @@
-// Cutting Sheets API for Stage 3 Cutting System
-// Based on CLIENT_UPDATED_PLAN.md specifications
-
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { db } from '@/lib/db'
 import { generateCuttingInstructions } from '@/lib/cutting-calculations'
 import { validateAshleyAI } from '@/lib/ashley-ai'
+// Cutting Sheets API for Stage 3 Cutting System
+// Based on CLIENT_UPDATED_PLAN.md specifications
+
 
 // GET /api/cutting/sheets - Get cutting sheets
 export async function GET(request: NextRequest) {
@@ -82,7 +85,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching cutting sheets:', error)
+    console.error('Error fetching cutting sheets:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch cutting sheets' },
       { status: 500 }
@@ -137,7 +140,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (cutting_sheet.status !== 'PENDING') {
+    if (cutting_sheet.status !== 'OPEN') {
       return NextResponse.json(
         { error: `Cannot start cutting sheet in ${cutting_sheet.status} status` },
         { status: 400 }
@@ -225,7 +228,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error starting cutting sheet:', error)
+    console.error('Error starting cutting sheet:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to start cutting sheet' },
       { status: 500 }
@@ -323,7 +326,7 @@ export async function PUT(request: NextRequest) {
               position_x: piece.position_x || 0,
               position_y: piece.position_y || 0,
               dimensions: piece.dimensions || {},
-              quality_check: piece.quality_check || 'PENDING',
+              quality_check: piece.quality_check || 'OPEN',
               defect_notes: piece.defect_notes
             }
           })
@@ -379,7 +382,7 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error updating cutting sheet:', error)
+    console.error('Error updating cutting sheet:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to update cutting sheet' },
       { status: 500 }

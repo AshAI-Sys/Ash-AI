@@ -1,10 +1,10 @@
-// Ashley AI Main API Route - SECURE VERSION
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { callAIAgent } from '@/lib/ai/ashley-agents'
 import { Role } from '@prisma/client'
+import { callAIAgent } from '@/lib/ai/ashley-agents'
 import { 
+// Ashley AI Main API Route - SECURE VERSION
   validateInput, 
   schemas, 
   rateLimit, 
@@ -16,7 +16,7 @@ import {
 export async function POST(request: NextRequest) {
   const startTime = Date.now()
   let userId: string | undefined
-  let clientIP: string | undefined
+  let clientIP: string = 'unknown'
 
   try {
     // Get client information for security logging
@@ -137,11 +137,11 @@ export async function POST(request: NextRequest) {
         /\<\|system\|\>/i,
       ]
       
-      if (suspiciousPatterns.some(pattern => pattern.test(data.message))) {
+      if (suspiciousPatterns.some(pattern => pattern.test(data.message as string))) {
         await auditLog.log({
           action: 'ai_prompt_injection_attempt',
           userId,
-          ip: clientIP || 'unknown',
+          ip: clientIP,
           success: false,
           error: 'Suspicious prompt detected'
         })

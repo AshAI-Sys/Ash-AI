@@ -1,10 +1,13 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db } from '@/lib/db'
+import { validateAshleyAI } from '@/lib/ashley-ai'
 // HR Payroll API for Stage 10 HR System
 // Philippine tax and compliance-ready payroll processing
 // Based on CLIENT_UPDATED_PLAN.md specifications
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { validateAshleyAI } from '@/lib/ashley-ai'
 
 // Philippine tax tables for 2024 (simplified)
 const TAX_BRACKETS = [
@@ -151,7 +154,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching payroll records:', error)
+    console.error('Error fetching payroll records:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch payroll records' },
       { status: 500 }
@@ -429,7 +432,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error processing payroll:', error)
+    console.error('Error processing payroll:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to process payroll' },
       { status: 500 }

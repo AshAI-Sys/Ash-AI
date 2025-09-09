@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 
 // GET /api/printing/machines - Get printing machines
@@ -30,7 +32,7 @@ export async function GET(request: NextRequest) {
       include: {
         printRuns: includeStats ? {
           where: {
-            createdAt: {
+            created_at: {
               gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // Last 30 days
             }
           },
@@ -40,11 +42,11 @@ export async function GET(request: NextRequest) {
         } : false,
         maintenanceRecords: includeStats ? {
           where: {
-            createdAt: {
+            created_at: {
               gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // Last 30 days
             }
           },
-          orderBy: { createdAt: 'desc' },
+          orderBy: { created_at: 'desc' },
           take: 5
         } : false,
         downtime: includeStats ? {
@@ -72,7 +74,7 @@ export async function GET(request: NextRequest) {
         workcenter: machine.workcenter,
         spec: machine.spec,
         isActive: machine.isActive,
-        createdAt: machine.createdAt
+        created_at: machine.createdAt
       }
 
       if (!includeStats || !machine.printRuns) {
@@ -135,7 +137,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching machines:', error)
+    console.error('Error fetching machines:', _error)
     return NextResponse.json({ 
       error: 'Internal server error' 
     }, { status: 500 })
@@ -211,7 +213,7 @@ export async function POST(request: NextRequest) {
           machineName: machine.name,
           workcenter: machine.workcenter,
           spec: machine.spec,
-          createdBy: session.user.name
+          created_by: session.user.name
         }
       }
     })
@@ -244,7 +246,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating machine:', error)
+    console.error('Error creating machine:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'

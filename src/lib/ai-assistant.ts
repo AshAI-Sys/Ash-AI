@@ -1,6 +1,6 @@
+import { ashAI, type OrderData } from './ai-engine'
 // Enhanced ASH AI Assistant - More accurate and intelligent responses
 
-import { ashAI, type OrderData } from './ai-engine'
 
 export interface AIAssistantContext {
   currentPage?: string
@@ -146,7 +146,7 @@ export class EnhancedAIAssistant {
       if (query.includes('delay') || query.includes('late')) {
         const delayedOrders = orders.filter(order => {
           const prediction = ashAI.predictDeliveryDate(order)
-          const targetDate = new Date(order.targetDeliveryDate)
+          const _targetDate = new Date(order.targetDeliveryDate)
           const predictedDate = new Date(prediction.estimatedDate)
           return predictedDate > targetDate
         })
@@ -291,7 +291,7 @@ export class EnhancedAIAssistant {
       if (context.orders && context.orders.length > 0) {
         const onTimeOrders = context.orders.filter(order => {
           const prediction = ashAI.predictDeliveryDate(order)
-          const targetDate = new Date(order.targetDeliveryDate)
+          const _targetDate = new Date(order.targetDeliveryDate)
           const predictedDate = new Date(prediction.estimatedDate)
           return predictedDate <= targetDate
         })

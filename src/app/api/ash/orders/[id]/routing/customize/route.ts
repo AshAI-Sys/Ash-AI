@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
 import { Role } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import { AshEventBus } from '@/lib/ash/event-bus'
 import { AuditLogger } from '@/lib/ash/audit'
 import { AshleyAI } from '@/lib/ash/ashley'
@@ -164,7 +164,7 @@ export async function POST(
     })
 
   } catch (_error) {
-    console.error('Error customizing routing:', error)
+    console.error('Error customizing routing:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

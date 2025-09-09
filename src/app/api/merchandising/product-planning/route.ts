@@ -4,6 +4,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { secureDb } from '@/lib/db-security'
 import { verifyToken } from '@/lib/auth'
 import { InputSanitizer } from '@/lib/input-security'
@@ -110,7 +113,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result)
 
   } catch (_error) {
-    console.error('Product planning error:', error)
+    console.error('Product planning error:', _error)
     return NextResponse.json(
       { error: 'Failed to generate product planning analysis' },
       { status: 500 }

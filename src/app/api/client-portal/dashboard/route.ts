@@ -4,6 +4,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import jwt from 'jsonwebtoken'
 
@@ -176,8 +179,7 @@ export async function GET(request: NextRequest) {
           id: asset.id,
           order_po: asset.order.po_number,
           brand: asset.order.brand.name,
-          file_name: asset.file_name,
-          type: asset.type,
+          file_type: asset.type,
           version: asset.version,
           created_at: asset.created_at,
           order_id: asset.order.id
@@ -193,7 +195,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
     }
 
-    console.error('Dashboard error:', error)
+    console.error('Dashboard error:', _error)
     return NextResponse.json({ 
       success: false,
       error: 'Failed to load dashboard' 
@@ -284,7 +286,7 @@ function calculateOrderInsights(orders: any[]) {
     completedOrders.forEach(order => {
       const delivery = order.deliveries?.[0]
       if (delivery && delivery.completed_at) {
-        const targetDate = new Date(order.target_delivery_date)
+        const _targetDate = new Date(order.target_delivery_date)
         const actualDate = new Date(delivery.completed_at)
         const daysDiff = Math.floor((new Date(actualDate).getTime() - new Date(targetDate).getTime()) / (1000 * 60 * 60 * 24))
         

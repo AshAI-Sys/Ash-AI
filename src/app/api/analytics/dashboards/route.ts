@@ -1,4 +1,7 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from "@/lib/prisma"
 
 export async function GET(request: NextRequest) {
@@ -21,44 +24,21 @@ export async function GET(request: NextRequest) {
       // Default: get public dashboards and user's private dashboards
       where.OR = [
         { visibility: "PUBLIC" },
-        { visibility: "PRIVATE", createdBy: userId },
+        { visibility: "PRIVATE", created_by: userId },
         { 
-          visibility: "ROLE_BASED",
-          allowedRoles: {
-            has: userRole
-          }
+          visibility: "ROLE_BASED"
         }
       ]
     }
 
     const dashboards = await prisma.dashboard.findMany({
-      where,
-      include: {
-        creator: {
-          select: {
-            id: true,
-            name: true,
-            email: true
-          }
-        },
-        widgets: {
-          where: {
-            isActive: true
-          },
-          orderBy: {
-            createdAt: "asc"
-          }
-        },
-        _count: {
-          select: {
-            widgets: true
-          }
-        }
+      where: { 
+        workspace_id: "workspace-1",
+        ...where 
       },
-      orderBy: [
-        { isDefault: "desc" },
-        { updatedAt: "desc" }
-      ]
+      orderBy: { 
+        updated_at: "desc" 
+      }
     })
 
     return NextResponse.json({
@@ -67,7 +47,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error("Error fetching dashboards:", error)
+    console.error("Error fetching dashboards:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch dashboards" },
       { status: 500 }
@@ -106,20 +86,8 @@ export async function POST(request: NextRequest) {
       data: {
         name,
         description,
-        layout: layout || {},
         visibility,
-        allowedRoles: visibility === "ROLE_BASED" ? allowedRoles : [],
-        createdBy
-      },
-      include: {
-        creator: {
-          select: {
-            id: true,
-            name: true,
-            email: true
-          }
-        },
-        widgets: true
+        workspace_id: "workspace-1"
       }
     })
 
@@ -129,7 +97,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error("Error creating dashboard:", error)
+    console.error("Error creating dashboard:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to create dashboard" },
       { status: 500 }

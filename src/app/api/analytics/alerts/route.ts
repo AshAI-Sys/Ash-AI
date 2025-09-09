@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
+import { Role, TaskStatus } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
-import { Role } from '@prisma/client'
 
 export interface ProductionAlert {
   id: string
@@ -81,7 +81,7 @@ async function generateProductionAlerts(): Promise<ProductionAlert[]> {
   // Check for overdue tasks
   const overdueTasks = await prisma.task.findMany({
     where: {
-      status: { in: ['IN_PROGRESS', 'PENDING'] },
+      status: { in: [TaskStatus.IN_PROGRESS, TaskStatus.OPEN] },
       due_date: { lt: now }
     },
     include: {
@@ -126,7 +126,7 @@ async function generateProductionAlerts(): Promise<ProductionAlert[]> {
   const roleBottlenecks = await prisma.task.groupBy({
     by: ['assigned_to'],
     where: {
-      status: 'PENDING',
+      status: TaskStatus.OPEN,
       created_at: { gte: new Date(new Date(now).getTime() - 24 * 60 * 60 * 1000) } // Last 24 hours
     },
     _count: { id: true },
@@ -164,8 +164,7 @@ async function generateProductionAlerts(): Promise<ProductionAlert[]> {
     include: {
       task: {
         include: {
-          order: { select: { orderNumber: true } },
-          assigned_user: { select: { name: true, role: true } }
+          assigned_user: { select: { full_name: true, role: true } }
         }
       }
     }
@@ -193,10 +192,9 @@ async function generateProductionAlerts(): Promise<ProductionAlert[]> {
           failureRate: qcFailureRate,
           recentFailures: recentQCFailures.length,
           failures: recentQCFailures.map(f => ({
-            order_id: f.task.order_id,
-            orderNumber: f.task.order?.orderNumber,
-            task_type: f.task.task_type,
-            assigned_to: f.task.assigned_user?.name
+            order_id: f.order_id,
+            task_id: f.task_id,
+            assigned_to: f.task?.assigned_user?.full_name
           }))
         }
       })
@@ -230,26 +228,31 @@ async function generateProductionAlerts(): Promise<ProductionAlert[]> {
     })
   })
 
-  // Check for low inventory
+  // Check for low inventory - get items where quantity is at or below reorder point
   const lowStockItems = await prisma.inventoryItem.findMany({
     where: {
-      quantity: { lte: prisma.raw('reorderPoint') }
+      active: true
     },
     include: {
       brand: { select: { name: true } }
     }
   })
 
-  lowStockItems.forEach(item => {
+  // Filter items that are at or below reorder point
+  const filteredLowStockItems = lowStockItems.filter(item => 
+    Number(item.quantity) <= Number(item.reorderPoint)
+  )
+
+  filteredLowStockItems.forEach(item => {
     let severity: ProductionAlert['severity'] = 'MEDIUM'
-    if (item.quantity === 0) severity = 'CRITICAL'
-    else if (item.quantity <= item.reorderPoint * 0.5) severity = 'HIGH'
+    if (Number(item.quantity) === 0) severity = 'CRITICAL'
+    else if (Number(item.quantity) <= Number(item.reorderPoint) * 0.5) severity = 'HIGH'
 
     alerts.push({
       id: `inventory-${item.id}`,
       type: 'INVENTORY',
       severity,
-      title: item.quantity === 0 ? `Out of Stock: ${item.name}` : `Low Stock: ${item.name}`,
+      title: Number(item.quantity) === 0 ? `Out of Stock: ${item.name}` : `Low Stock: ${item.name}`,
       description: `${item.name} has ${item.quantity} units remaining (reorder point: ${item.reorderPoint})`,
       affectedEntity: item.name,
       actionRequired: 'Order new stock immediately to avoid production delays',
@@ -257,8 +260,8 @@ async function generateProductionAlerts(): Promise<ProductionAlert[]> {
       data: {
         itemId: item.id,
         itemName: item.name,
-        currentQuantity: item.quantity,
-        reorderPoint: item.reorderPoint,
+        currentQuantity: Number(item.quantity),
+        reorderPoint: Number(item.reorderPoint),
         brandName: item.brand?.name
       }
     })
@@ -303,9 +306,9 @@ async function getOverloadedUsers() {
       }
     },
     include: {
-      assignedTasks: {
+      assigned_tasks: {
         where: {
-          status: { in: [TaskStatus.IN_PROGRESS, TaskStatus.PENDING] }
+          status: { in: [TaskStatus.IN_PROGRESS, TaskStatus.OPEN] }
         }
       }
     }
@@ -313,14 +316,14 @@ async function getOverloadedUsers() {
 
   return users
     .map(user => {
-      const activeTasks = user.assignedTasks.length
+      const activeTasks = user.assigned_tasks.length
       const workload = activeTasks * 8 // Assume 8 hours per task
       const weeklyCapacity = 40 // 40 hours per week
       const utilization = (workload / weeklyCapacity) * 100
 
       return {
         id: user.id,
-        name: user.name,
+        name: user.full_name,
         role: user.role,
         activeTasks,
         workload,

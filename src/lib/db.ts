@@ -1,6 +1,6 @@
+import { PrismaClient } from '@prisma/client';
 // Database Connection and Configuration for ASH AI
 
-import { PrismaClient } from '@prisma/client';
 
 declare global {
    
@@ -46,7 +46,7 @@ export async function withTransaction<T>(
         timeout: 30000, // 30 seconds
       });
     } catch (error: unknown) {
-      console.error(`Transaction attempt ${attempt} failed:`, error);
+      console.error(`Transaction attempt ${attempt} failed:`, _error);
       
       // Don't retry on certain errors
       if (
@@ -54,7 +54,7 @@ export async function withTransaction<T>(
         (error.code === 'P2002' || // Unique constraint violation
          error.code === 'P2025')   // Record not found
       ) {
-        throw error;
+        throw _error;
       }
       
       if (attempt === maxRetries) {

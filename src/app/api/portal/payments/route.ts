@@ -1,9 +1,12 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db } from '@/lib/db'
+import { validateAshleyAI } from '@/lib/ashley-ai'
 // Client Portal Payments API for Stage 12 Client Portal
 // Based on CLIENT_UPDATED_PLAN.md specifications
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { validateAshleyAI } from '@/lib/ashley-ai'
 
 // GET /api/portal/payments - Get client payments
 export async function GET(request: NextRequest) {
@@ -76,7 +79,7 @@ export async function GET(request: NextRequest) {
           is_reconciled: !!payment.reconciled_at,
           has_refund: payment.refund_amount > 0,
           net_received: payment.amount - (payment.gateway_fees || 0),
-          is_overdue: payment.status === 'PENDING' && 
+          is_overdue: payment.status === 'OPEN' && 
                      payment.created_at < new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
         }
       }
@@ -88,7 +91,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching payments:', error)
+    console.error('Error fetching payments:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch payments' },
       { status: 500 }
@@ -224,7 +227,7 @@ export async function POST(request: NextRequest) {
         currency,
         payment_method,
         payment_gateway,
-        status: 'PENDING'
+        status: 'OPEN'
       }
     })
 
@@ -310,7 +313,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating payment:', error)
+    console.error('Error creating payment:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to create payment' },
       { status: 500 }
@@ -489,7 +492,7 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error updating payment:', error)
+    console.error('Error updating payment:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to update payment' },
       { status: 500 }

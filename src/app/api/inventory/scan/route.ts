@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
           select: { name: true, code: true }
         },
         stockMovements: {
-          orderBy: { createdAt: 'desc' },
+          orderBy: { created_at: 'desc' },
           take: 5
         }
       }
@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (_error) {
-    console.error('Error processing scan:', error)
+    console.error('Error processing scan:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -328,7 +328,7 @@ export async function GET(request: NextRequest) {
           }
         }
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { created_at: 'desc' },
       take: limit
     })
 
@@ -338,7 +338,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching scan history:', error)
+    console.error('Error fetching scan history:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

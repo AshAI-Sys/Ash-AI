@@ -212,7 +212,7 @@ export async function withErrorHandling<T>(
   try {
     return await handler();
   } catch (_error) {
-    console.error('API Error:', error);
+    console.error('API Error:', _error);
     
     if (error instanceof z.ZodError) {
       return ResponseOptimizer.error('Validation failed', {

@@ -1,10 +1,13 @@
-// Cutting Plans API for Stage 3 Cutting System
-// Based on CLIENT_UPDATED_PLAN.md specifications
-
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { db } from '@/lib/db'
 import { optimizeFabricLayout, getAshleyAICuttingRecommendations, calculateCuttingCost } from '@/lib/cutting-calculations'
 import { validateAshleyAI } from '@/lib/ashley-ai'
+// Cutting Plans API for Stage 3 Cutting System
+// Based on CLIENT_UPDATED_PLAN.md specifications
+
 
 // GET /api/cutting/plans - Get cutting plans for workspace
 export async function GET(request: NextRequest) {
@@ -81,7 +84,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching cutting plans:', error)
+    console.error('Error fetching cutting plans:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch cutting plans' },
       { status: 500 }
@@ -277,7 +280,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating cutting plan:', error)
+    console.error('Error creating cutting plan:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to create cutting plan' },
       { status: 500 }
@@ -374,7 +377,7 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error updating cutting plan:', error)
+    console.error('Error updating cutting plan:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to update cutting plan' },
       { status: 500 }

@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "@/lib/auth"
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from "@/lib/prisma"
-import { Role } from "@prisma/client"
 
 export async function GET(request: NextRequest) {
   try {
@@ -41,7 +41,6 @@ export async function GET(request: NextRequest) {
         integration: {
           select: {
             id: true,
-            name: true,
             type: true,
             provider: true,
             status: true
@@ -85,7 +84,7 @@ export async function GET(request: NextRequest) {
       orderBy: [
         { priority: "desc" },
         { isActive: "desc" },
-        { updatedAt: "desc" }
+        { updated_at: "desc" }
       ]
     })
 
@@ -120,7 +119,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error("Error fetching automation rules:", error)
+    console.error("Error fetching automation rules:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch automation rules" },
       { status: 500 }
@@ -238,7 +237,6 @@ export async function POST(request: NextRequest) {
         integration: {
           select: {
             id: true,
-            name: true,
             type: true,
             provider: true
           }
@@ -270,7 +268,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error("Error creating automation rule:", error)
+    console.error("Error creating automation rule:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to create automation rule" },
       { status: 500 }

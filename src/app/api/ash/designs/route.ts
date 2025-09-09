@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { EventBus } from '@/lib/ash/event-bus'
 
@@ -59,7 +62,7 @@ export async function POST(request: NextRequest) {
           currentVersion: version,
           name,
           method,
-          updatedAt: new Date()
+          updated_at: new Date()
         }
       })
     } else {
@@ -72,7 +75,7 @@ export async function POST(request: NextRequest) {
           name,
           method,
           currentVersion: version,
-          createdBy: created_by
+          created_by: created_by
         }
       })
     }
@@ -86,7 +89,7 @@ export async function POST(request: NextRequest) {
         placements,
         palette,
         meta,
-        createdBy: created_by
+        created_by: created_by
       }
     })
 
@@ -108,7 +111,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating design version:', error)
+    console.error('Error creating design version:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -158,13 +161,13 @@ export async function GET(request: NextRequest) {
           }
         }
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { created_at: 'desc' }
     })
 
     return NextResponse.json(designs)
 
   } catch (_error) {
-    console.error('Error fetching designs:', error)
+    console.error('Error fetching designs:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

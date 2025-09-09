@@ -4,6 +4,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { secureDb } from '@/lib/db-security'
 import { verifyToken } from '@/lib/auth'
 import { InputSanitizer } from '@/lib/input-security'
@@ -190,7 +193,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Alert fetch error:', error)
+    console.error('Alert fetch error:', _error)
     return NextResponse.json(
       { error: 'Failed to fetch alerts' },
       { status: 500 }
@@ -216,7 +219,7 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (_error) {
-    console.error('Alert creation error:', error)
+    console.error('Alert creation error:', _error)
     return NextResponse.json(
       { error: 'Failed to create alert' },
       { status: 500 }
@@ -282,7 +285,7 @@ export async function PUT(request: NextRequest) {
     }
 
   } catch (_error) {
-    console.error('Alert action error:', error)
+    console.error('Alert action error:', _error)
     return NextResponse.json(
       { error: 'Failed to perform alert action' },
       { status: 500 }
@@ -550,7 +553,7 @@ async function evaluateAlertRule(alertRule: any) {
     }
 
   } catch (_error) {
-    console.error(`Failed to evaluate alert rule ${alertRule.id}:`, error)
+    console.error(`Failed to evaluate alert rule ${alertRule.id}:`, _error)
   }
 }
 
@@ -569,7 +572,7 @@ async function sendAlertNotifications(alert: any, workspace: any) {
       try {
         await sendAlertNotification(alert, recipientId, channel, workspace)
       } catch (_error) {
-        console.error(`Failed to send alert notification via ${channel} to ${recipientId}:`, error)
+        console.error(`Failed to send alert notification via ${channel} to ${recipientId}:`, _error)
       }
     }
   }

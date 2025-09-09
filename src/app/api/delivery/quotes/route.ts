@@ -1,8 +1,11 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { get3PLQuotes, recommendDeliveryMethod, calculateDriverCost } from '@/lib/delivery-calculations'
 // Delivery Quote API for Stage 8 Delivery System
 // Based on CLIENT_UPDATED_PLAN.md specifications
 
-import { NextRequest, NextResponse } from 'next/server'
-import { get3PLQuotes, recommendDeliveryMethod, calculateDriverCost } from '@/lib/delivery-calculations'
 
 // POST /api/delivery/quotes - Get delivery quotes for shipment
 export async function POST(request: NextRequest) {
@@ -98,7 +101,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error generating delivery quotes:', error)
+    console.error('Error generating delivery quotes:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to generate delivery quotes' },
       { status: 500 }
@@ -129,7 +132,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching saved quotes:', error)
+    console.error('Error fetching saved quotes:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch saved quotes' },
       { status: 500 }

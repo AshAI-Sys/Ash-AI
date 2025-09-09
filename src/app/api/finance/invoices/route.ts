@@ -1,9 +1,12 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db, createAuditLog } from '@/lib/db'
+import { calculateInvoiceTotals, generateInvoiceNumber, generateBIRSalesEntry } from '@/lib/finance-calculations'
 // Finance Invoices API
 // Based on CLIENT_UPDATED_PLAN.md Stage 9 specifications
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db, createAuditLog } from '@/lib/db'
-import { calculateInvoiceTotals, generateInvoiceNumber, generateBIRSalesEntry } from '@/lib/finance-calculations'
 
 // GET /api/finance/invoices - Get invoices with filtering
 export async function GET(request: NextRequest) {
@@ -83,7 +86,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching invoices:', error)
+    console.error('Error fetching invoices:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch invoices' },
       { status: 500 }
@@ -274,7 +277,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating invoice:', error)
+    console.error('Error creating invoice:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to create invoice' },
       { status: 500 }

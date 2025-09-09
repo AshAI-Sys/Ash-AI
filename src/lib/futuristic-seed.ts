@@ -31,8 +31,7 @@ export async function seedFuturisticDatabase() {
       },
       preferences: {
         theme: 'futuristic',
-        dashboard_layout: 'neural_grid',
-        ai_assistance_level: 'maximum'
+        dashboard_ai_assistance_level: 'maximum'
       },
     },
   })
@@ -355,8 +354,8 @@ async function main() {
   try {
     await seedFuturisticDatabase()
   } catch (_error) {
-    console.error('❌ Seeding failed:', error)
-    throw error
+    console.error('❌ Seeding failed:', _error)
+    throw _error
   } finally {
     await prisma.$disconnect()
   }

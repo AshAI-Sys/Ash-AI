@@ -1,9 +1,12 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db, createAuditLog } from '@/lib/db'
+import { validateCuring } from '@/lib/printing-calculations'
 // Silkscreen-Specific Printing API
 // Based on CLIENT_UPDATED_PLAN.md Stage 4.1 specifications
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db, createAuditLog } from '@/lib/db'
-import { validateCuring } from '@/lib/printing-calculations'
 
 // POST /api/printing/silkscreen - Log silkscreen-specific data
 export async function POST(request: NextRequest) {
@@ -163,7 +166,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error in silkscreen operation:', error)
+    console.error('Error in silkscreen operation:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to log silkscreen operation' },
       { status: 500 }
@@ -246,7 +249,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching silkscreen data:', error)
+    console.error('Error fetching silkscreen data:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch silkscreen data' },
       { status: 500 }

@@ -14,7 +14,7 @@ export interface SystemEvent {
   entity_type: string
   entity_id: string
   data: any
-  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED'
+  status: 'OPEN' | 'PROCESSING' | 'COMPLETED' | 'FAILED'
   retry_count?: number
   created_at: Date
   processed_at?: Date
@@ -51,7 +51,7 @@ export class AshEventBus {
           entity_type: entityType || 'system',
           entity_id: entityId || 'system',
           data: payload,
-          status: 'PENDING',
+          status: 'OPEN',
           created_at: new Date()
         }
       })
@@ -60,7 +60,7 @@ export class AshEventBus {
       await AshEventBus.processEvent(eventType, payload)
 
     } catch (_error) {
-      console.error('Error emitting ASH event:', error)
+      console.error('Error emitting ASH event:', _error)
     }
   }
 
@@ -111,7 +111,7 @@ export class AshEventBus {
           console.log(`Unhandled ASH event: ${eventType}`)
       }
     } catch (_error) {
-      console.error(`Error processing event ${eventType}:`, error)
+      console.error(`Error processing event ${eventType}:`, _error)
     }
   }
 
@@ -194,7 +194,7 @@ export class AshEventBus {
       })
 
     } catch (_error) {
-      console.error('Error processing design approval:', error)
+      console.error('Error processing design approval:', _error)
     }
   }
 
@@ -445,7 +445,7 @@ export class AshEventBus {
   static async getUnprocessedEvents(limit: number = 100): Promise<AshEvent[]> {
     const events = await prisma.eventLog.findMany({
       where: { processed: false },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { created_at: 'asc' },
       take: limit
     })
 
@@ -509,7 +509,7 @@ export class AshEventBus {
         }
       }
     } catch (_error) {
-      console.error('Error checking stage completion:', error)
+      console.error('Error checking stage completion:', _error)
     }
   }
 
@@ -524,7 +524,7 @@ export class AshEventBus {
         console.log(`ASH: Updated productivity metrics for operator ${operatorId} in ${workcenter}`)
       }
     } catch (_error) {
-      console.error('Error updating productivity metrics:', error)
+      console.error('Error updating productivity metrics:', _error)
     }
   }
 
@@ -540,7 +540,7 @@ export class AshEventBus {
     setInterval(async () => {
       try {
         const pendingEvents = await prisma.systemEvent.findMany({
-          where: { status: 'PENDING' },
+          where: { status: 'OPEN' },
           orderBy: { created_at: 'asc' },
           take: 20
         })
@@ -572,7 +572,7 @@ export class AshEventBus {
           }
         }
       } catch (_error) {
-        console.error('Error in background event processing:', error)
+        console.error('Error in background event processing:', _error)
       }
     }, intervalMs)
   }

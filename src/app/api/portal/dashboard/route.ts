@@ -1,9 +1,12 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db } from '@/lib/db'
+import { getAshleyAIRecommendations } from '@/lib/ashley-ai'
 // Enhanced Client Portal Dashboard API
 // Provides comprehensive dashboard data with AI-powered recommendations
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { getAshleyAIRecommendations } from '@/lib/ashley-ai'
 
 export async function GET(request: NextRequest) {
   try {
@@ -238,7 +241,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(dashboardData)
 
   } catch (_error) {
-    console.error('Dashboard API error:', error)
+    console.error('Dashboard API error:', _error)
     return NextResponse.json(
       { error: 'Failed to fetch dashboard data' },
       { status: 500 }

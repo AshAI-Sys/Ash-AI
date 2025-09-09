@@ -1,7 +1,7 @@
+import { ashAI, type OrderData } from './ai-engine'
 // Real-Time Production Optimization Engine
 // Monitors production metrics and provides instant recommendations
 
-import { ashAI, type OrderData } from './ai-engine'
 
 export interface ProductionMetrics {
   timestamp: string

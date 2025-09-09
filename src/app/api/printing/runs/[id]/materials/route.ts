@@ -1,8 +1,11 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db, createAuditLog } from '@/lib/db'
 // Print Run Material Tracking API
 // Based on CLIENT_UPDATED_PLAN.md Stage 4 specifications
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db, createAuditLog } from '@/lib/db'
 
 interface RouteParams {
   params: Promise<{
@@ -59,7 +62,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     })
 
   } catch (_error) {
-    console.error('Error fetching run materials:', error)
+    console.error('Error fetching run materials:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch materials' },
       { status: 500 }
@@ -163,7 +166,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error logging material usage:', error)
+    console.error('Error logging material usage:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to log material usage' },
       { status: 500 }

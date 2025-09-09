@@ -1,8 +1,8 @@
+import OpenAI from 'openai'
+import { prisma } from '@/lib/prisma'
 // Ashley AI Agent System
 // Comprehensive AI agents for apparel management system
 
-import OpenAI from 'openai'
-import { prisma } from '@/lib/prisma'
 
 // Initialize OpenAI with the correct API key
 const openai = (process.env.ASH_OPENAI_API_KEY || process.env.OPENAI_API_KEY)
@@ -203,7 +203,7 @@ export class AshleyAgent extends AIAgentBase {
     // Fetch recent data for analysis
     const recentOrders = await prisma.order.findMany({
       where: {
-        createdAt: {
+        created_at: {
           gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // Last 7 days
         }
       },
@@ -246,7 +246,7 @@ export class KaiAgent extends AIAgentBase {
       include: {
         tasks: {
           where: {
-            status: { in: ['PENDING', 'IN_PROGRESS'] }
+            status: { in: ['OPEN', 'IN_PROGRESS'] }
           }
         }
       }
@@ -480,7 +480,7 @@ export class NovaAgent extends AIAgentBase {
       where: { quantity: { lte: 10 } }, // Items with low stock
       include: {
         stockMovements: {
-          orderBy: { createdAt: 'desc' },
+          orderBy: { created_at: 'desc' },
           take: 5
         }
       },

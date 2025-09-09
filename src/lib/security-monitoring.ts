@@ -424,8 +424,8 @@ export class IncidentResponseSystem {
       eventId: event.id,
       status: 'OPEN',
       severity: event.severity,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      created_at: new Date(),
+      updated_at: new Date(),
       assignedTo: null,
       actions: [] as any[],
       notes: []

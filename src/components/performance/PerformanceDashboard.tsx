@@ -23,7 +23,7 @@ import {
   Wifi,
   Monitor
 } from 'lucide-react'
-import {
+  import {
   LineChart,
   Line,
   XAxis,

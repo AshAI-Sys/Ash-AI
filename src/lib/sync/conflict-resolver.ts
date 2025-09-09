@@ -38,11 +38,11 @@ export class ConflictResolver {
 
     return conflicts.map(conflict => ({
       id: conflict.id,
-      entity: conflict.entity,
-      entityId: conflict.entityId,
-      field: conflict.field,
-      localValue: conflict.localValue,
-      serverValue: conflict.serverValue,
+      entity: conflict.entity_type,
+      entityId: conflict.entity_id,
+      field: 'data', // Generic field since conflict_data is a JSON field
+      localValue: conflict.local_value,
+      serverValue: conflict.server_value,
       created_at: conflict.created_at
     }));
   }
@@ -69,10 +69,10 @@ export class ConflictResolver {
 
       switch (resolution.resolution) {
         case 'LOCAL':
-          finalData = conflict.localValue;
+          finalData = conflict.local_value;
           break;
         case 'SERVER':
-          finalData = conflict.serverValue;
+          finalData = conflict.server_value;
           break;
         case 'MANUAL':
           finalData = resolution.manualData;
@@ -81,15 +81,14 @@ export class ConflictResolver {
           return { success: false, error: 'Invalid resolution type' };
       }
 
-      await this.applyResolution(conflict, finalData, userId);
+      await this.applyResolution(conflict, finalData, user_id);
 
       await prisma.syncConflict.update({
         where: { id: resolution.conflictId },
         data: {
           resolved: true,
-          resolution: resolutionType,
-          resolvedBy: userId,
-          resolvedAt: new Date()
+          resolved_by: user_id,
+          resolved_at: new Date()
         }
       });
 
@@ -98,23 +97,23 @@ export class ConflictResolver {
         entity: 'SyncConflict',
         entityId: resolution.conflictId,
         metadata: {
-          originalEntity: conflict.entity,
-          originalEntityId: conflict.entityId,
-          field: conflict.field,
+          originalEntity: conflict.entity_type,
+          originalEntityId: conflict.entity_id,
+          field: 'data',
           resolutionType,
-          localValue: conflict.localValue,
-          serverValue: conflict.serverValue,
+          localValue: conflict.local_value,
+          serverValue: conflict.server_value,
           finalValue: finalData,
           reason: resolution.reason
         },
         severity: 'MEDIUM',
         category: 'SYSTEM'
-      }, { userId });
+      }, { userId: user_id });
 
       return { success: true };
 
-    } catch (_error) {
-      console.error('Conflict resolution failed:', error);
+    } catch (error) {
+      console.error('Conflict resolution failed:', _error);
       return { 
         success: false, 
         error: error instanceof Error ? error.message : 'Resolution failed' 
@@ -135,8 +134,8 @@ export class ConflictResolver {
       const result = await this.resolveConflict({
         conflictId,
         resolution: defaultResolution,
-        resolvedBy: userId
-      }, userId);
+        resolvedBy: user_id
+      }, user_id);
 
       if (result.success) {
         resolved++;
@@ -150,27 +149,27 @@ export class ConflictResolver {
   }
 
   private static async applyResolution(
-    conflict: { entity: string; entityId: string; field: string },
+    conflict: { entity_type: string; entity_id: string },
     finalData: unknown,
     user_id: string
   ): Promise<void> {
-    const { entity, entityId, field } = conflict;
+    const { entity_type, entity_id } = conflict;
 
-    switch (entity.toLowerCase()) {
+    switch (entity_type.toLowerCase()) {
       case 'task':
-        await this.updateTaskField(entityId, field, finalData, userId);
+        await this.updateTaskField(entity_id, 'status', finalData, user_id);
         break;
       case 'timerecord':
-        await this.updateTimeRecordField(entityId, field, finalData, userId);
+        await this.updateTimeRecordField(entity_id, 'duration', finalData, user_id);
         break;
       case 'inventoryitem':
-        await this.updateInventoryField(entityId, field, finalData, userId);
+        await this.updateInventoryField(entity_id, 'quantity', finalData, user_id);
         break;
       case 'qcrecord':
-        await this.updateQCRecordField(entityId, field, finalData, userId);
+        await this.updateQCRecordField(entity_id, 'status', finalData, user_id);
         break;
       default:
-        throw new Error(`Unknown entity type: ${entity}`);
+        throw new Error(`Unknown entity type: ${entity_type}`);
     }
   }
 
@@ -197,7 +196,7 @@ export class ConflictResolver {
       taskId,
       oldTask || {},
       updateData,
-      userId
+      user_id
     );
   }
 
@@ -224,7 +223,7 @@ export class ConflictResolver {
       recordId,
       oldRecord || {},
       updateData,
-      userId
+      user_id
     );
   }
 
@@ -251,7 +250,7 @@ export class ConflictResolver {
       itemId,
       oldItem || {},
       updateData,
-      userId
+      user_id
     );
   }
 
@@ -278,13 +277,13 @@ export class ConflictResolver {
       recordId,
       oldRecord || {},
       updateData,
-      userId
+      user_id
     );
   }
 
   private static async getUserTaskIds(user_id: string): Promise<string[]> {
     const tasks = await prisma.task.findMany({
-      where: { assigned_to: userId },
+      where: { assigned_to: user_id },
       select: { id: true }
     });
     return tasks.map(task => task.id);
@@ -292,7 +291,7 @@ export class ConflictResolver {
 
   private static async getUserTimeRecordIds(user_id: string): Promise<string[]> {
     const records = await prisma.timeRecord.findMany({
-      where: { employee_id: userId },
+      where: { employee_id: user_id },
       select: { id: true }
     });
     return records.map(record => record.id);
@@ -302,20 +301,20 @@ export class ConflictResolver {
     const { entity, field, localValue, serverValue } = conflict;
 
     if (field === 'lastActivity' || field === 'updatedAt') {
-      return new Date(localValue) > new Date(serverValue) ? 'LOCAL' : 'SERVER';
+      return new Date(localValue as string | number | Date) > new Date(serverValue as string | number | Date) ? 'LOCAL' : 'SERVER';
     }
 
     if (field === 'status' && entity === 'Task') {
       const statusPriority = {
-        'PENDING': 1,
+        'OPEN': 1,
         'IN_PROGRESS': 2,
         'COMPLETED': 3,
         'REJECTED': 2,
         'ON_HOLD': 1
       };
       
-      const localPriority = statusPriority[localValue] || 0;
-      const serverPriority = statusPriority[serverValue] || 0;
+      const localPriority = statusPriority[localValue as keyof typeof statusPriority] || 0;
+      const serverPriority = statusPriority[serverValue as keyof typeof statusPriority] || 0;
       
       if (localPriority > serverPriority) return 'LOCAL';
       if (serverPriority > localPriority) return 'SERVER';
@@ -329,7 +328,7 @@ export class ConflictResolver {
   }
 
   static async autoResolveConflicts(user_id: string): Promise<{ resolved: number; remaining: number }> {
-    const conflicts = await this.getConflicts(userId);
+    const conflicts = await this.getConflicts(user_id);
     let resolved = 0;
 
     for (const conflict of conflicts) {
@@ -339,9 +338,9 @@ export class ConflictResolver {
         const result = await this.resolveConflict({
           conflictId: conflict.id,
           resolution: autoResolution,
-          resolvedBy: userId,
+          resolvedBy: user_id,
           reason: 'Automatic resolution'
-        }, userId);
+        }, user_id);
 
         if (result.success) {
           resolved++;
@@ -349,7 +348,7 @@ export class ConflictResolver {
       }
     }
 
-    const remainingConflicts = await this.getConflicts(userId);
+    const remainingConflicts = await this.getConflicts(user_id);
     return { resolved, remaining: remainingConflicts.length };
   }
 
@@ -361,7 +360,7 @@ export class ConflictResolver {
     const conflicts = await prisma.syncConflict.findMany({
       where: { resolved: false },
       select: {
-        entity: true,
+        entity_type: true,
         created_at: true
       },
       orderBy: { created_at: 'asc' }
@@ -369,7 +368,7 @@ export class ConflictResolver {
 
     const byEntity: Record<string, number> = {};
     conflicts.forEach(conflict => {
-      byEntity[conflict.entity] = (byEntity[conflict.entity] || 0) + 1;
+      byEntity[conflict.entity_type] = (byEntity[conflict.entity_type] || 0) + 1;
     });
 
     return {

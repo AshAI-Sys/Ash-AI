@@ -16,8 +16,8 @@ import {
   MessageCircle,
   ExternalLink,
   Smartphone,
-  Desktop,
-  Tablet
+  Monitor,
+  TabletSmartphone
 } from 'lucide-react'
 import Layout from '@/components/Layout'
 
@@ -223,7 +223,7 @@ export default function PublicSitePage() {
                 <CardContent className="space-y-4">
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-2">
-                      <Desktop className="w-4 h-4 text-blue-400" />
+                      <Monitor className="w-4 h-4 text-blue-400" />
                       <span className="text-cyan-300">Desktop</span>
                     </div>
                     <div className="flex items-center gap-2">

@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client';
 import { ConflictResolver } from '@/lib/sync/conflict-resolver';
-import { authOptions } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,7 +25,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (_error) {
-    console.error('Auto-resolve conflicts error:', error);
+    console.error('Auto-resolve conflicts error:', _error);
     return NextResponse.json(
       { error: 'Failed to auto-resolve conflicts' },
       { status: 500 }

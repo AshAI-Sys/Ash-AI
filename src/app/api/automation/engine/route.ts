@@ -1,9 +1,12 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db } from '@/lib/db'
+import { AutomationEngine, AutomationRule, TriggerType, ActionType } from '@/lib/automation-engine'
 // Automation Engine API - Stage 14 Implementation
 // Complete automation and reminders system with AI-powered optimization
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { AutomationEngine, AutomationRule, TriggerType, ActionType } from '@/lib/automation-engine'
 
 export async function POST(request: NextRequest) {
   try {
@@ -41,7 +44,7 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (_error) {
-    console.error('Automation Engine API error:', error)
+    console.error('Automation Engine API error:', _error)
     return NextResponse.json(
       { 
         success: false,
@@ -87,7 +90,7 @@ export async function GET(request: NextRequest) {
     }
 
   } catch (_error) {
-    console.error('Automation Engine GET API error:', error)
+    console.error('Automation Engine GET API error:', _error)
     return NextResponse.json(
       { error: 'Failed to fetch automation data' },
       { status: 500 }
@@ -197,7 +200,7 @@ async function createAutomationRule(params: any, workspace_id: string) {
     })
 
   } catch (_error) {
-    console.error('Error creating automation rule:', error)
+    console.error('Error creating automation rule:', _error)
     return NextResponse.json(
       { error: 'Failed to create automation rule' },
       { status: 500 }
@@ -252,7 +255,7 @@ async function triggerAutomationEvent(params: any, workspace_id: string) {
     })
 
   } catch (_error) {
-    console.error('Error triggering automation event:', error)
+    console.error('Error triggering automation event:', _error)
     return NextResponse.json(
       { error: 'Failed to trigger automation event' },
       { status: 500 }
@@ -303,7 +306,7 @@ async function sendSmartNotification(params: any, workspace_id: string) {
     })
 
   } catch (_error) {
-    console.error('Error sending smart notification:', error)
+    console.error('Error sending smart notification:', _error)
     return NextResponse.json(
       { error: 'Failed to send notification' },
       { status: 500 }
@@ -345,7 +348,7 @@ async function scheduleSmartReminder(params: any, workspace_id: string) {
     })
 
   } catch (_error) {
-    console.error('Error scheduling smart reminder:', error)
+    console.error('Error scheduling smart reminder:', _error)
     return NextResponse.json(
       { error: 'Failed to schedule reminder' },
       { status: 500 }
@@ -365,7 +368,7 @@ async function getAutomationRecommendations(params: any, workspace_id: string) {
     })
 
   } catch (_error) {
-    console.error('Error getting automation recommendations:', error)
+    console.error('Error getting automation recommendations:', _error)
     return NextResponse.json(
       { error: 'Failed to get recommendations' },
       { status: 500 }
@@ -404,7 +407,7 @@ async function getAutomationRules(workspace_id: string) {
     })
 
   } catch (_error) {
-    console.error('Error fetching automation rules:', error)
+    console.error('Error fetching automation rules:', _error)
     return NextResponse.json(
       { error: 'Failed to fetch automation rules' },
       { status: 500 }
@@ -444,7 +447,7 @@ async function getRecentExecutions(workspace_id: string) {
     })
 
   } catch (_error) {
-    console.error('Error fetching recent executions:', error)
+    console.error('Error fetching recent executions:', _error)
     return NextResponse.json(
       { error: 'Failed to fetch executions' },
       { status: 500 }
@@ -497,7 +500,7 @@ async function getAutomationAnalytics(workspace_id: string) {
     })
 
   } catch (_error) {
-    console.error('Error fetching automation analytics:', error)
+    console.error('Error fetching automation analytics:', _error)
     return NextResponse.json(
       { error: 'Failed to fetch analytics' },
       { status: 500 }
@@ -521,7 +524,7 @@ async function getNotificationTemplates(workspace_id: string) {
     })
 
   } catch (_error) {
-    console.error('Error fetching notification templates:', error)
+    console.error('Error fetching notification templates:', _error)
     return NextResponse.json(
       { error: 'Failed to fetch templates' },
       { status: 500 }

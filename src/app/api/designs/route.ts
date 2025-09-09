@@ -1,8 +1,11 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db, createAuditLog } from '@/lib/db'
 // Stage 2: Design & Approval API
 // Based on CLIENT_UPDATED_PLAN.md specifications
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db, createAuditLog } from '@/lib/db'
 
 // GET /api/designs - Fetch design assets
 export async function GET(request: NextRequest) {
@@ -76,7 +79,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching designs:', error)
+    console.error('Error fetching designs:', _error)
     return NextResponse.json(
       { error: 'Failed to fetch designs' },
       { status: 500 }
@@ -143,7 +146,7 @@ export async function POST(request: NextRequest) {
         mime_type,
         color_count,
         print_ready: print_ready || false,
-        approval_status: 'PENDING'
+        approval_status: 'OPEN'
       }
     })
 
@@ -168,7 +171,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error uploading design:', error)
+    console.error('Error uploading design:', _error)
     return NextResponse.json(
       { error: 'Failed to upload design' },
       { status: 500 }
@@ -245,7 +248,7 @@ export async function PATCH(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error updating design:', error)
+    console.error('Error updating design:', _error)
     return NextResponse.json(
       { error: 'Failed to update design' },
       { status: 500 }

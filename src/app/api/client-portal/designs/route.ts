@@ -4,6 +4,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import jwt from 'jsonwebtoken'
 import { z } from 'zod'
@@ -156,7 +159,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
     }
 
-    console.error('Client designs error:', error)
+    console.error('Client designs error:', _error)
     return NextResponse.json({ 
       success: false,
       error: 'Failed to load designs' 
@@ -288,7 +291,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
     }
 
-    console.error('Design approval error:', error)
+    console.error('Design approval error:', _error)
     return NextResponse.json({
       success: false,
       error: 'Failed to process approval'
@@ -375,7 +378,7 @@ async function createApprovalNotification(asset: any, action: string, feedback?:
       }
     })
   } catch (_error) {
-    console.error('Failed to create approval notification:', error)
+    console.error('Failed to create approval notification:', _error)
   }
 }
 
@@ -392,7 +395,7 @@ async function createDesignRevisionTask(asset: any, requestedChanges?: string[])
         order_id: asset.order.id,
         title: `Design Revision Required - ${asset.file_name}`,
         description: `Client has requested revisions for design asset: ${asset.file_name}\n\nRequested changes:\n${requestedChanges.map(change => `• ${change}`).join('\n')}`,
-        status: 'PENDING',
+        status: 'OPEN',
         priority: 'HIGH',
         type: 'DESIGN_REVISION',
         due_at: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // Due in 2 days
@@ -404,6 +407,6 @@ async function createDesignRevisionTask(asset: any, requestedChanges?: string[])
       }
     })
   } catch (_error) {
-    console.error('Failed to create design revision task:', error)
+    console.error('Failed to create design revision task:', _error)
   }
 }

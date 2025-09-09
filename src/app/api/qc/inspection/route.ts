@@ -6,8 +6,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
 import { Role } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 
 const defectSchema = z.object({
@@ -273,7 +273,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    console.error('QC inspection error:', error)
+    console.error('QC inspection error:', _error)
     return NextResponse.json({
       success: false,
       error: 'Failed to create quality inspection'
@@ -330,7 +330,7 @@ export async function PUT(request: NextRequest) {
           estimated_time_minutes: validatedData.estimated_time_minutes,
           rework_instructions: validatedData.rework_instructions,
           priority: validatedData.priority,
-          status: 'PENDING',
+          status: 'OPEN',
           defect_count: validatedData.defect_ids.length
         }
       })
@@ -362,7 +362,7 @@ export async function PUT(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Rework creation error:', error)
+    console.error('Rework creation error:', _error)
     return NextResponse.json({
       success: false,
       error: 'Failed to create rework order'
@@ -449,7 +449,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Get QC inspections error:', error)
+    console.error('Get QC inspections error:', _error)
     return NextResponse.json({
       success: false,
       error: 'Failed to retrieve quality inspections'
@@ -557,11 +557,11 @@ async function emitQCEvent(eventType: string, data: any) {
         entity_type: 'quality_inspection',
         entity_id: data.inspection_id,
         data: data,
-        status: 'PENDING',
+        status: 'OPEN',
         created_at: new Date()
       }
     })
   } catch (_error) {
-    console.error('Failed to emit QC event:', error)
+    console.error('Failed to emit QC event:', _error)
   }
 }

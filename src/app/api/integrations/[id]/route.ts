@@ -1,4 +1,7 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from "@/lib/prisma"
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -19,7 +22,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
           include: {
             deliveries: {
               orderBy: {
-                createdAt: "desc"
+                created_at: "desc"
               },
               take: 10
             }
@@ -27,7 +30,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         },
         logs: {
           orderBy: {
-            createdAt: "desc"
+            created_at: "desc"
           },
           take: 50,
           include: {
@@ -103,7 +106,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     })
 
   } catch (_error) {
-    console.error("Error fetching integration:", error)
+    console.error("Error fetching integration:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch integration" },
       { status: 500 }
@@ -173,7 +176,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         isActive: isActive !== undefined ? isActive : existingIntegration.isActive,
         status: connectionTest ? (connectionTest.success ? "CONNECTED" : "ERROR") : existingIntegration.status,
         lastSync: connectionTest?.success ? new Date() : existingIntegration.lastSync,
-        updatedAt: new Date()
+        updated_at: new Date()
       },
       include: {
         creator: {
@@ -204,7 +207,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     })
 
   } catch (_error) {
-    console.error("Error updating integration:", error)
+    console.error("Error updating integration:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to update integration" },
       { status: 500 }
@@ -271,7 +274,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       data: {
         isActive: false,
         status: "DISCONNECTED",
-        updatedAt: new Date()
+        updated_at: new Date()
       }
     })
 
@@ -292,7 +295,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     })
 
   } catch (_error) {
-    console.error("Error deleting integration:", error)
+    console.error("Error deleting integration:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to delete integration" },
       { status: 500 }

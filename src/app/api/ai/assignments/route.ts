@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { aiService } from '@/lib/ai'
 
 export async function GET(req: NextRequest) {
@@ -50,7 +51,7 @@ export async function POST(req: NextRequest) {
       where: { id: taskId },
       data: { 
         assigned_to: assigneeId,
-        status: 'PENDING' // Keep as pending until work starts
+        status: 'OPEN' // Keep as open until work starts
       }
     })
 

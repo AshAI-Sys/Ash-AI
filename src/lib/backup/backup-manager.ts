@@ -75,7 +75,7 @@ export class BackupManager {
           errorMessage: error instanceof Error ? error.message : 'Unknown error'
         }
       });
-      throw error;
+      throw _error;
     }
   }
 
@@ -130,7 +130,7 @@ export class BackupManager {
 
     const oldBackups = await prisma.backupJob.findMany({
       where: {
-        createdAt: { lt: cutoffDate },
+        created_at: { lt: cutoffDate },
         status: 'COMPLETED'
       }
     });
@@ -232,7 +232,7 @@ export class BackupManager {
           brandName: order.brand.name,
           status: order.status,
           quantity: order.quantity,
-          createdAt: order.createdAt,
+          created_at: order.createdAt,
           dueDate: order.dueDate
         })),
         inventory: inventory.map(item => ({
@@ -261,8 +261,8 @@ export class BackupManager {
       console.log(`Data exported to: ${filePath}`);
       
     } catch (_error) {
-      console.error('Export to Google Sheets failed:', error);
-      throw error;
+      console.error('Export to Google Sheets failed:', _error);
+      throw _error;
     }
   }
 }

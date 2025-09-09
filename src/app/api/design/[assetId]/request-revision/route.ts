@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 
 // POST /api/design/[assetId]/request-revision - Request design revision
@@ -34,7 +36,7 @@ export async function POST(
             client: { select: { name: true } }
           }
         },
-        createdBy: {
+        created_by: {
           select: { name: true, id: true }
         }
       }
@@ -69,7 +71,7 @@ export async function POST(
       data: {
         orderId: asset.orderId,
         stage: 'Design Revision',
-        status: 'PENDING',
+        status: 'OPEN',
         message: `Client requested design revision: ${body.comments}`,
         operator: session.user.name || 'Client',
         timestamp: new Date()
@@ -83,7 +85,7 @@ export async function POST(
         description: `Client has requested design revisions for "${asset.name}".\n\nClient Comments: ${body.comments}`,
         type: 'DESIGN_REVISION',
         priority: body.urgency || 'MEDIUM',
-        status: 'PENDING',
+        status: 'OPEN',
         assignedToRole: 'GRAPHIC_ARTIST',
         assignedToUserId: asset.createdBy?.id,
         entityType: 'design_asset',
@@ -137,7 +139,7 @@ export async function POST(
     })
 
   } catch (_error) {
-    console.error('Error requesting design revision:', error)
+    console.error('Error requesting design revision:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'

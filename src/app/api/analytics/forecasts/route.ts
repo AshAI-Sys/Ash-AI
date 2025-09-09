@@ -1,4 +1,7 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from "@/lib/prisma"
 
 export async function GET(request: NextRequest) {
@@ -28,18 +31,12 @@ export async function GET(request: NextRequest) {
     }
 
     const forecasts = await prisma.forecast.findMany({
-      where,
-      include: {
-        creator: {
-          select: {
-            id: true,
-            name: true,
-            email: true
-          }
-        }
+      where: { 
+        workspace_id: "workspace-1",
+        ...where 
       },
       orderBy: {
-        createdAt: "desc"
+        created_at: "desc"
       }
     })
 
@@ -49,7 +46,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error("Error fetching forecasts:", error)
+    console.error("Error fetching forecasts:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch forecasts" },
       { status: 500 }
@@ -118,7 +115,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error("Error creating forecast:", error)
+    console.error("Error creating forecast:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to create forecast" },
       { status: 500 }
@@ -129,7 +126,7 @@ export async function POST(request: NextRequest) {
 // Forecast generation engine (mock implementation with realistic business logic)
 async function generateForecast(type: string, period: string, _algorithm: string, _parameters: unknown) {
   try {
-    const targetDate = new Date(period + "-01")
+    const _targetDate = new Date(period + "-01")
     
     // Get historical data based on forecast type
     let inputData: unknown = {}
@@ -138,32 +135,32 @@ async function generateForecast(type: string, period: string, _algorithm: string
     
     switch (type) {
       case "SALES":
-        inputData = await getSalesHistoricalData(targetDate)
-        prediction = generateSalesForecast(inputData, algorithm)
+        inputData = await getSalesHistoricalData(_targetDate)
+        prediction = generateSalesForecast(inputData, "linear")
         accuracy = 0.78 + Math.random() * 0.15 // 78-93% accuracy
         break
         
       case "INVENTORY":
-        inputData = await getInventoryHistoricalData(targetDate)
-        prediction = generateInventoryForecast(inputData, algorithm)
+        inputData = await getInventoryHistoricalData(_targetDate)
+        prediction = generateInventoryForecast(inputData, "linear")
         accuracy = 0.85 + Math.random() * 0.1 // 85-95% accuracy
         break
         
       case "CASH_FLOW":
-        inputData = await getCashFlowHistoricalData(targetDate)
-        prediction = generateCashFlowForecast(inputData, algorithm)
+        inputData = await getCashFlowHistoricalData(_targetDate)
+        prediction = generateCashFlowForecast(inputData, "linear")
         accuracy = 0.72 + Math.random() * 0.18 // 72-90% accuracy
         break
         
       case "DEMAND":
-        inputData = await getDemandHistoricalData(targetDate)
-        prediction = generateDemandForecast(inputData, algorithm)
+        inputData = await getDemandHistoricalData(_targetDate)
+        prediction = generateDemandForecast(inputData, "linear")
         accuracy = 0.80 + Math.random() * 0.12 // 80-92% accuracy
         break
         
       case "PRODUCTION":
-        inputData = await getProductionHistoricalData(targetDate)
-        prediction = generateProductionForecast(inputData, algorithm)
+        inputData = await getProductionHistoricalData(_targetDate)
+        prediction = generateProductionForecast(inputData, "linear")
         accuracy = 0.88 + Math.random() * 0.08 // 88-96% accuracy
         break
         
@@ -178,8 +175,8 @@ async function generateForecast(type: string, period: string, _algorithm: string
     }
     
   } catch (_error) {
-    console.error("Error generating forecast:", error)
-    throw error
+    console.error("Error generating forecast:", _error)
+    throw _error
   }
 }
 

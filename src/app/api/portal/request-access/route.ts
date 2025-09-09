@@ -1,9 +1,12 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db } from '@/lib/db'
+import { sendMagicLinkEmail } from '@/lib/magic-link'
 // Portal Access Request API
 // Based on CLIENT_UPDATED_PLAN.md Stage 12 specifications
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { sendMagicLinkEmail } from '@/lib/magic-link'
 
 // POST /api/portal/request-access - Send magic link to client
 export async function POST(request: NextRequest) {
@@ -128,7 +131,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error processing access request:', error)
+    console.error('Error processing access request:', _error)
     
     // Generic response for security
     return NextResponse.json({
@@ -161,7 +164,7 @@ export async function GET() {
     })
 
   } catch (_error) {
-    console.error('Error fetching access info:', error)
+    console.error('Error fetching access info:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch access info' },
       { status: 500 }

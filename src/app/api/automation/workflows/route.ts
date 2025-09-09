@@ -4,6 +4,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { secureDb } from '@/lib/db-security'
 import { verifyToken } from '@/lib/auth'
 import { InputSanitizer } from '@/lib/input-security'
@@ -154,7 +157,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Workflow fetch error:', error)
+    console.error('Workflow fetch error:', _error)
     return NextResponse.json(
       { error: 'Failed to fetch workflows' },
       { status: 500 }
@@ -246,7 +249,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Workflow creation error:', error)
+    console.error('Workflow creation error:', _error)
     return NextResponse.json(
       { error: 'Failed to create workflow' },
       { status: 500 }
@@ -325,7 +328,7 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Workflow update error:', error)
+    console.error('Workflow update error:', _error)
     return NextResponse.json(
       { error: 'Failed to update workflow' },
       { status: 500 }
@@ -395,7 +398,7 @@ export async function DELETE(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Workflow deletion error:', error)
+    console.error('Workflow deletion error:', _error)
     return NextResponse.json(
       { error: 'Failed to delete workflow' },
       { status: 500 }

@@ -25,8 +25,8 @@ import {
   RefreshCw,
   Download
 } from 'lucide-react'
-import { 
-  LineChart, 
+import {
+    LineChart, 
   Line, 
   XAxis, 
   YAxis, 

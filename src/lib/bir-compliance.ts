@@ -132,7 +132,7 @@ class BIRComplianceService {
     // Get sales (output VAT)
     const invoices = await db.invoice.findMany({
       where: {
-        createdAt: {
+        created_at: {
           gte: dateFrom,
           lte: dateTo
         }
@@ -145,7 +145,7 @@ class BIRComplianceService {
     // Get purchases (input VAT)  
     const bills = await db.bill.findMany({
       where: {
-        createdAt: {
+        created_at: {
           gte: dateFrom,
           lte: dateTo
         }
@@ -299,7 +299,7 @@ class BIRComplianceService {
     // Revenue calculations
     const invoices = await db.invoice.findMany({
       where: {
-        createdAt: { gte: dateFrom, lte: dateTo }
+        created_at: { gte: dateFrom, lte: dateTo }
       }
     })
 
@@ -315,19 +315,19 @@ class BIRComplianceService {
     // Expense calculations
     const orderCosts = await db.orderCost.findMany({
       where: {
-        createdAt: { gte: dateFrom, lte: dateTo }
+        created_at: { gte: dateFrom, lte: dateTo }
       }
     })
 
     const bills = await db.bill.findMany({
       where: {
-        createdAt: { gte: dateFrom, lte: dateTo }
+        created_at: { gte: dateFrom, lte: dateTo }
       }
     })
 
     const payrolls = await db.payroll.findMany({
       where: {
-        createdAt: { gte: dateFrom, lte: dateTo }
+        created_at: { gte: dateFrom, lte: dateTo }
       }
     })
 
@@ -379,7 +379,7 @@ class BIRComplianceService {
     // Get cash transactions
     const walletTransactions = await db.walletTransaction.findMany({
       where: {
-        createdAt: { gte: dateFrom, lte: dateTo }
+        created_at: { gte: dateFrom, lte: dateTo }
       }
     })
 
@@ -418,7 +418,7 @@ class BIRComplianceService {
     
     const walletTransactions = await db.walletTransaction.findMany({
       where: {
-        createdAt: { lte: asOfDate }
+        created_at: { lte: asOfDate }
       }
     })
 
@@ -427,8 +427,8 @@ class BIRComplianceService {
 
     const pendingInvoices = await db.invoice.findMany({
       where: {
-        status: 'PENDING',
-        createdAt: { lte: asOfDate }
+        status: 'OPEN',
+        created_at: { lte: asOfDate }
       }
     })
 
@@ -439,8 +439,8 @@ class BIRComplianceService {
 
     const pendingBills = await db.bill.findMany({
       where: {
-        status: 'PENDING',
-        createdAt: { lte: asOfDate }
+        status: 'OPEN',
+        created_at: { lte: asOfDate }
       }
     })
 

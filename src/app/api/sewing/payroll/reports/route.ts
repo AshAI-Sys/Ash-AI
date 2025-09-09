@@ -1,10 +1,13 @@
-// Sewing Payroll Reports API for Stage 5 Piece-Rate System
-// Based on CLIENT_UPDATED_PLAN.md specifications
-
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { secureDb } from '@/lib/db-security'
 import { verifyToken } from '@/lib/auth'
 import { InputSanitizer } from '@/lib/input-security'
+// Sewing Payroll Reports API for Stage 5 Piece-Rate System
+// Based on CLIENT_UPDATED_PLAN.md specifications
+
 
 // GET /api/sewing/payroll/reports - Generate payroll reports
 export async function GET(request: NextRequest) {
@@ -62,7 +65,7 @@ export async function GET(request: NextRequest) {
     }
 
   } catch (_error) {
-    console.error('Error generating payroll report:', error)
+    console.error('Error generating payroll report:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to generate payroll report' },
       { status: 500 }

@@ -98,7 +98,7 @@ export async function validateAshleyDesignAsset(input: DesignAnalysisInput): Pro
     generateDesignRecommendations(input, analysis)
 
   } catch (_error) {
-    console.error('Ashley Design AI analysis error:', error)
+    console.error('Ashley Design AI analysis error:', _error)
     analysis.risk = 'AMBER'
     analysis.confidence = 0.4
     analysis.issues.push({
@@ -169,7 +169,7 @@ async function analyzeImageTechnicals(input: DesignAnalysisInput, analysis: Desi
     }
 
   } catch (_error) {
-    console.error('Technical analysis error:', error)
+    console.error('Technical analysis error:', _error)
     analysis.issues.push({
       type: 'METADATA_READ_ERROR',
       severity: 'LOW',
@@ -255,7 +255,7 @@ async function validateScreenPrint(input: DesignAnalysisInput, analysis: DesignA
     }
 
   } catch (_error) {
-    console.error('Screen print validation error:', error)
+    console.error('Screen print validation error:', _error)
   }
 }
 
@@ -320,7 +320,7 @@ async function validateDTF(input: DesignAnalysisInput, analysis: DesignAnalysisR
       })
     }
   } catch (_error) {
-    console.error('DTF validation error:', error)
+    console.error('DTF validation error:', _error)
   }
 }
 
@@ -539,7 +539,7 @@ async function analyzeArtworkQuality(input: DesignAnalysisInput, analysis: Desig
       })
     }
   } catch (_error) {
-    console.error('Artwork quality analysis error:', error)
+    console.error('Artwork quality analysis error:', _error)
   }
 }
 

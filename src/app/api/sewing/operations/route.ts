@@ -1,7 +1,10 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 // Sewing Operations API - Mock Data for Testing
 // Based on CLIENT_UPDATED_PLAN.md specifications
 
-import { NextRequest, NextResponse } from 'next/server'
 
 // Mock sewing operations data
 const mockOperations = [
@@ -80,7 +83,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching sewing operations:', error)
+    console.error('Error fetching sewing operations:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch sewing operations' },
       { status: 500 }
@@ -120,7 +123,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating sewing operation:', error)
+    console.error('Error creating sewing operation:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to create sewing operation' },
       { status: 500 }

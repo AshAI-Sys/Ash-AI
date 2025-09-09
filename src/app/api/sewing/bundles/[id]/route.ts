@@ -1,9 +1,12 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db } from '@/lib/db'
+import { calculateBundleProgress } from '@/lib/sewing-calculations'
 // Individual Sewing Bundle API for Stage 5 Sewing System
 // Based on CLIENT_UPDATED_PLAN.md specifications
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { calculateBundleProgress } from '@/lib/sewing-calculations'
 
 // GET /api/sewing/bundles/[id] - Get specific bundle details
 export async function GET(
@@ -143,7 +146,7 @@ export async function GET(
     })
 
   } catch (_error) {
-    console.error('Error fetching bundle details:', error)
+    console.error('Error fetching bundle details:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch bundle details' },
       { status: 500 }
@@ -288,7 +291,7 @@ export async function POST(
     })
 
   } catch (_error) {
-    console.error('Error updating bundle operation:', error)
+    console.error('Error updating bundle operation:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to update bundle operation' },
       { status: 500 }

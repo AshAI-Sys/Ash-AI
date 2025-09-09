@@ -6,8 +6,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
 import { Role } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 
 const bundleUpdateSchema = z.object({
@@ -227,7 +227,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    console.error('Bundle tracking error:', error)
+    console.error('Bundle tracking error:', _error)
     return NextResponse.json({
       success: false,
       error: 'Failed to update bundle status'
@@ -311,7 +311,7 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Batch bundle update error:', error)
+    console.error('Batch bundle update error:', _error)
     return NextResponse.json({
       success: false,
       error: 'Failed to process batch update'
@@ -390,7 +390,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Get bundle tracking error:', error)
+    console.error('Get bundle tracking error:', _error)
     return NextResponse.json({
       success: false,
       error: 'Failed to retrieve bundle tracking data'
@@ -511,11 +511,11 @@ async function emitBundleEvent(eventType: string, data: any) {
         entity_type: 'cutting_bundle',
         entity_id: data.bundle_id,
         data: data,
-        status: 'PENDING',
+        status: 'OPEN',
         created_at: new Date()
       }
     })
   } catch (_error) {
-    console.error('Failed to emit bundle event:', error)
+    console.error('Failed to emit bundle event:', _error)
   }
 }

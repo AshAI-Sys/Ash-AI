@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 
@@ -101,7 +104,7 @@ export async function GET(
     })
 
   } catch (_error) {
-    console.error('Client fetch error:', error)
+    console.error('Client fetch error:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch client' },
       { status: 500 }
@@ -194,7 +197,7 @@ export async function PUT(
       )
     }
     
-    console.error('Client update error:', error)
+    console.error('Client update error:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to update client' },
       { status: 500 }
@@ -262,7 +265,7 @@ export async function DELETE(
     })
 
   } catch (_error) {
-    console.error('Client deletion error:', error)
+    console.error('Client deletion error:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to delete client' },
       { status: 500 }

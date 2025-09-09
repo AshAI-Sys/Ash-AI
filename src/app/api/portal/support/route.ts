@@ -1,9 +1,12 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db } from '@/lib/db'
+import { validateAshleyAI } from '@/lib/ashley-ai'
 // Client Portal Support API for Stage 12 Client Portal
 // Based on CLIENT_UPDATED_PLAN.md specifications
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { validateAshleyAI } from '@/lib/ashley-ai'
 
 // GET /api/portal/support - Get client support tickets
 export async function GET(request: NextRequest) {
@@ -81,7 +84,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching support tickets:', error)
+    console.error('Error fetching support tickets:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch support tickets' },
       { status: 500 }
@@ -278,7 +281,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating support ticket:', error)
+    console.error('Error creating support ticket:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to create support ticket' },
       { status: 500 }
@@ -467,7 +470,7 @@ export async function PUT(request: NextRequest) {
     }
 
   } catch (_error) {
-    console.error('Error updating support ticket:', error)
+    console.error('Error updating support ticket:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to update support ticket' },
       { status: 500 }

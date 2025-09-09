@@ -136,7 +136,7 @@ export async function verifyToken(request: NextRequest) {
       active: true
     }
   } catch (_error) {
-    console.error('Token verification error:', error)
+    console.error('Token verification error:', _error)
     return null
   }
 }

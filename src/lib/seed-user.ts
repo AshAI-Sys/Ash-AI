@@ -68,7 +68,7 @@ export async function createTestUser() {
 
     return user
   } catch (_error) {
-    console.error('❌ Error creating test user:', error)
-    throw error
+    console.error('❌ Error creating test user:', _error)
+    throw _error
   }
 }

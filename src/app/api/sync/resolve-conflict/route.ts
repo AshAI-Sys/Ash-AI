@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client';
 import { ConflictResolver } from '@/lib/sync/conflict-resolver';
-import { authOptions } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -58,7 +59,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (_error) {
-    console.error('Conflict resolution error:', error);
+    console.error('Conflict resolution error:', _error);
     return NextResponse.json(
       { error: 'Failed to resolve conflict' },
       { status: 500 }
@@ -93,7 +94,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (_error) {
-    console.error('Get conflicts error:', error);
+    console.error('Get conflicts error:', _error);
     return NextResponse.json(
       { error: 'Failed to fetch conflicts' },
       { status: 500 }

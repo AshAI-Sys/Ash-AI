@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { Role } from '@prisma/client'
-import { initializeAshSystem } from '@/lib/ash/init-system'
+import { initializeSystem } from '@/lib/ash/init-system'
 
 /**
  * POST /api/ash/init - Initialize ASH AI system
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('❌ ASH AI System initialization failed:', error)
+    console.error('❌ ASH AI System initialization failed:', _error)
     
     return NextResponse.json({
       success: false,
@@ -98,7 +98,7 @@ export async function GET(_request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error checking system status:', error)
+    console.error('Error checking system status:', _error)
     
     return NextResponse.json({
       error: 'Failed to check system status',

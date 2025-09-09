@@ -1,4 +1,7 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from "@/lib/prisma"
 
 export async function GET(request: NextRequest) {
@@ -30,7 +33,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error("Error fetching vehicles:", error)
+    console.error("Error fetching vehicles:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch vehicles" },
       { status: 500 }
@@ -81,7 +84,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error("Error creating vehicle:", error)
+    console.error("Error creating vehicle:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to create vehicle" },
       { status: 500 }
@@ -142,7 +145,7 @@ export async function PATCH(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error("Error updating vehicle:", error)
+    console.error("Error updating vehicle:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to update vehicle" },
       { status: 500 }
@@ -204,7 +207,7 @@ export async function DELETE(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error("Error deleting vehicle:", error)
+    console.error("Error deleting vehicle:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to delete vehicle" },
       { status: 500 }

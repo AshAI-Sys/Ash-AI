@@ -1,8 +1,11 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db, createAuditLog } from '@/lib/db'
 // Design Revision API
 // Based on CLIENT_UPDATED_PLAN.md specifications
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db, createAuditLog } from '@/lib/db'
 
 interface RouteParams {
   params: Promise<{
@@ -79,7 +82,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           mime_type: design.mime_type,
           color_count: design.color_count,
           print_ready: false, // Reset to false for new version
-          approval_status: 'PENDING'
+          approval_status: 'OPEN'
         }
       })
 
@@ -107,7 +110,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       await db.designApproval.updateMany({
         where: {
           design_asset_id: designId,
-          status: 'PENDING'
+          status: 'OPEN'
         },
         data: {
           status: 'SUPERSEDED'
@@ -145,7 +148,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error processing design revision:', error)
+    console.error('Error processing design revision:', _error)
     return NextResponse.json(
       { error: 'Failed to process revision' },
       { status: 500 }
@@ -199,7 +202,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     })
 
   } catch (_error) {
-    console.error('Error fetching revision history:', error)
+    console.error('Error fetching revision history:', _error)
     return NextResponse.json(
       { error: 'Failed to fetch revision history' },
       { status: 500 }

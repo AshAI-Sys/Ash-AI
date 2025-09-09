@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { TwoFactorAuth } from '@/lib/auth/two-factor';
-import { authOptions } from '@/lib/auth';
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { TwoFactorAuth } from '@/lib/auth/two-factor'
 
 export async function POST(request: NextRequest) {
   try {
@@ -39,7 +40,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (_error) {
-    console.error('2FA verify error:', error);
+    console.error('2FA verify error:', _error);
     return NextResponse.json(
       { error: 'Failed to verify token' },
       { status: 500 }

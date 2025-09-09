@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { EventBus } from '@/lib/ash/event-bus'
 import { randomUUID } from 'crypto'
@@ -112,7 +115,7 @@ export async function POST(
     })
 
   } catch (_error) {
-    console.error('Error sending design approval:', error)
+    console.error('Error sending design approval:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

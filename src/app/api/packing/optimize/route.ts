@@ -1,4 +1,7 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from "@/lib/prisma"
 
 interface CartonType {
@@ -40,7 +43,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Ashley AI Packing Optimization Algorithm
-    const solution = await optimizePackingWithAshley(cartonTypes, items, algorithm)
+    const solution = await optimizePackingWithAshley(cartonTypes, items, "linear")
 
     // Save optimization results
     const optimization = await prisma.packingOptimization.create({
@@ -65,7 +68,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error("Error optimizing packing:", error)
+    console.error("Error optimizing packing:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to optimize packing" },
       { status: 500 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { writeFile, mkdir } from 'fs/promises'
 import { join } from 'path'
 import { existsSync } from 'fs'
@@ -201,7 +202,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error uploading files:', error)
+    console.error('Error uploading files:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -228,7 +229,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching uploaded files:', error)
+    console.error('Error fetching uploaded files:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

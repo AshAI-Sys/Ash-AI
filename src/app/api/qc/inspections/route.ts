@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 
 // GET /api/qc/inspections - Get QC inspections with filtering and analytics
@@ -24,7 +26,7 @@ export async function GET(request: NextRequest) {
         ...(orderId && { orderId }),
         ...(stage && { stage: stage as any }),
         ...(status && { status: status as any }),
-        ...(inspector && { createdBy: inspector })
+        ...(inspector && { created_by: inspector })
       },
       include: {
         order: {
@@ -87,7 +89,7 @@ export async function GET(request: NextRequest) {
           }
         }
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { created_at: 'desc' },
       take: limit,
       skip: offset
     })
@@ -105,7 +107,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching QC inspections:', error)
+    console.error('Error fetching QC inspections:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'
@@ -190,7 +192,7 @@ export async function POST(request: NextRequest) {
         acceptance: aqlPlan.acceptance,
         rejection: aqlPlan.rejection,
         checklistId,
-        createdBy: session.user.id,
+        created_by: session.user.id,
         inspectorNotes: notes
       },
       include: {
@@ -250,7 +252,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating QC inspection:', error)
+    console.error('Error creating QC inspection:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'

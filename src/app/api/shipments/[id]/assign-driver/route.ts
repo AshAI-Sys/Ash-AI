@@ -1,4 +1,7 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from "@/lib/prisma"
 
 export async function POST(
@@ -129,7 +132,7 @@ export async function POST(
     })
 
   } catch (_error) {
-    console.error("Error assigning driver:", error)
+    console.error("Error assigning driver:", _error)
     return NextResponse.json(
       { success: false, error: error instanceof Error ? error.message : "Failed to assign driver" },
       { status: 500 }

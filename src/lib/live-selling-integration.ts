@@ -97,7 +97,7 @@ class ShopeeIntegration {
         fees: 4.50,
         netAmount: 40.50,
         saleDate: new Date(),
-        status: 'PENDING'
+        status: 'OPEN'
       }
     ]
   }
@@ -244,7 +244,7 @@ class LiveSellingIntegrationService {
           totalAmount: sale.totalAmount,
           fees: sale.fees,
           netAmount: sale.netAmount,
-          status: sale.status || 'PENDING',
+          status: sale.status || 'OPEN',
           saleDate: sale.saleDate,
           reconciled: false
         },
@@ -255,7 +255,7 @@ class LiveSellingIntegrationService {
           totalAmount: sale.totalAmount,
           fees: sale.fees,
           netAmount: sale.netAmount,
-          status: sale.status || 'PENDING',
+          status: sale.status || 'OPEN',
           saleDate: sale.saleDate
         }
       })

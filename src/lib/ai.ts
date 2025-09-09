@@ -56,7 +56,7 @@ export interface AIInsight {
   title: string
   description: string
   data: unknown
-  createdAt: string | Date
+  created_at: string | Date
   priority: 'HIGH' | 'MEDIUM' | 'LOW'
 }
 
@@ -87,7 +87,7 @@ class AIService {
         },
         qcRecords: {
           take: 50,
-          orderBy: { createdAt: 'desc' }
+          orderBy: { created_at: 'desc' }
         }
       }
     })
@@ -174,7 +174,7 @@ class AIService {
       include: {
         stockMovements: {
           take: 100,
-          orderBy: { createdAt: 'desc' }
+          orderBy: { created_at: 'desc' }
         },
         usageRecords: {
           take: 50,
@@ -407,7 +407,7 @@ class AIService {
       risks.push('Tight deadline (less than 7 days)')
     }
     
-    const pendingTasks = order.tasks.filter((t: Task) => t.status === 'PENDING')
+    const pendingTasks = order.tasks.filter((t: Task) => t.status === 'OPEN')
     if (pendingTasks.length > 5) {
       risks.push('Many unassigned tasks')
     }
@@ -507,7 +507,7 @@ class AIService {
     // Detect unusual cost patterns
     const recentOrders = await db.order.findMany({
       where: {
-        createdAt: {
+        created_at: {
           gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
         }
       },
@@ -554,7 +554,7 @@ class AIService {
     // Detect quality issues
     const qcRecords = await db.qCRecord.findMany({
       where: {
-        createdAt: {
+        created_at: {
           gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
         }
       },

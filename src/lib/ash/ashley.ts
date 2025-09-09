@@ -145,7 +145,7 @@ export class AshleyAI {
       }
 
     } catch (_error) {
-      console.error('Ashley AI assessment error:', error)
+      console.error('Ashley AI assessment error:', _error)
       assessment.confidence = 0.5
       assessment.insights.push({
         type: 'ANOMALY',
@@ -237,7 +237,7 @@ export class AshleyAI {
         }
       }
     } catch (_error) {
-      console.error('Stock availability check error:', error)
+      console.error('Stock availability check error:', _error)
     }
 
     return issues

@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client';
 import { RoleBasedAccessControl } from './permissions';
-import { authOptions } from '@/lib/auth';
 
 export interface ProtectedRouteConfig {
   resource: string;

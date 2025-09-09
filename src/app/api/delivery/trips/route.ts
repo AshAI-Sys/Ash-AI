@@ -1,10 +1,13 @@
-// Driver Trip Management API for Stage 8 Delivery System
-// Based on CLIENT_UPDATED_PLAN.md specifications
-
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { db } from '@/lib/db'
 import { optimizeRoute } from '@/lib/delivery-calculations'
 import { validateAshleyAI } from '@/lib/ashley-ai'
+// Driver Trip Management API for Stage 8 Delivery System
+// Based on CLIENT_UPDATED_PLAN.md specifications
+
 
 // GET /api/delivery/trips - Get all trips for workspace
 export async function GET(request: NextRequest) {
@@ -79,7 +82,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching trips:', error)
+    console.error('Error fetching trips:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch trips' },
       { status: 500 }
@@ -217,7 +220,7 @@ export async function POST(request: NextRequest) {
                 .find(stop => stop.stop_id === shipment.id)?.estimated_duration_minutes || 30,
               distance_km: optimized_route?.optimized_stops
                 .find(stop => stop.stop_id === shipment.id)?.distance_km || 5,
-              status: 'PENDING'
+              status: 'OPEN'
             }
           })
 
@@ -299,7 +302,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating trip:', error)
+    console.error('Error creating trip:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to create trip' },
       { status: 500 }
@@ -383,7 +386,7 @@ export async function PUT(request: NextRequest) {
       await db.tripStop.updateMany({
         where: {
           trip_id,
-          status: 'PENDING'
+          status: 'OPEN'
         },
         data: {
           status: 'DELIVERED',
@@ -427,7 +430,7 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error updating trip:', error)
+    console.error('Error updating trip:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to update trip' },
       { status: 500 }

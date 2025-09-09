@@ -1,9 +1,12 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db } from '@/lib/db'
+import { validateAshleyAI } from '@/lib/ashley-ai'
 // Individual Carton API for Stage 7 Finishing & Packing System
 // Handles adding/removing units to/from specific cartons
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { validateAshleyAI } from '@/lib/ashley-ai'
 
 // POST /api/packing/cartons/[id] - Add units to carton
 export async function POST(
@@ -249,7 +252,7 @@ export async function POST(
     }
 
   } catch (_error) {
-    console.error('Error modifying carton contents:', error)
+    console.error('Error modifying carton contents:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to modify carton contents' },
       { status: 500 }

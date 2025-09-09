@@ -6,8 +6,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
 import { Role } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 import { validateAshleyForecastingAI } from '@/lib/ashley-ai'
 
@@ -128,7 +128,7 @@ export async function GET(request: NextRequest) {
       }, { status: 400 })
     }
 
-    console.error('Error generating forecast:', error)
+    console.error('Error generating forecast:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to generate forecast' },
       { status: 500 }
@@ -191,7 +191,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error creating custom forecast:', error)
+    console.error('Error creating custom forecast:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to create custom forecast' },
       { status: 500 }

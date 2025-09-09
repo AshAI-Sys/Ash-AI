@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { db, createAuditLog } from '@/lib/db'
 import { generatePONumber } from '@/lib/po-generator'
 import { validateOrderIntake } from '@/lib/ashley-ai'
@@ -40,7 +43,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching orders:', error)
+    console.error('Error fetching orders:', _error)
     return NextResponse.json(
       { error: 'Failed to fetch orders' },
       { status: 500 }
@@ -214,7 +217,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating order:', error)
+    console.error('Error creating order:', _error)
     return NextResponse.json(
       { error: 'Failed to create order' },
       { status: 500 }

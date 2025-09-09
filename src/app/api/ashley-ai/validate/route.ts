@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { ashleyAI } from '@/services/ashley-ai'
 
 // POST /api/ashley-ai/validate - Real-time order validation
@@ -31,7 +34,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error in Ashley AI validation:', error)
+    console.error('Error in Ashley AI validation:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
       advisories: []

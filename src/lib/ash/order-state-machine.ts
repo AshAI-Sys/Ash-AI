@@ -422,7 +422,7 @@ export async function transitionOrderStatus(
     }
 
   } catch (_error) {
-    console.error('Error transitioning order status:', error)
+    console.error('Error transitioning order status:', _error)
     return {
       success: false,
       message: 'Failed to transition order status'
@@ -456,7 +456,7 @@ async function createDesignAssetPlaceholder(orderId: string, userId: string) {
       type: 'MOCKUP',
       file_url: 'placeholder://pending-design',
       file_name: 'pending-design.placeholder',
-      approval_status: 'PENDING'
+      approval_status: 'OPEN'
     }
   })
 }

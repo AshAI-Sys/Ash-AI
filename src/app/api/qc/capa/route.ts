@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 
 // GET /api/qc/capa - Get CAPA tasks with filtering
@@ -75,7 +77,7 @@ export async function GET(request: NextRequest) {
       orderBy: [
         { priority: 'desc' },
         { dueDate: 'asc' },
-        { createdAt: 'desc' }
+        { created_at: 'desc' }
       ],
       take: limit,
       skip: offset
@@ -110,7 +112,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching CAPA tasks:', error)
+    console.error('Error fetching CAPA tasks:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'
@@ -207,7 +209,7 @@ export async function POST(request: NextRequest) {
         assigneeId,
         dueDate: dueDate ? new Date(dueDate) : null,
         priority,
-        createdBy: session.user.id
+        created_by: session.user.id
       },
       include: {
         order: {
@@ -298,7 +300,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating CAPA task:', error)
+    console.error('Error creating CAPA task:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'

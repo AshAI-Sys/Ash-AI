@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 
 // GET /api/qc/defect-codes - Get defect codes with filtering
@@ -34,7 +36,7 @@ export async function GET(request: NextRequest) {
           select: {
             defects: {
               where: {
-                createdAt: {
+                created_at: {
                   gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // Last 30 days
                 }
               }
@@ -70,7 +72,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching defect codes:', error)
+    console.error('Error fetching defect codes:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'
@@ -144,7 +146,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating defect code:', error)
+    console.error('Error creating defect code:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'

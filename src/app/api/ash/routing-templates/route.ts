@@ -6,8 +6,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
 import { Role } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 import { validateAshleyRoutingOptimization } from '@/lib/ash/ashley-ai'
 
@@ -141,7 +141,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching routing templates:', error)
+    console.error('Error fetching routing templates:', _error)
     return NextResponse.json(
       { error: 'Failed to fetch routing templates' },
       { status: 500 }
@@ -281,7 +281,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    console.error('Error creating routing template:', error)
+    console.error('Error creating routing template:', _error)
     return NextResponse.json({
       success: false,
       error: 'Failed to create routing template'

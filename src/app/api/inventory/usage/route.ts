@@ -115,7 +115,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching material usage:', error)
+    console.error('Error fetching material usage:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -285,7 +285,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error recording material usage:', error)
+    console.error('Error recording material usage:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -359,7 +359,7 @@ export async function DELETE(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error deleting usage records:', error)
+    console.error('Error deleting usage records:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

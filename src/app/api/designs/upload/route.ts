@@ -6,8 +6,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
 import { Role } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import { writeFile, mkdir } from 'fs/promises'
 import { join } from 'path'
 import { validateAshleyDesignAsset } from '@/lib/ash/ashley-design-ai'
@@ -300,7 +300,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<DesignUpl
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Design upload error:', error)
+    console.error('Design upload error:', _error)
     return NextResponse.json({
       success: false,
       error: 'Failed to upload design asset'
@@ -319,11 +319,11 @@ async function emitDesignEvent(eventType: string, data: any) {
         entity_type: 'design_asset',
         entity_id: data.asset_id,
         data: data,
-        status: 'PENDING',
+        status: 'OPEN',
         created_at: new Date()
       }
     })
   } catch (_error) {
-    console.error('Failed to emit design event:', error)
+    console.error('Failed to emit design event:', _error)
   }
 }

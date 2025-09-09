@@ -1,9 +1,10 @@
-// My Queue API Route - Role-based task management
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { TaskStatus } from '@prisma/client'
+// My Queue API Route - Role-based task management
 
 export async function GET(request: NextRequest) {
   try {
@@ -100,7 +101,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('My Queue API error:', error)
+    console.error('My Queue API error:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -182,7 +183,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('My Queue batch action error:', error)
+    console.error('My Queue batch action error:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

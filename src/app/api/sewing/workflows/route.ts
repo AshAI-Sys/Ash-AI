@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 
 // GET /api/sewing/workflows - Get parallel workflow configurations
@@ -88,7 +90,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching workflows:', error)
+    console.error('Error fetching workflows:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'
@@ -168,8 +170,8 @@ export async function POST(request: NextRequest) {
         type: optimizationType,
         recommendations: optimization.recommendations,
         estimatedSavings: optimization.estimatedSavings,
-        createdBy: session.user.id,
-        status: 'PENDING'
+        created_by: session.user.id,
+        status: 'OPEN'
       }
     })
 
@@ -203,7 +205,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error optimizing workflow:', error)
+    console.error('Error optimizing workflow:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'

@@ -161,7 +161,7 @@ class RejectPolicyService {
                 billNumber: `REJECT-${rejectRecord.id.slice(-8)}`,
                 vendorId: rejectRecord.vendorId,
                 amount: -rejectRecord.assignedCost, // Negative for deduction
-                status: 'PENDING',
+                status: 'OPEN',
                 notes: `Reject deduction: ${rejectRecord.reason}`
               }
             })
@@ -215,7 +215,7 @@ class RejectPolicyService {
 
   async getRejectAnalytics(dateFrom: Date, dateTo: Date, orderId?: string): Promise<RejectAnalytics> {
     const whereClause: any = {
-      createdAt: {
+      created_at: {
         gte: dateFrom,
         lte: dateTo
       }
@@ -358,12 +358,12 @@ class RejectPolicyService {
 
     const rejects = await db.rejectRecord.findMany({
       where: {
-        createdAt: {
+        created_at: {
           gte: startDate
         }
       },
       orderBy: {
-        createdAt: 'asc'
+        created_at: 'asc'
       }
     })
 
@@ -451,7 +451,7 @@ class RejectPolicyService {
         staff: true,
         vendor: true
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { created_at: 'desc' }
     })
   }
 }

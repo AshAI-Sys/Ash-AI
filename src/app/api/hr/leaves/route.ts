@@ -1,9 +1,12 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db } from '@/lib/db'
+import { validateAshleyAI } from '@/lib/ashley-ai'
 // HR Leave Management API for Stage 10 HR System
 // Based on CLIENT_UPDATED_PLAN.md specifications
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { validateAshleyAI } from '@/lib/ashley-ai'
 
 // GET /api/hr/leaves - Get leave requests
 export async function GET(request: NextRequest) {
@@ -75,7 +78,7 @@ export async function GET(request: NextRequest) {
         },
         summary: {
           days_span,
-          is_pending: request.status === 'PENDING',
+          is_pending: request.status === 'OPEN',
           is_current: new Date() >= request.start_date && new Date() <= request.end_date,
           requires_supervisor_approval: request.days_requested > 3 || request.leave_type === 'EMERGENCY'
         }
@@ -88,7 +91,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching leave requests:', error)
+    console.error('Error fetching leave requests:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch leave requests' },
       { status: 500 }
@@ -149,7 +152,7 @@ export async function POST(request: NextRequest) {
       where: {
         employee_id,
         workspace_id,
-        status: { in: ['PENDING', 'APPROVED'] },
+        status: { in: ['OPEN', 'APPROVED'] },
         OR: [
           {
             start_date: { lte: leave_end },
@@ -225,7 +228,7 @@ export async function POST(request: NextRequest) {
         end_date: leave_end,
         days_requested,
         reason,
-        status: 'PENDING'
+        status: 'OPEN'
       }
     })
 
@@ -259,7 +262,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating leave request:', error)
+    console.error('Error creating leave request:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to create leave request' },
       { status: 500 }
@@ -311,7 +314,7 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    if (existing_request.status !== 'PENDING') {
+    if (existing_request.status !== 'OPEN') {
       return NextResponse.json(
         { error: 'Only pending leave requests can be reviewed' },
         { status: 409 }
@@ -395,7 +398,7 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error reviewing leave request:', error)
+    console.error('Error reviewing leave request:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to review leave request' },
       { status: 500 }

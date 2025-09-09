@@ -34,14 +34,14 @@ export class QueryOptimizer {
         where,
         skip,
         take: limit,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { created_at: 'desc' },
         select: {
           id: true,
           orderNumber: true,
           clientName: true,
           status: true,
           quantity: true,
-          createdAt: true,
+          created_at: true,
           dueDate: true,
           brand: {
             select: {
@@ -105,7 +105,7 @@ export class QueryOptimizer {
         take: limit,
         orderBy: [
           { priority: 'desc' },
-          { createdAt: 'desc' }
+          { created_at: 'desc' }
         ],
         select: {
           id: true,
@@ -114,7 +114,7 @@ export class QueryOptimizer {
           status: true,
           priority: true,
           dueDate: true,
-          createdAt: true,
+          created_at: true,
           assignee: {
             select: {
               id: true,
@@ -274,7 +274,7 @@ export class QueryOptimizer {
     const overdueTasks = await prisma.task.count({
       where: {
         dueDate: { lt: new Date() },
-        status: { in: ['PENDING', 'IN_PROGRESS'] }
+        status: { in: ['OPEN', 'IN_PROGRESS'] }
       }
     });
 
@@ -317,14 +317,14 @@ export class QueryOptimizer {
   private static async getRecentOrders(limit: number) {
     return prisma.order.findMany({
       take: limit,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { created_at: 'desc' },
       select: {
         id: true,
         orderNumber: true,
         clientName: true,
         status: true,
         quantity: true,
-        createdAt: true,
+        created_at: true,
         brand: {
           select: {
             name: true,
@@ -338,7 +338,7 @@ export class QueryOptimizer {
   private static async getUrgentTasks(limit: number) {
     return prisma.task.findMany({
       where: {
-        status: { in: ['PENDING', 'IN_PROGRESS'] },
+        status: { in: ['OPEN', 'IN_PROGRESS'] },
         OR: [
           { dueDate: { lte: new Date(Date.now() + 24 * 60 * 60 * 1000) } }, // Due within 24 hours
           { priority: { gte: 8 } } // High priority
@@ -468,7 +468,7 @@ export class QueryOptimizer {
     return prisma.order.groupBy({
       by: ['status'],
       where: {
-        createdAt: {
+        created_at: {
           gte: dateRange.from,
           lte: dateRange.to
         }
@@ -486,7 +486,7 @@ export class QueryOptimizer {
     return prisma.task.groupBy({
       by: ['taskType', 'status'],
       where: {
-        createdAt: {
+        created_at: {
           gte: dateRange.from,
           lte: dateRange.to
         }
@@ -501,7 +501,7 @@ export class QueryOptimizer {
     return prisma.stockMovement.groupBy({
       by: ['type'],
       where: {
-        createdAt: {
+        created_at: {
           gte: dateRange.from,
           lte: dateRange.to
         }

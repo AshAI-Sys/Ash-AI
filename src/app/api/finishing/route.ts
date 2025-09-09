@@ -1,9 +1,12 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db } from '@/lib/db'
+import { validateAshleyAI } from '@/lib/ashley-ai'
 // Finishing API for Stage 7 Finishing & Packing System
 // Based on CLIENT_UPDATED_PLAN.md specifications
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { validateAshleyAI } from '@/lib/ashley-ai'
 
 // GET /api/finishing - Get finishing runs
 export async function GET(request: NextRequest) {
@@ -65,7 +68,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching finishing runs:', error)
+    console.error('Error fetching finishing runs:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch finishing runs' },
       { status: 500 }
@@ -199,7 +202,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating finishing run:', error)
+    console.error('Error creating finishing run:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to create finishing run' },
       { status: 500 }
@@ -280,7 +283,7 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error updating finishing run:', error)
+    console.error('Error updating finishing run:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to update finishing run' },
       { status: 500 }

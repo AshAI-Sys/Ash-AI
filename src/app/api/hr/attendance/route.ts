@@ -1,9 +1,12 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db } from '@/lib/db'
+import { validateAshleyAI } from '@/lib/ashley-ai'
 // HR Attendance API for Stage 10 HR System
 // Based on CLIENT_UPDATED_PLAN.md specifications
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { validateAshleyAI } from '@/lib/ashley-ai'
 
 // GET /api/hr/attendance - Get attendance records
 export async function GET(request: NextRequest) {
@@ -94,7 +97,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching attendance records:', error)
+    console.error('Error fetching attendance records:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch attendance records' },
       { status: 500 }
@@ -320,7 +323,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error recording attendance:', error)
+    console.error('Error recording attendance:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to record attendance' },
       { status: 500 }

@@ -1,9 +1,12 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db } from '@/lib/db'
+import { validateAshleyAI } from '@/lib/ashley-ai'
 // Individual Employee Management API for Stage 10 HR System
 // Handles employee updates, termination, and detailed information
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { validateAshleyAI } from '@/lib/ashley-ai'
 
 // GET /api/hr/employees/[id] - Get employee details
 export async function GET(
@@ -70,7 +73,7 @@ export async function GET(
       .reduce((sum, pr) => sum + pr.net_pay, 0)
 
     const pending_leaves = employee.leave_requests
-      .filter(lr => lr.status === 'PENDING').length
+      .filter(lr => lr.status === 'OPEN').length
 
     const recent_disciplinary = employee.disciplinary_actions
       .filter(da => new Date(da.incident_date).getTime() > Date.now() - (365 * 24 * 60 * 60 * 1000))
@@ -93,7 +96,7 @@ export async function GET(
     })
 
   } catch (_error) {
-    console.error('Error fetching employee details:', error)
+    console.error('Error fetching employee details:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch employee details' },
       { status: 500 }
@@ -272,7 +275,7 @@ export async function PUT(
     })
 
   } catch (_error) {
-    console.error('Error updating employee:', error)
+    console.error('Error updating employee:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to update employee' },
       { status: 500 }
@@ -382,7 +385,7 @@ export async function DELETE(
     })
 
   } catch (_error) {
-    console.error('Error terminating employee:', error)
+    console.error('Error terminating employee:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to terminate employee' },
       { status: 500 }

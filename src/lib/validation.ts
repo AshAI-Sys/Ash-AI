@@ -1,5 +1,5 @@
-// Input validation and sanitization utilities
 import { Role, PrintMethod } from '@prisma/client'
+// Input validation and sanitization utilities
 
 // Sanitize string input to prevent XSS and injection attacks
 export function sanitizeString(input: string, maxLength: number = 255): string {

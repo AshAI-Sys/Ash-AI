@@ -1,9 +1,12 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db } from '@/lib/db'
+import { validateAshleyAI } from '@/lib/ashley-ai'
 // Maintenance Schedules API for Stage 11 Maintenance System
 // Based on CLIENT_UPDATED_PLAN.md specifications
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { validateAshleyAI } from '@/lib/ashley-ai'
 
 // Helper function to calculate next due date
 function calculateNextDueDate(frequency_type: string, frequency_value: number, last_date: Date): Date {
@@ -122,7 +125,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching maintenance schedules:', error)
+    console.error('Error fetching maintenance schedules:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch maintenance schedules' },
       { status: 500 }
@@ -269,7 +272,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating maintenance schedule:', error)
+    console.error('Error creating maintenance schedule:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to create maintenance schedule' },
       { status: 500 }
@@ -366,7 +369,7 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error updating maintenance schedule:', error)
+    console.error('Error updating maintenance schedule:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to update maintenance schedule' },
       { status: 500 }

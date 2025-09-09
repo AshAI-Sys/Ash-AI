@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 
@@ -34,7 +37,7 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (_error) {
-    console.error('Reconciliation error:', error)
+    console.error('Reconciliation error:', _error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -284,7 +287,7 @@ async function handleReturn(body: any) {
         reason: returnData?.reason || 'Platform return',
         quantity: sale.quantity,
         condition: returnData?.condition || 'USED',
-        status: 'PENDING',
+        status: 'OPEN',
         refundAmount: sale.netAmount
       }
     })
@@ -304,13 +307,13 @@ async function findMatchingOrder(sale: any) {
   const orders = await prisma.order.findMany({
     where: {
       quantity: sale.quantity,
-      createdAt: {
+      created_at: {
         gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // Last 7 days
         lte: new Date()
       }
     },
     orderBy: {
-      createdAt: 'desc'
+      created_at: 'desc'
     }
   })
 
@@ -350,7 +353,7 @@ async function createProductionTasks(orderId: string, printMethod: string) {
         orderId,
         taskType: tasks[i].type,
         description: tasks[i].description,
-        status: 'PENDING',
+        status: 'OPEN',
         priority: i === 0 ? 2 : 1 // First task higher priority
       }
     })

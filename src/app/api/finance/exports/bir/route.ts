@@ -1,9 +1,12 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db } from '@/lib/db'
+import { exportBIRBooksToCSV, type BIRExportData } from '@/lib/finance-calculations'
 // BIR Export API for Philippine Tax Compliance
 // Based on CLIENT_UPDATED_PLAN.md Stage 9 specifications
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { exportBIRBooksToCSV, type BIRExportData } from '@/lib/finance-calculations'
 
 // GET /api/finance/exports/bir - Export BIR-compliant sales and purchase books
 export async function GET(request: NextRequest) {
@@ -163,7 +166,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error generating BIR export:', error)
+    console.error('Error generating BIR export:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to generate BIR export' },
       { status: 500 }
@@ -258,7 +261,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating BIR export:', error)
+    console.error('Error creating BIR export:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to create BIR export' },
       { status: 500 }
@@ -382,7 +385,7 @@ export async function OPTIONS(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching BIR export summary:', error)
+    console.error('Error fetching BIR export summary:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch BIR export summary' },
       { status: 500 }

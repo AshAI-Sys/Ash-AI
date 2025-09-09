@@ -1,10 +1,13 @@
-// 3PL Booking API for Stage 8 Delivery System
-// Based on CLIENT_UPDATED_PLAN.md specifications
-
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { db } from '@/lib/db'
 import { get3PLQuotes, validateCODCollection } from '@/lib/delivery-calculations'
 import { validateAshleyAI } from '@/lib/ashley-ai'
+// 3PL Booking API for Stage 8 Delivery System
+// Based on CLIENT_UPDATED_PLAN.md specifications
+
 
 // GET /api/delivery/3pl - Get 3PL bookings
 export async function GET(request: NextRequest) {
@@ -81,7 +84,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching 3PL bookings:', error)
+    console.error('Error fetching 3PL bookings:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch 3PL bookings' },
       { status: 500 }
@@ -213,7 +216,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating 3PL booking:', error)
+    console.error('Error creating 3PL booking:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to create 3PL booking' },
       { status: 500 }
@@ -319,7 +322,7 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error updating 3PL booking:', error)
+    console.error('Error updating 3PL booking:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to update 3PL booking' },
       { status: 500 }
@@ -389,7 +392,7 @@ export async function OPTIONS(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error getting 3PL quotes:', error)
+    console.error('Error getting 3PL quotes:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to get 3PL quotes' },
       { status: 500 }

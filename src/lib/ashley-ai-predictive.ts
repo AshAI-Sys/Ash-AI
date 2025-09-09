@@ -3,8 +3,7 @@
 
 export interface PredictiveModel {
   id: string
-  name: string
-  model_type: 'DEMAND_FORECAST' | 'CHURN_PREDICTION' | 'QUALITY_PREDICTION' | 'COST_OPTIMIZATION'
+  type: 'DEMAND_FORECAST' | 'CHURN_PREDICTION' | 'QUALITY_PREDICTION' | 'COST_OPTIMIZATION'
   input_features: string[]
   output_variables: string[]
   accuracy_score: number
@@ -366,7 +365,7 @@ export class AshleyPredictiveAI {
         )
         insights.push(...categoryInsights)
       } catch (_error) {
-        console.error(`Error generating ${category} insights:`, error)
+        console.error(`Error generating ${category} insights:`, _error)
       }
     }
 

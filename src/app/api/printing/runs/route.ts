@@ -1,9 +1,12 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db, createAuditLog } from '@/lib/db'
+import { validatePrintingSpecs } from '@/lib/printing-calculations'
 // Print Runs API
 // Based on CLIENT_UPDATED_PLAN.md Stage 4 specifications
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db, createAuditLog } from '@/lib/db'
-import { validatePrintingSpecs } from '@/lib/printing-calculations'
 
 // GET /api/printing/runs - Get print runs (queue view for operators)
 export async function GET(request: NextRequest) {
@@ -96,7 +99,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching print runs:', error)
+    console.error('Error fetching print runs:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch print runs' },
       { status: 500 }
@@ -242,7 +245,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating print run:', error)
+    console.error('Error creating print run:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to create print run' },
       { status: 500 }

@@ -1,8 +1,8 @@
+import crypto from 'crypto'
+import { db } from '@/lib/db'
 // Magic Link Authentication for Client Portal
 // Based on CLIENT_UPDATED_PLAN.md Stage 12 specifications
 
-import crypto from 'crypto'
-import { db } from '@/lib/db'
 
 export interface MagicLinkResult {
   success: boolean
@@ -73,7 +73,7 @@ export async function generateMagicLink(
     }
 
   } catch (_error) {
-    console.error('Error generating magic link:', error)
+    console.error('Error generating magic link:', _error)
     return { success: false, error: 'Failed to generate magic link' }
   }
 }
@@ -131,7 +131,7 @@ export async function validateMagicLink(token: string): Promise<MagicLinkValidat
     }
 
   } catch (_error) {
-    console.error('Error validating magic link:', error)
+    console.error('Error validating magic link:', _error)
     return { valid: false, error: 'Token validation failed' }
   }
 }
@@ -167,7 +167,7 @@ export async function sendMagicLinkEmail(
     return true
 
   } catch (_error) {
-    console.error('Error sending magic link email:', error)
+    console.error('Error sending magic link email:', _error)
     return false
   }
 }

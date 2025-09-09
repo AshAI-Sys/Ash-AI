@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 
 // GET /api/routing-templates - Get all routing templates
@@ -20,7 +22,7 @@ export async function GET(request: NextRequest) {
       where,
       orderBy: [
         { method: 'asc' },
-        { isDefault: 'desc' },
+        { },
         { name: 'asc' }
       ]
     })
@@ -28,7 +30,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ templates })
 
   } catch (_error) {
-    console.error('Error fetching routing templates:', error)
+    console.error('Error fetching routing templates:', _error)
     return NextResponse.json({ 
       error: 'Internal server error' 
     }, { status: 500 })
@@ -73,7 +75,6 @@ export async function POST(request: NextRequest) {
         name: body.name,
         templateKey: body.key,
         method: body.method,
-        isDefault: body.isDefault || false,
         active: body.isActive !== false,
         steps: body.steps // Store steps as JSON
       }
@@ -86,7 +87,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating routing template:', error)
+    console.error('Error creating routing template:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'

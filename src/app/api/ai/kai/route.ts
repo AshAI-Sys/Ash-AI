@@ -1,9 +1,9 @@
-// Kai AI (Industrial Engineer) API Route
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { callAIAgent } from '@/lib/ai/ashley-agents'
 import { Role } from '@prisma/client'
+import { callAIAgent } from '@/lib/ai/ashley-agents'
+// Kai AI (Industrial Engineer) API Route
 
 export async function POST(request: NextRequest) {
   try {

@@ -6,8 +6,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
 import { Role } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 
 const layPlanSchema = z.object({
@@ -216,7 +216,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    console.error('Lay planning error:', error)
+    console.error('Lay planning error:', _error)
     return NextResponse.json({
       success: false,
       error: 'Failed to create lay plan'
@@ -333,7 +333,7 @@ export async function PUT(request: NextRequest) {
       }, { status: 400 })
     }
 
-    console.error('Bundle creation error:', error)
+    console.error('Bundle creation error:', _error)
     return NextResponse.json({
       success: false,
       error: 'Failed to create cutting bundles'
@@ -412,7 +412,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Get lay plans error:', error)
+    console.error('Get lay plans error:', _error)
     return NextResponse.json({
       success: false,
       error: 'Failed to retrieve lay plans'
@@ -501,11 +501,11 @@ async function emitCuttingEvent(eventType: string, data: any) {
         entity_type: 'lay_plan',
         entity_id: data.lay_plan_id,
         data: data,
-        status: 'PENDING',
+        status: 'OPEN',
         created_at: new Date()
       }
     })
   } catch (_error) {
-    console.error('Failed to emit cutting event:', error)
+    console.error('Failed to emit cutting event:', _error)
   }
 }

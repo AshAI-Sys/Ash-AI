@@ -405,14 +405,48 @@ function isNavigationRequest(request) {
 
 // IndexedDB helpers for offline data storage
 async function getOfflineData(store) {
-  // Implementation would use IndexedDB
-  // For now, return empty array
-  return [];
+  try {
+    const db = await openIndexedDB()
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(['sync_queue'], 'readonly')
+      const objectStore = transaction.objectStore('sync_queue')
+      const index = objectStore.index('type')
+      const request = index.getAll(store)
+      
+      request.onsuccess = () => resolve(request.result)
+      request.onerror = () => reject(request.error)
+    })
+  } catch (error) {
+    console.error('[SW] Failed to get offline data:', error)
+    return []
+  }
 }
 
 async function removeOfflineData(store, id) {
-  // Implementation would remove from IndexedDB
-  console.log(`[SW] Removing offline data from ${store}:`, id);
+  try {
+    const db = await openIndexedDB()
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(['sync_queue'], 'readwrite')
+      const objectStore = transaction.objectStore('sync_queue')
+      const request = objectStore.delete(id)
+      
+      request.onsuccess = () => {
+        console.log(`[SW] Removed offline data from ${store}:`, id)
+        resolve()
+      }
+      request.onerror = () => reject(request.error)
+    })
+  } catch (error) {
+    console.error('[SW] Failed to remove offline data:', error)
+  }
+}
+
+function openIndexedDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('ash-ai-offline', 1)
+    request.onsuccess = () => resolve(request.result)
+    request.onerror = () => reject(request.error)
+  })
 }
 
 console.log('[SW] ASH AI Service Worker loaded successfully');

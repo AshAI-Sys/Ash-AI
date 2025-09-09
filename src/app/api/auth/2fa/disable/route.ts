@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { TwoFactorAuth } from '@/lib/auth/two-factor';
 import { authOptions } from '@/lib/auth';
 
@@ -22,7 +22,7 @@ export async function POST() {
     });
 
   } catch (_error) {
-    console.error('2FA disable error:', error);
+    console.error('2FA disable error:', _error);
     return NextResponse.json(
       { error: 'Failed to disable 2FA' },
       { status: 500 }

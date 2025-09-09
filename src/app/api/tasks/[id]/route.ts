@@ -24,7 +24,7 @@ export async function GET(
         order: {
           include: {
             brand: true,
-            createdBy: {
+            created_by: {
               select: { id: true, name: true }
             }
           }
@@ -60,7 +60,7 @@ export async function GET(
     return NextResponse.json({ task })
 
   } catch (_error) {
-    console.error('Error fetching task:', error)
+    console.error('Error fetching task:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -288,7 +288,7 @@ export async function PATCH(
     })
 
   } catch (_error) {
-    console.error('Error updating task:', error)
+    console.error('Error updating task:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -331,7 +331,7 @@ export async function DELETE(
     })
 
   } catch (_error) {
-    console.error('Error deleting task:', error)
+    console.error('Error deleting task:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

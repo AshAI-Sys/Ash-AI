@@ -1,4 +1,7 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from "@/lib/prisma"
 
 export async function GET(request: NextRequest) {
@@ -43,7 +46,7 @@ export async function GET(request: NextRequest) {
         }
       },
       orderBy: {
-        createdAt: "desc"
+        created_at: "desc"
       }
     })
 
@@ -53,7 +56,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error("Error fetching shipments:", error)
+    console.error("Error fetching shipments:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch shipments" },
       { status: 500 }
@@ -212,7 +215,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error("Error creating shipment:", error)
+    console.error("Error creating shipment:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to create shipment" },
       { status: 500 }
@@ -311,7 +314,7 @@ export async function PATCH(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error("Error updating shipment:", error)
+    console.error("Error updating shipment:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to update shipment" },
       { status: 500 }

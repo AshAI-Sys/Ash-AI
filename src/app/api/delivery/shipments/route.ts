@@ -1,10 +1,13 @@
-// Shipment Management API for Stage 8 Delivery System
-// Based on CLIENT_UPDATED_PLAN.md specifications
-
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { db } from '@/lib/db'
 import { get3PLQuotes, recommendDeliveryMethod } from '@/lib/delivery-calculations'
 import { validateAshleyAI } from '@/lib/ashley-ai'
+// Shipment Management API for Stage 8 Delivery System
+// Based on CLIENT_UPDATED_PLAN.md specifications
+
 
 // GET /api/delivery/shipments - Get all shipments for workspace
 export async function GET(request: NextRequest) {
@@ -79,7 +82,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching shipments:', error)
+    console.error('Error fetching shipments:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch shipments' },
       { status: 500 }
@@ -253,7 +256,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating shipment:', error)
+    console.error('Error creating shipment:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to create shipment' },
       { status: 500 }
@@ -350,7 +353,7 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error updating shipment:', error)
+    console.error('Error updating shipment:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to update shipment' },
       { status: 500 }

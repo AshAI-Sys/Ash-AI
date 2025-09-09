@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 
 // GET /api/sewing/piece-rates - Get all piece rates with filtering
@@ -90,8 +92,8 @@ export async function GET(request: NextRequest) {
         rate: rate.rate,
         effectiveFrom: rate.effectiveFrom,
         effectiveTo: rate.effectiveTo,
-        createdBy: rate.creator?.name,
-        createdAt: rate.createdAt
+        created_by: rate.creator?.name,
+        created_at: rate.createdAt
       })
       
       return acc
@@ -106,7 +108,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching piece rates:', error)
+    console.error('Error fetching piece rates:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'
@@ -193,7 +195,7 @@ export async function POST(request: NextRequest) {
         effectiveFrom: fromDate,
         effectiveTo: toDate,
         notes: notes?.trim(),
-        createdBy: session.user.id
+        created_by: session.user.id
       },
       include: {
         operation: {
@@ -227,7 +229,7 @@ export async function POST(request: NextRequest) {
           rate: parseFloat(rate),
           effectiveFrom: fromDate,
           effectiveTo: toDate,
-          createdBy: session.user.name
+          created_by: session.user.name
         }
       }
     })
@@ -239,7 +241,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating piece rate:', error)
+    console.error('Error creating piece rate:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'
@@ -313,7 +315,7 @@ export async function PUT(request: NextRequest) {
               effectiveFrom: fromDate,
               effectiveTo: null,
               notes: notes?.trim(),
-              createdBy: session.user.id
+              created_by: session.user.id
             }
           })
 
@@ -363,7 +365,7 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error bulk updating piece rates:', error)
+    console.error('Error bulk updating piece rates:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'

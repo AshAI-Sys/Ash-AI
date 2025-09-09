@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 
 // POST /api/design/[assetId]/approve - Approve design asset
@@ -87,7 +89,7 @@ export async function POST(
         description: `Design approved for order ${asset.order?.orderNumber}. Ready for production planning.`,
         type: 'PRODUCTION_PLANNING',
         priority: 'MEDIUM',
-        status: 'PENDING',
+        status: 'OPEN',
         assignedToRole: 'PRODUCTION_MANAGER',
         entityType: 'design_asset',
         entityId: assetId,
@@ -139,7 +141,7 @@ export async function POST(
     })
 
   } catch (_error) {
-    console.error('Error approving design:', error)
+    console.error('Error approving design:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'

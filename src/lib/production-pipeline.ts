@@ -1,8 +1,8 @@
+import { prisma } from '@/lib/db'
+import { TaskStatus, Role } from '@prisma/client'
 // Production Pipeline System for Ashley AI
 // Handles different production workflows based on process type
 
-import { prisma } from '@/lib/db'
-import { TaskStatus, Role } from '@prisma/client'
 
 export interface PipelineStep {
   step: string

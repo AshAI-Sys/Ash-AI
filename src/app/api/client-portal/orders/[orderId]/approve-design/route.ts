@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 
 // POST /api/client-portal/orders/[orderId]/approve-design - Approve design for order
@@ -108,7 +110,7 @@ export async function POST(
     })
 
   } catch (_error) {
-    console.error('Error approving design:', error)
+    console.error('Error approving design:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'

@@ -71,6 +71,7 @@ enum TaskStatus {
   IN_PROGRESS
   COMPLETED
   CANCELLED
+  PENDING
 }
 
 enum Role {
@@ -116,6 +117,18 @@ enum PrintMethod {
   DTF
   EMBROIDERY
   NONE
+}
+
+enum SecurityEventType {
+  LOGIN_SUCCESS
+  LOGIN_FAILED
+  ACCOUNT_LOCKED
+  PASSWORD_CHANGED
+  MFA_ENABLED
+  MFA_DISABLED
+  SUSPICIOUS_ACTIVITY
+  SESSION_HIJACK
+  CONFIGURATION_CHANGE
 }
 
 // ==============================================
@@ -187,6 +200,14 @@ model Workspace {
   qc_records          QCRecord[]
   sync_conflicts      SyncConflict[]
   wallets             Wallet[]
+  dashboards          Dashboard[]
+  forecasts           Forecast[]
+  insights            Insight[]
+  kpis                KPI[]
+  anomalies           Anomaly[]
+  reject_records      RejectRecord[]
+  business_insights   BusinessInsight[]
+  kpi_metrics         KPIMetric[]
 
   @@map("workspaces")
 }
@@ -214,6 +235,9 @@ model User {
   // Relations
   workspace        Workspace @relation(fields: [workspace_id], references: [id])
   audit_logs       AuditLog[]
+  assigned_tasks   Task[]    @relation("AssignedUser")
+  created_tasks    Task[]    @relation("CreatedUser")
+  pushSubscriptions PushSubscription[]
   
   @@map("users")
 }
@@ -222,12 +246,14 @@ model User {
 model InventoryItem {
   id           String   @id @default(uuid())
   workspace_id String
+  brand_id     String?
   name         String
   sku          String   @unique
   category     String
   unit         String
   quantity     Decimal  @default(0)
   min_stock    Decimal  @default(0)
+  reorderPoint Decimal  @default(0)
   unit_cost    Decimal  @default(0)
   active       Boolean  @default(true)
   created_at   DateTime @default(now())
@@ -235,6 +261,7 @@ model InventoryItem {
 
   // Relations
   workspace    Workspace @relation(fields: [workspace_id], references: [id])
+  brand        Brand?    @relation(fields: [brand_id], references: [id])
   
   @@map("inventory_items")
 }
@@ -292,6 +319,7 @@ model Brand {
   settings     Json?    // defaults (pricing, routing, message templates)
   commission_rules Json? // Commission rules for sales staff
   return_policies Json?  // Return policies for the brand
+  active       Boolean  @default(true)
   created_at   DateTime @default(now())
 
   // Relations
@@ -301,6 +329,7 @@ model Brand {
   bills               Bill[]
   channel_settlements ChannelSettlement[]
   piece_rates         PieceRate[]
+  inventory_items     InventoryItem[]
 
   @@unique([workspace_id, code])
   @@map("brands")
@@ -2457,7 +2486,7 @@ model Task {
   workspace_id String
   title        String
   description  String?
-  status       String   @default("PENDING") // PENDING/IN_PROGRESS/COMPLETED/CANCELLED
+  status       TaskStatus @default(OPEN)
   assigned_to  String?
   priority     String   @default("MEDIUM") // LOW/MEDIUM/HIGH/URGENT
   due_date     DateTime?
@@ -2467,7 +2496,10 @@ model Task {
 
   // Relations
   workspace    Workspace @relation(fields: [workspace_id], references: [id])
+  assigned_user User?    @relation("AssignedUser", fields: [assigned_to], references: [id])
+  creator      User?     @relation("CreatedUser", fields: [created_by], references: [id])
   time_records TimeRecord[]
+  qc_records   QCRecord[]
 
   @@map("tasks")
 }
@@ -2500,13 +2532,16 @@ model QCRecord {
   inspector_id String?
   batch_id     String?
   status       String   @default("PENDING") // PENDING/PASS/FAIL
+  passed       Boolean  @default(false)
   defects      Json?
   notes        String?
+  task_id      String?
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
 
   // Relations
   workspace    Workspace @relation(fields: [workspace_id], references: [id])
+  task         Task?     @relation(fields: [task_id], references: [id])
 
   @@map("qc_records")
 }
@@ -2518,7 +2553,11 @@ model SyncConflict {
   entity_type  String
   entity_id    String
   conflict_data Json
+  local_value  Json?
+  server_value Json?
   resolved     Boolean  @default(false)
+  resolved_by  String?
+  resolved_at  DateTime?
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
 
@@ -2543,5 +2582,192 @@ model Wallet {
   workspace    Workspace @relation(fields: [workspace_id], references: [id])
 
   @@map("wallets")
+}
+
+// Dashboard model for analytics dashboards
+model Dashboard {
+  id           String   @id @default(uuid())
+  workspace_id String
+  name         String
+  description  String?
+  config       Json?
+  visibility   String   @default("PRIVATE") // PRIVATE/PUBLIC/SHARED
+  created_by   String?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  // Relations
+  workspace    Workspace @relation(fields: [workspace_id], references: [id])
+
+  @@map("dashboards")
+}
+
+// Forecast model for AI-generated forecasts
+model Forecast {
+  id           String   @id @default(uuid())
+  workspace_id String
+  type         String   // REVENUE/INVENTORY/PRODUCTION/CASHFLOW/DEMAND
+  period       String   // MONTHLY/QUARTERLY/YEARLY
+  data         Json
+  algorithm    String?
+  accuracy     Float?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  // Relations
+  workspace    Workspace @relation(fields: [workspace_id], references: [id])
+
+  @@map("forecasts")
+}
+
+// Insight model for analytics insights
+model Insight {
+  id           String   @id @default(uuid())
+  workspace_id String
+  type         String
+  title        String
+  description  String
+  data         Json?
+  priority     String   @default("MEDIUM") // LOW/MEDIUM/HIGH/CRITICAL
+  status       String   @default("ACTIVE") // ACTIVE/ACKNOWLEDGED/DISMISSED
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  // Relations
+  workspace    Workspace @relation(fields: [workspace_id], references: [id])
+
+  @@map("insights")
+}
+
+// KPI model for key performance indicators
+model KPI {
+  id           String   @id @default(uuid())
+  workspace_id String
+  name         String
+  metric_type  String
+  current_value Float?
+  target_value Float?
+  unit         String?
+  period       String   @default("MONTHLY") // DAILY/WEEKLY/MONTHLY/QUARTERLY/YEARLY
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  // Relations
+  workspace    Workspace @relation(fields: [workspace_id], references: [id])
+
+  @@map("kpis")
+}
+
+// Anomaly model for anomaly detection
+model Anomaly {
+  id           String   @id @default(uuid())
+  workspace_id String
+  type         String
+  entity_type  String?
+  entity_id    String?
+  description  String
+  severity     String   @default("MEDIUM") // LOW/MEDIUM/HIGH/CRITICAL
+  data         Json?
+  status       String   @default("DETECTED") // DETECTED/INVESTIGATING/RESOLVED/DISMISSED
+  detected_at  DateTime @default(now())
+  resolved_at  DateTime?
+
+  // Relations
+  workspace    Workspace @relation(fields: [workspace_id], references: [id])
+
+  @@map("anomalies")
+}
+
+// Reject Record model for reject tracking
+model RejectRecord {
+  id           String   @id @default(uuid())
+  workspace_id String
+  order_id     String?
+  reject_type  String
+  quantity     Int
+  reason       String?
+  cost_impact  Float?
+  responsible_stage String?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  // Relations
+  workspace    Workspace @relation(fields: [workspace_id], references: [id])
+
+  @@map("reject_records")
+}
+
+// Security Event model for security monitoring
+model SecurityEvent {
+  id           String            @id @default(uuid())
+  workspace_id String?
+  event_type   SecurityEventType
+  user_id      String?
+  ip_address   String?
+  user_agent   String?
+  details      Json?
+  severity     String            @default("INFO") // INFO/WARNING/ERROR/CRITICAL
+  created_at   DateTime          @default(now())
+
+  @@map("security_events")
+}
+
+// Business Insight model for analytics insights
+model BusinessInsight {
+  id           String   @id @default(uuid())
+  workspace_id String
+  category     String?
+  type         String
+  title        String
+  description  String
+  impact       String?
+  status       String   @default("ACTIVE") // ACTIVE/ACKNOWLEDGED/DISMISSED
+  assigned_to  String?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  // Relations
+  workspace    Workspace @relation(fields: [workspace_id], references: [id])
+
+  @@map("business_insights")
+}
+
+// KPI Metric model for key performance indicators
+model KPIMetric {
+  id           String   @id @default(uuid())
+  workspace_id String
+  name         String
+  metric_type  String
+  current_value Float?
+  target_value Float?
+  unit         String?
+  period       String   @default("MONTHLY") // DAILY/WEEKLY/MONTHLY/QUARTERLY/YEARLY
+  isActive     Boolean  @default(true)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  // Relations
+  workspace    Workspace @relation(fields: [workspace_id], references: [id])
+
+  @@map("kpi_metrics")
+}
+
+// Push Subscription model for PWA notifications
+model PushSubscription {
+  id         String   @id @default(uuid())
+  userId     String
+  endpoint   String
+  p256dhKey  String
+  authKey    String
+  userAgent  String?
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  lastUsed   DateTime @default(now())
+
+  // Relations
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, endpoint])
+  @@map("push_subscriptions")
 }
 

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
 import { Role } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 
 // GET /api/inventory/[id] - Get specific inventory item with history
 export async function GET(
@@ -22,7 +22,7 @@ export async function GET(
           select: { id: true, name: true, code: true }
         },
         stockMovements: {
-          orderBy: { createdAt: 'desc' },
+          orderBy: { created_at: 'desc' },
           take: 50
         },
         usageRecords: {
@@ -35,14 +35,14 @@ export async function GET(
               select: {
                 poNumber: true,
                 status: true,
-                createdAt: true,
+                created_at: true,
                 vendor: {
                   select: { name: true }
                 }
               }
             }
           },
-          orderBy: { purchaseOrder: { createdAt: 'desc' } },
+          orderBy: { purchaseOrder: { created_at: 'desc' } },
           take: 10
         }
       }
@@ -91,7 +91,7 @@ export async function GET(
     })
 
   } catch (_error) {
-    console.error('Error fetching inventory item:', error)
+    console.error('Error fetching inventory item:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -179,7 +179,7 @@ export async function PATCH(
     })
 
   } catch (_error) {
-    console.error('Error updating inventory item:', error)
+    console.error('Error updating inventory item:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -245,7 +245,7 @@ export async function DELETE(
     })
 
   } catch (_error) {
-    console.error('Error deleting inventory item:', error)
+    console.error('Error deleting inventory item:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

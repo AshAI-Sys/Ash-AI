@@ -216,7 +216,7 @@ export async function POST(
     })
 
   } catch (_error) {
-    console.error('Error completing QC inspection:', error)
+    console.error('Error completing QC inspection:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -249,7 +249,7 @@ export async function GET(
         order: {
           include: {
             brand: true,
-            createdBy: {
+            created_by: {
               select: { id: true, name: true }
             }
           }
@@ -263,7 +263,7 @@ export async function GET(
               select: { id: true, name: true }
             }
           },
-          orderBy: { createdAt: 'desc' }
+          orderBy: { created_at: 'desc' }
         }
       }
     })
@@ -285,7 +285,7 @@ export async function GET(
     })
 
   } catch (_error) {
-    console.error('Error fetching QC details:', error)
+    console.error('Error fetching QC details:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

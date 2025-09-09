@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 
 // GET /api/sewing/operations/[operationId] - Get specific operation details
@@ -50,7 +52,7 @@ export async function GET(
                 select: { orderNumber: true }
               }
             },
-            orderBy: { createdAt: 'desc' },
+            orderBy: { created_at: 'desc' },
             take: 50
           }
         }),
@@ -61,8 +63,8 @@ export async function GET(
               rate: true,
               effectiveFrom: true,
               effectiveTo: true,
-              createdBy: true,
-              createdAt: true,
+              created_by: true,
+              created_at: true,
               creator: {
                 select: { name: true }
               }
@@ -91,7 +93,7 @@ export async function GET(
     })
 
   } catch (_error) {
-    console.error('Error fetching sewing operation:', error)
+    console.error('Error fetching sewing operation:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'
@@ -178,7 +180,7 @@ export async function PUT(
     })
 
   } catch (_error) {
-    console.error('Error updating sewing operation:', error)
+    console.error('Error updating sewing operation:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'
@@ -250,7 +252,7 @@ export async function DELETE(
     })
 
   } catch (_error) {
-    console.error('Error deleting sewing operation:', error)
+    console.error('Error deleting sewing operation:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'

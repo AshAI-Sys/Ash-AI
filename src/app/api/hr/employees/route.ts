@@ -1,9 +1,12 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db } from '@/lib/db'
+import { validateAshleyAI } from '@/lib/ashley-ai'
 // HR Employees API for Stage 10 HR System
 // Based on CLIENT_UPDATED_PLAN.md specifications
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { validateAshleyAI } from '@/lib/ashley-ai'
 
 // GET /api/hr/employees - Get employees
 export async function GET(request: NextRequest) {
@@ -82,7 +85,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching employees:', error)
+    console.error('Error fetching employees:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch employees' },
       { status: 500 }
@@ -256,7 +259,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating employee:', error)
+    console.error('Error creating employee:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to create employee' },
       { status: 500 }

@@ -29,7 +29,7 @@ export async function GET(
     const [movements, total] = await Promise.all([
       prisma.stockMovement.findMany({
         where,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { created_at: 'desc' },
         skip: (page - 1) * limit,
         take: limit
       }),
@@ -47,7 +47,7 @@ export async function GET(
     })
 
   } catch (_error) {
-    console.error('Error fetching stock movements:', error)
+    console.error('Error fetching stock movements:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -211,7 +211,7 @@ export async function POST(
     })
 
   } catch (_error) {
-    console.error('Error recording stock movement:', error)
+    console.error('Error recording stock movement:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

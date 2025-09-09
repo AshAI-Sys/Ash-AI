@@ -4,6 +4,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 import bcrypt from 'bcryptjs'
@@ -173,7 +176,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    console.error('Client portal login error:', error)
+    console.error('Client portal login error:', _error)
     return NextResponse.json({
       success: false,
       error: 'Login failed'
@@ -219,7 +222,7 @@ export async function DELETE(request: NextRequest) {
     return response
 
   } catch (_error) {
-    console.error('Client portal logout error:', error)
+    console.error('Client portal logout error:', _error)
     return NextResponse.json({
       success: false,
       error: 'Logout failed'
@@ -298,7 +301,7 @@ export async function GET(request: NextRequest) {
       }, { status: 401 })
     }
 
-    console.error('Session verification error:', error)
+    console.error('Session verification error:', _error)
     return NextResponse.json({
       success: false,
       error: 'Session verification failed'
@@ -326,6 +329,6 @@ async function logSecurityEvent(event: string, clientId: string, metadata: any) 
       }
     })
   } catch (_error) {
-    console.error('Failed to log security event:', error)
+    console.error('Failed to log security event:', _error)
   }
 }

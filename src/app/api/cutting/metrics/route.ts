@@ -1,8 +1,11 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db } from '@/lib/db'
 // Cutting Metrics API for Stage 3 Cutting System
 // Based on CLIENT_UPDATED_PLAN.md specifications
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
 
 // GET /api/cutting/metrics - Get cutting performance metrics
 export async function GET(request: NextRequest) {
@@ -78,7 +81,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching cutting metrics:', error)
+    console.error('Error fetching cutting metrics:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch cutting metrics' },
       { status: 500 }
@@ -217,7 +220,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating cutting metrics:', error)
+    console.error('Error creating cutting metrics:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to create cutting metrics' },
       { status: 500 }
@@ -352,7 +355,7 @@ export async function OPTIONS(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching cutting dashboard:', error)
+    console.error('Error fetching cutting dashboard:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch cutting dashboard' },
       { status: 500 }

@@ -112,7 +112,7 @@ export async function validateOrderIntake(data: OrderIntakeData): Promise<Ashley
     return assessment
 
   } catch (_error) {
-    console.error('Ashley AI Error:', error)
+    console.error('Ashley AI Error:', _error)
     
     return {
       risk: 'AMBER',
@@ -474,7 +474,7 @@ export async function validateAshleyRoutingOptimization(input: RoutingOptimizati
     result.parallelOpportunities = identifyParallelOpportunities(input.steps)
 
   } catch (_error) {
-    console.error('Routing optimization error:', error)
+    console.error('Routing optimization error:', _error)
     result.bottlenecks.push({
       step: 'ANALYSIS',
       workcenter: 'SYSTEM',
@@ -726,6 +726,6 @@ async function logAshleyDecision(functionName: string, input: any, output: any) 
       }
     })
   } catch (_error) {
-    console.error('Failed to log Ashley decision:', error)
+    console.error('Failed to log Ashley decision:', _error)
   }
 }

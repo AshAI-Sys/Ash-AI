@@ -1,8 +1,11 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db, createAuditLog } from '@/lib/db'
 // Payment Allocation API
 // Based on CLIENT_UPDATED_PLAN.md Stage 9 specifications
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db, createAuditLog } from '@/lib/db'
 
 interface RouteParams {
   params: Promise<{
@@ -199,7 +202,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     })
 
   } catch (_error) {
-    console.error('Error allocating payment:', error)
+    console.error('Error allocating payment:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to allocate payment' },
       { status: 500 }
@@ -277,7 +280,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     })
 
   } catch (_error) {
-    console.error('Error fetching payment allocation details:', error)
+    console.error('Error fetching payment allocation details:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch payment details' },
       { status: 500 }

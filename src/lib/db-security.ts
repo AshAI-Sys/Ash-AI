@@ -137,7 +137,7 @@ export class SecureDatabase {
 
       return result
     } catch (_error) {
-      console.error(`[DB_ERROR] Database operation failed:`, error)
+      console.error(`[DB_ERROR] Database operation failed:`, _error)
       throw new Error('Database operation failed')
     }
   }
@@ -263,7 +263,7 @@ export class DataEncryption {
         try {
           result[field] = this.decrypt(result[field])
         } catch (_error) {
-          console.error(`Failed to decrypt field ${field}:`, error)
+          console.error(`Failed to decrypt field ${field}:`, _error)
           result[field] = '[ENCRYPTED]'
         }
       }

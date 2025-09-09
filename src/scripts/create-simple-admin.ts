@@ -22,12 +22,11 @@ async function createTestUser() {
 
     // Create or get default workspace
     const workspace = await db.workspace.upsert({
-      where: { name: 'Default Workspace' },
+      where: { id: 'default' },
       update: {},
       create: {
-        name: 'Default Workspace',
-        slug: 'default',
-        owner_email: 'admin@ashui.com'
+        id: 'default',
+        name: 'Default Workspace'
       }
     })
 

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 
 interface DesignData {
   palette?: Array<string>;
@@ -88,7 +90,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error in Ashley AI design analysis:', error)
+    console.error('Error in Ashley AI design analysis:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
       analysis: getDefaultAnalysis()

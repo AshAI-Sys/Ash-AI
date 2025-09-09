@@ -20,7 +20,7 @@ import {
   Area,
   AreaChart
 } from 'recharts'
-import { 
+  import {
   Activity,
   TrendingUp,
   AlertTriangle,

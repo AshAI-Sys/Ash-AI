@@ -1,4 +1,7 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from "@/lib/prisma"
 
 export async function GET(request: NextRequest) {
@@ -50,7 +53,7 @@ export async function GET(request: NextRequest) {
         }
       },
       orderBy: {
-        createdAt: "desc"
+        created_at: "desc"
       }
     })
 
@@ -60,7 +63,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error("Error fetching cartons:", error)
+    console.error("Error fetching cartons:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch cartons" },
       { status: 500 }
@@ -173,7 +176,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error("Error creating carton:", error)
+    console.error("Error creating carton:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to create carton" },
       { status: 500 }
@@ -273,7 +276,7 @@ export async function PATCH(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error("Error updating carton:", error)
+    console.error("Error updating carton:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to update carton" },
       { status: 500 }

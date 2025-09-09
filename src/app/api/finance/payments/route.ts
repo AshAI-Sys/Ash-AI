@@ -1,8 +1,11 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db, createAuditLog } from '@/lib/db'
 // Finance Payments API
 // Based on CLIENT_UPDATED_PLAN.md Stage 9 specifications
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db, createAuditLog } from '@/lib/db'
 
 // GET /api/finance/payments - Get payments with filtering
 export async function GET(request: NextRequest) {
@@ -76,7 +79,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching payments:', error)
+    console.error('Error fetching payments:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch payments' },
       { status: 500 }
@@ -166,7 +169,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error recording payment:', error)
+    console.error('Error recording payment:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to record payment' },
       { status: 500 }

@@ -4,6 +4,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import jwt from 'jsonwebtoken'
 
@@ -213,7 +216,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
     }
 
-    console.error('Client orders error:', error)
+    console.error('Client orders error:', _error)
     return NextResponse.json({ 
       success: false,
       error: 'Failed to load orders' 

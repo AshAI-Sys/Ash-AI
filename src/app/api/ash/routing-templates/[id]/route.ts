@@ -6,8 +6,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
 import { Role } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 import { validateAshleyRoutingOptimization } from '@/lib/ash/ashley-ai'
 
@@ -99,7 +99,7 @@ export async function GET(
           category: template.category
         })
       } catch (_error) {
-        console.error('Error analyzing template:', error)
+        console.error('Error analyzing template:', _error)
       }
     }
 
@@ -129,7 +129,7 @@ export async function GET(
     })
 
   } catch (_error) {
-    console.error('Error fetching routing template:', error)
+    console.error('Error fetching routing template:', _error)
     return NextResponse.json(
       { error: 'Failed to fetch routing template' },
       { status: 500 }
@@ -347,7 +347,7 @@ export async function PATCH(
       }, { status: 400 })
     }
 
-    console.error('Error updating routing template:', error)
+    console.error('Error updating routing template:', _error)
     return NextResponse.json({
       success: false,
       error: 'Failed to update routing template'
@@ -437,7 +437,7 @@ export async function DELETE(
     })
 
   } catch (_error) {
-    console.error('Error deleting routing template:', error)
+    console.error('Error deleting routing template:', _error)
     return NextResponse.json({
       success: false,
       error: 'Failed to delete routing template'

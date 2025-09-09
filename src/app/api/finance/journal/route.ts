@@ -1,4 +1,7 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from "@/lib/prisma"
 
 export async function GET(request: NextRequest) {
@@ -62,7 +65,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error("Error fetching journal entries:", error)
+    console.error("Error fetching journal entries:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch journal entries" },
       { status: 500 }
@@ -160,7 +163,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error("Error creating journal entry:", error)
+    console.error("Error creating journal entry:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to create journal entry" },
       { status: 500 }

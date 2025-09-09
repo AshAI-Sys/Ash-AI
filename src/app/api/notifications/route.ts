@@ -4,6 +4,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { secureDb } from '@/lib/db-security'
 import { verifyToken } from '@/lib/auth'
 import { InputSanitizer } from '@/lib/input-security'
@@ -168,7 +171,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Notification fetch error:', error)
+    console.error('Notification fetch error:', _error)
     return NextResponse.json(
       { error: 'Failed to fetch notifications' },
       { status: 500 }
@@ -220,7 +223,7 @@ export async function POST(request: NextRequest) {
         action_url: notificationData.action_url,
         priority: notificationData.priority,
         created_by: user.id,
-        status: notificationData.scheduled_for ? 'SCHEDULED' : 'PENDING'
+        status: notificationData.scheduled_for ? 'SCHEDULED' : 'OPEN'
       }
     })
 
@@ -251,7 +254,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Notification creation error:', error)
+    console.error('Notification creation error:', _error)
     return NextResponse.json(
       { error: 'Failed to create notification' },
       { status: 500 }
@@ -327,7 +330,7 @@ export async function PUT(request: NextRequest) {
     }
 
   } catch (_error) {
-    console.error('Notification update error:', error)
+    console.error('Notification update error:', _error)
     return NextResponse.json(
       { error: 'Failed to update notification' },
       { status: 500 }
@@ -387,7 +390,7 @@ export async function PATCH(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Notification preferences error:', error)
+    console.error('Notification preferences error:', _error)
     return NextResponse.json(
       { error: 'Failed to update notification preferences' },
       { status: 500 }
@@ -410,7 +413,7 @@ async function deliverNotification(notification: any) {
         try {
           await deliverThroughChannel(notification, recipient, channel)
         } catch (_error) {
-          console.error(`Failed to deliver notification ${notification.id} to ${recipient.id} via ${channel}:`, error)
+          console.error(`Failed to deliver notification ${notification.id} to ${recipient.id} via ${channel}:`, _error)
         }
       }
     }
@@ -425,7 +428,7 @@ async function deliverNotification(notification: any) {
     })
 
   } catch (_error) {
-    console.error(`Failed to deliver notification ${notification.id}:`, error)
+    console.error(`Failed to deliver notification ${notification.id}:`, _error)
     
     // Update status to failed
     await secureDb.getPrisma().notification.update({

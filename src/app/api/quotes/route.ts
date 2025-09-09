@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 
@@ -59,7 +62,7 @@ export async function POST(request: NextRequest) {
         orderId: order.id,
         taskType: 'QUOTE_FOLLOW_UP',
         description: `Follow up on quote request from ${validatedData.clientName} - ${validatedData.apparelType} (${validatedData.quantity} pieces)`,
-        status: 'PENDING',
+        status: 'OPEN',
         priority: 1
       }
     })
@@ -86,7 +89,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Quote submission error:', error)
+    console.error('Quote submission error:', _error)
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -135,7 +138,7 @@ export async function GET() {
         client: true
       },
       orderBy: {
-        createdAt: 'desc'
+        created_at: 'desc'
       },
       take: 10
     })
@@ -146,7 +149,7 @@ export async function GET() {
     })
 
   } catch (_error) {
-    console.error('Get quotes error:', error)
+    console.error('Get quotes error:', _error)
     return NextResponse.json(
       { 
         success: false, 

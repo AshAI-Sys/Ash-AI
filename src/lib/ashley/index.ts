@@ -1,8 +1,8 @@
-// Ashley AI - The Intelligent Assistant for ASH AI System
-
 import { OpenAI } from 'openai';
 import { ASHLEY_CONFIG, ASHLEY_EVENTS, ASHLEY_THRESHOLDS } from '../constants';
 import { db } from '../db';
+// Ashley AI - The Intelligent Assistant for ASH AI System
+
 
 // Initialize OpenAI client
 const openai = new OpenAI({
@@ -75,7 +75,7 @@ export class AshleyAI {
 
       return analysis;
     } catch (_error) {
-      console.error('Ashley order intake analysis failed:', error);
+      console.error('Ashley order intake analysis failed:', _error);
       return {
         ...analysis,
         canFulfill: false,
@@ -117,7 +117,7 @@ export class AshleyAI {
 
       return analysis;
     } catch (_error) {
-      console.error('Ashley design analysis failed:', error);
+      console.error('Ashley design analysis failed:', _error);
       return {
         ...analysis,
         result: 'FAIL' as const,
@@ -154,7 +154,7 @@ export class AshleyAI {
 
       return optimization;
     } catch (_error) {
-      console.error('Ashley cutting optimization failed:', error);
+      console.error('Ashley cutting optimization failed:', _error);
       throw new Error('Cutting optimization failed');
     }
   }
@@ -173,7 +173,7 @@ export class AshleyAI {
       const qcData = await db.qcInspection.findMany({
         where: {
           ...(params.brandId && { order: { brandId: params.brandId } }),
-          createdAt: {
+          created_at: {
             gte: this.getTimeframeStart(params.timeframe),
           },
         },
@@ -215,7 +215,7 @@ export class AshleyAI {
 
       return analysis;
     } catch (_error) {
-      console.error('Ashley quality analysis failed:', error);
+      console.error('Ashley quality analysis failed:', _error);
       throw new Error('Quality analysis failed');
     }
   }
@@ -266,7 +266,7 @@ export class AshleyAI {
 
       return recommendation;
     } catch (_error) {
-      console.error('Ashley reprint recommendation failed:', error);
+      console.error('Ashley reprint recommendation failed:', _error);
       throw new Error('Reprint recommendation failed');
     }
   }
@@ -329,7 +329,7 @@ export class AshleyAI {
         suggestions.push(...aiSuggestions.slice(0, 3));
       }
     } catch (_error) {
-      console.error('AI suggestion generation failed:', error);
+      console.error('AI suggestion generation failed:', _error);
     }
 
     return suggestions;
@@ -389,7 +389,7 @@ export class AshleyAI {
 
       return response.choices[0]?.message?.content?.split('\n').filter(s => s.trim()).slice(0, 3) || [];
     } catch (_error) {
-      console.error('AI quality suggestion generation failed:', error);
+      console.error('AI quality suggestion generation failed:', _error);
       return ['Review operator training programs', 'Implement additional quality checkpoints'];
     }
   }

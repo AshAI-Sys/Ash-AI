@@ -1,8 +1,11 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db, createAuditLog } from '@/lib/db'
 // Design Approval API
 // Based on CLIENT_UPDATED_PLAN.md specifications
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db, createAuditLog } from '@/lib/db'
 
 interface RouteParams {
   params: Promise<{
@@ -147,7 +150,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     })
 
   } catch (_error) {
-    console.error('Error processing design approval:', error)
+    console.error('Error processing design approval:', _error)
     return NextResponse.json(
       { error: 'Failed to process approval' },
       { status: 500 }
@@ -201,7 +204,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     })
 
   } catch (_error) {
-    console.error('Error fetching approval status:', error)
+    console.error('Error fetching approval status:', _error)
     return NextResponse.json(
       { error: 'Failed to fetch approval status' },
       { status: 500 }

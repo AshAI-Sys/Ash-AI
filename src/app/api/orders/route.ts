@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 
@@ -163,7 +166,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Order fetch error:', error)
+    console.error('Order fetch error:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch orders' },
       { status: 500 }
@@ -306,7 +309,7 @@ export async function POST(request: NextRequest) {
         },
         include: {
           brand: true,
-          createdBy: {
+          created_by: {
             select: { id: true, name: true, email: true }
           }
         }
@@ -336,7 +339,7 @@ export async function POST(request: NextRequest) {
               assignedTo: assignee?.id,
               taskType: taskInfo.taskType,
               description: taskInfo.description,
-              status: taskInfo.status === 'BLOCKED' ? 'PENDING' : 'PENDING', // Start with first task as PENDING
+              status: taskInfo.status === 'BLOCKED' ? 'OPEN' : 'OPEN', // Start with first task as PENDING
               priority: taskInfo.priority,
               dueDate: taskInfo.dueDate
             }
@@ -361,7 +364,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating order:', error)
+    console.error('Error creating order:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

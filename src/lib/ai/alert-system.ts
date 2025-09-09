@@ -1,8 +1,8 @@
+import { prisma } from '@/lib/db'
+import { createAgent } from './ashley-agents'
 // Ashley AI Alert System
 // Comprehensive alert rules and management for the apparel system
 
-import { prisma } from '@/lib/db'
-import { createAgent } from './ashley-agents'
 
 export type AlertSeverity = 'P1' | 'P2' | 'P3'
 export type AlertCategory = 'PRODUCTION' | 'FINANCE' | 'INVENTORY' | 'HR' | 'DATA'
@@ -48,7 +48,7 @@ export const ALERT_RULES: AlertRule[] = [
         include: {
           tasks: {
             where: {
-              status: { in: ['PENDING', 'IN_PROGRESS'] }
+              status: { in: ['OPEN', 'IN_PROGRESS'] }
             }
           }
         }
@@ -348,7 +348,7 @@ export class AlertEngine {
           alerts.push(alert)
         }
       } catch (_error) {
-        console.error(`Error processing alert rule ${rule.id}:`, error)
+        console.error(`Error processing alert rule ${rule.id}:`, _error)
       }
     }
 
@@ -401,7 +401,7 @@ export class AlertEngine {
       },
       include: {
         tasks: {
-          where: { status: { in: ['PENDING', 'IN_PROGRESS'] } }
+          where: { status: { in: ['OPEN', 'IN_PROGRESS'] } }
         }
       }
     })

@@ -1,7 +1,7 @@
-// Security Validation and Sanitization Library
 import { z } from 'zod'
 import DOMPurify from 'dompurify'
 import { JSDOM } from 'jsdom'
+// Security Validation and Sanitization Library
 
 // Initialize DOMPurify for server-side
 const window = new JSDOM('').window

@@ -6,8 +6,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
 import { Role } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 
 /**
  * GET /api/ash/orders/[id] - Get detailed order information
@@ -169,7 +169,7 @@ export async function GET(
     })
 
   } catch (_error) {
-    console.error('Error fetching order details:', error)
+    console.error('Error fetching order details:', _error)
     return NextResponse.json(
       { error: 'Failed to fetch order details' },
       { status: 500 }
@@ -241,7 +241,7 @@ export async function PATCH(
     })
 
   } catch (_error) {
-    console.error('Error updating order:', error)
+    console.error('Error updating order:', _error)
     return NextResponse.json(
       { error: 'Failed to update order' },
       { status: 500 }

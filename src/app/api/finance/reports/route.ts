@@ -1,4 +1,7 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from "@/lib/prisma"
 
 export async function GET(request: NextRequest) {
@@ -44,7 +47,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error("Error fetching financial reports:", error)
+    console.error("Error fetching financial reports:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch reports" },
       { status: 500 }
@@ -130,7 +133,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error("Error generating report:", error)
+    console.error("Error generating report:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to generate report" },
       { status: 500 }
@@ -340,7 +343,7 @@ async function generateTaxSummaryReport(period: string) {
 
   const taxRecords = await prisma.taxRecord.findMany({
     where: {
-      createdAt: {
+      created_at: {
         gte: startDate,
         lte: endDate
       }

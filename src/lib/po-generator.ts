@@ -1,8 +1,8 @@
+import { db } from './db';
 // PO Number Generation Utility
 // Based on CLIENT_UPDATED_PLAN.md: PO = {BRANDCODE}-{YYYY}-{zero-pad seq}
 // Sequence is per brand per year (safe via DB transaction)
 
-import { db } from './db';
 
 export interface PONumberResult {
   po_number: string;

@@ -101,7 +101,6 @@ export class RoutingTemplateService {
         templateKey: 'SILK_OPTION_A',
         name: 'Silkscreen Standard (Cut → Print → Sew)',
         method: PrintMethod.SILKSCREEN,
-        isDefault: true,
         steps: [
           {
             name: 'Cutting',
@@ -156,7 +155,6 @@ export class RoutingTemplateService {
         templateKey: 'SILK_OPTION_B',
         name: 'Silkscreen Alternative (Cut → Sew → Print) [Ashley Guarded]',
         method: PrintMethod.SILKSCREEN,
-        isDefault: false,
         steps: [
           {
             name: 'Cutting',
@@ -209,7 +207,6 @@ export class RoutingTemplateService {
         templateKey: 'SUBL_DEFAULT',
         name: 'Sublimation Standard (GA → Print → Heat Press → Cut → Sew)',
         method: PrintMethod.SUBLIMATION,
-        isDefault: true,
         steps: [
           {
             name: 'Graphic Arts',
@@ -267,7 +264,6 @@ export class RoutingTemplateService {
         templateKey: 'DTF_DEFAULT',
         name: 'DTF Standard (Receive → DTF → Heat Press → QC)',
         method: PrintMethod.DTF,
-        isDefault: true,
         steps: [
           {
             name: 'Receive Plain Garments',
@@ -321,7 +317,6 @@ export class RoutingTemplateService {
         templateKey: 'EMB_DEFAULT',
         name: 'Embroidery Standard (Cut → Emb → Sew → QC)',
         method: PrintMethod.EMBROIDERY,
-        isDefault: true,
         steps: [
           {
             name: 'Cutting',
@@ -369,15 +364,13 @@ export class RoutingTemplateService {
         update: {
           name: templateData.name,
           steps: templateData.steps,
-          isDefault: templateData.isDefault
-        },
+          },
         create: {
           workspaceId: 'default',
           templateKey: templateData.templateKey,
           name: templateData.name,
           method: templateData.method,
           steps: templateData.steps,
-          isDefault: templateData.isDefault,
           active: true
         }
       })
@@ -396,7 +389,7 @@ export class RoutingTemplateService {
         active: true
       },
       orderBy: [
-        { isDefault: 'desc' },
+        { },
         { name: 'asc' }
       ]
     })

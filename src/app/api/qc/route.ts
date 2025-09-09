@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
         order: {
           include: {
             brand: true,
-            createdBy: {
+            created_by: {
               select: { id: true, name: true }
             }
           }
@@ -56,13 +56,13 @@ export async function GET(request: NextRequest) {
               select: { id: true, name: true }
             }
           },
-          orderBy: { createdAt: 'desc' }
+          orderBy: { created_at: 'desc' }
         }
       },
       orderBy: [
         { priority: 'desc' },
         { dueDate: 'asc' },
-        { createdAt: 'desc' }
+        { created_at: 'desc' }
       ]
     })
 
@@ -99,7 +99,7 @@ export async function GET(request: NextRequest) {
           }
         }
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { created_at: 'desc' }
     })
 
     const totalInspected = allQCRecords.length
@@ -143,7 +143,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching QC items:', error)
+    console.error('Error fetching QC items:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -235,7 +235,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error starting QC inspection:', error)
+    console.error('Error starting QC inspection:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

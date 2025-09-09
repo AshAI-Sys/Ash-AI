@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
-import { authOptions } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   try {
@@ -27,7 +28,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (_error) {
-    console.error('Sync download error:', error);
+    console.error('Sync download error:', _error);
     return NextResponse.json(
       { error: 'Failed to download changes' },
       { status: 500 }
@@ -53,7 +54,7 @@ async function getChangesForUser(userId: string, since: Date) {
         { assignedTo: userId },
         { order: { createdById: userId } }
       ],
-      updatedAt: { gt: since }
+      updated_at: { gt: since }
     },
     include: {
       order: true
@@ -80,7 +81,7 @@ async function getChangesForUser(userId: string, since: Date) {
   const timeRecords = await prisma.timeRecord.findMany({
     where: {
       employeeId: userId,
-      createdAt: { gt: since }
+      created_at: { gt: since }
     }
   });
 
@@ -103,7 +104,7 @@ async function getChangesForUser(userId: string, since: Date) {
 
   const inventoryUpdates = await prisma.stockMovement.findMany({
     where: {
-      createdAt: { gt: since }
+      created_at: { gt: since }
     },
     include: {
       inventory: true
@@ -130,7 +131,7 @@ async function getChangesForUser(userId: string, since: Date) {
   const qcRecords = await prisma.qCRecord.findMany({
     where: {
       inspectorId: userId,
-      createdAt: { gt: since }
+      created_at: { gt: since }
     }
   });
 

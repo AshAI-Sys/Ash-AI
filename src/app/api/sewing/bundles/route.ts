@@ -1,10 +1,13 @@
-// Sewing Bundles API for Stage 5 Sewing System
-// Based on CLIENT_UPDATED_PLAN.md specifications
-
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { db } from '@/lib/db'
 import { calculateBundleProgress } from '@/lib/sewing-calculations'
 import { validateAshleyAI } from '@/lib/ashley-ai'
+// Sewing Bundles API for Stage 5 Sewing System
+// Based on CLIENT_UPDATED_PLAN.md specifications
+
 
 // GET /api/sewing/bundles - Get sewing bundles
 export async function GET(request: NextRequest) {
@@ -112,7 +115,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching sewing bundles:', error)
+    console.error('Error fetching sewing bundles:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch sewing bundles' },
       { status: 500 }
@@ -228,7 +231,7 @@ export async function POST(request: NextRequest) {
           workspace_id,
           bundle_id: bundle.id,
           sewing_operation_id: sewing_op.id,
-          status: 'PENDING',
+          status: 'OPEN',
           started_at: null,
           completed_at: null
         })
@@ -293,7 +296,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating sewing bundle:', error)
+    console.error('Error creating sewing bundle:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to create sewing bundle' },
       { status: 500 }
@@ -376,7 +379,7 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error updating bundle:', error)
+    console.error('Error updating bundle:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to update bundle' },
       { status: 500 }

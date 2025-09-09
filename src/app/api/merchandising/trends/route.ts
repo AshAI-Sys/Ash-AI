@@ -6,8 +6,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
 import { Role } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 import { validateAshleyTrendAnalysis } from '@/lib/ashley-ai'
 
@@ -174,7 +174,7 @@ export async function GET(request: NextRequest) {
       }, { status: 400 })
     }
 
-    console.error('Error analyzing trends:', error)
+    console.error('Error analyzing trends:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to analyze trends' },
       { status: 500 }

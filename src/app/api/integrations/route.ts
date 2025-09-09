@@ -1,4 +1,7 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from "@/lib/prisma"
 
 export async function GET(request: NextRequest) {
@@ -55,7 +58,7 @@ export async function GET(request: NextRequest) {
         },
         logs: {
           orderBy: {
-            createdAt: "desc"
+            created_at: "desc"
           },
           take: 5,
           select: {
@@ -63,7 +66,7 @@ export async function GET(request: NextRequest) {
             action: true,
             status: true,
             errorMessage: true,
-            createdAt: true
+            created_at: true
           }
         },
         _count: {
@@ -76,7 +79,7 @@ export async function GET(request: NextRequest) {
       },
       orderBy: [
         { status: "asc" },
-        { updatedAt: "desc" }
+        { updated_at: "desc" }
       ]
     })
 
@@ -116,7 +119,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error("Error fetching integrations:", error)
+    console.error("Error fetching integrations:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch integrations" },
       { status: 500 }
@@ -218,7 +221,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error("Error creating integration:", error)
+    console.error("Error creating integration:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to create integration" },
       { status: 500 }

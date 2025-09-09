@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client';
 import { BackupManager } from '@/lib/backup/backup-manager';
-import { authOptions } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (_error) {
-    console.error('Backup creation error:', error);
+    console.error('Backup creation error:', _error);
     return NextResponse.json(
       { error: 'Backup creation failed' },
       { status: 500 }
@@ -74,7 +75,7 @@ export async function GET(_request: NextRequest) {
     const { prisma } = await import('@/lib/prisma');
     
     const backups = await prisma.backupJob.findMany({
-      orderBy: { createdAt: 'desc' },
+      orderBy: { created_at: 'desc' },
       take: 50
     });
 
@@ -84,7 +85,7 @@ export async function GET(_request: NextRequest) {
     });
 
   } catch (_error) {
-    console.error('Backup list error:', error);
+    console.error('Backup list error:', _error);
     return NextResponse.json(
       { error: 'Failed to fetch backups' },
       { status: 500 }

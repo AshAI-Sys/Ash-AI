@@ -32,7 +32,7 @@ export class AuditLogger {
         }
       })
     } catch (_error) {
-      console.error('Error logging audit event:', error)
+      console.error('Error logging audit event:', _error)
       // Don't throw - audit logging shouldn't break business logic
     }
   }

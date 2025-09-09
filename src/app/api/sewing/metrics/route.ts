@@ -1,9 +1,12 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
+import { db } from '@/lib/db'
+import { analyzeLineEfficiency, calculateSewingPayrollAccruals } from '@/lib/sewing-calculations'
 // Sewing Metrics API for Stage 5 Sewing System
 // Based on CLIENT_UPDATED_PLAN.md specifications
 
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { analyzeLineEfficiency, calculateSewingPayrollAccruals } from '@/lib/sewing-calculations'
 
 // GET /api/sewing/metrics - Get sewing performance metrics and analytics
 export async function GET(request: NextRequest) {
@@ -221,7 +224,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching sewing metrics:', error)
+    console.error('Error fetching sewing metrics:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch sewing metrics' },
       { status: 500 }
@@ -344,7 +347,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating line metrics:', error)
+    console.error('Error creating line metrics:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to create line metrics' },
       { status: 500 }

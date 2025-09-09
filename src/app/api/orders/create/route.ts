@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { ashleyAI } from '@/services/ashley-ai'
 import { prisma } from '@/lib/prisma'
 
@@ -106,7 +108,6 @@ export async function POST(request: NextRequest) {
           data: {
             orderId: order.id,
             brandId: body.brandId,
-            name: asset.name || 'Design Asset',
             type: asset.type || 'MOCKUP',
             fileUrl: asset.url,
             createdById: session.user.id
@@ -158,7 +159,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error creating order:', error)
+    console.error('Error creating order:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'
@@ -174,12 +175,12 @@ async function generateSequenceNumber(brandId: string, year: number): Promise<nu
   const lastOrder = await prisma.order.findFirst({
     where: {
       brandId,
-      createdAt: {
+      created_at: {
         gte: startOfYear,
         lte: endOfYear
       }
     },
-    orderBy: { createdAt: 'desc' }
+    orderBy: { created_at: 'desc' }
   })
 
   if (!lastOrder) return 1

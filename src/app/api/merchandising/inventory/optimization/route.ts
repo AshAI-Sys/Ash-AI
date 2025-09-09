@@ -4,6 +4,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { secureDb } from '@/lib/db-security'
 import { verifyToken } from '@/lib/auth'
 import { InputSanitizer } from '@/lib/input-security'
@@ -101,7 +104,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result)
 
   } catch (_error) {
-    console.error('Inventory optimization error:', error)
+    console.error('Inventory optimization error:', _error)
     return NextResponse.json(
       { error: 'Failed to perform inventory optimization' },
       { status: 500 }

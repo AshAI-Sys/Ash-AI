@@ -14,8 +14,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { 
-  Upload,
+import {
+    Upload,
   Image,
   FileText,
   Palette,

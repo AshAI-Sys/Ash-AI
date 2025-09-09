@@ -1,13 +1,16 @@
-// Client Portal Authentication API for Stage 12 Client Portal
-// Based on CLIENT_UPDATED_PLAN.md specifications
-
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { db } from '@/lib/db'
 import { validateAshleyAI } from '@/lib/ashley-ai'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { randomBytes } from 'crypto'
 import { RateLimiter, InputSanitizer, PasswordPolicy } from '@/lib/security'
+// Client Portal Authentication API for Stage 12 Client Portal
+// Based on CLIENT_UPDATED_PLAN.md specifications
+
 
 const JWT_SECRET = process.env.JWT_SECRET
 if (!JWT_SECRET) {

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 
 // POST /api/qc/inspections/[inspectionId]/defect - Log defect in inspection
@@ -231,7 +233,7 @@ export async function POST(
           ownerId: inspection.createdBy, // Assign to original inspector
           priority: severity === 'CRITICAL' ? 'HIGH' : 'MEDIUM',
           dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-          createdBy: session.user.id
+          created_by: session.user.id
         }
       })
     }
@@ -253,7 +255,7 @@ export async function POST(
     }, { status: 201 })
 
   } catch (_error) {
-    console.error('Error logging defect:', error)
+    console.error('Error logging defect:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error'

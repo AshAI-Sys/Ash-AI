@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { verifyToken } from '@/lib/auth'
 
 // Mock settings storage (in real app, this would be database)
@@ -97,7 +100,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Error fetching settings:', error)
+    console.error('Error fetching settings:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to fetch settings' },
       { status: 500 }
@@ -150,7 +153,7 @@ export async function POST(request: NextRequest) {
     )
 
   } catch (_error) {
-    console.error('Error saving settings:', error)
+    console.error('Error saving settings:', _error)
     return NextResponse.json(
       { success: false, error: 'Failed to save settings' },
       { status: 500 }

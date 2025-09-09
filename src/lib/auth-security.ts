@@ -107,7 +107,7 @@ class SessionSecurity {
     return createHash('sha256').update(token).digest('hex')
   }
   
-  static isSessionValid(session: { createdAt: Date; lastActive: Date }): boolean {
+  static isSessionValid(session: { created_at: Date; lastActive: Date }): boolean {
     const now = Date.now()
     const created = new Date(session.createdAt).getTime()
     const lastActive = new Date(session.lastActive).getTime()
@@ -125,7 +125,7 @@ class SessionSecurity {
     return true
   }
   
-  static shouldRotateSession(session: { createdAt: Date }): boolean {
+  static shouldRotateSession(session: { created_at: Date }): boolean {
     const sessionAge = Date.now() - new Date(session.createdAt).getTime()
     return sessionAge > (this.MAX_SESSION_AGE / 4) // Rotate after 6 hours
   }

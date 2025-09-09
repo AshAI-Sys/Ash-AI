@@ -20,7 +20,7 @@ import {
   Calendar,
   Maximize2
 } from 'lucide-react'
-import {
+  import {
   AreaChart,
   Area,
   BarChart,

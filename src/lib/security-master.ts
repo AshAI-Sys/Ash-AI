@@ -12,7 +12,7 @@ import {
   securityAuditLogger 
 } from './auth-security'
 import { InputSanitizer, SecuritySchemas } from './input-security'
-import { 
+import {
   initializeSecurityMonitoring, 
   securityMonitor, 
   incidentResponse 
@@ -136,11 +136,11 @@ export class SecurityMaster {
       }
 
     } catch (_error) {
-      console.error('[SECURITY_MASTER] Failed to initialize security system:', error)
+      console.error('[SECURITY_MASTER] Failed to initialize security system:', _error)
       return {
         success: false,
         score: 0,
-        issues: [`Initialization failed: ${error}`]
+        issues: [`Initialization failed: ${_error}`]
       }
     }
   }
@@ -159,7 +159,7 @@ export class SecurityMaster {
     } catch (_error) {
       return {
         score: 0,
-        issues: [`Environment validation failed: ${error}`]
+        issues: [`Environment validation failed: ${_error}`]
       }
     }
   }
@@ -177,7 +177,7 @@ export class SecurityMaster {
     } catch (_error) {
       return {
         score: 0,
-        issues: [`Database security initialization failed: ${error}`]
+        issues: [`Database security initialization failed: ${_error}`]
       }
     }
   }
@@ -219,7 +219,7 @@ export class SecurityMaster {
     } catch (_error) {
       return {
         score: 0,
-        issues: [`Authentication security initialization failed: ${error}`]
+        issues: [`Authentication security initialization failed: ${_error}`]
       }
     }
   }
@@ -508,7 +508,7 @@ if (process.env.NODE_ENV === 'production') {
       console.warn('[SECURITY_MASTER] Issues:', result.issues)
     }
   }).catch((error) => {
-    console.error('[SECURITY_MASTER] Critical security initialization failure:', error)
+    console.error('[SECURITY_MASTER] Critical security initialization failure:', _error)
     process.exit(1)
   })
 }

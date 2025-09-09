@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
 import { Role, TaskStatus, OrderStatus } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 
 export async function GET(request: NextRequest) {
   try {
@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error('Production analytics error:', error)
+    console.error('Production analytics error:', _error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

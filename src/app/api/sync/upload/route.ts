@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
-import { authOptions } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,7 +28,7 @@ export async function POST(request: NextRequest) {
           processedChanges.push(change);
         }
       } catch (_error) {
-        console.error('Error processing change:', error);
+        console.error('Error processing change:', _error);
       }
     }
 
@@ -40,7 +41,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (_error) {
-    console.error('Sync upload error:', error);
+    console.error('Sync upload error:', _error);
     return NextResponse.json(
       { error: 'Sync failed' },
       { status: 500 }

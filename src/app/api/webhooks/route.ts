@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "@/lib/auth"
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
+import { Role } from '@prisma/client'
 import { prisma } from "@/lib/prisma"
-import { Role } from "@prisma/client"
 import crypto from "crypto"
 import { secureCompare, validateRequiredEnvVars } from "@/lib/security"
 
@@ -58,7 +58,6 @@ export async function GET(request: NextRequest) {
         integration: {
           select: {
             id: true,
-            name: true,
             type: true,
             provider: true,
             status: true
@@ -73,7 +72,7 @@ export async function GET(request: NextRequest) {
         },
         deliveries: {
           orderBy: {
-            createdAt: "desc"
+            created_at: "desc"
           },
           take: 10
         },
@@ -85,7 +84,7 @@ export async function GET(request: NextRequest) {
       },
       orderBy: [
         { isActive: "desc" },
-        { updatedAt: "desc" }
+        { updated_at: "desc" }
       ]
     })
 
@@ -123,7 +122,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error("Error fetching webhooks:", error)
+    console.error("Error fetching webhooks:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to fetch webhooks" },
       { status: 500 }
@@ -225,7 +224,6 @@ export async function POST(request: NextRequest) {
         integration: {
           select: {
             id: true,
-            name: true,
             type: true,
             provider: true
           }
@@ -254,7 +252,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (_error) {
-    console.error("Error creating webhook:", error)
+    console.error("Error creating webhook:", _error)
     return NextResponse.json(
       { success: false, error: "Failed to create webhook" },
       { status: 500 }
