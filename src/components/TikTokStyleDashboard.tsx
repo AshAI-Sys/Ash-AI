@@ -73,21 +73,54 @@ export function TikTokStyleDashboard() {
   const [activeTab, setActiveTab] = useState('home')
   const [isMobile, setIsMobile] = useState(false)
 
-  // ASH AI Manufacturing Data
+  // ASH AI Manufacturing Data from CLIENT_UPDATED_PLAN.md
   const [stats] = useState<ManufacturingStats>({
     totalOrders: 1247,
-    activeOrders: 19, // From CLIENT_UPDATED_PLAN.md - 19 active orders
+    activeOrders: 19, // Exact from plan: 19 active orders
     completedOrders: 1228,
     revenue: 2849750,
     efficiency: 94.2,
-    alerts: 3
+    alerts: 8 // Critical fixes needed
   })
 
+  // Core Requirements Status from CLIENT_UPDATED_PLAN.md
+  const coreRequirements = [
+    { id: 1, name: 'Authentication & User Management', status: 'completed', progress: 100, color: 'text-green-600', bgColor: 'bg-green-50' },
+    { id: 2, name: 'Dashboard & Analytics', status: 'completed', progress: 100, color: 'text-green-600', bgColor: 'bg-green-50' },
+    { id: 3, name: 'Order Management System', status: 'needs_fix', progress: 70, color: 'text-orange-600', bgColor: 'bg-orange-50' },
+    { id: 4, name: 'Production Management', status: 'needs_fix', progress: 65, color: 'text-orange-600', bgColor: 'bg-orange-50' },
+    { id: 5, name: 'Quality Control System', status: 'needs_fix', progress: 60, color: 'text-orange-600', bgColor: 'bg-orange-50' },
+    { id: 6, name: 'Inventory Management', status: 'needs_fix', progress: 55, color: 'text-orange-600', bgColor: 'bg-orange-50' },
+    { id: 7, name: 'Human Resources', status: 'needs_fix', progress: 50, color: 'text-orange-600', bgColor: 'bg-orange-50' },
+    { id: 8, name: 'Financial Management', status: 'needs_fix', progress: 55, color: 'text-orange-600', bgColor: 'bg-orange-50' },
+    { id: 9, name: 'Client Portal', status: 'needs_fix', progress: 60, color: 'text-orange-600', bgColor: 'bg-orange-50' },
+    { id: 10, name: 'AI Integration (Ashley AI)', status: 'completed', progress: 100, color: 'text-green-600', bgColor: 'bg-green-50' }
+  ]
+
+  // Critical Fixes from CLIENT_UPDATED_PLAN.md
+  const criticalFixes = [
+    { priority: 1, title: 'Database & API Stability', items: ['Fix 170+ API endpoints', 'PostgreSQL migration', 'Connection pooling', 'Error handling'], urgent: true },
+    { priority: 2, title: 'User Experience', items: ['Fix sidebar navigation', 'Add loading states', 'Responsive design', 'Error boundaries'], urgent: true },
+    { priority: 3, title: 'Core Functionality', items: ['Order workflow automation', 'Production tracking', 'Quality checkpoints', 'Client communication'], urgent: false }
+  ]
+
+  // Immediate Action Items from CLIENT_UPDATED_PLAN.md
+  const immediateActions = [
+    { title: 'Fix database connection issues', status: 'pending', urgent: true },
+    { title: 'Resolve API endpoint errors', status: 'pending', urgent: true },
+    { title: 'Fix authentication flow', status: 'pending', urgent: true },
+    { title: 'Implement proper error handling', status: 'pending', urgent: true },
+    { title: 'Complete order management system', status: 'in_progress', urgent: false },
+    { title: 'Fix production tracking', status: 'pending', urgent: false },
+    { title: 'Implement quality control', status: 'pending', urgent: false },
+    { title: 'Add inventory management', status: 'pending', urgent: false }
+  ]
+
   const [productionStages] = useState<ProductionStage[]>([
-    { stage: 'Material Preparation', active: 11, completed: 156, efficiency: '93%', color: 'text-blue-600', bgColor: 'bg-blue-50', borderColor: 'border-blue-100' },
-    { stage: 'Screen Making/Sampling', active: 4, completed: 89, efficiency: '87%', color: 'text-purple-600', bgColor: 'bg-purple-50', borderColor: 'border-purple-100' },
-    { stage: 'Cutting', active: 3, completed: 134, efficiency: '95%', color: 'text-emerald-600', bgColor: 'bg-emerald-50', borderColor: 'border-emerald-100' },
-    { stage: 'Sewing', active: 1, completed: 98, efficiency: '92%', color: 'text-amber-600', bgColor: 'bg-amber-50', borderColor: 'border-amber-100' }
+    { stage: 'Material Preparation', active: 11, completed: 156, efficiency: '58%', color: 'text-blue-600', bgColor: 'bg-blue-50', borderColor: 'border-blue-100' },
+    { stage: 'Screen Making/Sampling', active: 4, completed: 89, efficiency: '21%', color: 'text-purple-600', bgColor: 'bg-purple-50', borderColor: 'border-purple-100' },
+    { stage: 'Cutting', active: 3, completed: 134, efficiency: '16%', color: 'text-emerald-600', bgColor: 'bg-emerald-50', borderColor: 'border-emerald-100' },
+    { stage: 'Sewing', active: 1, completed: 98, efficiency: '5%', color: 'text-amber-600', bgColor: 'bg-amber-50', borderColor: 'border-amber-100' }
   ])
 
   // Active orders from CLIENT_UPDATED_PLAN.md
@@ -102,10 +135,11 @@ export function TikTokStyleDashboard() {
   ])
 
   const tasks = [
-    { id: '1', title: 'Orders ready to ship', count: 0, urgent: false },
-    { id: '2', title: 'Quality inspections pending', count: 3, urgent: true },
-    { id: '3', title: 'Material preparation needed', count: 11, urgent: true },
-    { id: '4', title: 'Production scheduling', count: 5, urgent: false }
+    { id: '1', title: 'Fix database connection issues', count: 1, urgent: true },
+    { id: '2', title: 'Resolve API endpoint errors', count: 170, urgent: true },
+    { id: '3', title: 'Fix authentication flow', count: 1, urgent: true },
+    { id: '4', title: 'Order workflow automation', count: 3, urgent: false },
+    { id: '5', title: 'Production tracking fixes', count: 5, urgent: false }
   ]
 
   useEffect(() => {
@@ -212,32 +246,63 @@ export function TikTokStyleDashboard() {
           </Card>
         </div>
 
-        {/* Tasks Section */}
+        {/* Critical Fixes Required - From CLIENT_UPDATED_PLAN.md */}
         <div className="px-4 mb-6">
           <div className="flex items-center space-x-2 mb-4">
-            <div className="w-6 h-6 bg-gray-100 rounded flex items-center justify-center">
-              <CheckCircle className="w-4 h-4 text-gray-600" />
+            <div className="w-6 h-6 bg-red-100 rounded flex items-center justify-center">
+              <AlertTriangle className="w-4 h-4 text-red-600" />
             </div>
-            <span className="font-semibold text-gray-900">Tasks</span>
+            <span className="font-semibold text-gray-900">Critical Fixes Required</span>
           </div>
           
           <div className="space-y-3">
-            {tasks.map((task) => (
-              <Card key={task.id} className="bg-white border-0 shadow-sm">
+            {criticalFixes.map((fix, index) => (
+              <Card key={index} className="bg-white border-0 shadow-sm">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center space-x-2">
+                      <Badge className={`${fix.urgent ? 'bg-red-500' : 'bg-orange-500'} text-white text-xs`}>
+                        Priority {fix.priority}
+                      </Badge>
+                      <span className="text-gray-900 font-medium">{fix.title}</span>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    {fix.items.slice(0, 2).map((item, i) => (
+                      <div key={i} className="flex items-center space-x-2">
+                        <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+                        <span>{item}</span>
+                      </div>
+                    ))}
+                    {fix.items.length > 2 && (
+                      <div className="text-xs text-gray-500 mt-1">+{fix.items.length - 2} more items</div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Immediate Action Items */}
+        <div className="px-4 mb-6">
+          <div className="flex items-center space-x-2 mb-4">
+            <div className="w-6 h-6 bg-gray-100 rounded flex items-center justify-center">
+              <Clock className="w-4 h-4 text-gray-600" />
+            </div>
+            <span className="font-semibold text-gray-900">Immediate Actions</span>
+          </div>
+          
+          <div className="space-y-3">
+            {immediateActions.filter(action => action.urgent).map((action, index) => (
+              <Card key={index} className="bg-white border-0 shadow-sm">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-900 font-medium">{task.title}</span>
+                    <span className="text-gray-900 font-medium">{action.title}</span>
                     <div className="flex items-center space-x-2">
-                      <Badge 
-                        className={`${
-                          task.urgent 
-                            ? 'bg-red-500 text-white' 
-                            : task.count > 0 
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-gray-100 text-gray-700'
-                        } rounded-full px-2 py-1`}
-                      >
-                        {task.count}
+                      <Badge className={`${action.urgent ? 'bg-red-500' : 'bg-gray-500'} text-white rounded-full px-2 py-1 text-xs`}>
+                        {action.status}
                       </Badge>
                       <ChevronRight className="w-5 h-5 text-gray-400" />
                     </div>
@@ -522,11 +587,80 @@ export function TikTokStyleDashboard() {
                 </Card>
               </div>
 
-              {/* Production Pipeline */}
+              {/* Core Requirements Status from CLIENT_UPDATED_PLAN.md */}
+              <Card className="bg-white">
+                <CardHeader>
+                  <CardTitle className="text-lg font-semibold">Core Requirements Progress</CardTitle>
+                  <CardDescription>10 main modules as per CLIENT_UPDATED_PLAN.md</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {coreRequirements.map((req) => (
+                      <div key={req.id} className={`p-4 rounded-lg border ${req.bgColor} ${req.status === 'completed' ? 'border-green-200' : 'border-orange-200'}`}>
+                        <div className="flex items-center justify-between mb-3">
+                          <h3 className={`font-semibold ${req.color} text-sm`}>{req.name}</h3>
+                          <div className="flex items-center space-x-2">
+                            {req.status === 'completed' ? (
+                              <CheckCircle className="w-4 h-4 text-green-600" />
+                            ) : (
+                              <AlertTriangle className="w-4 h-4 text-orange-600" />
+                            )}
+                            <span className={`text-xs font-medium ${req.color}`}>{req.progress}%</span>
+                          </div>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div 
+                            className={`h-2 rounded-full ${req.status === 'completed' ? 'bg-green-500' : 'bg-orange-500'}`}
+                            style={{ width: `${req.progress}%` }}
+                          />
+                        </div>
+                        <div className="mt-2 text-xs text-gray-600">
+                          {req.status === 'completed' ? '✅ Completed' : '🔧 Needs fixes'}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Critical Fixes Required */}
+              <Card className="bg-white">
+                <CardHeader>
+                  <CardTitle className="text-lg font-semibold text-red-600">🚨 Critical Fixes Required</CardTitle>
+                  <CardDescription>Priority issues from CLIENT_UPDATED_PLAN.md</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {criticalFixes.map((fix, index) => (
+                      <div key={index} className={`p-4 rounded-lg ${fix.urgent ? 'bg-red-50 border-red-200' : 'bg-orange-50 border-orange-200'} border`}>
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center space-x-2">
+                            <Badge className={`${fix.urgent ? 'bg-red-500' : 'bg-orange-500'} text-white`}>
+                              Priority {fix.priority}
+                            </Badge>
+                            <h3 className="font-semibold text-gray-900">{fix.title}</h3>
+                          </div>
+                          <AlertTriangle className={`w-5 h-5 ${fix.urgent ? 'text-red-500' : 'text-orange-500'}`} />
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {fix.items.map((item, i) => (
+                            <div key={i} className="flex items-center space-x-2 text-sm text-gray-700">
+                              <div className={`w-2 h-2 rounded-full ${fix.urgent ? 'bg-red-400' : 'bg-orange-400'}`}></div>
+                              <span>{item}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Production Pipeline Status */}
               <Card className="bg-white">
                 <CardHeader>
                   <CardTitle className="text-lg font-semibold">Production Pipeline Status</CardTitle>
-                  <CardDescription>Real-time view of manufacturing stages</CardDescription>
+                  <CardDescription>Real-time view from CLIENT_UPDATED_PLAN.md data</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -221,39 +221,38 @@ async function getBottleneckAnalysis(startDate: Date) {
       due_date: { lt: new Date() }
     },
     include: {
-      assigned_user: { select: { name: true } }
+      assigned_user: { select: { full_name: true } }
     },
     orderBy: { due_date: 'asc' },
     take: 10
   })
 
-  // Identify role-based bottlenecks
-  const roleBottlenecks = await prisma.task.groupBy({
-    by: ['task_type'],
-    where: {
-      created_at: { gte: startDate },
-      status: TaskStatus.PENDING
-    },
-    _count: { id: true },
-    _avg: { estimatedHours: true },
-    orderBy: { _count: { id: 'desc' } },
-    take: 5
-  })
+  // Skip role-based bottlenecks as task_type field doesn't exist
+  const roleBottlenecks: any[] = []
+  // const roleBottlenecks = await prisma.task.groupBy({
+  //   by: ['task_type'],
+  //   where: {
+  //     created_at: { gte: startDate },
+  //     status: TaskStatus.PENDING
+  //   },
+  //   _count: { id: true },
+  //   _avg: { estimatedHours: true },
+  //   orderBy: { _count: { id: 'desc' } },
+  //   take: 5
+  // })
 
   return {
     overdueTasks: overdueTasks.map(task => ({
       id: task.id,
       title: task.title,
-      orderNumber: task.order?.orderNumber,
-      assigned_to: task.assigned_user?.name,
-      role: task.assigned_user?.role,
-      dueDate: task.dueDate,
-      daysOverdue: Math.ceil((new Date().getTime() - new Date(task.dueDate).getTime()) / (1000 * 3600 * 24))
+      assigned_to: task.assigned_user?.full_name,
+      dueDate: task.due_date,
+      daysOverdue: task.due_date ? Math.ceil((new Date().getTime() - new Date(task.due_date).getTime()) / (1000 * 3600 * 24)) : 0
     })),
     roleBottlenecks: roleBottlenecks.map(item => ({
-      task_type: item.task_type,
-      pendingCount: item._count.id,
-      avgEstimatedHours: item._avg.estimatedHours || 0
+      task_type: 'GENERIC',
+      pendingCount: 0,
+      avgEstimatedHours: 0
     }))
   }
 }
@@ -281,7 +280,7 @@ async function getCapacityMetrics(startDate: Date, department?: string | null) {
   const users = await prisma.user.findMany({
     where: userFilter,
     include: {
-      assignedTasks: {
+      assigned_tasks: {
         where: {
           created_at: { gte: startDate },
           status: { in: [TaskStatus.IN_PROGRESS, TaskStatus.PENDING] }
@@ -291,14 +290,14 @@ async function getCapacityMetrics(startDate: Date, department?: string | null) {
   })
 
   const capacityData = users.map(user => {
-    const activeTasks = user.assignedTasks.length
+    const activeTasks = user.assigned_tasks.length
     const workload = activeTasks * 8 // Assuming 8 hours per task average
     const capacity = getWorkingHoursPerPeriod() // e.g., 40 hours per week
     const utilization = Math.min((workload / capacity) * 100, 100)
 
     return {
       user_id: user.id,
-      name: user.name,
+      name: user.full_name,
       role: user.role,
       activeTasks,
       workload,
@@ -324,7 +323,7 @@ async function getQualityMetrics(startDate: Date) {
     prisma.qCRecord.findMany({
       where: { created_at: { gte: startDate } },
       include: {
-        task: { select: { order: { select: { orderNumber: true } } } }
+        task: { select: { title: true } }
       }
     }),
     prisma.qCRecord.groupBy({
