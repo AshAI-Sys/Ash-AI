@@ -3,8 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-import EnhancedLayout from '@/components/EnhancedLayout'
-import { UnifiedDashboard } from '@/components/UnifiedDashboard'
+import { TikTokStyleDashboard } from '@/components/TikTokStyleDashboard'
 
 export default function DashboardPage() {
   const { data: session, status } = useSession()
@@ -66,9 +65,5 @@ export default function DashboardPage() {
     return null
   }
 
-  return (
-    <EnhancedLayout>
-      <UnifiedDashboard />
-    </EnhancedLayout>
-  )
+  return <TikTokStyleDashboard />
 }

@@ -31,25 +31,21 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const validatedData = loginSchema.parse(body)
 
-    // Find client by email
-    const client = await prisma.client.findFirst({
+    // Find client user by email
+    const clientUser = await prisma.clientUser.findFirst({
       where: {
-        emails: {
-          hasSome: [validatedData.email]
-        },
-        portal_access: true,
-        is_active: true
+        email: validatedData.email,
+        status: 'ACTIVE'
       },
-      select: {
-        id: true,
-        name: true,
-        company: true,
-        emails: true,
-        phone: true,
-        portal_password: true,
-        portal_settings: true,
-        workspace_id: true,
-        last_login: true,
+      include: {
+        client: {
+          select: {
+            id: true,
+            name: true,
+            company: true,
+            workspace_id: true
+          }
+        },
         workspace: {
           select: {
             name: true,
@@ -59,7 +55,7 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    if (!client) {
+    if (!clientUser) {
       return NextResponse.json({
         success: false,
         error: 'Invalid credentials or portal access not enabled'
@@ -67,17 +63,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify password
-    if (!client.portal_password) {
-      return NextResponse.json({
-        success: false,
-        error: 'Portal access not configured. Please contact your account manager.'
-      }, { status: 401 })
-    }
-
-    const isPasswordValid = await bcrypt.compare(validatedData.password, client.portal_password)
+    const isPasswordValid = await bcrypt.compare(validatedData.password, clientUser.password_hash)
     if (!isPasswordValid) {
       // Log failed login attempt
-      await logSecurityEvent('LOGIN_FAILED', client.id, {
+      await logSecurityEvent('LOGIN_FAILED', clientUser.client.id, {
         email: validatedData.email,
         ip: request.headers.get('x-forwarded-for') || 'unknown',
         user_agent: request.headers.get('user-agent') || 'unknown'
@@ -91,9 +80,10 @@ export async function POST(request: NextRequest) {
 
     // Generate JWT token
     const tokenPayload = {
-      clientId: client.id,
-      clientName: client.name,
-      workspaceId: client.workspace_id,
+      clientId: clientUser.client.id,
+      clientUserId: clientUser.id,
+      clientName: clientUser.client.name,
+      workspaceId: clientUser.client.workspace_id,
       type: 'client_portal'
     }
 
@@ -107,20 +97,15 @@ export async function POST(request: NextRequest) {
     )
 
     // Update last login
-    await prisma.client.update({
-      where: { id: client.id },
+    await prisma.clientUser.update({
+      where: { id: clientUser.id },
       data: {
-        last_login: new Date(),
-        portal_settings: {
-          ...((client.portal_settings as any) || {}),
-          last_login: new Date().toISOString(),
-          login_count: ((client.portal_settings as any)?.login_count || 0) + 1
-        }
+        last_login: new Date()
       }
     })
 
     // Log successful login
-    await logSecurityEvent('LOGIN_SUCCESS', client.id, {
+    await logSecurityEvent('LOGIN_SUCCESS', clientUser.client.id, {
       email: validatedData.email,
       ip: request.headers.get('x-forwarded-for') || 'unknown',
       user_agent: request.headers.get('user-agent') || 'unknown',
@@ -131,8 +116,8 @@ export async function POST(request: NextRequest) {
     const orderStats = await prisma.order.groupBy({
       by: ['status'],
       where: {
-        client_id: client.id,
-        workspace_id: client.workspace_id
+        client_id: clientUser.client.id,
+        workspace_id: clientUser.client.workspace_id
       },
       _count: true
     })
@@ -141,12 +126,18 @@ export async function POST(request: NextRequest) {
       success: true,
       message: 'Login successful',
       client: {
-        id: client.id,
-        name: client.name,
-        company: client.company,
-        emails: client.emails,
-        workspace: client.workspace,
-        portal_settings: client.portal_settings
+        id: clientUser.client.id,
+        name: clientUser.client.name,
+        company: clientUser.client.company,
+        workspace: clientUser.workspace
+      },
+      user: {
+        id: clientUser.id,
+        email: clientUser.email,
+        first_name: clientUser.first_name,
+        last_name: clientUser.last_name,
+        role: clientUser.role,
+        permissions: clientUser.permissions
       },
       stats: {
         order_counts: orderStats.reduce((acc, stat) => {
@@ -167,7 +158,7 @@ export async function POST(request: NextRequest) {
 
     return response
 
-  } catch (_error) {
+  } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({
         success: false,
@@ -176,7 +167,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    console.error('Client portal login error:', _error)
+    console.error('Client portal login error:', error)
     return NextResponse.json({
       success: false,
       error: 'Login failed'
@@ -221,8 +212,8 @@ export async function DELETE(request: NextRequest) {
 
     return response
 
-  } catch (_error) {
-    console.error('Client portal logout error:', _error)
+  } catch (error) {
+    console.error('Client portal logout error:', error)
     return NextResponse.json({
       success: false,
       error: 'Logout failed'
@@ -293,7 +284,7 @@ export async function GET(request: NextRequest) {
       }
     })
 
-  } catch (_error) {
+  } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {
       return NextResponse.json({
         success: false,
@@ -301,7 +292,7 @@ export async function GET(request: NextRequest) {
       }, { status: 401 })
     }
 
-    console.error('Session verification error:', _error)
+    console.error('Session verification error:', error)
     return NextResponse.json({
       success: false,
       error: 'Session verification failed'
@@ -328,7 +319,7 @@ async function logSecurityEvent(event: string, clientId: string, metadata: any) 
         }
       }
     })
-  } catch (_error) {
-    console.error('Failed to log security event:', _error)
+  } catch (error) {
+    console.error('Failed to log security event:', error)
   }
 }

@@ -37,15 +37,16 @@ function MobileWorkflowSkeleton() {
 }
 
 interface MobileWorkflowPageProps {
-  searchParams: {
+  searchParams: Promise<{
     orderId?: string
     type?: 'cutting' | 'printing' | 'sewing' | 'qc' | 'packing'
-  }
+  }>
 }
 
-export default function MobileWorkflowPage({ searchParams }: MobileWorkflowPageProps) {
-  const orderId = searchParams.orderId || 'DEMO-001'
-  const workflowType = searchParams.type || 'cutting'
+export default async function MobileWorkflowPage({ searchParams }: MobileWorkflowPageProps) {
+  const params = await searchParams
+  const orderId = params.orderId || 'DEMO-001'
+  const workflowType = params.type || 'cutting'
 
   return (
     <Suspense fallback={<MobileWorkflowSkeleton />}>

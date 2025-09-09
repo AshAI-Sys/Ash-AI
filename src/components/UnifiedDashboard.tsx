@@ -29,6 +29,7 @@ import {
   Edit,
   Trash2
 } from 'lucide-react'
+import { Peso } from '@/components/icons/Peso'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -124,16 +125,16 @@ export function UnifiedDashboard() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'IN_PRODUCTION': return 'bg-blue-500/10 text-blue-400 border-blue-500/20'
-      case 'DESIGN_APPROVAL': return 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
-      case 'QC': return 'bg-purple-500/10 text-purple-400 border-purple-500/20'
-      case 'COMPLETED': return 'bg-green-500/10 text-green-400 border-green-500/20'
-      case 'ON_HOLD': return 'bg-red-500/10 text-red-400 border-red-500/20'
-      default: return 'bg-slate-500/10 text-slate-400 border-slate-500/20'
+      case 'IN_PRODUCTION': return 'status-info'
+      case 'DESIGN_APPROVAL': return 'status-warning'
+      case 'QC': return 'bg-purple-50 text-purple-600 border-purple-200'
+      case 'COMPLETED': return 'status-success'
+      case 'ON_HOLD': return 'status-danger'
+      default: return 'bg-slate-50 text-slate-600 border-slate-200'
     }
   }
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!newMessage.trim()) return
 
     const userMessage: ChatMessage = {
@@ -144,254 +145,263 @@ export function UnifiedDashboard() {
     }
 
     setChatMessages(prev => [...prev, userMessage])
+    const currentMessage = newMessage
     setNewMessage('')
 
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      // Call real OpenAI API
+      const response = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: currentMessage
+        })
+      })
+
+      const data = await response.json()
+
       const aiResponse: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
-        message: `I understand you're asking about "${newMessage}". Based on current data, I recommend optimizing your production workflow for better efficiency.`,
+        message: data.response || data.fallback || "Sorry, I couldn't process your request.",
         timestamp: new Date().toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit' })
       }
+      
       setChatMessages(prev => [...prev, aiResponse])
-    }, 1000)
+    } catch (error) {
+      console.error('Ashley AI Error:', error)
+      
+      // Fallback response if API fails
+      const fallbackResponse: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        type: 'ai',
+        message: `I understand you're asking about "${currentMessage}". I'm experiencing some connectivity issues right now, but I recommend checking your production workflow for optimization opportunities.`,
+        timestamp: new Date().toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit' })
+      }
+      setChatMessages(prev => [...prev, fallbackResponse])
+    }
   }
 
   return (
-    <div className="p-6 max-w-full flex gap-6">
-      {/* Main Content Area */}
-      <div className="flex-1">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-white mb-2">
-                ASH AI Command Center
-              </h1>
-              <p className="text-slate-400">
-                Unified control panel for all your apparel production needs
-              </p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+        {/* Mobile-Optimized Header */}
+        <div className="mb-4 sm:mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                <img src="/Ash-AI.png" alt="ASH AI" className="w-6 h-6 sm:w-8 sm:h-8 object-contain" />
+              </div>
+              <div>
+                <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-800">ASH AI Dashboard</h1>
+                <p className="text-xs sm:text-sm text-slate-600 font-medium">Manufacturing Intelligence System</p>
+              </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <Badge className="bg-green-500/20 text-green-400 border-green-500/20">
-                System Operational
-              </Badge>
-              <div className="text-right">
-                <p className="text-sm text-slate-400">
-                  {new Date().toLocaleDateString('en-PH', {
-                    weekday: 'short',
-                    month: 'short',
-                    day: 'numeric'
-                  })}
-                </p>
-                <p className="text-lg font-semibold text-white">
-                  {new Date().toLocaleTimeString('en-PH', {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
-                </p>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 border border-green-200 rounded-full">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-xs sm:text-sm text-green-700 font-medium">System Online</span>
               </div>
             </div>
           </div>
         </div>
 
-      {/* Unified Tabs Interface */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 mb-6 bg-slate-800/50 border border-cyan-500/20">
-          <TabsTrigger value="overview" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400">
-            <BarChart3 className="w-4 h-4 mr-2" />
-            Overview
-          </TabsTrigger>
-          <TabsTrigger value="orders" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400">
-            <Package className="w-4 h-4 mr-2" />
-            Orders
-          </TabsTrigger>
-          <TabsTrigger value="production" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400">
-            <Settings className="w-4 h-4 mr-2" />
-            Production
-          </TabsTrigger>
-          <TabsTrigger value="analytics" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400">
-            <TrendingUp className="w-4 h-4 mr-2" />
-            Analytics
-          </TabsTrigger>
-        </TabsList>
+        {/* Main Content Container */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+          {/* Main Dashboard Content */}
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
 
-        {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-6">
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="hologram-card">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-slate-400">Total Orders</p>
-                    <p className="text-3xl font-bold text-white">{stats.totalOrders.toLocaleString()}</p>
-                    <p className="text-xs text-green-400 flex items-center mt-1">
-                      <ArrowUpRight className="w-3 h-3 mr-1" />
-                      +12% from last month
-                    </p>
-                  </div>
-                  <div className="p-3 bg-cyan-500/20 rounded-full">
-                    <Package className="w-6 h-6 text-cyan-400" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          {/* Simple Tabs Interface */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid grid-cols-2 sm:grid-cols-4 w-full mb-4 sm:mb-6">
+              <TabsTrigger value="overview" className="text-xs sm:text-sm p-2 sm:p-3">
+                <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Overview</span>
+                <span className="sm:hidden">Stats</span>
+              </TabsTrigger>
+              <TabsTrigger value="orders" className="text-xs sm:text-sm p-2 sm:p-3">
+                <Package className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                Orders
+              </TabsTrigger>
+              <TabsTrigger value="production" className="text-xs sm:text-sm p-2 sm:p-3">
+                <Settings className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Production</span>
+                <span className="sm:hidden">Prod</span>
+              </TabsTrigger>
+              <TabsTrigger value="analytics" className="text-xs sm:text-sm p-2 sm:p-3">
+                <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Analytics</span>
+                <span className="sm:hidden">Charts</span>
+              </TabsTrigger>
+            </TabsList>
 
-            <Card className="hologram-card">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-slate-400">Active Orders</p>
-                    <p className="text-3xl font-bold text-white">{stats.activeOrders}</p>
-                    <p className="text-xs text-blue-400 flex items-center mt-1">
-                      <Clock className="w-3 h-3 mr-1" />
-                      In production
-                    </p>
-                  </div>
-                  <div className="p-3 bg-blue-500/20 rounded-full">
-                    <Zap className="w-6 h-6 text-blue-400" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Overview Tab - Mobile Optimized */}
+            <TabsContent value="overview" className="space-y-4 sm:space-y-6">
+              {/* Mobile-Optimized Stats Cards */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <Card className="bg-white/70 backdrop-blur-sm border border-blue-100 hover:shadow-lg transition-all duration-300">
+                  <CardContent className="p-4 sm:p-5 text-center">
+                    <div className="flex items-center justify-center mb-3">
+                      <div className="p-2 sm:p-3 bg-blue-100 rounded-full">
+                        <Package className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+                      </div>
+                    </div>
+                    <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-800 mb-1">
+                      {stats.totalOrders.toLocaleString()}
+                    </div>
+                    <div className="text-xs sm:text-sm text-slate-600 font-medium">Total Orders</div>
+                  </CardContent>
+                </Card>
 
-            <Card className="hologram-card">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-slate-400">Revenue</p>
-                    <p className="text-3xl font-bold text-white">{formatCurrency(stats.revenue)}</p>
-                    <p className="text-xs text-green-400 flex items-center mt-1">
-                      <ArrowUpRight className="w-3 h-3 mr-1" />
-                      +18% from last month
-                    </p>
-                  </div>
-                  <div className="p-3 bg-green-500/20 rounded-full">
-                    <DollarSign className="w-6 h-6 text-green-400" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                <Card className="bg-white/70 backdrop-blur-sm border border-green-100 hover:shadow-lg transition-all duration-300">
+                  <CardContent className="p-4 sm:p-5 text-center">
+                    <div className="flex items-center justify-center mb-3">
+                      <div className="p-2 sm:p-3 bg-green-100 rounded-full">
+                        <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
+                      </div>
+                    </div>
+                    <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-800 mb-1">
+                      {stats.activeOrders}
+                    </div>
+                    <div className="text-xs sm:text-sm text-slate-600 font-medium">Active Orders</div>
+                  </CardContent>
+                </Card>
 
-            <Card className="hologram-card">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-slate-400">Efficiency</p>
-                    <p className="text-3xl font-bold text-white">{stats.efficiency}%</p>
-                    <p className="text-xs text-purple-400 flex items-center mt-1">
-                      <Target className="w-3 h-3 mr-1" />
-                      Above target
-                    </p>
+                <Card className="bg-white/70 backdrop-blur-sm border border-purple-100 hover:shadow-lg transition-all duration-300">
+                  <CardContent className="p-4 sm:p-5 text-center">
+                    <div className="flex items-center justify-center mb-3">
+                      <div className="p-2 sm:p-3 bg-purple-100 rounded-full">
+                        <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
+                      </div>
+                    </div>
+                    <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-800 mb-1">
+                      ₱{(stats.revenue / 1000000).toFixed(1)}M
+                    </div>
+                    <div className="text-xs sm:text-sm text-slate-600 font-medium">Revenue</div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-white/70 backdrop-blur-sm border border-orange-100 hover:shadow-lg transition-all duration-300">
+                  <CardContent className="p-4 sm:p-5 text-center">
+                    <div className="flex items-center justify-center mb-3">
+                      <div className="p-2 sm:p-3 bg-orange-100 rounded-full">
+                        <Target className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" />
+                      </div>
+                    </div>
+                    <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-800 mb-1">
+                      {stats.efficiency}%
+                    </div>
+                    <div className="text-xs sm:text-sm text-slate-600 font-medium">Efficiency</div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+        {/* Orders Tab - Mobile Optimized */}
+        <TabsContent value="orders" className="space-y-4 sm:space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-800">Order Management</h2>
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-lg transition-all duration-200 w-full sm:w-auto touch-manipulation">
+              <Plus className="w-4 h-4 mr-2" />
+              New Order
+            </Button>
+          </div>
+
+          <div className="space-y-3 sm:space-y-4">
+            {orders.map((order) => (
+              <Card key={order.id} className="bg-white/70 backdrop-blur-sm border border-slate-200 hover:shadow-lg transition-all duration-300">
+                <CardContent className="p-4 sm:p-5">
+                  {/* Mobile-First Order Layout */}
+                  <div className="space-y-3">
+                    {/* Header Row */}
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-bold text-slate-900 text-sm sm:text-base truncate">{order.po_number}</h3>
+                        <p className="text-xs sm:text-sm text-slate-600 truncate">{order.client}</p>
+                      </div>
+                      <Badge className={`${getStatusColor(order.status)} text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap`}>
+                        {order.status.replace('_', ' ')}
+                      </Badge>
+                    </div>
+
+                    {/* Amount and Due Date Row */}
+                    <div className="flex items-center justify-between text-sm">
+                      <div>
+                        <p className="font-bold text-slate-900">{formatCurrency(order.amount)}</p>
+                        <p className="text-xs text-slate-500">Due: {new Date(order.due_date).toLocaleDateString()}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-semibold text-slate-700">{order.progress}%</p>
+                        <p className="text-xs text-slate-500">Complete</p>
+                      </div>
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="space-y-2">
+                      <div className="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+                        <div 
+                          className="bg-gradient-to-r from-blue-500 to-blue-600 h-2.5 rounded-full transition-all duration-500"
+                          style={{ width: `${order.progress}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex justify-end space-x-2 pt-1">
+                      <Button size="sm" variant="ghost" className="px-3 py-1.5 text-xs sm:text-sm touch-manipulation hover:bg-slate-100">
+                        <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                        View
+                      </Button>
+                      <Button size="sm" variant="ghost" className="px-3 py-1.5 text-xs sm:text-sm touch-manipulation hover:bg-slate-100">
+                        <Edit className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                        Edit
+                      </Button>
+                    </div>
                   </div>
-                  <div className="p-3 bg-purple-500/20 rounded-full">
-                    <BarChart3 className="w-6 h-6 text-purple-400" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </TabsContent>
 
-        {/* Orders Tab */}
-        <TabsContent value="orders" className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-white">Order Management</h2>
-            <div className="flex space-x-2">
-              <Button className="bg-gradient-to-r from-cyan-500 to-teal-500">
-                <Plus className="w-4 h-4 mr-2" />
-                New Order
-              </Button>
-            </div>
-          </div>
-
-          <Card className="hologram-card">
-            <CardContent className="p-6">
-              <div className="space-y-4">
-                {orders.map((order) => (
-                  <div key={order.id} className="flex items-center justify-between p-4 bg-slate-800/50 rounded-lg border border-cyan-500/10">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-4">
-                        <div>
-                          <p className="font-semibold text-white">{order.po_number}</p>
-                          <p className="text-sm text-slate-400">{order.client}</p>
-                        </div>
-                        <Badge className={`${getStatusColor(order.status)} border`}>
-                          {order.status.replace('_', ' ')}
-                        </Badge>
+        {/* Production Tab - Mobile Optimized */}
+        <TabsContent value="production" className="space-y-4 sm:space-y-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-800">Production Control</h2>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            {[
+              { stage: 'Cutting', active: 2, completed: 15, efficiency: '92%', color: 'text-blue-600', bgColor: 'bg-blue-50', borderColor: 'border-blue-100' },
+              { stage: 'Printing', active: 3, completed: 12, efficiency: '88%', color: 'text-purple-600', bgColor: 'bg-purple-50', borderColor: 'border-purple-100' },
+              { stage: 'Sewing', active: 5, completed: 18, efficiency: '95%', color: 'text-emerald-600', bgColor: 'bg-emerald-50', borderColor: 'border-emerald-100' },
+              { stage: 'QC', active: 1, completed: 20, efficiency: '98%', color: 'text-rose-600', bgColor: 'bg-rose-50', borderColor: 'border-rose-100' },
+              { stage: 'Packing', active: 2, completed: 17, efficiency: '94%', color: 'text-amber-600', bgColor: 'bg-amber-50', borderColor: 'border-amber-100' },
+              { stage: 'Delivery', active: 1, completed: 16, efficiency: '89%', color: 'text-cyan-600', bgColor: 'bg-cyan-50', borderColor: 'border-cyan-100' }
+            ].map((stage, index) => (
+              <Card key={index} className={`bg-white/70 backdrop-blur-sm ${stage.borderColor} hover:shadow-lg transition-all duration-300`}>
+                <CardContent className="p-4 sm:p-5">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 ${stage.bgColor} rounded-lg`}>
+                        <Settings className={`w-4 h-4 sm:w-5 sm:h-5 ${stage.color}`} />
                       </div>
+                      <h3 className={`${stage.color} font-bold text-sm sm:text-base`}>{stage.stage}</h3>
                     </div>
                     
-                    <div className="flex items-center space-x-6">
-                      <div className="text-right">
-                        <p className="font-semibold text-white">{formatCurrency(order.amount)}</p>
-                        <p className="text-sm text-slate-400">Due: {order.due_date}</p>
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs sm:text-sm text-slate-600">Active Jobs</span>
+                        <span className="text-sm sm:text-base font-bold text-slate-800">{stage.active}</span>
                       </div>
-                      
-                      <div className="w-20">
-                        <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
-                          <span>Progress</span>
-                          <span>{order.progress}%</span>
-                        </div>
-                        <div className="w-full bg-slate-700 rounded-full h-2">
-                          <div 
-                            className="bg-gradient-to-r from-cyan-400 to-teal-400 h-2 rounded-full"
-                            style={{ width: `${order.progress}%` }}
-                          />
-                        </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs sm:text-sm text-slate-600">Completed</span>
+                        <span className="text-sm sm:text-base font-bold text-slate-800">{stage.completed}</span>
                       </div>
-                      
-                      <div className="flex space-x-2">
-                        <Button size="sm" variant="outline" className="border-cyan-500/20">
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                        <Button size="sm" variant="outline" className="border-cyan-500/20">
-                          <Edit className="w-4 h-4" />
-                        </Button>
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs sm:text-sm text-slate-600">Efficiency</span>
+                        <span className={`${stage.color} font-bold text-sm sm:text-base`}>{stage.efficiency}</span>
                       </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Production Tab */}
-        <TabsContent value="production" className="space-y-6">
-          <h2 className="text-2xl font-bold text-white">Production Control</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { stage: 'Cutting', active: 2, completed: 15, efficiency: '92%', color: 'cyan' },
-              { stage: 'Printing', active: 3, completed: 12, efficiency: '88%', color: 'blue' },
-              { stage: 'Sewing', active: 5, completed: 18, efficiency: '95%', color: 'purple' },
-              { stage: 'QC', active: 1, completed: 20, efficiency: '98%', color: 'green' },
-              { stage: 'Packing', active: 2, completed: 17, efficiency: '94%', color: 'teal' },
-              { stage: 'Delivery', active: 1, completed: 16, efficiency: '89%', color: 'pink' }
-            ].map((stage, index) => (
-              <Card key={index} className="hologram-card">
-                <CardHeader>
-                  <CardTitle className={`text-${stage.color}-400 flex items-center`}>
-                    <Settings className="w-5 h-5 mr-2" />
-                    {stage.stage}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">Active Jobs</span>
-                      <span className="text-white font-bold">{stage.active}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">Completed</span>
-                      <span className="text-white font-bold">{stage.completed}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">Efficiency</span>
-                      <span className={`text-${stage.color}-400 font-bold`}>{stage.efficiency}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -401,46 +411,51 @@ export function UnifiedDashboard() {
         </TabsContent>
 
 
-        {/* Analytics Tab */}
-        <TabsContent value="analytics" className="space-y-6">
-          <h2 className="text-2xl font-bold text-white">Advanced Analytics</h2>
+        {/* Analytics Tab - Mobile Optimized */}
+        <TabsContent value="analytics" className="space-y-4 sm:space-y-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-800">Advanced Analytics</h2>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="hologram-card">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+            <Card className="bg-white/70 backdrop-blur-sm border border-indigo-100 hover:shadow-lg transition-all duration-300">
               <CardHeader>
-                <CardTitle className="text-white">Production Trends</CardTitle>
+                <CardTitle className="text-slate-800 text-base sm:text-lg font-bold">Production Trends</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-64 flex items-center justify-center text-slate-400">
+                <div className="h-48 sm:h-64 flex items-center justify-center">
                   <div className="text-center">
-                    <TrendingUp className="w-12 h-12 mx-auto mb-4 text-cyan-400" />
-                    <p>Interactive charts and analytics coming soon</p>
+                    <div className="p-3 sm:p-4 bg-indigo-50 rounded-2xl mx-auto w-fit mb-4">
+                      <TrendingUp className="w-8 h-8 sm:w-12 sm:h-12 text-indigo-600" />
+                    </div>
+                    <p className="text-sm sm:text-base text-slate-500">Interactive charts and analytics coming soon</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="hologram-card">
+            <Card className="bg-white/70 backdrop-blur-sm border border-emerald-100 hover:shadow-lg transition-all duration-300">
               <CardHeader>
-                <CardTitle className="text-white">Quality Metrics</CardTitle>
+                <CardTitle className="text-slate-800 text-base sm:text-lg font-bold">Quality Metrics</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400">Overall Quality Score</span>
-                    <span className="text-green-400 font-bold text-2xl">98.7%</span>
+                <div className="space-y-3 sm:space-y-4">
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-slate-600 text-sm sm:text-base">Overall Quality Score</span>
+                    <span className="text-emerald-600 font-bold text-lg sm:text-xl">98.7%</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400">Defect Rate</span>
-                    <span className="text-red-400 font-bold">1.3%</span>
+                  <div className="border-t border-slate-100"></div>
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-slate-600 text-sm sm:text-base">Defect Rate</span>
+                    <span className="text-red-600 font-semibold text-sm sm:text-base">1.3%</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400">Rework Required</span>
-                    <span className="text-yellow-400 font-bold">2.1%</span>
+                  <div className="border-t border-slate-100"></div>
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-slate-600 text-sm sm:text-base">Rework Required</span>
+                    <span className="text-amber-600 font-semibold text-sm sm:text-base">2.1%</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-400">Customer Satisfaction</span>
-                    <span className="text-green-400 font-bold">96.4%</span>
+                  <div className="border-t border-slate-100"></div>
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-slate-600 text-sm sm:text-base">Customer Satisfaction</span>
+                    <span className="text-emerald-600 font-semibold text-sm sm:text-base">96.4%</span>
                   </div>
                 </div>
               </CardContent>
@@ -448,64 +463,68 @@ export function UnifiedDashboard() {
           </div>
         </TabsContent>
       </Tabs>
-      </div>
+          </div>
 
-      {/* Always Visible AI Chat Sidebar */}
-      <div className="w-80 flex-shrink-0">
-        <Card className="hologram-card h-full sticky top-6">
-          <CardHeader className="pb-3">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-full">
-                <Brain className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <CardTitle className="text-white text-lg">Ashley AI</CardTitle>
-                <CardDescription className="text-xs">Always here to help</CardDescription>
-              </div>
-              <div className="ml-auto">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="p-4 h-96 flex flex-col">
-            <div className="flex-1 overflow-y-auto mb-4 space-y-3">
-              {chatMessages.map((msg) => (
-                <div key={msg.id} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[250px] p-3 rounded-lg text-sm ${
-                    msg.type === 'user' 
-                      ? 'bg-gradient-to-r from-cyan-500 to-teal-500 text-white' 
-                      : 'bg-slate-800 text-white border border-purple-500/20'
-                  }`}>
-                    <p>{msg.message}</p>
-                    <p className="text-xs opacity-70 mt-1">{msg.timestamp}</p>
+          {/* Mobile-Optimized Ashley AI Chat */}
+          <div className="lg:col-span-1 space-y-4 sm:space-y-6">
+            <Card className="bg-white/70 backdrop-blur-sm border border-blue-100 hover:shadow-lg transition-all duration-300">
+              <CardContent className="p-4 sm:p-5">
+                {/* Chat Header */}
+                <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                      <Brain className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-slate-800 text-sm sm:text-base">Ashley AI</h3>
+                      <p className="text-xs sm:text-sm text-slate-600">Manufacturing Assistant</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 px-2 py-1 bg-green-50 border border-green-200 rounded-full">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span className="text-xs text-green-700 font-medium">Online</span>
                   </div>
                 </div>
-              ))}
-            </div>
-            
-            <div className="flex space-x-2">
-              <Input
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="Ask Ashley AI..."
-                onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                className="flex-1 bg-slate-800 border-cyan-500/20 text-white placeholder-slate-400 text-sm"
-              />
-              <Button 
-                onClick={sendMessage} 
-                size="sm"
-                className="bg-gradient-to-r from-cyan-500 to-purple-500 px-3"
-              >
-                <MessageSquare className="w-4 h-4" />
-              </Button>
-            </div>
-            
-            <div className="mt-2 text-center">
-              <p className="text-xs text-slate-500">AI assistant for production optimization</p>
-            </div>
-          </CardContent>
-        </Card>
+                
+                {/* Chat Messages */}
+                <div className="h-48 sm:h-64 lg:h-72 overflow-y-auto mb-4 space-y-3 scroll-smooth">
+                  {chatMessages.map((msg) => (
+                    <div key={msg.id} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+                      <div className={`max-w-[85%] sm:max-w-[75%] p-3 rounded-lg text-sm transition-all duration-200 ${
+                        msg.type === 'user' 
+                          ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-md' 
+                          : 'bg-slate-50 text-slate-800 border border-slate-200 shadow-sm'
+                      }`}>
+                        <p className="leading-relaxed text-xs sm:text-sm">{msg.message}</p>
+                        <p className="text-xs opacity-60 mt-2">{msg.timestamp}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Chat Input */}
+                <div className="flex gap-2 pt-3 border-t border-slate-100">
+                  <Input
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    placeholder="Ask Ashley anything..."
+                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                    className="flex-1 h-10 text-sm border-slate-200 rounded-lg focus:border-blue-400 focus:ring-2 focus:ring-blue-100 placeholder:text-slate-400 text-slate-800 bg-white/50"
+                  />
+                  <button 
+                    onClick={sendMessage} 
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg shadow-lg transition-all duration-200 touch-manipulation"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                  </button>
+                </div>
+                
+                <p className="text-xs text-slate-500 text-center mt-3 italic">AI-powered manufacturing insights</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     </div>
-  )
+  );
 }

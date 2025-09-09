@@ -5,6 +5,7 @@
 
 import { PrismaClient, ProcessType, RouteTemplateType, WorkcenterType } from '@prisma/client'
 import { nanoid } from 'nanoid'
+import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
@@ -112,7 +113,35 @@ async function createDefaultBrands(workspace_id: string) {
 async function createSampleClients(workspace_id: string) {
   console.log('👥 Creating sample clients...')
   
+  // Hash password for portal access
+  const demoPassword = await bcrypt.hash('demo123', 12)
+  
   const clients = [
+    {
+      id: nanoid(),
+      workspace_id,
+      name: 'Demo Client',
+      company: 'Demo Company Inc.',
+      emails: ['client@example.com'],
+      phones: ['+63-917-000-0000'],
+      billing_address: {
+        street: 'Demo Street 123',
+        city: 'Demo City',
+        province: 'Demo Province',
+        postal_code: '1000',
+        country: 'Philippines'
+      },
+      notes: 'Demo client for testing portal access.',
+      portal_access: true,
+      portal_password: demoPassword,
+      ai_preferences: {
+        preferred_communication: 'email',
+        order_frequency: 'monthly',
+        quality_preference: 'premium'
+      },
+      risk_score: 0.10,
+      ltv_prediction: 250000.0
+    },
     {
       id: nanoid(),
       workspace_id,
@@ -129,6 +158,7 @@ async function createSampleClients(workspace_id: string) {
       },
       notes: 'Premium safari park client. Requires high-quality outdoor apparel.',
       portal_access: true,
+      portal_password: demoPassword,
       ai_preferences: {
         preferred_communication: 'email',
         order_frequency: 'monthly',
@@ -153,6 +183,7 @@ async function createSampleClients(workspace_id: string) {
       },
       notes: 'Tech startup incubator. Orders corporate shirts and hoodies for events.',
       portal_access: true,
+      portal_password: demoPassword,
       ai_preferences: {
         preferred_communication: 'slack',
         order_frequency: 'quarterly',

@@ -312,6 +312,53 @@
 
 ---
 
+## 📋 Current PO List Status
+
+### **Active Purchase Orders** (As of Sept 9, 2025)
+
+| PO# | Clothing/Company | Design Name | Qty | Status |
+|-----|------------------|-------------|-----|---------|
+| 020335 | REEFER | - | 30 | MATERIAL PREPARATION |
+| 020334 | REEFER | - | 30 | MATERIAL PREPARATION |
+| 020333 | REEFER | SHADOWLEAF | 30 | MATERIAL PREPARATION |
+| 020332 | REEFER | WILDROOT | 30 | MATERIAL PREPARATION |
+| 020331 | REEFER | SHADOWLEAF | 30 | MATERIAL PREPARATION |
+| 020330 | REEFER | CANOPY | 30 | MATERIAL PREPARATION |
+| 020329 | REVEL | SWEAT PANTS | 7 | MATERIAL PREPARATION |
+| 020328 | REVEL | HOODIE - RED | 31 | MATERIAL PREPARATION |
+| 020327 | REVEL | HOODIE - BROWN | 31 | MATERIAL PREPARATION |
+| 020326 | REVEL | REVEL - PINK HOODIE | 30 | MATERIAL PREPARATION |
+| 020325 | REVEL | HOODIE - ROYAL BLUE | 30 | MATERIAL PREPARATION |
+| 020324 | REEFER | REEFER VIBES | 0 | SCREEN MAKING |
+| 020323 | REEFER | INNER PEACE | 0 | SAMPLE PRINTING |
+| 020322 | REEFER | REEFER WORK HARD | 0 | SAMPLE PRINTING |
+| 020321 | REEFER | STAY SWEET | 0 | SAMPLE PRINTING |
+| 020320 | PRESIDENT AU HOSPITALITY MANAGEMENT SOCIETY | HMS WASH DAY UNIFORM | 21 | CUTTING |
+| 020319 | PRESIDENT AU HOSPITALITY MANAGEMENT SOCIETY | HMS COMMITTEE MEMBER UNINFORM | 10 | CUTTING |
+| 020318 | PRESIDENT AU HOSPITALITY MANAGEMENT SOCIETY | HMS COUNCIL UNIFORM | 17 | CUTTING |
+| 020317 | PLEAD THE FIFTH | PLAIN OFF WHITE SHIRTS | 65 | SEWING |
+| 020316 | REEFER CLOTHING | BLOOM | 0 | CANCELLED |
+
+### **PO Summary Statistics**
+- **Total Active POs**: 19 orders
+- **Material Preparation**: 11 orders (57.9%)
+- **Screen Making/Sample Printing**: 4 orders (21.1%) 
+- **Cutting**: 3 orders (15.8%)
+- **Sewing**: 1 order (5.3%)
+- **Cancelled**: 1 order
+- **Total Units in Production**: 348 pieces
+- **Major Clients**: REEFER, REVEL, President AU Hospitality Management Society
+
+### **Production Pipeline Status**
+```
+Material Preparation: ████████████████████████████████████████ 58%
+Screen Making/Sampling: ███████████████████████████ 21%
+Cutting: ██████████████████ 16%
+Sewing: ████████ 5%
+```
+
+---
+
 ## 📝 Final Delivery
 
 ### **Documentation**

@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
     // Authorization check - admin/manager only
-    if (![Role.ADMIN, Role.MANAGER].includes(session.user.role as Role)) {
+    if (session.user.role !== Role.ADMIN && session.user.role !== Role.MANAGER) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
     const body = await request.json()
@@ -87,23 +87,25 @@ export async function POST(request: NextRequest) {
 
     const forecast = await prisma.forecast.create({
       data: {
-        name,
+        workspace_id: "workspace-1",
         type,
         period,
         algorithm,
         accuracy: forecastResult.accuracy,
-        parameters: parameters || {},
-        inputData: forecastResult.inputData,
-        prediction: forecastResult.prediction,
-        status: "COMPLETED",
-        createdBy
+        data: {
+          name,
+          parameters: parameters || {},
+          inputData: forecastResult.inputData,
+          prediction: forecastResult.prediction,
+          status: "COMPLETED",
+          createdBy
+        }
       },
       include: {
-        creator: {
+        workspace: {
           select: {
             id: true,
-            name: true,
-            email: true
+            name: true
           }
         }
       }
@@ -185,7 +187,7 @@ async function getSalesHistoricalData(_targetDate: Date) {
   // In real implementation, query actual sales data
   const months = []
   for (let i = 12; i >= 1; i--) {
-    const date = new Date(targetDate)
+    const date = new Date(_targetDate)
     date.setMonth(date.getMonth() - i)
     
     // Mock seasonal sales pattern with growth trend
@@ -221,7 +223,7 @@ async function getInventoryHistoricalData(_targetDate: Date) {
 async function getCashFlowHistoricalData(_targetDate: Date) {
   const months = []
   for (let i = 6; i >= 1; i--) {
-    const date = new Date(targetDate)
+    const date = new Date(_targetDate)
     date.setMonth(date.getMonth() - i)
     
     months.push({

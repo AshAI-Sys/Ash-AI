@@ -21,15 +21,12 @@ export async function GET(request: NextRequest) {
       category?: string
       type?: string
       assigned_to?: string
+      status?: string
       created_at?: { gte: Date; lte: Date }
     } = {}
     
     if (category) {
       where.category = category
-    }
-    
-    if (impact) {
-      where.impact = impact
     }
     
     if (status) {
@@ -41,19 +38,20 @@ export async function GET(request: NextRequest) {
     }
 
     const insights = await prisma.businessInsight.findMany({
-      where,
+      where: {
+        workspace_id: "workspace-1",
+        ...where
+      },
       include: {
-        assignee: {
+        workspace: {
           select: {
             id: true,
-            name: true,
-            email: true
+            name: true
           }
         }
       },
       orderBy: [
-        { impact: "desc" },
-        { confidence: "desc" },
+        { status: "asc" },
         { created_at: "desc" }
       ]
     })
@@ -92,11 +90,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
     // Authorization check - admin/manager only
-    if (![Role.ADMIN, Role.MANAGER].includes(session.user.role as Role)) {
+    if (session.user.role !== Role.ADMIN && session.user.role !== Role.MANAGER) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
     const body = await request.json()
     const {
+      type,
       title,
       category,
       description,
@@ -124,24 +123,12 @@ export async function POST(request: NextRequest) {
 
     const insight = await prisma.businessInsight.create({
       data: {
+        type,
         title,
-        category,
         description,
         impact,
-        confidence: confidence || 0.8,
-        dataSource,
-        evidence: evidence || {},
-        recommendation,
-        assignedTo
-      },
-      include: {
-        assignee: {
-          select: {
-            id: true,
-            name: true,
-            email: true
-          }
-        }
+        assigned_to: assignedTo,
+        workspace_id: "default-workspace"
       }
     })
 

@@ -28,7 +28,25 @@ export async function GET(request: NextRequest) {
 
     const decoded = jwt.verify(token, JWT_SECRET) as any
     const clientId = decoded.clientId
+    const clientUserId = decoded.clientUserId
     const workspaceId = decoded.workspaceId
+
+    // Verify client user still exists and has portal access
+    const clientUser = await prisma.clientUser.findFirst({
+      where: {
+        id: clientUserId,
+        client_id: clientId,
+        workspace_id: workspaceId,
+        status: 'ACTIVE'
+      },
+      include: {
+        client: true
+      }
+    })
+
+    if (!clientUser) {
+      return NextResponse.json({ error: 'Client access revoked' }, { status: 401 })
+    }
 
     // Get client orders with detailed information
     const orders = await prisma.order.findMany({
@@ -137,23 +155,13 @@ export async function GET(request: NextRequest) {
     // Get communication notifications
     const notifications = await getClientNotifications(clientId, workspaceId)
 
-    // Get client preferences and settings
-    const client = await prisma.client.findUnique({
-      where: { id: clientId },
-      select: {
-        name: true,
-        company: true,
-        portal_settings: true
-      }
-    })
-
     return NextResponse.json({
       success: true,
       dashboard: {
         client: {
-          name: client?.name,
-          company: client?.company,
-          settings: client?.portal_settings || {}
+          name: clientUser.client.name,
+          company: clientUser.client.company,
+          settings: {}
         },
         overview: {
           total_orders: orders.length,
@@ -195,7 +203,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
     }
 
-    console.error('Dashboard error:', _error)
+    console.error('Dashboard error:', error)
     return NextResponse.json({ 
       success: false,
       error: 'Failed to load dashboard' 
@@ -286,9 +294,9 @@ function calculateOrderInsights(orders: any[]) {
     completedOrders.forEach(order => {
       const delivery = order.deliveries?.[0]
       if (delivery && delivery.completed_at) {
-        const _targetDate = new Date(order.target_delivery_date)
+        const targetDate = new Date(order.target_delivery_date)
         const actualDate = new Date(delivery.completed_at)
-        const daysDiff = Math.floor((new Date(actualDate).getTime() - new Date(targetDate).getTime()) / (1000 * 60 * 60 * 24))
+        const daysDiff = Math.floor((actualDate.getTime() - targetDate.getTime()) / (1000 * 60 * 60 * 24))
         
         if (daysDiff <= 0) insights.delivery_performance.on_time++
         else if (daysDiff > 0) insights.delivery_performance.delayed++

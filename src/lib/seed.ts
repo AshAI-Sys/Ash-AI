@@ -1,4 +1,4 @@
-import { PrismaClient, Role, RouteTemplateType, ProcessType, WorkcenterType, WalletType } from '@prisma/client'
+import { PrismaClient, Role, WorkcenterType } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()

@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Authorization - only admin, manager can create automation rules
-    if (![Role.ADMIN, Role.MANAGER].includes(session.user.role as Role)) {
+    if (session.user.role !== Role.ADMIN && session.user.role !== Role.MANAGER) {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
     }
 

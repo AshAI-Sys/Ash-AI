@@ -114,54 +114,54 @@ export default function MessagesPage() {
 
   return (
     <Layout>
-      <div className="neural-bg min-h-screen p-6 space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <h1 className="text-3xl font-bold text-white glitch-text flex items-center gap-3" data-text="MESSAGES">
-              <MessageCircle className="w-8 h-8 text-cyan-400" />
-              MESSAGES
+      <div className="elegant-background min-h-screen p-8 space-y-10">
+        {/* Elegant Header */}
+        <div className="flex items-start justify-between">
+          <div className="space-y-3">
+            <h1 className="text-display text-slate-800 flex items-center gap-4">
+              <MessageCircle className="w-10 h-10 text-blue-600" />
+              Messages
               {unreadCount > 0 && (
-                <Badge className="bg-red-500/20 text-red-400 border-red-500/50 animate-pulse">
+                <Badge className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-caption font-semibold animate-pulse">
                   {unreadCount} NEW
                 </Badge>
               )}
             </h1>
-            <p className="text-cyan-300 font-mono">System notifications and team communications</p>
+            <p className="text-body text-slate-600 max-w-md leading-relaxed">Elegant communication center for your manufacturing operations</p>
           </div>
           
-          <div className="flex gap-3">
-            <Button className="neon-btn-primary">
-              <Bell className="w-4 h-4 mr-2" />
+          <div className="flex gap-4">
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-subtle hover:shadow-elegant transition-all">
+              <Bell className="w-5 h-5 mr-2" />
               Notifications
             </Button>
-            <Button className="neon-btn-outline">
-              <Users className="w-4 h-4 mr-2" />
+            <Button className="bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 px-6 py-3 rounded-xl shadow-subtle hover:shadow-elegant transition-all">
+              <Users className="w-5 h-5 mr-2" />
               Team Chat
             </Button>
           </div>
         </div>
 
-        {/* Search and Filters */}
-        <div className="flex gap-4 items-center">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+        {/* Elegant Search and Filters */}
+        <div className="flex gap-6 items-center">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
             <input
               type="text"
-              placeholder="Search messages..."
+              placeholder="Search conversations..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="cyber-input pl-10"
+              className="w-full pl-12 pr-4 py-4 text-body-sm border border-slate-200 rounded-xl focus:border-blue-300 focus:ring-blue-100 focus:ring-4 transition-all"
             />
           </div>
-          <Button className="neon-btn-outline">
-            <Filter className="w-4 h-4 mr-2" />
+          <Button className="bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 px-6 py-4 rounded-xl shadow-subtle hover:shadow-elegant transition-all">
+            <Filter className="w-5 h-5 mr-2" />
             Filter
           </Button>
         </div>
 
-        {/* Tabs */}
-        <div className="flex space-x-1 bg-slate-900/50 rounded-lg p-1">
+        {/* Elegant Tabs */}
+        <div className="flex space-x-2 border-b border-slate-200">
           {[
             { id: 'all', label: 'All Messages', count: messages.length },
             { id: 'unread', label: 'Unread', count: unreadCount },
@@ -170,90 +170,90 @@ export default function MessagesPage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 font-mono text-sm ${
+              className={`flex items-center gap-3 px-6 py-4 text-body-sm font-medium transition-all duration-200 border-b-2 ${
                 activeTab === tab.id
-                  ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
-                  : 'text-gray-400 hover:text-cyan-300 hover:bg-cyan-500/10'
+                  ? 'border-blue-600 text-blue-700'
+                  : 'border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300'
               }`}
             >
               {tab.label}
               {tab.count > 0 && (
-                <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/50 text-xs">
+                <span className="bg-slate-100 text-slate-600 px-2 py-1 rounded-full text-xs font-semibold">
                   {tab.count}
-                </Badge>
+                </span>
               )}
             </button>
           ))}
         </div>
 
-        {/* Messages List */}
-        <div className="space-y-3">
+        {/* Elegant Messages List */}
+        <div className="space-y-6">
           {filteredMessages.map((message) => (
-            <Card key={message.id} className={`quantum-card transition-all duration-300 hover:scale-105 cursor-pointer ${
-              message.unread ? 'border-cyan-500/50 shadow-cyan-500/20' : ''
+            <Card key={message.id} className={`elegant-card shadow-subtle hover:shadow-elegant border-0 transition-all duration-300 cursor-pointer ${
+              message.unread ? 'ring-2 ring-blue-100' : ''
             }`}>
-              <CardContent className="p-4">
-                <div className="flex items-start gap-4">
-                  {/* Avatar */}
-                  <div className={`ai-orb ${message.unread ? 'animate-pulse' : ''}`}>
-                    <span className="text-lg">{message.avatar}</span>
+              <CardContent className="p-8">
+                <div className="flex items-start gap-6">
+                  {/* Elegant Avatar */}
+                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-subtle ${message.unread ? 'animate-pulse' : ''}`}>
+                    <span className="text-xl text-white">{message.avatar}</span>
                   </div>
 
                   {/* Message Content */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className={`font-bold ${message.unread ? 'text-white' : 'text-cyan-300'}`}>
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className={`font-semibold text-body ${message.unread ? 'text-slate-800' : 'text-slate-700'}`}>
                         {message.sender}
                       </span>
                       {message.priority === 'high' && (
-                        <Badge className="bg-red-500/20 text-red-400 border-red-500/50 text-xs">
-                          HIGH
-                        </Badge>
+                        <span className="bg-red-100 text-red-600 px-2 py-1 rounded-full text-xs font-semibold">
+                          HIGH PRIORITY
+                        </span>
                       )}
                       {message.unread && (
-                        <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/50 text-xs">
+                        <span className="bg-blue-100 text-blue-600 px-2 py-1 rounded-full text-xs font-semibold">
                           NEW
-                        </Badge>
+                        </span>
                       )}
                     </div>
                     
-                    <h3 className={`font-semibold mb-1 ${message.unread ? 'text-white' : 'text-gray-300'}`}>
+                    <h3 className={`font-semibold mb-3 text-h4 ${message.unread ? 'text-slate-800' : 'text-slate-700'}`}>
                       {message.subject}
                     </h3>
                     
-                    <p className="text-sm text-gray-400 mb-2 line-clamp-2">
+                    <p className="text-body text-slate-600 mb-4 leading-relaxed line-clamp-2">
                       {message.preview}
                     </p>
                     
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-1 text-xs text-cyan-400">
-                        <Clock className="w-3 h-3" />
+                    <div className="flex items-center gap-6">
+                      <div className="flex items-center gap-2 text-body-sm text-slate-400">
+                        <Clock className="w-4 h-4" />
                         {message.time}
                       </div>
                       
                       {message.type === 'system' && (
-                        <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/50 text-xs">
+                        <span className="bg-purple-100 text-purple-600 px-3 py-1 rounded-full text-xs font-semibold">
                           SYSTEM
-                        </Badge>
+                        </span>
                       )}
                       
                       {message.type === 'alert' && (
-                        <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/50 text-xs">
+                        <span className="bg-amber-100 text-amber-600 px-3 py-1 rounded-full text-xs font-semibold">
                           ALERT
-                        </Badge>
+                        </span>
                       )}
                     </div>
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex items-center gap-2">
+                  {/* Elegant Actions */}
+                  <div className="flex items-center gap-4">
                     {message.unread ? (
-                      <AlertCircle className="w-5 h-5 text-cyan-400 animate-pulse" />
+                      <AlertCircle className="w-6 h-6 text-blue-600 animate-pulse" />
                     ) : (
-                      <CheckCircle2 className="w-5 h-5 text-gray-500" />
+                      <CheckCircle2 className="w-6 h-6 text-slate-400" />
                     )}
-                    <Button className="neon-btn-outline text-xs px-2 py-1">
-                      <Send className="w-3 h-3" />
+                    <Button className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl transition-all">
+                      <Send className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
@@ -263,14 +263,14 @@ export default function MessagesPage() {
         </div>
 
         {filteredMessages.length === 0 && (
-          <Card className="quantum-card">
-            <CardContent className="p-8 text-center">
-              <div className="ai-orb mx-auto mb-4">
-                <MessageCircle className="w-8 h-8 text-gray-400" />
+          <Card className="elegant-card shadow-subtle border-0">
+            <CardContent className="p-12 text-center">
+              <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <MessageCircle className="w-10 h-10 text-slate-400" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">No messages found</h3>
-              <p className="text-cyan-300">
-                {searchTerm ? 'Try adjusting your search terms' : 'All caught up! No new messages.'}
+              <h3 className="text-h2 text-slate-800 mb-3 font-serif">No messages found</h3>
+              <p className="text-body text-slate-500 max-w-sm mx-auto leading-relaxed">
+                {searchTerm ? 'Try adjusting your search terms for better results' : 'You\'re all caught up! No new messages at the moment.'}
               </p>
             </CardContent>
           </Card>

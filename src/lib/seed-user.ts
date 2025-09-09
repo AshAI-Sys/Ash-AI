@@ -22,8 +22,6 @@ export async function createTestUser() {
       data: {
         id: crypto.randomUUID(),
         name: 'ASH AI Demo Workspace',
-        slug: 'ash-ai-demo',
-        plan: 'PROFESSIONAL',
         active: true,
         settings: {
           currency: 'PHP',

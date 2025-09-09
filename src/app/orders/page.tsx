@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import Layout from '@/components/Layout'
+// Removed Layout import to prevent duplicate navigation
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -24,8 +24,10 @@ import {
   User,
   Shield,
   RefreshCw,
-  Brain
+  Brain,
+  ArrowLeft
 } from 'lucide-react'
+import { Peso } from '@/components/icons/Peso'
 import { Role } from '@prisma/client'
 
 interface Order {
@@ -133,7 +135,7 @@ export default function OrdersPage() {
     if (status === 'loading') return
     
     if (!session) {
-      router.push('/auth/signin')
+      router.push('/login')
       return
     }
 
@@ -186,17 +188,15 @@ export default function OrdersPage() {
 
   if (status === 'loading') {
     return (
-      <Layout>
-        <div className="neural-bg min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <div className="quantum-loader w-16 h-16 mx-auto mb-8">
-              <div></div><div></div><div></div>
-            </div>
-            <h1 className="text-3xl font-bold glitch-text text-white mb-4" data-text="ASH AI">ASH AI</h1>
-            <p className="text-cyan-300 font-medium">Loading Neural Orders System...</p>
+      <div className="neural-bg min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="quantum-loader w-16 h-16 mx-auto mb-8">
+            <div></div><div></div><div></div>
           </div>
+          <h1 className="text-3xl font-bold glitch-text text-white mb-4" data-text="ASH AI">ASH AI</h1>
+          <p className="text-cyan-300 font-medium">Loading Neural Orders System...</p>
         </div>
-      </Layout>
+      </div>
     )
   }
 
@@ -208,16 +208,16 @@ export default function OrdersPage() {
   const allowedRoles = [Role.ADMIN, Role.MANAGER, Role.CSR, Role.SALES_STAFF, Role.LIVE_SELLER]
   if (!allowedRoles.includes(session.user.role)) {
     return (
-      <Layout>
-        <div className="neural-bg min-h-screen flex items-center justify-center">
-          <div className="quantum-card neon-glow text-center p-8">
-            <Shield className="w-16 h-16 text-cyan-400 mx-auto mb-4 animate-pulse" />
-            <h3 className="text-xl font-semibold text-white mb-2 glitch-text" data-text="Access Denied">Access Denied</h3>
-            <p className="text-cyan-300 mb-4">Neural access restricted to authorized personnel.</p>
-            <p className="text-sm text-cyan-400">Contact your system administrator for clearance.</p>
+      <div className="simple-page-container">
+        <div className="simple-content-wrapper max-w-md mx-auto mt-20">
+          <div className="simple-card text-center p-8">
+            <Shield className="w-12 h-12 text-red-600 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold simple-text-primary mb-2">Access Denied</h3>
+            <p className="simple-text-secondary mb-4">You don't have permission to view this page.</p>
+            <p className="text-sm simple-text-muted">Contact your administrator for access.</p>
           </div>
         </div>
-      </Layout>
+      </div>
     )
   }
 
@@ -253,52 +253,38 @@ export default function OrdersPage() {
   }
 
   return (
-    <Layout>
-      <div className="neural-bg min-h-screen relative">
-        {/* Quantum Field Background */}
-        <div className="quantum-field">
-          {Array.from({ length: 15 }).map((_, i) => (
-            <div
-              key={i}
-              className="quantum-particle"
-              style={{
-                left: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 6}s`,
-              }}
-            />
-          ))}
-        </div>
-        
-        <div className="relative z-10 p-10 space-y-8">
-          {/* Neural Header */}
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-            <div className="space-y-2">
-              <div className="flex items-center space-x-4">
-                <div className="ai-orb w-12 h-12 animate-pulse">
-                  <Package className="w-6 h-6 text-white" />
-                </div>
-                <h1 className="text-4xl font-bold glitch-text text-white" data-text="Neural Orders Command">Neural Orders Command</h1>
+    <div className="simple-page-container">
+      <div className="simple-content-wrapper">
+        <div className="simple-header">
+          <div className="simple-flex justify-between">
+            <div className="simple-flex">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                <Package className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
               </div>
-              <p className="text-lg text-cyan-300 font-medium ml-16">Advanced production order management with AI-powered insights</p>
+              <div>
+                <h1 className="text-lg sm:text-xl font-semibold simple-text-primary">Orders Management</h1>
+                <p className="text-xs sm:text-sm simple-text-secondary">Production order tracking system</p>
+              </div>
             </div>
-            <div className="flex gap-3">
-              <Button 
+            <div className="simple-flex gap-2 sm:gap-4">
+              <button 
                 onClick={() => fetchOrders()}
                 disabled={loading}
-                className="neon-btn hover:scale-105 transition-all duration-300"
+                className="simple-btn text-xs sm:text-sm px-3 py-1.5 sm:px-4 sm:py-2"
               >
-                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 ${loading ? 'animate-spin' : ''}`} />
                 Refresh
-              </Button>
-              <Button 
+              </button>
+              <button 
                 onClick={() => router.push('/orders/new')}
-                className="neon-btn-primary hover:scale-105 transition-all duration-300 shadow-lg"
+                className="simple-btn text-xs sm:text-sm px-3 py-1.5 sm:px-4 sm:py-2"
               >
-                <Plus className="w-5 h-5 mr-3" />
+                <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                 New Order
-              </Button>
+              </button>
             </div>
           </div>
+        </div>
 
           {/* Neural Metrics Dashboard */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -352,7 +338,7 @@ export default function OrdersPage() {
                     <p className="text-3xl font-bold text-white">{formatCurrency(orders.reduce((sum, order) => sum + order.totalAmount, 0))}</p>
                   </div>
                   <div className="ai-orb w-12 h-12">
-                    <DollarSign className="w-6 h-6 text-white" />
+                    <Peso className="w-6 h-6 text-white" />
                   </div>
                 </div>
               </CardContent>
@@ -497,7 +483,7 @@ export default function OrdersPage() {
                           <span className="text-cyan-200">Created {formatDate(order.createdAt)}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <DollarSign className="w-4 h-4 text-cyan-400" />
+                          <Peso className="w-4 h-4 text-cyan-400" />
                           <span className="text-cyan-200 font-medium">{formatCurrency(order.totalAmount)}</span>
                         </div>
                       </div>
@@ -565,7 +551,6 @@ export default function OrdersPage() {
           )}
         </div>
       </div>
-      </div>
-    </Layout>
+    </div>
   )
 }

@@ -3,7 +3,8 @@
 import { SessionProvider } from 'next-auth/react'
 import { ReactNode, useEffect } from 'react'
 import { ToastProvider } from '@/context/toast-context'
-import { PWAInstallPrompt } from '@/components/pwa/PWAInstallPrompt'
+// Removed PWAInstallPrompt - not required in CLIENT_UPDATED_PLAN.md
+// import { PWAInstallPrompt } from '@/components/pwa/PWAInstallPrompt'
 import { offlineSyncManager } from '@/lib/pwa/offline-sync'
 import { pushNotificationManager } from '@/lib/pwa/push-notifications'
 
@@ -46,7 +47,7 @@ export default function Providers({ children }: ProvidersProps) {
     <SessionProvider>
       <ToastProvider>
         <PWAInitializer />
-        <PWAInstallPrompt />
+        {/* PWAInstallPrompt removed - not in CLIENT_UPDATED_PLAN.md requirements */}
         {children}
       </ToastProvider>
     </SessionProvider>

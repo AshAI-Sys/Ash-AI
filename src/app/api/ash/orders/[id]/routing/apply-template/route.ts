@@ -19,7 +19,7 @@ export async function POST(
     }
 
     // Only Manager and Admin can change routing templates
-    if (![Role.ADMIN, Role.MANAGER].includes(session.user.role as Role)) {
+    if (session.user.role !== Role.ADMIN && session.user.role !== Role.MANAGER) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 

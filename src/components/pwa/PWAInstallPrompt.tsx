@@ -153,16 +153,16 @@ export function PWAInstallPrompt({ className }: PWAInstallPromptProps) {
 
   return (
     <>
-      {/* Floating Install Button */}
+      {/* Floating Install Button - Positioned to avoid AI chat conflict */}
       {!showPrompt && deferredPrompt && (
-        <div className="fixed bottom-4 right-4 z-50">
+        <div className="fixed bottom-4 left-4 sm:bottom-6 sm:left-6 z-30">
           <Button
             onClick={handleManualInstall}
-            className="rounded-full shadow-lg hover:shadow-xl transition-shadow"
-            size="lg"
+            className="rounded-full shadow-lg hover:shadow-xl transition-shadow bg-blue-600 hover:bg-blue-700 text-white"
+            size="sm"
           >
-            <Download className="h-5 w-5 mr-2" />
-            Install App
+            <Download className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2" />
+            <span className="text-xs sm:text-sm">Install ASH AI</span>
           </Button>
         </div>
       )}

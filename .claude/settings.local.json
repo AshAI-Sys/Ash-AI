@@ -27,7 +27,13 @@
       "Bash(git branch:*)",
       "Bash(gh:*)",
       "Bash(npx vercel:*)",
-      "Bash(del tsconfig.tsbuildinfo)"
+      "Bash(del tsconfig.tsbuildinfo)",
+      "Bash(npx tsx:*)",
+      "Bash(del:*)",
+      "Bash(powershell:*)",
+      "Bash(sed:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []
