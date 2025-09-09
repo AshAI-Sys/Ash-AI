@@ -13,16 +13,21 @@ interface ProvidersProps {
 
 function PWAInitializer() {
   useEffect(() => {
-    // Initialize PWA features (temporarily disabled for debugging)
+    // Initialize PWA features
     const initializePWA = async () => {
       try {
-        console.log('PWA initialization temporarily disabled for debugging')
-        // TODO: Re-enable after fixing dashboard error
-        // await offlineSyncManager.initialize()
-        // offlineSyncManager.setupAutoSync()
-        // await offlineSyncManager.cacheEssentialData()
-        // await pushNotificationManager.initialize()
-        // offlineSyncManager.registerBackgroundSync()
+        // Initialize offline sync
+        await offlineSyncManager.initialize()
+        offlineSyncManager.setupAutoSync()
+        
+        // Cache essential data
+        await offlineSyncManager.cacheEssentialData()
+        
+        // Initialize push notifications
+        await pushNotificationManager.initialize()
+        
+        // Register background sync
+        offlineSyncManager.registerBackgroundSync()
         
         console.log('✅ PWA features initialized')
       } catch (error) {

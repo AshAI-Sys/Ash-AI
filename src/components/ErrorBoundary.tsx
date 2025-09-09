@@ -88,8 +88,8 @@ export class ErrorBoundary extends Component<Props, State> {
                 </p>
               </div>
 
-              {/* Error Details (temporarily enabled for debugging) */}
-              {this.state.error && (
+              {/* Error Details (only in development) */}
+              {process.env.NODE_ENV === 'development' && this.state.error && (
                 <div className="mb-6 bg-red-900/20 border border-red-500/30 rounded-xl p-4">
                   <details className="text-red-200">
                     <summary className="cursor-pointer text-red-300 font-semibold mb-2">
