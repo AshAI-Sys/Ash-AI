@@ -390,9 +390,12 @@ export function EnterpriseDashboard() {
               </div>
 
               <div className="flex space-x-2">
-                <Button className="flex-1 bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600">
+                <Button 
+                  className="flex-1 bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600"
+                  onClick={() => window.location.href = '/ai-assistant'}
+                >
                   <Brain className="w-4 h-4 mr-2" />
-                  Open Ashley AI
+                  Chat with Ashley AI
                 </Button>
               </div>
             </div>
