@@ -17,7 +17,7 @@ export default function Home() {
     if (status === 'loading') return
     
     if (session) {
-      router.push('/dashboard')
+      router.push('/unified-dashboard')
       return
     }
     

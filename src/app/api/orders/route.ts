@@ -57,7 +57,7 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
         },
         include: {
           client: {
-            select: { id: true, name: true, email: true }
+            select: { id: true, name: true, emails: true }
           },
           orderItems: {
             select: { id: true, product_type: true, quantity: true, unit_price: true }
@@ -192,7 +192,7 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
     const completeOrder = await db.order.findUnique({
       where: { id: order.id },
       include: {
-        client: { select: { id: true, name: true, email: true } },
+        client: { select: { id: true, name: true, emails: true } },
         orderItems: true,
         statusHistory: { orderBy: { changed_at: 'desc' } }
       }

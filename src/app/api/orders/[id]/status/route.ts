@@ -45,7 +45,7 @@ export const PUT = withErrorHandler(async (
     const updatedOrder = await db.order.findUnique({
       where: { id: order_id },
       include: {
-        client: { select: { name: true, email: true } },
+        client: { select: { name: true, emails: true } },
         statusHistory: {
           orderBy: { changed_at: 'desc' },
           take: 5,
@@ -102,7 +102,7 @@ export const GET = withErrorHandler(async (
       db.order.findUnique({
         where: { id: order_id },
         include: {
-          client: { select: { name: true, email: true } }
+          client: { select: { name: true, emails: true } }
         }
       }),
       db.orderStatusHistory.findMany({
@@ -164,10 +164,10 @@ async function sendOrderStatusNotifications(
   const notifications = [];
 
   // Client notification
-  if (updateData.notify_client && order.client?.email) {
+  if (updateData.notify_client && order.client?.emails) {
     notifications.push({
       type: 'EMAIL',
-      recipient: order.client.email,
+      recipient: order.client.emails,
       subject: `Order Update: ${order.po_number}`,
       template: 'order_status_update',
       data: {

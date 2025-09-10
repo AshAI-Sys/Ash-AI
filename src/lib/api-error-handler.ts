@@ -117,7 +117,7 @@ export function withErrorHandler(
     try {
       return await handler(request);
     } catch (_error) {
-      console.error('API Error:', error);
+      console.error('API Error:', _error);
       
       // Log error for monitoring
       if (process.env.NODE_ENV === 'production') {
@@ -125,8 +125,8 @@ export function withErrorHandler(
         console.error('Production API Error:', {
           url: request.url,
           method: request.method,
-          error: error instanceof Error ? error.message : String(error),
-          stack: error instanceof Error ? error.stack : undefined,
+          error: _error instanceof Error ? _error.message : String(_error),
+          stack: _error instanceof Error ? _error.stack : undefined,
           timestamp: new Date().toISOString()
         });
       }
