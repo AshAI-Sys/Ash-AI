@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
       where: { id: workspace_id }
     })
 
-    if (!workspace) {
+    if (!_workspace) {
       return NextResponse.json(
         { error: 'Workspace not found' },
         { status: 404 }

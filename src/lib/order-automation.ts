@@ -193,7 +193,7 @@ export class OrderWorkflowAutomation {
   private startAutomationEngine() {
     // Check for time-based rules every minute
     setInterval(() => {
-      this.processTimeBased Automation()
+      this.processTimeBasedAutomation()
     }, 60000)
   }
 

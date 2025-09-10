@@ -463,3 +463,5 @@ export default function AshleyAIChat() {
     </>
   )
 }
+
+export default AshleyAIChat

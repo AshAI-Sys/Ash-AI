@@ -79,9 +79,25 @@ export async function GET(
     let ashleyAnalysis = null
     if (template.steps.length > 0) {
       try {
+        // Transform steps to match expected input format
+        const transformedSteps = template.steps.map(step => ({
+          id: step.id,
+          name: step.name,
+          workcenter: step.workcenter,
+          sequence: step.sequence,
+          standard_spec: {
+            duration_minutes: (step.standard_spec as any)?.duration_minutes || 60,
+            setup_minutes: (step.standard_spec as any)?.setup_minutes || 10,
+            capacity_per_hour: (step.standard_spec as any)?.capacity_per_hour || 30,
+            skill_requirements: (step.standard_spec as any)?.skill_requirements || [],
+            equipment_requirements: (step.standard_spec as any)?.equipment_requirements || [],
+            quality_checkpoints: (step.standard_spec as any)?.quality_checkpoints || []
+          }
+        }))
+        
         ashleyAnalysis = await validateAshleyRoutingOptimization({
           template_id: template.id,
-          steps: template.steps,
+          steps: transformedSteps,
           category: template.category
         })
       } catch (_error) {

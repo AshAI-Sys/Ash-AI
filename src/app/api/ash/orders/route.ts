@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     const _workspace = await db.workspace.findUnique({
       where: { id: workspace_id }
     })
-    if (!workspace) {
+    if (!_workspace) {
       return NextResponse.json(
         { error: 'Workspace not found' },
         { status: 404 }
@@ -209,7 +209,7 @@ export async function POST(request: NextRequest) {
       success: true,
       message: `Order ${po_number} created successfully`,
       order: result.order,
-      routing_steps: result.routing_steps,
+      routing_steps: result.routingSteps,
       ashley_assessment: ashleyResult
     }, { status: 201 })
 

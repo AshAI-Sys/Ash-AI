@@ -26,8 +26,8 @@ export async function GET(request: NextRequest) {
       where.status = status
     }
     
-    if (period) {
-      where.period = period
+    if (_period) {
+      where.period = _period
     }
 
     const forecasts = await prisma.forecast.findMany({

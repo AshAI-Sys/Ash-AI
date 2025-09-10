@@ -167,7 +167,7 @@ async function getTaskMetrics(startDate: Date, department?: string | null) {
   return {
     byStatus: tasksByStatus.map(item => ({
       status: item.status,
-      count: _item._count.id
+      count: item._count.id
     })),
     byType: tasksByType.map(_item => ({
       type: 'GENERIC',
@@ -175,7 +175,7 @@ async function getTaskMetrics(startDate: Date, department?: string | null) {
     })),
     byPriority: tasksByPriority.map(item => ({
       priority: item.priority,
-      count: _item._count.id
+      count: item._count.id
     }))
   }
 }
@@ -204,7 +204,7 @@ async function getOrderMetrics(startDate: Date) {
   return {
     byStatus: ordersByStatus.map(item => ({
       status: item.status,
-      count: _item._count.id
+      count: item._count.id
     })),
     totalRevenue: revenueData._sum?.total_qty || 0,
     completedOrders: revenueData._count || 0,

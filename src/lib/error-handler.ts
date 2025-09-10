@@ -15,3 +15,18 @@ export async function logError(
     stack: errorStack
   })
 }
+
+export function createSuccessResponse<T>(data: T, message?: string) {
+  return Response.json({
+    success: true,
+    message: message || 'Success',
+    data
+  }, { status: 200 })
+}
+
+export function createErrorResponse(error: string, status: number = 500) {
+  return Response.json({
+    success: false,
+    error
+  }, { status })
+}

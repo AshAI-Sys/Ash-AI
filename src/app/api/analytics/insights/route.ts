@@ -25,8 +25,8 @@ export async function GET(request: NextRequest) {
       created_at?: { gte: Date; lte: Date }
     } = {}
     
-    if (category) {
-      where.category = category
+    if (_category) {
+      where.category = _category
     }
     
     if (status) {

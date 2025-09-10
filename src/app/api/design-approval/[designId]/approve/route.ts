@@ -7,7 +7,7 @@ const prisma = new PrismaClient()
 
 export async function POST(
   request: Request,
-  { params }: { params: Promise<{ design_id: string }> }
+  { params }: { params: Promise<{ designId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -22,7 +22,8 @@ export async function POST(
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
     }
 
-    const { design_id } = await params
+    const { designId } = await params
+    const design_id = designId
     const { approvalType, comments } = await request.json()
 
     // Update design status based on approval type
@@ -71,7 +72,7 @@ export async function POST(
 
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ design_id: string }> }
+  { params }: { params: Promise<{ designId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -80,7 +81,8 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { design_id } = await params
+    const { designId } = await params
+    const design_id = designId
     const { action, comments, revisionRequests } = await request.json()
 
     let newStatus = 'Pending_Review'

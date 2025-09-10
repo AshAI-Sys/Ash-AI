@@ -13,11 +13,11 @@ interface SyncQueue {
   priority: 'low' | 'medium' | 'high' | 'critical'
 }
 
-// interface OfflineStorage {
-//   orders: any[]
-//   production: any[]
-//   qc: any[]
-//   inventory: any[]
+interface OfflineStorage {
+  orders: any[]
+  production: any[]
+  qc: any[]
+  inventory: any[]
   sync_queue: SyncQueue[]
   user_data: any
   last_sync: Date

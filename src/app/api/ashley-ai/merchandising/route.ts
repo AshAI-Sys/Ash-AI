@@ -47,20 +47,7 @@ export async function POST(request: NextRequest) {
           gte: dateThreshold
         }
       },
-      include: {
-        design_assets: {
-          select: {
-            design_theme: true,
-            colors_used: true
-          }
-        },
-        feedback: {
-          select: {
-            rating: true,
-            created_at: true
-          }
-        }
-      },
+      // include: {} // TODO: Add design_assets and feedback relations
       orderBy: {
         created_at: 'desc'
       }
@@ -71,11 +58,11 @@ export async function POST(request: NextRequest) {
       id: order.id,
       product_type: order.product_type,
       method: order.method,
-      design_theme: order.design_assets[0]?.design_theme || undefined,
-      colors_used: order.design_assets[0]?.colors_used || [],
+      design_theme: undefined, // TODO: Add design_assets relation to Order model
+      colors_used: [],
       quantity: order.total_qty,
-      total_value: order.total_value || 0,
-      client_satisfaction: order.feedback[0]?.rating || undefined,
+      total_value: 0, // TODO: Add total_value field to Order model
+      client_satisfaction: undefined, // TODO: Add feedback relation to Order model
       reorder_count: orders.filter(o => 
         o.product_type === order.product_type && 
         o.method === order.method &&
@@ -86,7 +73,7 @@ export async function POST(request: NextRequest) {
       performance_metrics: {
         sell_through_rate: Math.random() * 0.5 + 0.5, // Mock data
         return_rate: Math.random() * 0.1,
-        customer_feedback_score: order.feedback[0]?.rating || 4.0
+        customer_feedback_score: 4.0 // TODO: Add feedback relation to Order model
       }
     }))
 
@@ -357,15 +344,14 @@ async function logAshleyInsight(data: {
   data: any
 }) {
   try {
-    await db.ashleyInsight.create({
+    await db.businessInsight.create({
       data: {
         workspace_id: data.workspace_id,
-        entity_type: 'client',
-        entity_id: data.client_id,
-        insight_type: data.insight_type,
-        insight_data: data.data,
-        confidence_score: 0.85, // Default confidence
-        created_at: new Date()
+        type: data.insight_type,
+        title: 'Ashley AI Merchandising Insight',
+        description: JSON.stringify(data.data),
+        category: 'MERCHANDISING',
+        status: 'ACTIVE'
       }
     })
   } catch (_error) {

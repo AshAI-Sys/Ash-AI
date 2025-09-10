@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
     const templates = await prisma.routeTemplate.findMany({
       where: {
         workspace_id: session.user.workspace_id,
-        ...(category && { category }),
+        ...(_category && { category: _category }),
         ...(active_only && { is_active: true })
       },
       select: {
@@ -59,20 +59,13 @@ export async function GET(request: NextRequest) {
         name: true,
         description: true,
         category: true,
-        is_default: true,
         is_active: true,
         created_at: true,
         updated_at: true,
-        created_by: {
-          select: {
-            full_name: true
-          }
-        },
         steps: include_steps ? {
           select: {
             id: true,
             name: true,
-            description: true,
             workcenter: true,
             sequence: true,
             standard_spec: true
@@ -89,7 +82,6 @@ export async function GET(request: NextRequest) {
         }
       },
       orderBy: [
-        { is_default: 'desc' },
         { name: 'asc' }
       ]
     })
@@ -97,7 +89,7 @@ export async function GET(request: NextRequest) {
     // Add Ashley AI efficiency analysis for each template
     const templatesWithAnalysis = await Promise.all(
       templates.map(async (template) => {
-        if (!include_steps || !template.steps) {
+        if (!include_steps || !(template as any).steps) {
           return {
             ...template,
             ai_analysis: null
@@ -107,7 +99,7 @@ export async function GET(request: NextRequest) {
         try {
           const analysis = await validateAshleyRoutingOptimization({
             template_id: template.id,
-            steps: template.steps,
+            steps: (template as any).steps,
             category: template.category
           })
 
@@ -121,7 +113,7 @@ export async function GET(request: NextRequest) {
             }
           }
         } catch (_error) {
-          console.error('Error analyzing template:', template.id, error)
+          console.error('Error analyzing template:', template.id, _error)
           return {
             ...template,
             ai_analysis: null
@@ -160,7 +152,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Only certain roles can create routing templates
-    if (![Role.ADMIN, Role.MANAGER, Role.PRODUCTION_MANAGER].includes(session.user.role as Role)) {
+    if (!['ADMIN', 'MANAGER'].includes(session.user.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
@@ -190,17 +182,7 @@ export async function POST(request: NextRequest) {
 
     // Create template with steps in transaction
     const template = await prisma.$transaction(async (tx) => {
-      // If this is set as default, unset other defaults in the category
-      if (validatedData.is_default) {
-        await tx.routeTemplate.updateMany({
-          where: {
-            workspace_id: session.user.workspace_id,
-            category: validatedData.category,
-            is_default: true
-          },
-          data: { is_default: false }
-        })
-      }
+      // Note: is_default functionality removed - not in schema
 
       // Create the template
       const newTemplate = await tx.routeTemplate.create({
@@ -210,30 +192,21 @@ export async function POST(request: NextRequest) {
           name: validatedData.name,
           description: validatedData.description,
           category: validatedData.category,
-          is_default: validatedData.is_default,
-          is_active: validatedData.is_active,
-          created_by_id: session.user.id,
-          ai_optimization_data: {
-            ashley_analysis: ashleyAnalysis,
-            optimization_version: 'v2.1.3',
-            created_at: new Date().toISOString()
-          }
+          is_active: validatedData.is_active || true
+          // Note: removed is_default, created_by_id, ai_optimization_data - not in schema
         }
       })
 
       // Create routing steps
       await Promise.all(
         validatedData.steps.map(step =>
-          tx.routingStep.create({
+          tx.routeTemplateStep.create({
             data: {
-              id: crypto.randomUUID(),
-              workspace_id: session.user.workspace_id,
               route_template_id: template_id,
               name: step.name,
-              description: step.description,
-              workcenter: step.workcenter,
+              workcenter: step.workcenter as any, // Cast to WorkcenterType
               sequence: step.sequence,
-              standard_spec: step.standard_spec
+              standard_spec: step.standard_spec || {}
             }
           })
         )
@@ -252,8 +225,8 @@ export async function POST(request: NextRequest) {
         entity_id: template_id,
         action: 'CREATE',
         after_data: {
-          template: validatedData,
-          ashley_analysis: ashleyAnalysis
+          template: JSON.parse(JSON.stringify(validatedData)),
+          ashley_analysis: ashleyAnalysis ? JSON.parse(JSON.stringify(ashleyAnalysis)) : null
         },
         metadata: {
           source: 'routing_templates_api',
@@ -273,11 +246,11 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (_error) {
-    if (error instanceof z.ZodError) {
+    if (_error instanceof z.ZodError) {
       return NextResponse.json({
         success: false,
         error: 'Validation failed',
-        details: error.errors
+        details: _error.errors
       }, { status: 400 })
     }
 

@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     const where: { isActive?: boolean } = {}
     
     if (active !== null) {
-      where.is_active = active === "true"
+      where.isActive = active === "true"
     }
 
     // Fetch KPI metrics - remove non-existent relations

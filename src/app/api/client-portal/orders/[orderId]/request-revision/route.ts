@@ -7,7 +7,7 @@ import { prisma } from '@/lib/prisma'
 // POST /api/client-portal/orders/[order_id]/request-revision - Request design revision
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ order_id: string }> }
+  { params }: { params: Promise<{ orderId: string }> }
 ) {
   try {
     const session = await getServerSession()
@@ -15,7 +15,8 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { order_id } = await params
+    const { orderId } = await params
+    const order_id = orderId
     const body = await request.json()
 
     // Validate required fields
@@ -134,7 +135,7 @@ export async function POST(
     console.error('Error requesting design revision:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
-      message: error instanceof Error ? error.message : 'Unknown error'
+      message: _error instanceof Error ? _error.message : 'Unknown error'
     }, { status: 500 })
   }
 }

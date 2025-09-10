@@ -80,8 +80,8 @@ export async function GET(request: NextRequest) {
     if (severity && validSeverities.includes(severity)) {
       whereClause.severity = severity
     }
-    if (category && validCategories.includes(category)) {
-      whereClause.category = category
+    if (_category && validCategories.includes(_category)) {
+      whereClause.category = _category
     }
 
     // Mock alerts since Alert table doesn't exist yet
@@ -115,7 +115,7 @@ export async function GET(request: NextRequest) {
     const alerts = mockAlerts.filter(alert => {
       if (status && alert.status !== status) return false
       if (severity && alert.severity !== severity) return false
-      if (category && alert.category !== category) return false
+      if (_category && alert.category !== _category) return false
       return true
     }).slice(0, limit)
 
