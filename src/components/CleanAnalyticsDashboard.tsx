@@ -59,142 +59,133 @@ export function CleanAnalyticsDashboard() {
   const [selectedTimeframe, setSelectedTimeframe] = useState('Last 7 days')
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      {/* Header Navigation */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">Analytics</h1>
-          <div className="flex items-center gap-4">
-            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-              All Systems
-            </Badge>
-            <Button variant="outline" size="sm">
-              {selectedTimeframe}: Sep 02, 2025 — Sep 09, 2025
-            </Button>
-          </div>
+    <div className="min-h-screen bg-white">
+      {/* TikTok Black Header */}
+      <div className="bg-black text-white px-4 py-2 flex items-center gap-3">
+        <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
+          <span className="text-black font-bold text-xs">TT</span>
         </div>
-
-        {/* Tab Navigation */}
-        <nav className="border-b border-gray-200">
-          <div className="flex space-x-8">
-            {['Home', 'Core', 'Fixes', 'Plan', 'Metrics', 'P.O', 'Delivery'].map((tab) => (
-              <button
-                key={tab}
-                className={`pb-4 px-1 border-b-2 font-medium text-sm ${
-                  tab === 'Home' 
-                    ? 'border-blue-500 text-blue-600' 
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-        </nav>
+        <span className="text-white font-medium">Seller Center</span>
       </div>
 
-      {/* Business Data Section */}
-      <div className="mb-8">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Business data</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* System Performance Card */}
-          <Card className="bg-white border-gray-200">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-gray-600">System Performance</CardTitle>
-                <div className="w-3 h-3 bg-cyan-400 rounded-full"></div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-baseline justify-between">
-                <div>
-                  <div className="text-2xl font-bold text-gray-900">₱{analyticsData.systemPerformance.value.toLocaleString()}</div>
-                  <div className="flex items-center mt-1">
-                    <ArrowUp className="w-4 h-4 text-green-500 mr-1" />
-                    <span className="text-sm text-gray-600">vs last 7 days: +₱{analyticsData.systemPerformance.change}</span>
-                  </div>
-                </div>
-              </div>
-              <Button variant="link" className="text-cyan-600 p-0 h-auto mt-2">
-                View breakdown →
+      <div className="p-6">
+        {/* Header Navigation */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-2xl font-semibold text-gray-900">Analytics</h1>
+            <div className="flex items-center gap-4">
+              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                All Systems
+              </Badge>
+              <Button variant="outline" size="sm">
+                {selectedTimeframe}: Sep 02, 2025 — Sep 09, 2025
               </Button>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          {/* User Experience Card */}
-          <Card className="bg-white border-gray-200">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-gray-600">User Experience</CardTitle>
-                <div className="w-3 h-3 bg-cyan-400 rounded-full"></div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-baseline justify-between">
-                <div>
-                  <div className="text-2xl font-bold text-gray-900">₱{analyticsData.userExperience.value.toLocaleString()}</div>
-                  <div className="flex items-center mt-1">
-                    <ArrowUp className="w-4 h-4 text-green-500 mr-1" />
-                    <span className="text-sm text-gray-600">vs last 7 days: +₱{analyticsData.userExperience.change}</span>
-                  </div>
-                </div>
-              </div>
-              <Button variant="link" className="text-cyan-600 p-0 h-auto mt-2">
-                View breakdown →
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Business Value Card */}
-          <Card className="bg-white border-gray-200">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-medium text-gray-600">Business Value</CardTitle>
-                <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-baseline justify-between">
-                <div>
-                  <div className="text-2xl font-bold text-gray-900">{analyticsData.businessValue.value}</div>
-                  <div className="flex items-center mt-1">
-                    <ArrowUp className="w-4 h-4 text-green-500 mr-1" />
-                    <span className="text-sm text-gray-600">vs last 7 days: +₱{analyticsData.businessValue.change}</span>
-                  </div>
-                </div>
-              </div>
-              <Button variant="link" className="text-cyan-600 p-0 h-auto mt-2">
-                View breakdown →
-              </Button>
-            </CardContent>
-          </Card>
+          {/* TikTok-style Tab Navigation */}
+          <nav className="border-b border-gray-200">
+            <div className="flex space-x-8">
+              {['Home', 'Core', 'Fixes', 'Plan', 'Metrics', 'P.O', 'Delivery'].map((tab) => (
+                <button
+                  key={tab}
+                  className={`pb-3 px-1 border-b-2 font-medium text-sm transition-all ${
+                    tab === 'Home' 
+                      ? 'border-blue-500 text-blue-600' 
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
+          </nav>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Performance Chart */}
-        <div className="lg:col-span-3">
-          <Card className="bg-white border-gray-200">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-cyan-400 rounded-full"></div>
-                    <span className="text-sm text-gray-600">System Performance</span>
+        {/* Business Data Section */}
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Business data</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* System Performance Card */}
+            <Card className="bg-white border border-gray-200 rounded-lg shadow-sm">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <CardTitle className="text-sm font-medium text-gray-700">System Performance</CardTitle>
+                  <div className="w-3 h-3 bg-cyan-400 rounded-full"></div>
+                </div>
+                <div className="text-2xl font-bold text-gray-900 mb-1">₱{analyticsData.systemPerformance.value.toLocaleString()}</div>
+                <div className="flex items-center text-sm text-gray-600 mb-3">
+                  <ArrowUp className="w-4 h-4 text-green-500 mr-1" />
+                  <span>vs last 7 days: +₱{analyticsData.systemPerformance.change}</span>
+                </div>
+                <Button variant="link" className="text-cyan-600 p-0 h-auto text-sm">
+                  View breakdown →
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* User Experience Card */}
+            <Card className="bg-white border border-gray-200 rounded-lg shadow-sm">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <CardTitle className="text-sm font-medium text-gray-700">User Experience</CardTitle>
+                  <div className="w-3 h-3 bg-cyan-400 rounded-full"></div>
+                </div>
+                <div className="text-2xl font-bold text-gray-900 mb-1">₱{analyticsData.userExperience.value.toLocaleString()}</div>
+                <div className="flex items-center text-sm text-gray-600 mb-3">
+                  <ArrowUp className="w-4 h-4 text-green-500 mr-1" />
+                  <span>vs last 7 days: +₱{analyticsData.userExperience.change}</span>
+                </div>
+                <Button variant="link" className="text-cyan-600 p-0 h-auto text-sm">
+                  View breakdown →
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Business Value Card */}
+            <Card className="bg-white border border-gray-200 rounded-lg shadow-sm">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <CardTitle className="text-sm font-medium text-gray-700">Business Value</CardTitle>
+                  <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
+                </div>
+                <div className="text-2xl font-bold text-gray-900 mb-1">{analyticsData.businessValue.value}</div>
+                <div className="flex items-center text-sm text-gray-600 mb-3">
+                  <ArrowUp className="w-4 h-4 text-green-500 mr-1" />
+                  <span>vs last 7 days: +₱{analyticsData.businessValue.change}</span>
+                </div>
+                <Button variant="link" className="text-cyan-600 p-0 h-auto text-sm">
+                  View breakdown →
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Performance Chart */}
+          <div className="lg:col-span-3">
+            <Card className="bg-white border border-gray-200 rounded-lg shadow-sm">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-cyan-400 rounded-full"></div>
+                      <span className="text-sm text-gray-600">System Performance</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-orange-400 rounded-full"></div>
+                      <span className="text-sm text-gray-600">User Experience</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-orange-400 rounded-full"></div>
-                    <span className="text-sm text-gray-600">User Experience</span>
+                  <div className="text-right">
+                    <div className="text-sm text-gray-600">System Performance (%) | User Experience (%)</div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="text-sm text-gray-600">System Performance (%) | User Experience (%)</div>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {/* Simplified Chart Representation */}
-              <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center relative overflow-hidden">
+                
+                {/* Simplified Chart Representation */}
+                <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center relative overflow-hidden">
                 <svg className="w-full h-full" viewBox="0 0 400 200">
                   {/* Grid lines */}
                   <defs>
@@ -232,23 +223,22 @@ export function CleanAnalyticsDashboard() {
                   <span>Sep 05</span>
                   <span>Sep 07</span>
                   <span>Sep 09</span>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+              </CardContent>
+            </Card>
+          </div>
 
-        {/* Today's Data Sidebar */}
-        <div className="lg:col-span-1">
-          <Card className="bg-white border-gray-200">
-            <CardHeader>
-              <CardTitle className="text-sm font-medium text-gray-600">Today's data</CardTitle>
-              <div className="text-right">
-                <Button variant="link" className="text-blue-600 p-0 h-auto text-sm">Trends →</Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
+          {/* Today's Data Sidebar */}
+          <div className="lg:col-span-1">
+            <Card className="bg-white border border-gray-200 rounded-lg shadow-sm">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <CardTitle className="text-sm font-medium text-gray-700">Today's data</CardTitle>
+                  <Button variant="link" className="text-blue-600 p-0 h-auto text-sm">Trends →</Button>
+                </div>
+                
+                <div className="space-y-4">
                 <div className="text-right">
                   <div className="text-sm text-gray-600">Last Update: 16:41</div>
                   <div className="text-lg font-semibold text-gray-900">Active Modules</div>
@@ -281,17 +271,18 @@ export function CleanAnalyticsDashboard() {
             </CardContent>
           </Card>
 
-          {/* Business Accelerator */}
-          <Card className="bg-white border-gray-200 mt-6">
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-cyan-400 rounded-full"></div>
-                <CardTitle className="text-sm font-medium text-gray-600">Business accelerator</CardTitle>
-                <Button variant="link" className="text-cyan-600 p-0 h-auto text-sm ml-auto">More →</Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
+            {/* Business Accelerator */}
+            <Card className="bg-white border border-gray-200 rounded-lg shadow-sm mt-6">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-cyan-400 rounded-full"></div>
+                    <CardTitle className="text-sm font-medium text-gray-700">Business accelerator</CardTitle>
+                  </div>
+                  <Button variant="link" className="text-cyan-600 p-0 h-auto text-sm">More →</Button>
+                </div>
+                
+                <div className="space-y-3">
                 <div className="p-3 bg-gray-50 rounded-lg">
                   <div className="text-sm font-medium text-gray-900">Optimize production flow than f...</div>
                   <div className="text-xs text-cyan-600">CASH INCREASE 30% • 4/5 ★</div>
@@ -306,26 +297,26 @@ export function CleanAnalyticsDashboard() {
                   <div className="text-sm font-medium text-gray-900">Improve system performance opt...</div>
                   <div className="text-xs text-cyan-600">CASH INCREASE 30% • 4/5 ★</div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-      </div>
 
-      {/* Core Requirements Section */}
-      <div className="mt-8">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Core Requirements</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Authentication Card */}
-          <Card className="bg-white border-gray-200">
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                <CardTitle className="text-sm font-medium text-gray-600">AUTHENTICATION</CardTitle>
-                <Button variant="link" className="text-cyan-600 p-0 h-auto text-sm ml-auto">View analysis →</Button>
-              </div>
-            </CardHeader>
-            <CardContent>
+        {/* Core Requirements Section */}
+        <div className="mt-8">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Core Requirements</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Authentication Card */}
+            <Card className="bg-white border border-gray-200 rounded-lg shadow-sm">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                    <CardTitle className="text-sm font-medium text-gray-700">AUTHENTICATION</CardTitle>
+                  </div>
+                  <Button variant="link" className="text-cyan-600 p-0 h-auto text-sm">View analysis →</Button>
+                </div>
               <div className="text-2xl font-bold text-gray-900 mb-2">₱{analyticsData.coreRequirements.authentication.value.toLocaleString()}</div>
               <div className="text-sm text-gray-600 mb-4">System build from 4 integrated modules</div>
               <div className="text-sm text-gray-600 mb-4">Try 3 AUTH modules, ranked by usage</div>
@@ -344,7 +335,7 @@ export function CleanAnalyticsDashboard() {
           </Card>
 
           {/* Order Management Card */}
-          <Card className="bg-white border-gray-200">
+            <Card className="bg-white border border-gray-200 rounded-lg shadow-sm">
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
@@ -371,7 +362,7 @@ export function CleanAnalyticsDashboard() {
           </Card>
 
           {/* Quality Control Card */}
-          <Card className="bg-white border-gray-200">
+            <Card className="bg-white border border-gray-200 rounded-lg shadow-sm">
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-gray-800 rounded-full"></div>
