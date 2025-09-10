@@ -26,7 +26,7 @@ import {
 
 interface QCInspection {
   id: string
-  orderId: string
+  order_id: string
   stage: 'PRINTING' | 'SEWING' | 'FINAL' | 'INLINE'
   status: 'OPEN' | 'IN_PROGRESS' | 'PASSED' | 'FAILED' | 'CLOSED'
   lotSize: number
@@ -37,7 +37,7 @@ interface QCInspection {
   actualDefects: number
   disposition?: string
   holdShipment: boolean
-  createdAt: string
+  created_at: string
   closedAt?: string
   order: {
     orderNumber: string
@@ -308,7 +308,7 @@ export default function QCPage() {
                         {inspection.order.clientName} • {inspection.order.productType}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        Inspector: {inspection.inspector.name} • Created: {new Date(inspection.createdAt).toLocaleDateString()}
+                        Inspector: {inspection.inspector.name} • Created: {new Date(inspection.created_at).toLocaleDateString()}
                       </p>
                     </div>
                     <div className="text-right">

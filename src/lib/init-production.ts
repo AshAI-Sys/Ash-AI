@@ -18,7 +18,7 @@ export async function initializeProductionDatabase() {
       console.log('🔧 Creating admin user...');
       
       // Create workspace first
-      const workspace = await db.workspace.create({
+      const _workspace = await db.workspace.create({
         data: {
           name: 'ASH AI Production',
           slug: 'ash-ai-prod',
@@ -60,7 +60,7 @@ export async function initializeProductionDatabase() {
 
     console.log('🎉 Production database initialized successfully!');
     return true;
-  } catch (error) {
+  } catch (_error) {
     console.error('❌ Failed to initialize production database:', error);
     return false;
   }

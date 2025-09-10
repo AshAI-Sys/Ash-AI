@@ -11,7 +11,7 @@ export interface BOMCalculation {
 }
 
 export interface BOMSummary {
-  orderId: string
+  order_id: string
   totalItems: number
   totalCost: number
   totalShrinkage: number
@@ -20,14 +20,14 @@ export interface BOMSummary {
 }
 
 class BOMService {
-  async createBOM(orderId: string, items: Array<{
+  async createBOM(order_id: string, items: Array<{
     inventoryId: string
     requiredQty: number
     shrinkageFactor?: number
     wastageFactor?: number
   }>): Promise<BOM> {
     const order = await db.order.findUnique({
-      where: { id: orderId },
+      where: { id: order_id },
       include: { bom: true }
     })
 
@@ -70,11 +70,11 @@ class BOMService {
 
     const bom = await db.bOM.create({
       data: {
-        orderId,
+        order_id,
         totalCost,
-        isActive: true,
+        is_active: true,
         items: {
-          create: items.map((item, index) => ({
+          create: items.map((_item, index) => ({
             inventoryId: item.inventoryId,
             requiredQty: item.requiredQty,
             shrinkageFactor: bomItems[index].shrinkageFactor,
@@ -138,7 +138,7 @@ class BOMService {
     }
 
     await db.bOMItem.createMany({
-      data: items.map((item, index) => ({
+      data: items.map((_item, index) => ({
         bomId,
         inventoryId: item.inventoryId,
         requiredQty: item.requiredQty,
@@ -168,9 +168,9 @@ class BOMService {
     return updatedBOM
   }
 
-  async getBOMByOrderId(orderId: string): Promise<BOM | null> {
+  async getBOMByOrderId(order_id: string): Promise<BOM | null> {
     return db.bOM.findUnique({
-      where: { orderId },
+      where: { order_id },
       include: {
         items: {
           include: {
@@ -207,7 +207,7 @@ class BOMService {
     )
 
     return {
-      orderId: bom.orderId,
+      order_id: bom.order_id,
       totalItems: bom.items.length,
       totalCost: bom.totalCost,
       totalShrinkage,
@@ -314,7 +314,7 @@ class BOMService {
         await tx.materialUsage.create({
           data: {
             inventoryId: item.inventoryId,
-            orderId: bom.orderId,
+            order_id: bom.order_id,
             quantityUsed: actualQty,
             unitCost: item.unitCost,
             totalCost: item.totalCost
@@ -372,7 +372,7 @@ class BOMService {
         actualQty: item.actualQty ?? item.requiredQty,
         shrinkageCost: itemShrinkageCost,
         wastageCost: itemWastageCost,
-        totalCost: item.totalCost
+        totalCost: _item.totalCost
       }
     })
 
@@ -388,13 +388,13 @@ class BOMService {
   private async archiveBOM(bomId: string): Promise<void> {
     await db.bOM.update({
       where: { id: bomId },
-      data: { isActive: false }
+      data: { is_active: false }
     })
   }
 
-  async getBOMHistory(orderId: string): Promise<BOM[]> {
+  async getBOMHistory(order_id: string): Promise<BOM[]> {
     return db.bOM.findMany({
-      where: { orderId },
+      where: { order_id },
       orderBy: { version: 'desc' },
       include: {
         items: {

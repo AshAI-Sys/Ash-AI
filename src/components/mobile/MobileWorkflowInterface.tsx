@@ -60,12 +60,12 @@ interface WorkflowTask {
 }
 
 interface MobileWorkflowProps {
-  orderId: string
+  order_id: string
   workflowType: 'cutting' | 'printing' | 'sewing' | 'qc' | 'packing'
   className?: string
 }
 
-export function MobileWorkflowInterface({ orderId, workflowType, className }: MobileWorkflowProps) {
+export function MobileWorkflowInterface({ order_id, workflowType, className }: MobileWorkflowProps) {
   const { data: session } = useSession()
   const [stages, setStages] = useState<WorkflowStage[]>([])
   const [currentStage, setCurrentStage] = useState<string>('')
@@ -96,7 +96,7 @@ export function MobileWorkflowInterface({ orderId, workflowType, className }: Mo
         cameraStream.getTracks().forEach(track => track.stop())
       }
     }
-  }, [orderId, workflowType])
+  }, [order_id, workflowType])
 
   const initializeMobileFeatures = async () => {
     // Initialize PWA features
@@ -143,7 +143,7 @@ export function MobileWorkflowInterface({ orderId, workflowType, className }: Mo
       
       if (isOnline) {
         // Try to fetch from server
-        const response = await fetch(`/api/workflows/${workflowType}/${orderId}`)
+        const response = await fetch(`/api/workflows/${workflowType}/${order_id}`)
         if (response.ok) {
           data = await response.json()
           // Cache the data offline
@@ -153,7 +153,7 @@ export function MobileWorkflowInterface({ orderId, workflowType, className }: Mo
         }
       } else {
         // Load from offline storage
-        const offlineData = await offlineSyncManager.getData('workflows', { orderId, type: workflowType })
+        const offlineData = await offlineSyncManager.getData('workflows', { order_id, type: workflowType })
         data = offlineData[0] || getDefaultWorkflowData()
       }
 
@@ -237,17 +237,17 @@ export function MobileWorkflowInterface({ orderId, workflowType, className }: Mo
 
     return (taskConfigs[stageId] || []).map(task => ({
       ...task,
-      description: `Complete ${task.title.toLowerCase()} for order ${orderId}`,
+      description: `Complete ${task.title.toLowerCase()} for order ${order_id}`,
       completed: false
     }))
   }
 
   const getDefaultWorkflowData = () => ({
-    orderId,
+    order_id,
     type: workflowType,
     stages: getDefaultStages(),
     currentStage: '',
-    updatedAt: new Date()
+    updated_at: new Date()
   })
 
   const handleOnline = () => {
@@ -290,7 +290,7 @@ export function MobileWorkflowInterface({ orderId, workflowType, className }: Mo
 
     // Store the change for sync
     const changeData = {
-      orderId,
+      order_id,
       workflowType,
       stageId,
       taskId,
@@ -502,7 +502,7 @@ export function MobileWorkflowInterface({ orderId, workflowType, className }: Mo
               <WifiOff className="h-4 w-4 text-red-600" />
             )}
             <span className="text-sm font-medium">
-              Order {orderId} - {workflowType.toUpperCase()}
+              Order {order_id} - {workflowType.toUpperCase()}
             </span>
           </div>
           

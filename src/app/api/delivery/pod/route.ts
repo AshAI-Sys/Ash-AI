@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth'
-import { Role } from '@prisma/client'
+
 import { db } from '@/lib/db'
 import { validateAshleyAI } from '@/lib/ashley-ai'
 // POD (Proof of Delivery) Records API for Stage 8 Delivery System

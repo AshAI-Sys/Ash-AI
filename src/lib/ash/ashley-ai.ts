@@ -48,13 +48,13 @@ export interface AshleyAssessment {
 }
 
 export interface OrderIntakeData {
-  clientId: string
-  brandId: string
+  client_id: string
+  brand_id: string
   productType: string
   method: ProcessType
-  totalQty: number
+  total_qty: number
   sizeCurve: Record<string, number>
-  targetDeliveryDate: Date
+  target_delivery_date: Date
   routeTemplateKey?: string
   variants?: any[]
   addons?: any[]
@@ -71,10 +71,10 @@ export async function validateOrderIntake(data: OrderIntakeData): Promise<Ashley
   try {
     // Load contextual data for analysis
     const [brand, client, routeTemplate, recentOrders, capacityData] = await Promise.all([
-      loadBrandContext(data.brandId),
-      loadClientContext(data.clientId),
+      loadBrandContext(data.brand_id),
+      loadClientContext(data.client_id),
       loadRouteContext(data.routeTemplateKey, data.method),
-      loadRecentOrdersContext(data.brandId),
+      loadRecentOrdersContext(data.brand_id),
       loadCapacityContext()
     ])
 
@@ -141,12 +141,12 @@ async function analyzeCapacityConstraints(
   capacityData: any
 ) {
   const deliveryWindow = Math.ceil(
-    (new Date(data.targetDeliveryDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+    (new Date(data.target_delivery_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
   )
 
   // Simulate capacity analysis based on method
   const methodCapacity = getMethodCapacity(data.method)
-  const requiredHours = Math.ceil(data.totalQty / methodCapacity.piecesPerHour)
+  const requiredHours = Math.ceil(data.total_qty / methodCapacity.piecesPerHour)
   const availableHours = deliveryWindow * 8 // 8 hour workdays
   const utilizationRate = requiredHours / availableHours
 
@@ -211,7 +211,7 @@ async function analyzeRoutingComplexity(
   }
 
   // Large quantity routing recommendations
-  if (data.totalQty > 500) {
+  if (data.total_qty > 500) {
     assessment.recommendations.push({
       title: 'Consider Batch Splitting',
       description: 'Split large order into multiple batches for better quality control',
@@ -234,9 +234,9 @@ async function analyzeRoutingComplexity(
  * Analyze delivery feasibility
  */
 async function analyzeDeliveryFeasibility(data: OrderIntakeData, assessment: AshleyAssessment) {
-  const leadTime = getTypicalLeadTime(data.method, data.totalQty)
+  const leadTime = getTypicalLeadTime(data.method, data.total_qty)
   const availableTime = Math.ceil(
-    (new Date(data.targetDeliveryDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+    (new Date(data.target_delivery_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
   )
 
   if (availableTime < leadTime) {
@@ -288,7 +288,7 @@ async function generateSmartRecommendations(
   client: any
 ) {
   // Efficiency recommendations
-  if (data.method === 'SILKSCREEN' && data.totalQty > 100) {
+  if (data.method === 'SILKSCREEN' && data.total_qty > 100) {
     assessment.recommendations.push({
       title: 'Optimize Screen Setup',
       description: 'Use multi-color carousel setup for better efficiency',
@@ -349,9 +349,9 @@ function getMethodCapacity(method: ProcessType): { piecesPerHour: number } {
 function calculateMaterialRequirements(data: OrderIntakeData): Record<string, number> {
   // Simplified material calculation
   return {
-    'Fabric': data.totalQty * 0.5, // 0.5kg per piece
-    'Ink': data.totalQty * 0.02, // 20g per piece
-    'Thread': data.totalQty * 0.01 // 10g per piece
+    'Fabric': data.total_qty * 0.5, // 0.5kg per piece
+    'Ink': data.total_qty * 0.02, // 20g per piece
+    'Thread': data.total_qty * 0.01 // 10g per piece
   }
 }
 
@@ -402,7 +402,7 @@ function calculateEstimatedCost(data: OrderIntakeData): number {
 
 // Enhanced types for routing optimization
 export interface RoutingOptimizationInput {
-  templateId?: string
+  template_id?: string
   steps: Array<{
     id?: string
     name: string
@@ -665,16 +665,16 @@ function identifyParallelGroups(steps: Array<any>): Array<Array<any>> {
 }
 
 // Context loading functions
-async function loadBrandContext(brandId: string) {
+async function loadBrandContext(brand_id: string) {
   return await prisma.brand.findUnique({
-    where: { id: brandId },
+    where: { id: brand_id },
     include: { settings: true }
   })
 }
 
-async function loadClientContext(clientId: string) {
+async function loadClientContext(client_id: string) {
   return await prisma.client.findUnique({
-    where: { id: clientId }
+    where: { id: client_id }
   })
 }
 
@@ -689,10 +689,10 @@ async function loadRouteContext(routeTemplateKey: string | undefined, method: Pr
   })
 }
 
-async function loadRecentOrdersContext(brandId: string) {
+async function loadRecentOrdersContext(brand_id: string) {
   return await prisma.order.findMany({
     where: { 
-      brand_id: brandId,
+      brand_id: brand_id,
       created_at: {
         gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // Last 30 days
       }

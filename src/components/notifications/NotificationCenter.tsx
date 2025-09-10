@@ -35,7 +35,7 @@ interface Notification {
   message: string
   data?: Record<string, any>
   priority: 'low' | 'medium' | 'high' | 'urgent'
-  createdAt: Date
+  created_at: Date
   isRead: boolean
   readAt?: Date
 }
@@ -138,7 +138,7 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
       description: `Order status changed to ${update.status}`,
       action: {
         label: 'View Order',
-        onClick: () => window.open(`/orders/${update.orderId}`, '_blank')
+        onClick: () => window.open(`/orders/${update.order_id}`, '_blank')
       }
     })
   }
@@ -150,7 +150,7 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
         description: `${message.sender.name}: ${message.message.slice(0, 50)}...`,
         action: {
           label: 'Reply',
-          onClick: () => window.open(`/orders/${message.orderId}#chat`, '_blank')
+          onClick: () => window.open(`/orders/${message.order_id}#chat`, '_blank')
         }
       })
     }
@@ -227,7 +227,7 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
     // Navigate based on notification type
     switch (notification.type) {
       case 'order_update':
-        window.open(`/orders/${notification.data?.orderId}`, '_blank')
+        window.open(`/orders/${notification.data?.order_id}`, '_blank')
         break
       case 'payment_received':
         window.open(`/finance/payments/${notification.data?.paymentId}`, '_blank')
@@ -236,10 +236,10 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
         window.open(`/qc/inspections/${notification.data?.inspectionId}`, '_blank')
         break
       case 'production_milestone':
-        window.open(`/production/tracking/${notification.data?.orderId}`, '_blank')
+        window.open(`/production/tracking/${notification.data?.order_id}`, '_blank')
         break
       case 'chat_message':
-        window.open(`/orders/${notification.data?.orderId}#chat`, '_blank')
+        window.open(`/orders/${notification.data?.order_id}#chat`, '_blank')
         break
       default:
         // Generic notification, no specific navigation
@@ -417,7 +417,7 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
                             
                             <div className="flex items-center gap-2 text-xs text-gray-500">
                               <Clock className="h-3 w-3" />
-                              {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+                              {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
                             </div>
                           </div>
                         </div>

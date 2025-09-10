@@ -7,7 +7,7 @@ const prisma = new PrismaClient()
 
 export async function POST(
   request: Request,
-  { params }: { params: Promise<{ designId: string }> }
+  { params }: { params: Promise<{ design_id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -22,7 +22,7 @@ export async function POST(
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
     }
 
-    const { designId } = await params
+    const { design_id } = await params
     const { approvalType, comments } = await request.json()
 
     // Update design status based on approval type
@@ -36,7 +36,7 @@ export async function POST(
 
     // Mock database update - would be actual Prisma call
     const updatedDesign = {
-      id: designId,
+      id: design_id,
       status: newStatus,
       approvedBy: session.user.id,
       approvedAt: new Date(),
@@ -45,13 +45,13 @@ export async function POST(
     }
 
     // Log approval action for audit trail
-    console.log(`Design ${designId} ${approvalType} by ${session.user.full_name}`)
+    console.log(`Design ${design_id} ${approvalType} by ${session.user.full_name}`)
 
     // If design is locked, trigger production routing
     if (newStatus === 'Locked') {
       // Ashley AI: Connect approved designs to printing specs and pattern areas
       // This would trigger Stage 3 preparation
-      console.log(`Design ${designId} locked - triggering production setup`)
+      console.log(`Design ${design_id} locked - triggering production setup`)
     }
 
     return NextResponse.json({
@@ -71,7 +71,7 @@ export async function POST(
 
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ designId: string }> }
+  { params }: { params: Promise<{ design_id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -80,7 +80,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { designId } = await params
+    const { design_id } = await params
     const { action, comments, revisionRequests } = await request.json()
 
     let newStatus = 'Pending_Review'
@@ -103,7 +103,7 @@ export async function PUT(
 
     // Mock database update
     const updatedDesign = {
-      id: designId,
+      id: design_id,
       status: newStatus,
       lastModifiedBy: session.user.id,
       lastModifiedAt: new Date(),

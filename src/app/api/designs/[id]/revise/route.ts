@@ -16,7 +16,7 @@ interface RouteParams {
 // POST /api/designs/[id]/revise - Submit design revision
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
-    const { id: designId } = await params
+    const { id: design_id } = await params
     const body = await request.json()
     const {
       revision_notes,
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     // Validate design exists
     const design = await db.designAsset.findUnique({
-      where: { id: designId },
+      where: { id: design_id },
       include: {
         order: {
           include: {
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
       // Update old design status
       await db.designAsset.update({
-        where: { id: designId },
+        where: { id: design_id },
         data: {
           approval_status: 'REVISION_REQUESTED'
         }
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // Create revision record
     const revision = await db.designRevision.create({
       data: {
-        design_asset_id: newDesign ? newDesign.id : designId,
+        design_asset_id: newDesign ? newDesign.id : design_id,
         revision_notes,
         changes_made: typeof changes_made === 'object' ? changes_made : { notes: changes_made },
         revised_by: revised_by || 'system'
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     if (newDesign) {
       await db.designApproval.updateMany({
         where: {
-          design_asset_id: designId,
+          design_asset_id: design_id,
           status: 'OPEN'
         },
         data: {
@@ -159,11 +159,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 // GET /api/designs/[id]/revise - Get revision history
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const { id: designId } = await params
+    const { id: design_id } = await params
 
     const revisions = await db.designRevision.findMany({
       where: {
-        design_asset_id: designId
+        design_asset_id: design_id
       },
       orderBy: {
         revised_at: 'desc'
@@ -171,7 +171,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     })
 
     const design = await db.designAsset.findUnique({
-      where: { id: designId },
+      where: { id: design_id },
       select: {
         type: true,
         version: true,

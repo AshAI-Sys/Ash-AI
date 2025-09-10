@@ -17,7 +17,7 @@ import { Loader2, CreditCard, Smartphone, Building2, Shield, CheckCircle } from 
 import { paymentGateway, PaymentMethod, PaymentRequest } from '@/lib/payments/payment-gateway'
 
 interface PaymentCheckoutProps {
-  orderId: string
+  order_id: string
   amount: number
   currency?: string
   description: string
@@ -31,7 +31,7 @@ interface PaymentCheckoutProps {
 }
 
 export function PaymentCheckout({
-  orderId,
+  order_id,
   amount,
   currency = 'PHP',
   description,
@@ -104,7 +104,7 @@ export function PaymentCheckout({
       if (!method) throw new Error('Selected payment method not found')
 
       const paymentRequest: PaymentRequest = {
-        orderId,
+        order_id,
         amount,
         currency,
         paymentMethod: method,

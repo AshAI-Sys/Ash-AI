@@ -29,7 +29,7 @@ interface Vehicle {
   plateNumber: string
   type: string
   active: boolean
-  createdAt: string
+  created_at: string
   // Extended properties
   brand?: string
   model?: string
@@ -84,7 +84,7 @@ export default function VehiclesPage() {
           plateNumber: "ABC-123",
           type: "Van",
           active: true,
-          createdAt: new Date().toISOString(),
+          created_at: new Date().toISOString(),
           brand: "Toyota",
           model: "Hiace",
           year: 2020,
@@ -100,7 +100,7 @@ export default function VehiclesPage() {
           plateNumber: "XYZ-789",
           type: "Motorcycle",
           active: true,
-          createdAt: new Date().toISOString(),
+          created_at: new Date().toISOString(),
           brand: "Honda",
           model: "Click 150i",
           year: 2022,
@@ -116,7 +116,7 @@ export default function VehiclesPage() {
           plateNumber: "DEF-456",
           type: "Truck",
           active: true,
-          createdAt: new Date().toISOString(),
+          created_at: new Date().toISOString(),
           brand: "Isuzu",
           model: "ELF",
           year: 2019,
@@ -144,7 +144,7 @@ export default function VehiclesPage() {
         plateNumber: newVehicle.plateNumber,
         type: newVehicle.type,
         active: true,
-        createdAt: new Date().toISOString(),
+        created_at: new Date().toISOString(),
         brand: newVehicle.brand,
         model: newVehicle.model,
         year: newVehicle.year,

@@ -42,7 +42,7 @@ interface Machine {
   id: string
   name: string
   workcenter: string
-  isActive: boolean
+  is_active: boolean
   spec: any
 }
 
@@ -74,10 +74,10 @@ const mockRoutingSteps: RoutingStep[] = [
 ]
 
 const mockMachines: Machine[] = [
-  { id: '1', name: 'Press A1', workcenter: 'PRINTING', isActive: true, spec: { bedSize: '40x50cm' } },
-  { id: '2', name: 'Epson F570', workcenter: 'PRINTING', isActive: true, spec: { width: '44inch' } },
-  { id: '3', name: 'Heat Press B2', workcenter: 'HEAT_PRESS', isActive: true, spec: { bedSize: '38x38cm' } },
-  { id: '4', name: 'Embroidery Machine C1', workcenter: 'EMBROIDERY', isActive: true, spec: { heads: 6 } }
+  { id: '1', name: 'Press A1', workcenter: 'PRINTING', is_active: true, spec: { bedSize: '40x50cm' } },
+  { id: '2', name: 'Epson F570', workcenter: 'PRINTING', is_active: true, spec: { width: '44inch' } },
+  { id: '3', name: 'Heat Press B2', workcenter: 'HEAT_PRESS', is_active: true, spec: { bedSize: '38x38cm' } },
+  { id: '4', name: 'Embroidery Machine C1', workcenter: 'EMBROIDERY', is_active: true, spec: { heads: 6 } }
 ]
 
 export function StartPrintRunModal({ isOpen, onClose, onStart }: StartPrintRunModalProps) {
@@ -91,7 +91,7 @@ export function StartPrintRunModal({ isOpen, onClose, onStart }: StartPrintRunMo
       // Filter machines based on method
       const workcenters = getWorkcentersForMethod(selectedStep.method)
       const filtered = mockMachines.filter(machine => 
-        workcenters.includes(machine.workcenter) && machine.isActive
+        workcenters.includes(machine.workcenter) && machine.is_active
       )
       setAvailableMachines(filtered)
       setSelectedMachine('')
@@ -114,8 +114,8 @@ export function StartPrintRunModal({ isOpen, onClose, onStart }: StartPrintRunMo
     if (!selectedStep) return
 
     const printRunData = {
-      orderId: 'order_id', // Would get from selectedStep
-      routingStepId: selectedStep.id,
+      order_id: 'order_id', // Would get from selectedStep
+      routing_step_id: selectedStep.id,
       method: selectedStep.method,
       workcenter: selectedMachine ? mockMachines.find(m => m.id === selectedMachine)?.workcenter : getWorkcentersForMethod(selectedStep.method)[0],
       machineId: selectedMachine || null,

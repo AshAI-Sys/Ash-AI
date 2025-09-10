@@ -109,7 +109,7 @@ class SessionSecurity {
   
   static isSessionValid(session: { created_at: Date; lastActive: Date }): boolean {
     const now = Date.now()
-    const created = new Date(session.createdAt).getTime()
+    const created = new Date(session.created_at).getTime()
     const lastActive = new Date(session.lastActive).getTime()
     
     // Check if session has expired
@@ -126,7 +126,7 @@ class SessionSecurity {
   }
   
   static shouldRotateSession(session: { created_at: Date }): boolean {
-    const sessionAge = Date.now() - new Date(session.createdAt).getTime()
+    const sessionAge = Date.now() - new Date(session.created_at).getTime()
     return sessionAge > (this.MAX_SESSION_AGE / 4) // Rotate after 6 hours
   }
 }
@@ -223,7 +223,7 @@ class SecurityAuditLogger {
   static async logSecurityEvent(event: {
     type: 'LOGIN_SUCCESS' | 'LOGIN_FAILED' | 'ACCOUNT_LOCKED' | 'PASSWORD_CHANGED' | 
           'MFA_ENABLED' | 'MFA_DISABLED' | 'SUSPICIOUS_ACTIVITY' | 'SESSION_HIJACK',
-    userId?: string,
+    user_id?: string,
     email?: string,
     ip: string,
     userAgent: string,

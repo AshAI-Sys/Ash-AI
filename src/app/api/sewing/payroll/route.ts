@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth'
-import { Role } from '@prisma/client'
+
 import { db } from '../../../../lib/db'
 // Sewing Payroll API for Stage 5 Piece-Rate System
 // Based on CLIENT_UPDATED_PLAN.md specifications
@@ -25,7 +23,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Verify workspace exists
-    const workspace = await db.workspace.findFirst({
+    const _workspace = await db.workspace.findFirst({
       where: {
         id: workspace_id
       }
@@ -98,7 +96,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify workspace exists
-    const workspace = await db.workspace.findFirst({
+    const _workspace = await db.workspace.findFirst({
       where: {
         id: workspace_id
       }
@@ -283,7 +281,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Verify workspace exists
-    const workspace = await db.workspace.findFirst({
+    const _workspace = await db.workspace.findFirst({
       where: {
         id: workspace_id
       }

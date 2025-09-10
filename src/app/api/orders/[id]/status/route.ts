@@ -27,14 +27,14 @@ export const PUT = withErrorHandler(async (
     throw Errors.UNAUTHORIZED;
   }
 
-  const orderId = params.id;
+  const order_id = params.id;
   const body = await request.json();
   const validatedData = OrderStatusUpdateSchema.parse(body);
 
   try {
     // Use workflow engine for status transition
     await OrderWorkflowEngine.transitionOrder(
-      orderId,
+      order_id,
       validatedData.status,
       session.user.id,
       session.user.role as Role,
@@ -43,7 +43,7 @@ export const PUT = withErrorHandler(async (
 
     // Get updated order with full details
     const updatedOrder = await db.order.findUnique({
-      where: { id: orderId },
+      where: { id: order_id },
       include: {
         client: { select: { name: true, email: true } },
         statusHistory: {
@@ -68,7 +68,7 @@ export const PUT = withErrorHandler(async (
 
     // Get available next transitions for the user
     const availableTransitions = await OrderWorkflowEngine.getAvailableTransitions(
-      orderId,
+      order_id,
       session.user.role as Role
     );
 
@@ -79,7 +79,7 @@ export const PUT = withErrorHandler(async (
       workflow_complete: validatedData.status === 'CLOSED'
     }, 'Order status updated successfully');
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Order Status Update Error:', error);
     throw error;
   }
@@ -95,25 +95,25 @@ export const GET = withErrorHandler(async (
     throw Errors.UNAUTHORIZED;
   }
 
-  const orderId = params.id;
+  const order_id = params.id;
 
   try {
     const [order, statusHistory, availableTransitions] = await Promise.all([
       db.order.findUnique({
-        where: { id: orderId },
+        where: { id: order_id },
         include: {
           client: { select: { name: true, email: true } }
         }
       }),
       db.orderStatusHistory.findMany({
-        where: { order_id: orderId },
+        where: { order_id: order_id },
         include: {
           changedBy: { select: { name: true, role: true } }
         },
         orderBy: { changed_at: 'desc' }
       }),
       OrderWorkflowEngine.getAvailableTransitions(
-        orderId,
+        order_id,
         session.user.role as Role
       )
     ]);
@@ -149,7 +149,7 @@ export const GET = withErrorHandler(async (
       }
     });
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Order Status Retrieval Error:', error);
     throw error;
   }
@@ -215,7 +215,7 @@ async function sendOrderStatusNotifications(
         });
       }
       // Email notifications would be handled by a background job
-    } catch (error) {
+    } catch (_error) {
       console.error('Notification send error:', error);
     }
   }

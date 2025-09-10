@@ -229,9 +229,9 @@ export class ProductionPipelineManager {
   /**
    * Generate tasks for an order based on its process type
    */
-  async generateOrderTasks(orderId: string) {
+  async generateOrderTasks(order_id: string) {
     const order = await prisma.order.findUnique({
-      where: { id: orderId },
+      where: { id: order_id },
       include: { brand: true }
     })
 
@@ -246,7 +246,7 @@ export class ProductionPipelineManager {
 
     // Clear existing tasks if any
     await prisma.task.deleteMany({
-      where: { order_id: orderId }
+      where: { order_id: order_id }
     })
 
     // Calculate due dates for each step
@@ -261,7 +261,7 @@ export class ProductionPipelineManager {
 
       const task = await prisma.task.create({
         data: {
-          order_id: orderId,
+          order_id: order_id,
           step: step.step,
           title: `${step.step.replace('_', ' ')} - ${order.design_name}`,
           task_type: step.step,
@@ -280,7 +280,7 @@ export class ProductionPipelineManager {
     }
 
     // Auto-assign first task to available user
-    await this.autoAssignNextTask(orderId)
+    await this.autoAssignNextTask(order_id)
 
     return createdTasks
   }
@@ -340,7 +340,7 @@ export class ProductionPipelineManager {
   /**
    * Complete a task and unlock next step
    */
-  async completeTask(taskId: string, userId: string, notes?: string) {
+  async completeTask(taskId: string, user_id: string, notes?: string) {
     const task = await prisma.task.findUnique({
       where: { id: taskId },
       include: { order: true }
@@ -364,7 +364,7 @@ export class ProductionPipelineManager {
     await prisma.taskLog.create({
       data: {
         task_id: taskId,
-        actor_id: userId,
+        actor_id: user_id,
         action: 'COMPLETE',
         details: {
           completion_time: new Date().toISOString(),
@@ -383,11 +383,11 @@ export class ProductionPipelineManager {
   /**
    * Auto-assign next available task to appropriate user
    */
-  async autoAssignNextTask(orderId: string) {
+  async autoAssignNextTask(order_id: string) {
     // Find next pending task
     const nextTask = await prisma.task.findFirst({
       where: {
-        order_id: orderId,
+        order_id: order_id,
         status: TaskStatus.PENDING
       },
       orderBy: { created_at: 'asc' }
@@ -432,33 +432,33 @@ export class ProductionPipelineManager {
   /**
    * Check if all tasks are complete and update order status
    */
-  async checkOrderCompletion(orderId: string) {
+  async checkOrderCompletion(order_id: string) {
     const incompleteTasks = await prisma.task.count({
       where: {
-        order_id: orderId,
+        order_id: order_id,
         status: { not: TaskStatus.COMPLETED }
       }
     })
 
     if (incompleteTasks === 0) {
       await prisma.order.update({
-        where: { id: orderId },
+        where: { id: order_id },
         data: {
           status: 'DELIVERED',
           updated_at: new Date()
         }
       })
 
-      console.log(`Order ${orderId} completed successfully`)
+      console.log(`Order ${order_id} completed successfully`)
     }
   }
 
   /**
    * Get pipeline progress for an order
    */
-  async getOrderProgress(orderId: string) {
+  async getOrderProgress(order_id: string) {
     const tasks = await prisma.task.findMany({
-      where: { order_id: orderId },
+      where: { order_id: order_id },
       include: {
         assignee: {
           select: { id: true, full_name: true, role: true }

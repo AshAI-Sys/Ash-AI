@@ -21,7 +21,7 @@ async function createTestUser() {
     const hashedPassword = await bcrypt.hash('admin123', 12)
 
     // Create or get default workspace
-    const workspace = await db.workspace.upsert({
+    const _workspace = await db.workspace.upsert({
       where: { id: 'default' },
       update: {},
       create: {

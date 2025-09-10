@@ -37,8 +37,8 @@ export async function GET(request: NextRequest) {
     }
 
     const decoded = jwt.verify(token, JWT_SECRET) as any
-    const clientId = decoded.clientId
-    const workspaceId = decoded.workspaceId
+    const client_id = decoded.client_id
+    const workspace_id = decoded.workspace_id
 
     const { searchParams } = new URL(request.url)
     const order_id = searchParams.get('order_id')
@@ -50,8 +50,8 @@ export async function GET(request: NextRequest) {
     // Build filter conditions
     const whereConditions: any = {
       order: {
-        client_id: clientId,
-        workspace_id: workspaceId
+        client_id: client_id,
+        workspace_id: workspace_id
       }
     }
 
@@ -140,7 +140,7 @@ export async function GET(request: NextRequest) {
     }))
 
     // Get summary statistics
-    const summaryStats = await getDesignSummaryStats(clientId, workspaceId)
+    const summaryStats = await getDesignSummaryStats(client_id, workspace_id)
 
     return NextResponse.json({
       success: true,
@@ -179,8 +179,8 @@ export async function POST(request: NextRequest) {
     }
 
     const decoded = jwt.verify(token, JWT_SECRET) as any
-    const clientId = decoded.clientId
-    const workspaceId = decoded.workspaceId
+    const client_id = decoded.client_id
+    const workspace_id = decoded.workspace_id
 
     const body = await request.json()
     const validatedData = approvalSchema.parse(body)
@@ -190,8 +190,8 @@ export async function POST(request: NextRequest) {
       where: {
         id: validatedData.asset_id,
         order: {
-          client_id: clientId,
-          workspace_id: workspaceId
+          client_id: client_id,
+          workspace_id: workspace_id
         },
         approval_status: 'PENDING_CLIENT_APPROVAL'
       },
@@ -222,7 +222,7 @@ export async function POST(request: NextRequest) {
       data: {
         approval_status: newStatus,
         approved_at: approvalDate,
-        approved_by_client_id: validatedData.action === 'APPROVE' ? clientId : null,
+        approved_by_client_id: validatedData.action === 'APPROVE' ? client_id : null,
         client_feedback: validatedData.feedback,
         requested_changes: validatedData.requested_changes || [],
         updated_at: new Date()
@@ -233,8 +233,8 @@ export async function POST(request: NextRequest) {
     await prisma.auditLog.create({
       data: {
         id: require('nanoid').nanoid(),
-        workspace_id: workspaceId,
-        actor_id: clientId,
+        workspace_id: workspace_id,
+        actor_id: client_id,
         entity_type: 'design_asset',
         entity_id: validatedData.asset_id,
         action: `CLIENT_${validatedData.action}`,
@@ -264,7 +264,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get updated summary stats
-    const summaryStats = await getDesignSummaryStats(clientId, workspaceId)
+    const summaryStats = await getDesignSummaryStats(client_id, workspace_id)
 
     return NextResponse.json({
       success: true,
@@ -300,13 +300,13 @@ export async function POST(request: NextRequest) {
 }
 
 // Helper functions
-async function getDesignSummaryStats(clientId: string, workspaceId: string) {
+async function getDesignSummaryStats(client_id: string, workspace_id: string) {
   const statusCounts = await prisma.designAsset.groupBy({
     by: ['approval_status'],
     where: {
       order: {
-        client_id: clientId,
-        workspace_id: workspaceId
+        client_id: client_id,
+        workspace_id: workspace_id
       }
     },
     _count: true
@@ -316,8 +316,8 @@ async function getDesignSummaryStats(clientId: string, workspaceId: string) {
     by: ['type'],
     where: {
       order: {
-        client_id: clientId,
-        workspace_id: workspaceId
+        client_id: client_id,
+        workspace_id: workspace_id
       }
     },
     _count: true
@@ -326,8 +326,8 @@ async function getDesignSummaryStats(clientId: string, workspaceId: string) {
   // Get recent activity (last 30 days)
   const recentActivity = await prisma.auditLog.count({
     where: {
-      workspace_id: workspaceId,
-      actor_id: clientId,
+      workspace_id: workspace_id,
+      actor_id: client_id,
       entity_type: 'design_asset',
       action: {
         in: ['CLIENT_APPROVE', 'CLIENT_REJECT']

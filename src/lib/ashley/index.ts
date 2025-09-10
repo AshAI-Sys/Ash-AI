@@ -24,13 +24,13 @@ export class AshleyAI {
    * Validates capacity, checks BOM, suggests routing
    */
   async analyzeOrderIntake(params: {
-    workspaceId: string;
-    brandId: string;
+    workspace_id: string;
+    brand_id: string;
     productType: string;
     method: string;
-    totalQty: number;
+    total_qty: number;
     sizeCurve: Record<string, number>;
-    targetDeliveryDate: Date;
+    target_delivery_date: Date;
   }) {
     const analysis = {
       canFulfill: true,
@@ -44,8 +44,8 @@ export class AshleyAI {
       // 1. Capacity Check
       const capacityCheck = await this.checkCapacityAvailability({
         method: params.method,
-        qty: params.totalQty,
-        targetDate: params.targetDeliveryDate,
+        qty: params.total_qty,
+        targetDate: params.target_delivery_date,
       });
 
       analysis.capacityUtilization = capacityCheck.utilization;
@@ -130,13 +130,13 @@ export class AshleyAI {
    * Stage 3: Cutting Optimization
    */
   async optimizeCuttingLay(params: {
-    orderId: string;
+    order_id: string;
     fabricBatch: any;
     sizeCurve: Record<string, number>;
   }) {
     try {
       const optimization = {
-        markerName: `MARKER_${params.orderId}_${Date.now()}`,
+        markerName: `MARKER_${params.order_id}_${Date.now()}`,
         efficiency: 0,
         expectedWaste: 0,
         layPlans: [] as any[],
@@ -163,16 +163,16 @@ export class AshleyAI {
    * Stage 6: Quality Control Analysis
    */
   async analyzeQualityTrends(params: {
-    workspaceId: string;
+    workspace_id: string;
     timeframe: 'DAILY' | 'WEEKLY' | 'MONTHLY';
-    brandId?: string;
+    brand_id?: string;
     method?: string;
   }) {
     try {
       // Get recent QC data
       const qcData = await db.qcInspection.findMany({
         where: {
-          ...(params.brandId && { order: { brandId: params.brandId } }),
+          ...(params.brand_id && { order: { brand_id: params.brand_id } }),
           created_at: {
             gte: this.getTimeframeStart(params.timeframe),
           },
@@ -180,7 +180,7 @@ export class AshleyAI {
         include: {
           qcDefects: true,
           order: {
-            select: { method: true, brandId: true },
+            select: { method: true, brand_id: true },
           },
         },
       });
@@ -250,7 +250,7 @@ export class AshleyAI {
 
       // AI-powered demand forecasting
       const demandForecast = await this.forecastDemand({
-        designId: params.designAssetId,
+        design_id: params.designAssetId,
         historicalData: [], // Would include actual sales data
         seasonality: true,
       });
@@ -295,7 +295,7 @@ export class AshleyAI {
 
   private async calculateDeliveryFeasibility(params: any) {
     // Mock delivery calculation
-    const leadTime = this.getEstimatedLeadTime(params.method, params.totalQty);
+    const leadTime = this.getEstimatedLeadTime(params.method, params.total_qty);
     const estimatedDate = new Date(Date.now() + leadTime * 24 * 60 * 60 * 1000);
     
     return {
@@ -312,8 +312,8 @@ export class AshleyAI {
       const prompt = `Analyze this apparel order and provide optimization suggestions:
         - Product: ${params.productType}
         - Method: ${params.method}  
-        - Quantity: ${params.totalQty}
-        - Delivery: ${params.targetDeliveryDate}
+        - Quantity: ${params.total_qty}
+        - Delivery: ${params.target_delivery_date}
         
         Provide 3 actionable suggestions to optimize cost, quality, or delivery.`;
 
@@ -395,7 +395,7 @@ export class AshleyAI {
   }
 
   private async forecastDemand(params: {
-    designId: string;
+    design_id: string;
     historicalData: any[];
     seasonality: boolean;
   }) {

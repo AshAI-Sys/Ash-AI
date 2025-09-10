@@ -68,7 +68,7 @@ export function AIInsightsDashboard({ orders, className = '' }: AIInsightsDashbo
     const avgConfidence = predictions.reduce((sum, p) => sum + p.confidence, 0) / predictions.length
     const highRiskCount = risks.filter(r => r.riskLevel === 'HIGH' || r.riskLevel === 'CRITICAL').length
     const avgPricing = pricing.reduce((sum, p) => sum + p.suggestedPrice, 0) / pricing.length
-    const totalRevenuePotential = pricing.reduce((sum, p, i) => sum + (p.suggestedPrice * orders[i].totalQty), 0)
+    const totalRevenuePotential = pricing.reduce((sum, p, i) => sum + (p.suggestedPrice * orders[i].total_qty), 0)
 
     return {
       avgConfidence: Math.round(avgConfidence),

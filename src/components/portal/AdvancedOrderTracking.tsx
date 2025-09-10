@@ -77,10 +77,10 @@ interface Order {
 }
 
 interface AdvancedOrderTrackingProps {
-  orderId: string
+  order_id: string
 }
 
-export function AdvancedOrderTracking({ orderId }: AdvancedOrderTrackingProps) {
+export function AdvancedOrderTracking({ order_id }: AdvancedOrderTrackingProps) {
   const [order, setOrder] = useState<Order | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [selectedStage, setSelectedStage] = useState<string | null>(null)
@@ -90,7 +90,7 @@ export function AdvancedOrderTracking({ orderId }: AdvancedOrderTrackingProps) {
   const { isConnected, lastMessage } = useWebSocket({
     url: process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3000',
     onMessage: (message) => {
-      if (message.type === 'order_update' && message.data.orderId === orderId) {
+      if (message.type === 'order_update' && message.data.order_id === order_id) {
         updateOrderStatus(message.data)
       }
     }
@@ -98,11 +98,11 @@ export function AdvancedOrderTracking({ orderId }: AdvancedOrderTrackingProps) {
 
   useEffect(() => {
     loadOrderData()
-  }, [orderId])
+  }, [order_id])
 
   const loadOrderData = async () => {
     try {
-      const response = await fetch(`/api/portal/orders/${orderId}`, {
+      const response = await fetch(`/api/portal/orders/${order_id}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('portal_token')}`
         }
@@ -190,7 +190,7 @@ export function AdvancedOrderTracking({ orderId }: AdvancedOrderTrackingProps) {
 
   const downloadReport = async () => {
     try {
-      const response = await fetch(`/api/portal/orders/${orderId}/report`, {
+      const response = await fetch(`/api/portal/orders/${order_id}/report`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('portal_token')}`
         }

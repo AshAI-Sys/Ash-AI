@@ -33,7 +33,7 @@ export async function GET(
           include: {
             purchaseOrder: {
               select: {
-                poNumber: true,
+                po_number: true,
                 status: true,
                 created_at: true,
                 vendor: {
@@ -57,10 +57,10 @@ export async function GET(
       totalUsed: item.usageRecords.reduce((sum, record) => sum + record.quantityUsed, 0),
       avgUsagePerMonth: 0,
       topProjects: await prisma.materialUsage.groupBy({
-        by: ['orderId'],
+        by: ['order_id'],
         where: {
           inventoryId: id,
-          orderId: { not: null }
+          order_id: { not: null }
         },
         _sum: { quantityUsed: true },
         orderBy: { _sum: { quantityUsed: 'desc' } },
@@ -125,7 +125,7 @@ export async function PATCH(
       location,
       barcode,
       qrCode,
-      brandId
+      brand_id
     } = body
 
     const { id } = await params
@@ -140,9 +140,9 @@ export async function PATCH(
     }
 
     // Validate brand if provided
-    if (brandId) {
+    if (brand_id) {
       const brand = await prisma.brand.findUnique({
-        where: { id: brandId }
+        where: { id: brand_id }
       })
       if (!brand) {
         return NextResponse.json(
@@ -163,7 +163,7 @@ export async function PATCH(
         ...(location !== undefined && { location }),
         ...(barcode !== undefined && { barcode }),
         ...(qrCode !== undefined && { qrCode }),
-        ...(brandId !== undefined && { brandId }),
+        ...(brand_id !== undefined && { brand_id }),
         lastUpdated: new Date()
       },
       include: {

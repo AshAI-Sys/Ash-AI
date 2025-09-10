@@ -15,14 +15,14 @@ interface NotificationPayload {
   priority: 'low' | 'medium' | 'high' | 'urgent'
   targetUsers?: string[]
   targetRoles?: string[]
-  workspaceId: string
-  createdAt: Date
+  workspace_id: string
+  created_at: Date
   expiresAt?: Date
 }
 
 interface ConnectedUser {
-  userId: string
-  workspaceId: string
+  user_id: string
+  workspace_id: string
   roles: string[]
   socketId: string
   joinedAt: Date
@@ -32,7 +32,7 @@ interface ConnectedUser {
 class WebSocketNotificationService {
   private io: SocketIOServer | null = null
   private connectedUsers: Map<string, ConnectedUser> = new Map()
-  private userSockets: Map<string, string[]> = new Map() // userId -> socketIds
+  private userSockets: Map<string, string[]> = new Map() // user_id -> socketIds
 
   initialize(server: HTTPServer) {
     this.io = new SocketIOServer(server, {
@@ -63,32 +63,32 @@ class WebSocketNotificationService {
       
       // Get user details from database
       const user = await prisma.user.findUnique({
-        where: { id: decoded.userId },
+        where: { id: decoded.user_id },
         include: {
           workspace: true,
           roles: true
         }
       })
 
-      if (!user || !user.isActive) {
+      if (!user || !user.is_active) {
         return next(new Error('User not found or inactive'))
       }
 
-      socket.userId = user.id
-      socket.workspaceId = user.workspaceId
+      socket.user_id = user.id
+      socket.workspace_id = user.workspace_id
       socket.roles = user.roles.map(r => r.name)
       socket.userData = user
 
       next()
-    } catch (error) {
+    } catch (_error) {
       next(new Error('Authentication failed'))
     }
   }
 
   private handleConnection(socket: any) {
     const user: ConnectedUser = {
-      userId: socket.userId,
-      workspaceId: socket.workspaceId,
+      user_id: socket.user_id,
+      workspace_id: socket.workspace_id,
       roles: socket.roles,
       socketId: socket.id,
       joinedAt: new Date(),
@@ -99,29 +99,29 @@ class WebSocketNotificationService {
     this.connectedUsers.set(socket.id, user)
     
     // Add socket to user's socket list
-    const userSockets = this.userSockets.get(socket.userId) || []
+    const userSockets = this.userSockets.get(socket.user_id) || []
     userSockets.push(socket.id)
-    this.userSockets.set(socket.userId, userSockets)
+    this.userSockets.set(socket.user_id, userSockets)
 
     // Join workspace room
-    socket.join(`workspace:${socket.workspaceId}`)
+    socket.join(`workspace:${socket.workspace_id}`)
     
     // Join role-specific rooms
     socket.roles.forEach((role: string) => {
       socket.join(`role:${role}`)
     })
 
-    console.log(`👤 User ${socket.userId} connected (${socket.id})`)
+    console.log(`👤 User ${socket.user_id} connected (${socket.id})`)
 
     // Send connection confirmation
     socket.emit('connected', {
       message: 'Connected to ASH AI real-time notifications',
-      userId: socket.userId,
-      connectedUsers: this.getWorkspaceConnectedCount(socket.workspaceId)
+      user_id: socket.user_id,
+      connectedUsers: this.getWorkspaceConnectedCount(socket.workspace_id)
     })
 
     // Send pending notifications
-    this.sendPendingNotifications(socket.userId, socket)
+    this.sendPendingNotifications(socket.user_id, socket)
 
     // Handle socket events
     this.setupSocketEvents(socket)
@@ -140,26 +140,26 @@ class WebSocketNotificationService {
 
     // Join specific notification channels
     socket.on('join_channel', (channel: string) => {
-      if (this.isValidChannel(channel, socket.workspaceId, socket.roles)) {
+      if (this.isValidChannel(channel, socket.workspace_id, socket.roles)) {
         socket.join(channel)
-        console.log(`👤 User ${socket.userId} joined channel: ${channel}`)
+        console.log(`👤 User ${socket.user_id} joined channel: ${channel}`)
       }
     })
 
     // Leave specific channels
     socket.on('leave_channel', (channel: string) => {
       socket.leave(channel)
-      console.log(`👤 User ${socket.userId} left channel: ${channel}`)
+      console.log(`👤 User ${socket.user_id} left channel: ${channel}`)
     })
 
     // Mark notification as read
     socket.on('mark_read', async (notificationId: string) => {
-      await this.markNotificationAsRead(notificationId, socket.userId)
+      await this.markNotificationAsRead(notificationId, socket.user_id)
     })
 
     // Mark all notifications as read
     socket.on('mark_all_read', async () => {
-      await this.markAllNotificationsAsRead(socket.userId)
+      await this.markAllNotificationsAsRead(socket.user_id)
     })
 
     // Handle disconnection
@@ -168,17 +168,17 @@ class WebSocketNotificationService {
     })
 
     // Chat message handling
-    socket.on('chat_message', async (data: { orderId: string, message: string, attachments?: string[] }) => {
+    socket.on('chat_message', async (data: { order_id: string, message: string, attachments?: string[] }) => {
       await this.handleChatMessage(socket, data)
     })
 
     // Typing indicators
-    socket.on('typing_start', (data: { orderId: string }) => {
-      socket.to(`order:${data.orderId}`).emit('user_typing', { userId: socket.userId, orderId: data.orderId })
+    socket.on('typing_start', (data: { order_id: string }) => {
+      socket.to(`order:${data.order_id}`).emit('user_typing', { user_id: socket.user_id, order_id: data.order_id })
     })
 
-    socket.on('typing_stop', (data: { orderId: string }) => {
-      socket.to(`order:${data.orderId}`).emit('user_stopped_typing', { userId: socket.userId, orderId: data.orderId })
+    socket.on('typing_stop', (data: { order_id: string }) => {
+      socket.to(`order:${data.order_id}`).emit('user_stopped_typing', { user_id: socket.user_id, order_id: data.order_id })
     })
   }
 
@@ -187,16 +187,16 @@ class WebSocketNotificationService {
     this.connectedUsers.delete(socket.id)
 
     // Remove from user's socket list
-    const userSockets = this.userSockets.get(socket.userId) || []
+    const userSockets = this.userSockets.get(socket.user_id) || []
     const updatedSockets = userSockets.filter(id => id !== socket.id)
     
     if (updatedSockets.length === 0) {
-      this.userSockets.delete(socket.userId)
+      this.userSockets.delete(socket.user_id)
     } else {
-      this.userSockets.set(socket.userId, updatedSockets)
+      this.userSockets.set(socket.user_id, updatedSockets)
     }
 
-    console.log(`👤 User ${socket.userId} disconnected (${socket.id})`)
+    console.log(`👤 User ${socket.user_id} disconnected (${socket.id})`)
   }
 
   // Public methods for sending notifications
@@ -215,10 +215,10 @@ class WebSocketNotificationService {
         message: notification.message,
         data: JSON.stringify(notification.data || {}),
         priority: notification.priority.toUpperCase(),
-        workspaceId: notification.workspaceId,
+        workspace_id: notification.workspace_id,
         targetUsers: notification.targetUsers || [],
         targetRoles: notification.targetRoles || [],
-        createdAt: notification.createdAt,
+        created_at: notification.created_at,
         expiresAt: notification.expiresAt,
         isRead: false
       }
@@ -226,8 +226,8 @@ class WebSocketNotificationService {
 
     // Send to specific users
     if (notification.targetUsers?.length) {
-      notification.targetUsers.forEach(userId => {
-        const userSockets = this.userSockets.get(userId) || []
+      notification.targetUsers.forEach(user_id => {
+        const userSockets = this.userSockets.get(user_id) || []
         userSockets.forEach(socketId => {
           this.io!.to(socketId).emit('notification', notification)
         })
@@ -243,7 +243,7 @@ class WebSocketNotificationService {
 
     // Send to entire workspace if no specific targeting
     if (!notification.targetUsers?.length && !notification.targetRoles?.length) {
-      this.io!.to(`workspace:${notification.workspaceId}`).emit('notification', notification)
+      this.io!.to(`workspace:${notification.workspace_id}`).emit('notification', notification)
     }
 
     // Send push notifications for high priority items
@@ -255,53 +255,53 @@ class WebSocketNotificationService {
   }
 
   // Broadcast order status updates
-  async broadcastOrderUpdate(orderId: string, update: any) {
+  async broadcastOrderUpdate(order_id: string, update: any) {
     const notification: NotificationPayload = {
-      id: `order_${orderId}_${Date.now()}`,
+      id: `order_${order_id}_${Date.now()}`,
       type: 'order_update',
       title: 'Order Status Update',
-      message: `Order #${orderId.slice(-8)} status changed to ${update.status}`,
-      data: { orderId, ...update },
+      message: `Order #${order_id.slice(-8)} status changed to ${update.status}`,
+      data: { order_id, ...update },
       priority: 'medium',
-      workspaceId: update.workspaceId,
-      createdAt: new Date()
+      workspace_id: update.workspace_id,
+      created_at: new Date()
     }
 
     await this.sendNotification(notification)
 
     // Also broadcast to order-specific channel
-    this.io?.to(`order:${orderId}`).emit('order_update', update)
+    this.io?.to(`order:${order_id}`).emit('order_update', update)
   }
 
   // Broadcast production milestone updates
-  async broadcastProductionMilestone(orderId: string, milestone: any) {
+  async broadcastProductionMilestone(order_id: string, milestone: any) {
     const notification: NotificationPayload = {
-      id: `milestone_${orderId}_${Date.now()}`,
+      id: `milestone_${order_id}_${Date.now()}`,
       type: 'production_milestone',
       title: 'Production Milestone',
-      message: `${milestone.stageName} completed for Order #${orderId.slice(-8)}`,
-      data: { orderId, ...milestone },
+      message: `${milestone.stageName} completed for Order #${order_id.slice(-8)}`,
+      data: { order_id, ...milestone },
       priority: 'medium',
-      workspaceId: milestone.workspaceId,
+      workspace_id: milestone.workspace_id,
       targetRoles: ['PRODUCTION_MANAGER', 'CSR'],
-      createdAt: new Date()
+      created_at: new Date()
     }
 
     await this.sendNotification(notification)
   }
 
   // Broadcast QC alerts
-  async broadcastQCAlert(orderId: string, alert: any) {
+  async broadcastQCAlert(order_id: string, alert: any) {
     const notification: NotificationPayload = {
-      id: `qc_${orderId}_${Date.now()}`,
+      id: `qc_${order_id}_${Date.now()}`,
       type: 'qc_alert',
       title: 'Quality Control Alert',
-      message: `QC ${alert.result} for Order #${orderId.slice(-8)}`,
-      data: { orderId, ...alert },
+      message: `QC ${alert.result} for Order #${order_id.slice(-8)}`,
+      data: { order_id, ...alert },
       priority: alert.result === 'FAILED' ? 'urgent' : 'high',
-      workspaceId: alert.workspaceId,
+      workspace_id: alert.workspace_id,
       targetRoles: ['QC_INSPECTOR', 'PRODUCTION_MANAGER'],
-      createdAt: new Date()
+      created_at: new Date()
     }
 
     await this.sendNotification(notification)
@@ -312,17 +312,17 @@ class WebSocketNotificationService {
     return this.connectedUsers.size
   }
 
-  getWorkspaceConnectedCount(workspaceId: string): number {
+  getWorkspaceConnectedCount(workspace_id: string): number {
     return Array.from(this.connectedUsers.values())
-      .filter(user => user.workspaceId === workspaceId).length
+      .filter(user => user.workspace_id === workspace_id).length
   }
 
   // Helper methods
-  private async sendPendingNotifications(userId: string, socket: any) {
+  private async sendPendingNotifications(user_id: string, socket: any) {
     const pendingNotifications = await prisma.notification.findMany({
       where: {
         OR: [
-          { targetUsers: { has: userId } },
+          { targetUsers: { has: user_id } },
           { targetUsers: { isEmpty: true } }
         ],
         isRead: false,
@@ -330,7 +330,7 @@ class WebSocketNotificationService {
           gt: new Date()
         }
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { created_at: 'desc' },
       take: 50
     })
 
@@ -342,12 +342,12 @@ class WebSocketNotificationService {
     })
   }
 
-  private async markNotificationAsRead(notificationId: string, userId: string) {
+  private async markNotificationAsRead(notificationId: string, user_id: string) {
     await prisma.notification.updateMany({
       where: {
         id: notificationId,
         OR: [
-          { targetUsers: { has: userId } },
+          { targetUsers: { has: user_id } },
           { targetUsers: { isEmpty: true } }
         ]
       },
@@ -355,11 +355,11 @@ class WebSocketNotificationService {
     })
   }
 
-  private async markAllNotificationsAsRead(userId: string) {
+  private async markAllNotificationsAsRead(user_id: string) {
     await prisma.notification.updateMany({
       where: {
         OR: [
-          { targetUsers: { has: userId } },
+          { targetUsers: { has: user_id } },
           { targetUsers: { isEmpty: true } }
         ],
         isRead: false
@@ -368,10 +368,10 @@ class WebSocketNotificationService {
     })
   }
 
-  private isValidChannel(channel: string, workspaceId: string, roles: string[]): boolean {
+  private isValidChannel(channel: string, workspace_id: string, roles: string[]): boolean {
     // Validate channel access based on workspace and roles
     const allowedChannels = [
-      `workspace:${workspaceId}`,
+      `workspace:${workspace_id}`,
       `order:*`, // Will be validated further
       ...roles.map(role => `role:${role}`)
     ]
@@ -381,16 +381,16 @@ class WebSocketNotificationService {
     )
   }
 
-  private async handleChatMessage(socket: any, data: { orderId: string, message: string, attachments?: string[] }) {
+  private async handleChatMessage(socket: any, data: { order_id: string, message: string, attachments?: string[] }) {
     // Store chat message in database
     const chatMessage = await prisma.chatMessage.create({
       data: {
         id: crypto.randomUUID(),
-        orderId: data.orderId,
-        senderId: socket.userId,
+        order_id: data.order_id,
+        senderId: socket.user_id,
         message: data.message,
         attachments: data.attachments || [],
-        createdAt: new Date()
+        created_at: new Date()
       },
       include: {
         sender: {
@@ -400,7 +400,7 @@ class WebSocketNotificationService {
     })
 
     // Broadcast to order participants
-    this.io!.to(`order:${data.orderId}`).emit('chat_message', {
+    this.io!.to(`order:${data.order_id}`).emit('chat_message', {
       ...chatMessage,
       sender: chatMessage.sender
     })

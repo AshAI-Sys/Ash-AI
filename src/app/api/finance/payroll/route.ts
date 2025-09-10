@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth'
-import { Role } from '@prisma/client'
+
 import { prisma } from "@/lib/prisma"
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const period = searchParams.get("period")
+    const _period = searchParams.get("period")
     const employeeId = searchParams.get("employeeId")
     const status = searchParams.get("status")
     

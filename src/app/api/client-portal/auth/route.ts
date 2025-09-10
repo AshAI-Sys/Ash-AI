@@ -80,10 +80,10 @@ export async function POST(request: NextRequest) {
 
     // Generate JWT token
     const tokenPayload = {
-      clientId: clientUser.client.id,
+      client_id: clientUser.client.id,
       clientUserId: clientUser.id,
       clientName: clientUser.client.name,
-      workspaceId: clientUser.client.workspace_id,
+      workspace_id: clientUser.client.workspace_id,
       type: 'client_portal'
     }
 
@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
 
     return response
 
-  } catch (error) {
+  } catch (_error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({
         success: false,
@@ -187,7 +187,7 @@ export async function DELETE(request: NextRequest) {
         const decoded = jwt.verify(token, JWT_SECRET) as any
         
         // Log logout event
-        await logSecurityEvent('LOGOUT', decoded.clientId, {
+        await logSecurityEvent('LOGOUT', decoded.client_id, {
           ip: request.headers.get('x-forwarded-for') || 'unknown',
           user_agent: request.headers.get('user-agent') || 'unknown'
         })
@@ -212,7 +212,7 @@ export async function DELETE(request: NextRequest) {
 
     return response
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Client portal logout error:', error)
     return NextResponse.json({
       success: false,
@@ -240,7 +240,7 @@ export async function GET(request: NextRequest) {
     // Get current client data
     const client = await prisma.client.findUnique({
       where: { 
-        id: decoded.clientId,
+        id: decoded.client_id,
         portal_access: true,
         is_active: true
       },
@@ -278,13 +278,13 @@ export async function GET(request: NextRequest) {
         portal_settings: client.portal_settings
       },
       session: {
-        clientId: decoded.clientId,
-        workspaceId: decoded.workspaceId,
+        client_id: decoded.client_id,
+        workspace_id: decoded.workspace_id,
         expires_at: decoded.exp
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     if (error instanceof jwt.JsonWebTokenError) {
       return NextResponse.json({
         success: false,
@@ -301,15 +301,15 @@ export async function GET(request: NextRequest) {
 }
 
 // Helper function to log security events
-async function logSecurityEvent(event: string, clientId: string, metadata: any) {
+async function logSecurityEvent(event: string, client_id: string, metadata: any) {
   try {
     await prisma.auditLog.create({
       data: {
         id: require('nanoid').nanoid(),
         workspace_id: 'system', // Security events are system-wide
-        actor_id: clientId,
+        actor_id: client_id,
         entity_type: 'client_portal',
-        entity_id: clientId,
+        entity_id: client_id,
         action: event,
         metadata: {
           event_type: 'security',
@@ -319,7 +319,7 @@ async function logSecurityEvent(event: string, clientId: string, metadata: any) 
         }
       }
     })
-  } catch (error) {
+  } catch (_error) {
     console.error('Failed to log security event:', error)
   }
 }

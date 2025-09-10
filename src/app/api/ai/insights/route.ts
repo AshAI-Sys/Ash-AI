@@ -39,7 +39,7 @@ export async function GET() {
           type: 'FORECAST' as const,
           title: 'Delivery Risk Detected',
           description: 'Order #045 has 78% chance of delay due to cutting stage bottleneck. Consider reallocating resources.',
-          data: { orderId: 'ORD-045', estimatedDelay: 2, confidence: 0.78 },
+          data: { order_id: 'ORD-045', estimatedDelay: 2, confidence: 0.78 },
           created_at: new Date(),
           priority: 'MEDIUM' as const
         },

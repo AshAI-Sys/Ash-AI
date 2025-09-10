@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     const bundle = await prisma.cuttingBundle.findFirst({
       where: {
         ...whereClause,
-        workspace_id: session.user.workspaceId
+        workspace_id: session.user.workspace_id
       },
       include: {
         lay_plan: {
@@ -148,7 +148,7 @@ export async function POST(request: NextRequest) {
       await tx.bundleStatusHistory.create({
         data: {
           id: require('nanoid').nanoid(),
-          workspace_id: session.user.workspaceId,
+          workspace_id: session.user.workspace_id,
           bundle_id: bundle.id,
           from_status: bundle.status,
           to_status: validatedData.new_status,
@@ -170,7 +170,7 @@ export async function POST(request: NextRequest) {
     await prisma.auditLog.create({
       data: {
         id: require('nanoid').nanoid(),
-        workspace_id: session.user.workspaceId,
+        workspace_id: session.user.workspace_id,
         actor_id: session.user.id,
         entity_type: 'cutting_bundle',
         entity_id: bundle.id,
@@ -257,7 +257,7 @@ export async function PUT(request: NextRequest) {
         const bundle = await prisma.cuttingBundle.findFirst({
           where: {
             id: update.bundle_id,
-            workspace_id: session.user.workspaceId
+            workspace_id: session.user.workspace_id
           }
         })
 
@@ -338,7 +338,7 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0')
 
     const whereConditions: any = {
-      workspace_id: session.user.workspaceId
+      workspace_id: session.user.workspace_id
     }
 
     if (lay_plan_id) whereConditions.lay_plan_id = lay_plan_id
@@ -376,7 +376,7 @@ export async function GET(request: NextRequest) {
     })
 
     // Get summary statistics
-    const summaryStats = await getBundleTrackingSummary(session.user.workspaceId, lay_plan_id)
+    const summaryStats = await getBundleTrackingSummary(session.user.workspace_id, lay_plan_id)
 
     return NextResponse.json({
       success: true,
@@ -454,8 +454,8 @@ async function calculateBundleMetrics(bundleId: string, bundle: any) {
   }
 }
 
-async function getBundleTrackingSummary(workspaceId: string, layPlanId?: string) {
-  const whereClause: any = { workspace_id: workspaceId }
+async function getBundleTrackingSummary(workspace_id: string, layPlanId?: string) {
+  const whereClause: any = { workspace_id: workspace_id }
   if (layPlanId) whereClause.lay_plan_id = layPlanId
 
   const [statusCounts, todayActivity, avgMetrics] = await Promise.all([

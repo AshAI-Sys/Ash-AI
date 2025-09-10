@@ -33,7 +33,8 @@
       "Bash(powershell:*)",
       "Bash(sed:*)",
       "mcp__ide__getDiagnostics",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []

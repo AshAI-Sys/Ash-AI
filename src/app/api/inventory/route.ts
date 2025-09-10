@@ -16,8 +16,8 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '50')
     const search = searchParams.get('search')
-    const category = searchParams.get('category')
-    const brandId = searchParams.get('brandId')
+    const _category = searchParams.get('category')
+    const brand_id = searchParams.get('brand_id')
     const stockLevel = searchParams.get('stockLevel') // 'low', 'out', 'all'
     const location = searchParams.get('location')
 
@@ -36,8 +36,8 @@ export async function GET(request: NextRequest) {
       where.category = category
     }
 
-    if (brandId && brandId !== 'all') {
-      where.brandId = brandId
+    if (brand_id && brand_id !== 'all') {
+      where.brand_id = brand_id
     }
 
     if (location) {
@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
       name,
       sku,
       category,
-      brandId,
+      brand_id,
       quantity = 0,
       unit,
       unitCost,
@@ -173,9 +173,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate brand if provided
-    if (brandId) {
+    if (brand_id) {
       const brand = await prisma.brand.findUnique({
-        where: { id: brandId }
+        where: { id: brand_id }
       })
       if (!brand) {
         return NextResponse.json(
@@ -191,7 +191,7 @@ export async function POST(request: NextRequest) {
         name,
         sku: sku.toUpperCase(),
         category,
-        brandId: brandId || null,
+        brand_id: brand_id || null,
         quantity: parseInt(quantity),
         unit,
         unitCost: parseFloat(unitCost),

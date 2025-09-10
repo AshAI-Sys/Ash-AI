@@ -26,7 +26,7 @@ import { CreatePOModal } from '@/components/purchase-orders/CreatePOModal'
 
 interface PurchaseOrder {
   id: string
-  poNumber: string
+  po_number: string
   vendor: string
   status: 'DRAFT' | 'PENDING' | 'APPROVED' | 'ORDERED' | 'RECEIVED' | 'CANCELLED'
   totalAmount: number
@@ -46,7 +46,7 @@ interface PurchaseOrder {
 const mockPurchaseOrders: PurchaseOrder[] = [
   {
     id: '1',
-    poNumber: 'PO-2024-001',
+    po_number: 'PO-2024-001',
     vendor: 'Fabric Suppliers Inc.',
     status: 'APPROVED',
     totalAmount: 25000,
@@ -61,7 +61,7 @@ const mockPurchaseOrders: PurchaseOrder[] = [
   },
   {
     id: '2',
-    poNumber: 'PO-2024-002',
+    po_number: 'PO-2024-002',
     vendor: 'Ink & Supplies Co.',
     status: 'PENDING',
     totalAmount: 18500,
@@ -75,7 +75,7 @@ const mockPurchaseOrders: PurchaseOrder[] = [
   },
   {
     id: '3',
-    poNumber: 'PO-2024-003',
+    po_number: 'PO-2024-003',
     vendor: 'Packaging Materials Ltd.',
     status: 'RECEIVED',
     totalAmount: 12000,
@@ -104,7 +104,7 @@ export default function PurchaseOrdersPage() {
   const [statusFilter, setStatusFilter] = useState<string>('ALL')
 
   const filteredOrders = purchaseOrders.filter(po => {
-    const matchesSearch = po.poNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = po.po_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          po.vendor.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesStatus = statusFilter === 'ALL' || po.status === statusFilter
     return matchesSearch && matchesStatus
@@ -139,7 +139,7 @@ export default function PurchaseOrdersPage() {
           <CreatePOModal onPOCreate={(poData) => {
             const newPO = {
               id: `po_${Date.now()}`,
-              poNumber: `PO-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
+              po_number: `PO-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
               vendor: poData.vendor?.name || '',
               status: 'DRAFT' as const,
               totalAmount: poData.items.reduce((sum, item) => sum + item.totalPrice, 0),
@@ -247,7 +247,7 @@ export default function PurchaseOrdersPage() {
                     <div className="flex items-center space-x-3">
                       <StatusIcon className="h-5 w-5 text-muted-foreground" />
                       <div>
-                        <CardTitle className="text-lg">{po.poNumber}</CardTitle>
+                        <CardTitle className="text-lg">{po.po_number}</CardTitle>
                         <p className="text-sm text-muted-foreground">{po.vendor}</p>
                       </div>
                     </div>
@@ -335,7 +335,7 @@ export default function PurchaseOrdersPage() {
                 <CreatePOModal onPOCreate={(poData) => {
                   const newPO = {
                     id: `po_${Date.now()}`,
-                    poNumber: `PO-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
+                    po_number: `PO-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
                     vendor: poData.vendor?.name || '',
                     status: 'DRAFT' as const,
                     totalAmount: poData.items.reduce((sum, item) => sum + item.totalPrice, 0),

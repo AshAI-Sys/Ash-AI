@@ -262,7 +262,7 @@ export class TaskPipelineService {
   /**
    * Generate tasks for an order based on its print method
    */
-  static generateTasksForOrder(orderId: string, printMethod: PrintMethod, dueDate?: Date) {
+  static generateTasksForOrder(order_id: string, printMethod: PrintMethod, dueDate?: Date) {
     const pipeline = this.getPipeline(printMethod)
     const tasks = []
 
@@ -280,7 +280,7 @@ export class TaskPipelineService {
       }
 
       const task = {
-        orderId,
+        order_id,
         taskType: step.taskType,
         description: step.description,
         assignedRole: step.assignedRole,

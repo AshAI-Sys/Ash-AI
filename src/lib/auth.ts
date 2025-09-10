@@ -14,6 +14,7 @@ declare module 'next-auth' {
       name: string
       full_name: string
       role: Role
+      workspace_id: string
     }
   }
   
@@ -23,6 +24,7 @@ declare module 'next-auth' {
     name: string
     full_name: string
     role: Role
+    workspace_id: string
   }
 }
 
@@ -55,7 +57,7 @@ export const authOptions: NextAuthOptions = {
               role: user.role
             };
           }
-        } catch (error) {
+        } catch (_error) {
           console.warn('Database auth failed, using mock auth:', error);
         }
 
@@ -73,21 +75,24 @@ export const authOptions: NextAuthOptions = {
             email: 'admin@ash-ai.com',
             password: 'AshAI2024!',
             full_name: 'ASH AI Administrator',
-            role: 'ADMIN' as Role
+            role: 'ADMIN' as Role,
+            workspace_id: 'workspace-1'
           },
           {
             id: '2',
             email: 'sewing@example.com',
             password: 'sewing123',
             full_name: 'Maria Santos',
-            role: 'SEWING_OPERATOR' as Role
+            role: 'SEWING_OPERATOR' as Role,
+            workspace_id: 'workspace-1'
           },
           {
             id: '3',
             email: 'manager@example.com',
             password: 'manager123',
             full_name: 'John Manager',
-            role: 'MANAGER' as Role
+            role: 'MANAGER' as Role,
+            workspace_id: 'workspace-1'
           }
         ]
 
@@ -103,6 +108,7 @@ export const authOptions: NextAuthOptions = {
           name: user.full_name,
           full_name: user.full_name,
           role: user.role,
+          workspace_id: user.workspace_id
         }
       }
     })
@@ -115,6 +121,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.role = (user as { role: string }).role
         token.full_name = (user as { full_name: string }).full_name
+        token.workspace_id = (user as { workspace_id: string }).workspace_id
       }
       return token
     },
@@ -123,6 +130,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.sub!
         session.user.role = token.role as Role
         session.user.full_name = token.full_name as string
+        session.user.workspace_id = token.workspace_id as string
       }
       return session
     }

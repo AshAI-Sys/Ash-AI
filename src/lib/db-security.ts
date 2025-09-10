@@ -164,7 +164,7 @@ export class SecureDatabase {
     }
     
     if (Array.isArray(input)) {
-      return input.map(item => this.sanitizeInput(item))
+      return input.map(item => this.sanitizeInput(_item))
     }
     
     if (typeof input === 'object' && input !== null) {

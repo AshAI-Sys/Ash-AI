@@ -59,13 +59,13 @@ interface AshleyRecommendation {
 }
 
 interface OrderData {
-  clientId: string
-  brandId: string
+  client_id: string
+  brand_id: string
   productType: string
   method: string
-  totalQty: number
+  total_qty: number
   sizeCurve: Record<string, number>
-  targetDeliveryDate: string
+  target_delivery_date: string
   unitPrice: number
   depositPercentage: number
   routeTemplateKey: string
@@ -95,7 +95,7 @@ export function CreateOrderModal({ isOpen, onClose, onSubmit }: CreateOrderModal
   const [orderData, setOrderData] = useState<Partial<OrderData>>({
     sizeCurve: { S: 0, M: 0, L: 0, XL: 0 },
     depositPercentage: 50,
-    totalQty: 0
+    total_qty: 0
   })
   const [selectedClient, setSelectedClient] = useState<Client | null>(null)
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null)
@@ -113,14 +113,14 @@ export function CreateOrderModal({ isOpen, onClose, onSubmit }: CreateOrderModal
   ]
 
   useEffect(() => {
-    if (orderData.method && orderData.productType && orderData.totalQty > 0 && orderData.targetDeliveryDate) {
+    if (orderData.method && orderData.productType && orderData.total_qty > 0 && orderData.target_delivery_date) {
       const context: OrderContext = {
         productType: orderData.productType,
         method: orderData.method as any,
-        quantity: orderData.totalQty,
-        targetDeliveryDate: new Date(orderData.targetDeliveryDate),
-        brandId: orderData.brandId || '',
-        isPriority: orderData.totalQty > 500 // Consider large orders priority
+        quantity: orderData.total_qty,
+        target_delivery_date: new Date(orderData.target_delivery_date),
+        brand_id: orderData.brand_id || '',
+        isPriority: orderData.total_qty > 500 // Consider large orders priority
       }
       
       // Get available templates from routing engine
@@ -134,8 +134,8 @@ export function CreateOrderModal({ isOpen, onClose, onSubmit }: CreateOrderModal
       if (recommendation.recommendedTemplate) {
         const criticalPath = routingEngine.calculateCriticalPath(
           recommendation.recommendedTemplate, 
-          orderData.totalQty,
-          new Date(orderData.targetDeliveryDate)
+          orderData.total_qty,
+          new Date(orderData.target_delivery_date)
         )
         recommendation.criticalPath = criticalPath
       }
@@ -148,12 +148,12 @@ export function CreateOrderModal({ isOpen, onClose, onSubmit }: CreateOrderModal
         setOrderData(prev => ({ ...prev, routeTemplateKey: recommendation.recommendedTemplate!.id }))
       }
     }
-  }, [orderData.method, orderData.totalQty, orderData.productType, orderData.targetDeliveryDate, orderData.brandId])
+  }, [orderData.method, orderData.total_qty, orderData.productType, orderData.target_delivery_date, orderData.brand_id])
 
   const handleSizeCurveChange = (size: string, value: number) => {
     const newSizeCurve = { ...orderData.sizeCurve, [size]: value }
     const newTotal = Object.values(newSizeCurve).reduce((sum, qty) => sum + qty, 0)
-    setOrderData({ ...orderData, sizeCurve: newSizeCurve, totalQty: newTotal })
+    setOrderData({ ...orderData, sizeCurve: newSizeCurve, total_qty: newTotal })
   }
 
   const handleNext = () => {
@@ -169,12 +169,12 @@ export function CreateOrderModal({ isOpen, onClose, onSubmit }: CreateOrderModal
   }
 
   const handleSubmit = () => {
-    if (orderData.clientId && orderData.brandId && orderData.productType && 
-        orderData.method && orderData.totalQty > 0 && orderData.routeTemplateKey) {
+    if (orderData.client_id && orderData.brand_id && orderData.productType && 
+        orderData.method && orderData.total_qty > 0 && orderData.routeTemplateKey) {
       onSubmit(orderData as OrderData)
       onClose()
       setCurrentStep(1)
-      setOrderData({ sizeCurve: { S: 0, M: 0, L: 0, XL: 0 }, depositPercentage: 50, totalQty: 0 })
+      setOrderData({ sizeCurve: { S: 0, M: 0, L: 0, XL: 0 }, depositPercentage: 50, total_qty: 0 })
     }
   }
 
@@ -194,7 +194,7 @@ export function CreateOrderModal({ isOpen, onClose, onSubmit }: CreateOrderModal
                     }`}
                     onClick={() => {
                       setSelectedClient(client)
-                      setOrderData({ ...orderData, clientId: client.id })
+                      setOrderData({ ...orderData, client_id: client.id })
                     }}
                   >
                     <CardContent className="p-4">
@@ -223,7 +223,7 @@ export function CreateOrderModal({ isOpen, onClose, onSubmit }: CreateOrderModal
                     }`}
                     onClick={() => {
                       setSelectedBrand(brand)
-                      setOrderData({ ...orderData, brandId: brand.id })
+                      setOrderData({ ...orderData, brand_id: brand.id })
                     }}
                   >
                     <CardContent className="p-4">
@@ -322,12 +322,12 @@ export function CreateOrderModal({ isOpen, onClose, onSubmit }: CreateOrderModal
               <CardContent className="p-4">
                 <div className="flex items-center space-x-2">
                   <Package className="h-5 w-5 text-blue-600" />
-                  <span className="font-semibold text-blue-900">Total Quantity: {orderData.totalQty}</span>
+                  <span className="font-semibold text-blue-900">Total Quantity: {orderData.total_qty}</span>
                 </div>
               </CardContent>
             </Card>
 
-            {orderData.totalQty > 0 && (
+            {orderData.total_qty > 0 && (
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                 <div className="flex items-center space-x-2 mb-2">
                   <CheckCircle className="h-5 w-5 text-green-600" />
@@ -336,7 +336,7 @@ export function CreateOrderModal({ isOpen, onClose, onSubmit }: CreateOrderModal
                 <div className="grid grid-cols-4 gap-2 text-sm">
                   {Object.entries(orderData.sizeCurve || {}).map(([size, qty]) => (
                     <div key={size} className="text-green-700">
-                      {size}: {qty} ({Math.round((qty / orderData.totalQty) * 100)}%)
+                      {size}: {qty} ({Math.round((qty / orderData.total_qty) * 100)}%)
                     </div>
                   ))}
                 </div>
@@ -353,8 +353,8 @@ export function CreateOrderModal({ isOpen, onClose, onSubmit }: CreateOrderModal
               <Input
                 id="targetDelivery"
                 type="date"
-                value={orderData.targetDeliveryDate || ''}
-                onChange={(e) => setOrderData({ ...orderData, targetDeliveryDate: e.target.value })}
+                value={orderData.target_delivery_date || ''}
+                onChange={(e) => setOrderData({ ...orderData, target_delivery_date: e.target.value })}
                 className="mt-2"
               />
             </div>
@@ -392,18 +392,18 @@ export function CreateOrderModal({ isOpen, onClose, onSubmit }: CreateOrderModal
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span>Total Amount:</span>
-                    <span className="font-semibold">₱{((orderData.unitPrice || 0) * (orderData.totalQty || 0)).toLocaleString()}</span>
+                    <span className="font-semibold">₱{((orderData.unitPrice || 0) * (orderData.total_qty || 0)).toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Deposit ({orderData.depositPercentage}%):</span>
                     <span className="font-semibold text-purple-700">
-                      ₱{(((orderData.unitPrice || 0) * (orderData.totalQty || 0) * (orderData.depositPercentage || 0)) / 100).toLocaleString()}
+                      ₱{(((orderData.unitPrice || 0) * (orderData.total_qty || 0) * (orderData.depositPercentage || 0)) / 100).toLocaleString()}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm text-muted-foreground">
                     <span>Balance on Delivery:</span>
                     <span>
-                      ₱{(((orderData.unitPrice || 0) * (orderData.totalQty || 0)) - (((orderData.unitPrice || 0) * (orderData.totalQty || 0) * (orderData.depositPercentage || 0)) / 100)).toLocaleString()}
+                      ₱{(((orderData.unitPrice || 0) * (orderData.total_qty || 0)) - (((orderData.unitPrice || 0) * (orderData.total_qty || 0) * (orderData.depositPercentage || 0)) / 100)).toLocaleString()}
                     </span>
                   </div>
                 </div>
@@ -627,7 +627,7 @@ export function CreateOrderModal({ isOpen, onClose, onSubmit }: CreateOrderModal
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span>Total Quantity:</span>
-                      <span className="font-medium">{orderData.totalQty} pcs</span>
+                      <span className="font-medium">{orderData.total_qty} pcs</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Unit Price:</span>
@@ -635,11 +635,11 @@ export function CreateOrderModal({ isOpen, onClose, onSubmit }: CreateOrderModal
                     </div>
                     <div className="flex justify-between">
                       <span>Total Amount:</span>
-                      <span className="font-bold text-lg">₱{((orderData.unitPrice || 0) * (orderData.totalQty || 0)).toLocaleString()}</span>
+                      <span className="font-bold text-lg">₱{((orderData.unitPrice || 0) * (orderData.total_qty || 0)).toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Delivery Date:</span>
-                      <span className="font-medium">{orderData.targetDeliveryDate}</span>
+                      <span className="font-medium">{orderData.target_delivery_date}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -812,8 +812,8 @@ export function CreateOrderModal({ isOpen, onClose, onSubmit }: CreateOrderModal
                 disabled={
                   (currentStep === 1 && (!selectedClient || !selectedBrand)) ||
                   (currentStep === 2 && (!orderData.productType || !orderData.method)) ||
-                  (currentStep === 3 && !orderData.totalQty) ||
-                  (currentStep === 4 && (!orderData.targetDeliveryDate || !orderData.unitPrice)) ||
+                  (currentStep === 3 && !orderData.total_qty) ||
+                  (currentStep === 4 && (!orderData.target_delivery_date || !orderData.unitPrice)) ||
                   (currentStep === 5 && !orderData.routeTemplateKey)
                 }
               >

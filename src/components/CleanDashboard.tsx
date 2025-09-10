@@ -142,7 +142,7 @@ export function CleanDashboard() {
         apparelType: 'T-Shirt',
         quantity: 50,
         status: 'IN_PROGRESS',
-        createdAt: '2024-09-01T08:00:00Z',
+        created_at: '2024-09-01T08:00:00Z',
         total: 15750
       },
       {
@@ -151,7 +151,7 @@ export function CleanDashboard() {
         apparelType: 'Hoodie',
         quantity: 25,
         status: 'PENDING',
-        createdAt: '2024-08-31T16:30:00Z',
+        created_at: '2024-08-31T16:30:00Z',
         total: 12500
       }
     ]
@@ -167,7 +167,7 @@ export function CleanDashboard() {
         apparelType: 'Polo Shirt',
         quantity: 75,
         status: 'COMPLETED',
-        createdAt: '2024-08-30T14:00:00Z',
+        created_at: '2024-08-30T14:00:00Z',
         total: 22500
       },
       {
@@ -176,7 +176,7 @@ export function CleanDashboard() {
         apparelType: 'Jersey',
         quantity: 30,
         status: 'PENDING',
-        createdAt: '2024-08-29T10:30:00Z',
+        created_at: '2024-08-29T10:30:00Z',
         total: 18000
       }
     ]

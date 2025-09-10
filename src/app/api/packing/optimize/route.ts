@@ -32,10 +32,10 @@ interface PackingSolution {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { orderId, cartonTypes, items, algorithm = "ASHLEY_AI" } = body
+    const { order_id, cartonTypes, items, algorithm = "ASHLEY_AI" } = body
 
     // Validate input
-    if (!orderId || !cartonTypes || !items) {
+    if (!order_id || !cartonTypes || !items) {
       return NextResponse.json(
         { success: false, error: "Missing required fields" },
         { status: 400 }
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     // Save optimization results
     const optimization = await prisma.packingOptimization.create({
       data: {
-        orderId,
+        order_id,
         algorithm,
         cartonTypes,
         items,

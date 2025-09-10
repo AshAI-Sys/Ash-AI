@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const type = searchParams.get("type")
     const status = searchParams.get("status")
-    const period = searchParams.get("period")
+    const _period = searchParams.get("period")
     
     const where: { type?: string; status?: string; period?: string } = {}
     
@@ -95,11 +95,11 @@ export async function POST(request: NextRequest) {
         data: {
           name,
           parameters: parameters || {},
-          inputData: forecastResult.inputData,
-          prediction: forecastResult.prediction,
+          inputData: forecastResult.inputData as any,
+          prediction: forecastResult.prediction as any,
           status: "COMPLETED",
           createdBy
-        }
+        } as any
       },
       include: {
         workspace: {
@@ -138,31 +138,31 @@ async function generateForecast(type: string, period: string, _algorithm: string
     switch (type) {
       case "SALES":
         inputData = await getSalesHistoricalData(_targetDate)
-        prediction = generateSalesForecast(inputData, "linear")
+        prediction = generateSalesForecast(inputData as { monthlyData: { revenue: number; }[] }, "linear")
         accuracy = 0.78 + Math.random() * 0.15 // 78-93% accuracy
         break
         
       case "INVENTORY":
         inputData = await getInventoryHistoricalData(_targetDate)
-        prediction = generateInventoryForecast(inputData, "linear")
+        prediction = generateInventoryForecast(inputData as { materials: { material: string; currentStock: number; reorderPoint: number; avgMonthlyConsumption: number; leadTime: number; }[]; totalValue: number; }, "linear")
         accuracy = 0.85 + Math.random() * 0.1 // 85-95% accuracy
         break
         
       case "CASH_FLOW":
         inputData = await getCashFlowHistoricalData(_targetDate)
-        prediction = generateCashFlowForecast(inputData, "linear")
+        prediction = generateCashFlowForecast(inputData as { monthlyData: { inflow: number; outflow: number; }[] }, "linear")
         accuracy = 0.72 + Math.random() * 0.18 // 72-90% accuracy
         break
         
       case "DEMAND":
         inputData = await getDemandHistoricalData(_targetDate)
-        prediction = generateDemandForecast(inputData, "linear")
+        prediction = generateDemandForecast(inputData as { productDemand: { product: string; avgMonthlyDemand: number; trend: string; }[] }, "linear")
         accuracy = 0.80 + Math.random() * 0.12 // 80-92% accuracy
         break
         
       case "PRODUCTION":
         inputData = await getProductionHistoricalData(_targetDate)
-        prediction = generateProductionForecast(inputData, "linear")
+        prediction = generateProductionForecast(inputData as { stageMetrics: { stage: string; avgDailyOutput: number; efficiency: number; bottleneckRisk: string; }[] }, "linear")
         accuracy = 0.88 + Math.random() * 0.08 // 88-96% accuracy
         break
         

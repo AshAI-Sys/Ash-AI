@@ -44,7 +44,7 @@ interface AshleyInsight {
 }
 
 interface AshleyInsightsProps {
-  workspaceId?: string
+  workspace_id?: string
   refreshInterval?: number
   maxInsights?: number
 }
@@ -83,7 +83,7 @@ const getPriorityColor = (priority: string) => {
 }
 
 export default function AshleyInsights({ 
-  workspaceId = 'default', 
+  workspace_id = 'default', 
   refreshInterval = 300000, // 5 minutes
   maxInsights = 8 
 }: AshleyInsightsProps) {
@@ -96,7 +96,7 @@ export default function AshleyInsights({
     loadInsights()
     const interval = setInterval(loadInsights, refreshInterval)
     return () => clearInterval(interval)
-  }, [workspaceId, refreshInterval])
+  }, [workspace_id, refreshInterval])
 
   const loadInsights = async () => {
     try {
@@ -108,7 +108,7 @@ export default function AshleyInsights({
       setLastUpdate(new Date())
       
       // In production, this would call the actual API
-      // const response = await fetch(`/api/ai/ashley/insights?workspace_id=${workspaceId}`)
+      // const response = await fetch(`/api/ai/ashley/insights?workspace_id=${workspace_id}`)
       // if (response.ok) {
       //   const data = await response.json()
       //   setInsights(data.insights.slice(0, maxInsights))

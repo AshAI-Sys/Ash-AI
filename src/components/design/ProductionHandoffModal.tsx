@@ -36,10 +36,10 @@ interface ProductionSpec {
 }
 
 interface ProductionHandoffData {
-  designId: string
+  design_id: string
   designName: string
-  orderId: string
-  poNumber: string
+  order_id: string
+  po_number: string
   method: string
   specifications: ProductionSpec[]
   estimatedTime: string
@@ -52,8 +52,8 @@ interface ProductionHandoffModalProps {
   design: {
     id: string
     name: string
-    orderId: string
-    poNumber: string
+    order_id: string
+    po_number: string
     method: string
     status: string
   } | null
@@ -99,10 +99,10 @@ export function ProductionHandoffModal({ design, isOpen, onClose, onHandoff }: P
 
   const handleHandoff = () => {
     const handoffData: ProductionHandoffData = {
-      designId: design.id,
+      design_id: design.id,
       designName: design.name,
-      orderId: design.orderId,
-      poNumber: design.poNumber,
+      order_id: design.order_id,
+      po_number: design.po_number,
       method: design.method,
       specifications: specifications.filter(spec => spec.verified),
       estimatedTime: '2-3 business days',
@@ -136,7 +136,7 @@ export function ProductionHandoffModal({ design, isOpen, onClose, onHandoff }: P
               </div>
               <div>
                 <CardTitle className="text-xl font-bold text-white">Production Handoff</CardTitle>
-                <p className="text-white/70">{design.name} • {design.poNumber}</p>
+                <p className="text-white/70">{design.name} • {design.po_number}</p>
               </div>
             </div>
             <div className="flex items-center space-x-3">

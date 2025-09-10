@@ -32,7 +32,7 @@ export interface SecurityEvent {
   source: {
     ip: string
     userAgent: string
-    userId?: string
+    user_id?: string
     sessionId?: string
   }
   details: {
@@ -71,7 +71,7 @@ export class ThreatDetectionEngine {
     path: string
     headers: Record<string, string>
     body?: any
-    userId?: string
+    user_id?: string
   }): SecurityEvent | null {
     const threats: Partial<SecurityEvent>[] = []
 
@@ -116,7 +116,7 @@ export class ThreatDetectionEngine {
   private detectSQLInjection(request: any): Partial<SecurityEvent> | null {
     const sqlPatterns = [
       /(\bUNION\b|\bSELECT\b|\bINSERT\b|\bUPDATE\b|\bDELETE\b|\bDROP\b)/i,
-      /('|(\\')|(;)|(\|)|(\*)|(%27)|(%3B)|(%7C)/,
+      /('|(\\')|(;)|(\|)|(\\\*)|(%27)|(%3B)|(%7C)/,
       /(\bOR\b|\bAND\b)\s+(\w+\s*)?\=\s*(\w+\s*)?/i,
       /(\bOR\b|\bAND\b)\s+['"]?\d+['"]?\s*=\s*['"]?\d+['"]?/i
     ]
@@ -193,8 +193,7 @@ export class ThreatDetectionEngine {
         severity: 'CRITICAL',
         details: {
           detectionRule: 'BRUTE_FORCE_THRESHOLD',
-          riskScore: 95,
-          attemptCount: currentAttempts
+          riskScore: 95
         }
       }
     } else if (currentAttempts > 5) {
@@ -204,8 +203,7 @@ export class ThreatDetectionEngine {
         severity: 'MEDIUM',
         details: {
           detectionRule: 'MULTIPLE_AUTH_ATTEMPTS',
-          riskScore: 60,
-          attemptCount: currentAttempts
+          riskScore: 60
         }
       }
     }
@@ -303,8 +301,7 @@ export class ThreatDetectionEngine {
         severity: 'MEDIUM',
         details: {
           detectionRule: 'RATE_LIMIT_VIOLATION',
-          riskScore: 65,
-          requestCount: currentRequests
+          riskScore: 65
         }
       }
     }

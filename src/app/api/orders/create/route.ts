@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     
     // Validate required fields according to CLIENT_UPDATED_PLAN Stage 1
-    const requiredFields = ['brandId', 'productType', 'method', 'totalQty', 'targetDeliveryDate']
+    const requiredFields = ['brand_id', 'productType', 'method', 'total_qty', 'target_delivery_date']
     const missingFields = requiredFields.filter(field => !body[field])
     
     if (missingFields.length > 0) {
@@ -27,24 +27,24 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate PO number according to CLIENT_UPDATED_PLAN format
-    const brand = await prisma.brand.findUnique({ where: { id: body.brandId } })
+    const brand = await prisma.brand.findUnique({ where: { id: body.brand_id } })
     if (!brand) {
       return NextResponse.json({ error: 'Brand not found' }, { status: 404 })
     }
 
     const year = new Date().getFullYear()
-    const sequence = await generateSequenceNumber(body.brandId, year)
+    const sequence = await generateSequenceNumber(body.brand_id, year)
     const poNumber = `${brand.code}-${year}-${sequence.toString().padStart(3, '0')}`
 
     // Ashley AI Validation
     const ashleyValidation = await ashleyAI.validateOrderIntake({
       method: body.method,
       productType: body.productType,
-      totalQty: body.totalQty,
+      total_qty: body.total_qty,
       sizeCurve: body.sizeCurve || {},
-      targetDeliveryDate: body.targetDeliveryDate,
-      routingTemplate: body.routingTemplate || '',
-      brandId: body.brandId
+      target_delivery_date: body.target_delivery_date,
+      routeTemplate: body.routeTemplate || '',
+      brand_id: body.brand_id
     })
 
     // Check for blocking errors
@@ -61,8 +61,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Create client if new client data provided
-    let clientId = body.clientId
-    if (body.newClient && !clientId) {
+    let client_id = body.client_id
+    if (body.newClient && !client_id) {
       const client = await prisma.client.create({
         data: {
           name: body.newClient.name,
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
           address: body.newClient.billingAddress ? JSON.stringify(body.newClient.billingAddress) : null
         }
       })
-      clientId = client.id
+      client_id = client.id
     }
 
     // Create order according to database schema
@@ -80,34 +80,34 @@ export async function POST(request: NextRequest) {
       data: {
         orderNumber: poNumber,
         clientName: body.clientName || body.newClient?.name || '',
-        clientId,
-        brandId: body.brandId,
+        client_id,
+        brand_id: body.brand_id,
         designName: body.designName || 'Design TBD',
         apparelType: body.productType,
-        quantity: body.totalQty,
+        quantity: body.total_qty,
         sizeBreakdown: body.sizeCurve || {},
         printMethod: body.method,
         sewingType: body.sewingType || 'Standard',
         notes: body.notes || '',
         mockupUrl: body.mockupUrl,
         status: body.status || 'DRAFT',
-        dueDate: new Date(body.targetDeliveryDate),
+        dueDate: new Date(body.target_delivery_date),
         createdById: session.user.id
       }
     })
 
     // Create routing steps based on template
-    if (body.routingTemplate) {
-      await createRoutingSteps(order.id, body.routingTemplate, body.method)
+    if (body.routeTemplate) {
+      await createRoutingSteps(order.id, body.routeTemplate, body.method)
     }
 
     // Create design assets if provided
-    if (body.designAssets && body.designAssets.length > 0) {
-      for (const asset of body.designAssets) {
+    if (body.design_assets && body.design_assets.length > 0) {
+      for (const asset of body.design_assets) {
         await prisma.designAsset.create({
           data: {
-            orderId: order.id,
-            brandId: body.brandId,
+            order_id: order.id,
+            brand_id: body.brand_id,
             type: asset.type || 'MOCKUP',
             fileUrl: asset.url,
             createdById: session.user.id
@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
         payload: {
           poNumber,
           method: body.method,
-          quantity: body.totalQty,
+          quantity: body.total_qty,
           ashleyAdvisories: ashleyValidation.length
         }
       }
@@ -134,11 +134,11 @@ export async function POST(request: NextRequest) {
     // Create audit log
     await prisma.auditLog.create({
       data: {
-        userId: session.user.id,
+        user_id: session.user.id,
         action: 'CREATE_ORDER',
         entityType: 'Order',
         entityId: order.id,
-        details: `Created PO ${poNumber} for ${body.totalQty} ${body.productType} via ${body.method}`,
+        details: `Created PO ${poNumber} for ${body.total_qty} ${body.productType} via ${body.method}`,
         metadata: {
           poNumber,
           ashleyValidationCount: ashleyValidation.length,
@@ -168,13 +168,13 @@ export async function POST(request: NextRequest) {
 }
 
 // Generate sequence number for PO according to CLIENT_UPDATED_PLAN
-async function generateSequenceNumber(brandId: string, year: number): Promise<number> {
+async function generateSequenceNumber(brand_id: string, year: number): Promise<number> {
   const startOfYear = new Date(year, 0, 1)
   const endOfYear = new Date(year, 11, 31, 23, 59, 59)
 
   const lastOrder = await prisma.order.findFirst({
     where: {
-      brandId,
+      brand_id,
       created_at: {
         gte: startOfYear,
         lte: endOfYear
@@ -192,8 +192,8 @@ async function generateSequenceNumber(brandId: string, year: number): Promise<nu
 }
 
 // Create routing steps based on template
-async function createRoutingSteps(orderId: string, templateKey: string, method: string) {
-  const routingTemplates = {
+async function createRoutingSteps(order_id: string, templateKey: string, method: string) {
+  const routeTemplates = {
     SILK_OPTION_A: [
       { name: 'Cutting', workcenter: 'CUTTING', sequence: 1 },
       { name: 'Printing', workcenter: 'PRINTING', sequence: 2 },
@@ -232,12 +232,12 @@ async function createRoutingSteps(orderId: string, templateKey: string, method: 
     ]
   }
 
-  const steps = routingTemplates[templateKey as keyof typeof routingTemplates] || routingTemplates.SILK_OPTION_A
+  const steps = routeTemplates[templateKey as keyof typeof routeTemplates] || routeTemplates.SILK_OPTION_A
 
   for (const step of steps) {
     await prisma.routingStep.create({
       data: {
-        orderId,
+        order_id,
         name: step.name,
         workcenter: step.workcenter,
         sequence: step.sequence,

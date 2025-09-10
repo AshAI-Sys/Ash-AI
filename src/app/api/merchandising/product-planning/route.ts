@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     const planningData = productPlanningSchema.parse(sanitizedBody)
 
     // Verify workspace access
-    const workspace = await secureDb.getPrisma().workspace.findFirst({
+    const _workspace = await secureDb.getPrisma().workspace.findFirst({
       where: {
         id: planningData.workspace_id,
         OR: [
@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function gatherHistoricalData(workspaceId: string, horizon: string) {
+async function gatherHistoricalData(workspace_id: string, horizon: string) {
   const monthsBack = getMonthsFromHorizon(horizon) * 2 // Double for historical context
   const startDate = new Date()
   startDate.setMonth(startDate.getMonth() - monthsBack)
@@ -129,7 +129,7 @@ async function gatherHistoricalData(workspaceId: string, horizon: string) {
   // Get historical orders with product details
   const orders = await secureDb.getPrisma().order.findMany({
     where: {
-      workspace_id: workspaceId,
+      workspace_id: workspace_id,
       created_at: { gte: startDate },
       status: { in: ['COMPLETED', 'DELIVERED'] }
     },
@@ -146,7 +146,7 @@ async function gatherHistoricalData(workspaceId: string, horizon: string) {
   // Get inventory movements
   const inventoryTransactions = await secureDb.getPrisma().inventoryTransaction.findMany({
     where: {
-      workspace_id: workspaceId,
+      workspace_id: workspace_id,
       created_at: { gte: startDate }
     },
     include: {

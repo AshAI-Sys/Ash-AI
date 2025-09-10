@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
     const {
-      orderId,
+      order_id,
       assignedTo,
       taskType,
       description,
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
     } = body
 
     // Validate required fields
-    if (!orderId || !taskType || !description) {
+    if (!order_id || !taskType || !description) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
 
     // Validate order exists
     const order = await prisma.order.findUnique({
-      where: { id: orderId }
+      where: { id: order_id }
     })
     if (!order) {
       return NextResponse.json(
@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
 
     const task = await prisma.task.create({
       data: {
-        orderId,
+        order_id,
         assignedTo,
         taskType,
         description,

@@ -32,7 +32,7 @@ export async function POST(
         order: {
           select: {
             orderNumber: true,
-            clientId: true,
+            client_id: true,
             client: { select: { name: true } }
           }
         },
@@ -69,7 +69,7 @@ export async function POST(
     // Create tracking update
     await prisma.trackingUpdate.create({
       data: {
-        orderId: asset.orderId,
+        order_id: asset.order_id,
         stage: 'Design Revision',
         status: 'OPEN',
         message: `Client requested design revision: ${body.comments}`,
@@ -115,7 +115,7 @@ export async function POST(
     // Create audit log
     await prisma.auditLog.create({
       data: {
-        userId: session.user.id,
+        user_id: session.user.id,
         action: 'REQUEST_DESIGN_REVISION',
         entityType: 'DesignAsset',
         entityId: assetId,

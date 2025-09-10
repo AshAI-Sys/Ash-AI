@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     
     // Validate request body
-    if (!body.method || !body.totalQty || !body.targetDeliveryDate) {
+    if (!body.method || !body.total_qty || !body.target_delivery_date) {
       return NextResponse.json({ 
         error: 'Missing required fields',
         advisories: []
@@ -21,11 +21,11 @@ export async function POST(request: NextRequest) {
     const advisories = await ashleyAI.validateOrderIntake({
       method: body.method,
       productType: body.productType || 'T-Shirt',
-      totalQty: body.totalQty,
+      total_qty: body.total_qty,
       sizeCurve: body.sizeCurve || {},
-      targetDeliveryDate: body.targetDeliveryDate,
-      routingTemplate: body.routingTemplate || '',
-      brandId: body.brandId || ''
+      target_delivery_date: body.target_delivery_date,
+      routeTemplate: body.routeTemplate || '',
+      brand_id: body.brand_id || ''
     })
 
     return NextResponse.json({

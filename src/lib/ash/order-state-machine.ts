@@ -19,7 +19,7 @@ export interface OrderStateTransition {
 }
 
 export interface TransitionContext {
-  userId: string
+  user_id: string
   userRole: Role
   reason?: string
   metadata?: any
@@ -48,9 +48,9 @@ export const ORDER_STATE_TRANSITIONS: OrderStateTransition[] = [
       // Must have basic order info
       return !!(order.client_id && order.brand_id && order.total_qty > 0)
     },
-    onTransition: async (order, context) => {
+    onTransition: async (order, _context) => {
       // Create initial design asset placeholder
-      await createDesignAssetPlaceholder(order.id, context.userId)
+      await createDesignAssetPlaceholder(order.id, context.user_id)
       
       // Notify design team
       await notifyDesignTeam(order.id)
@@ -71,7 +71,7 @@ export const ORDER_STATE_TRANSITIONS: OrderStateTransition[] = [
       })
       return designAssets > 0
     },
-    onTransition: async (order, context) => {
+    onTransition: async (order, _context) => {
       // Set portal visibility for client approval
       await prisma.order.update({
         where: { id: order.id },
@@ -100,7 +100,7 @@ export const ORDER_STATE_TRANSITIONS: OrderStateTransition[] = [
       })
       return approvedDesigns > 0
     },
-    onTransition: async (order, context) => {
+    onTransition: async (order, _context) => {
       // Apply routing template and create routing steps
       await applyRoutingTemplate(order.id)
       
@@ -126,7 +126,7 @@ export const ORDER_STATE_TRANSITIONS: OrderStateTransition[] = [
       })
       return routingSteps > 0
     },
-    onTransition: async (order, context) => {
+    onTransition: async (order, _context) => {
       // Mark first routing step as READY
       await prisma.routingStep.updateMany({
         where: { 
@@ -161,7 +161,7 @@ export const ORDER_STATE_TRANSITIONS: OrderStateTransition[] = [
       })
       return totalSteps > 0 && completedSteps === totalSteps
     },
-    onTransition: async (order, context) => {
+    onTransition: async (order, _context) => {
       // Create QC inspection tasks
       await createQCTasks(order.id)
       
@@ -187,7 +187,7 @@ export const ORDER_STATE_TRANSITIONS: OrderStateTransition[] = [
       })
       return !!passingQC
     },
-    onTransition: async (order, context) => {
+    onTransition: async (order, _context) => {
       // Create packing tasks
       await createPackingTasks(order.id)
       
@@ -207,7 +207,7 @@ export const ORDER_STATE_TRANSITIONS: OrderStateTransition[] = [
       // All items must be packed (implementation specific)
       return true // Simplified for now
     },
-    onTransition: async (order, context) => {
+    onTransition: async (order, _context) => {
       // Schedule delivery
       await scheduleDelivery(order.id)
       
@@ -230,7 +230,7 @@ export const ORDER_STATE_TRANSITIONS: OrderStateTransition[] = [
       })
       return !!delivery
     },
-    onTransition: async (order, context) => {
+    onTransition: async (order, _context) => {
       // Update delivery record
       await prisma.delivery.updateMany({
         where: { order_id: order.id },
@@ -256,7 +256,7 @@ export const ORDER_STATE_TRANSITIONS: OrderStateTransition[] = [
       // Payment should be complete (simplified)
       return true
     },
-    onTransition: async (order, context) => {
+    onTransition: async (order, _context) => {
       // Final order closure tasks
       await finalizeOrderClosure(order.id)
       
@@ -274,9 +274,9 @@ export const ORDER_STATE_TRANSITIONS: OrderStateTransition[] = [
     action: 'put_on_hold',
     requiredRole: [Role.ADMIN, Role.MANAGER],
     conditions: async () => true, // Always allowed
-    onTransition: async (order, context) => {
+    onTransition: async (order, _context) => {
       // Log hold reason
-      await logOrderHold(order.id, context.reason || 'No reason provided', context.userId)
+      await logOrderHold(order.id, context.reason || 'No reason provided', context.user_id)
     },
     description: 'Put order on hold'
   },
@@ -288,9 +288,9 @@ export const ORDER_STATE_TRANSITIONS: OrderStateTransition[] = [
     action: 'resume_order',
     requiredRole: [Role.ADMIN, Role.MANAGER],
     conditions: async () => true,
-    onTransition: async (order, context) => {
+    onTransition: async (order, _context) => {
       // Resume order processing
-      await logOrderResume(order.id, context.userId)
+      await logOrderResume(order.id, context.user_id)
     },
     description: 'Resume order from hold'
   },
@@ -305,9 +305,9 @@ export const ORDER_STATE_TRANSITIONS: OrderStateTransition[] = [
       // Cannot cancel if already delivered
       return order.status !== OrderStatus.DELIVERED
     },
-    onTransition: async (order, context) => {
+    onTransition: async (order, _context) => {
       // Handle order cancellation
-      await handleOrderCancellation(order.id, context.reason || 'No reason provided', context.userId)
+      await handleOrderCancellation(order.id, context.reason || 'No reason provided', context.user_id)
     },
     description: 'Cancel order'
   }
@@ -317,14 +317,14 @@ export const ORDER_STATE_TRANSITIONS: OrderStateTransition[] = [
  * Main function to transition order status
  */
 export async function transitionOrderStatus(
-  orderId: string,
+  order_id: string,
   action: string,
   context: TransitionContext
 ): Promise<StateTransitionResult> {
   try {
     // Get current order
     const order = await prisma.order.findUnique({
-      where: { id: orderId },
+      where: { id: order_id },
       include: {
         routing_steps: true,
         design_assets: true
@@ -374,14 +374,14 @@ export async function transitionOrderStatus(
     let targetStatus = transition.to
     if (action === 'resume_order') {
       // Get previous status from audit log
-      targetStatus = await getPreviousStatus(orderId) || OrderStatus.INTAKE
+      targetStatus = await getPreviousStatus(order_id) || OrderStatus.INTAKE
     }
 
     // Perform the transition
     const updatedOrder = await prisma.$transaction(async (tx) => {
       // Update order status
       const updated = await tx.order.update({
-        where: { id: orderId },
+        where: { id: order_id },
         data: { 
           status: targetStatus,
           updated_at: new Date()
@@ -393,9 +393,9 @@ export async function transitionOrderStatus(
         data: {
           id: nanoid(),
           workspace_id: order.workspace_id,
-          actor_id: context.userId,
+          actor_id: context.user_id,
           entity_type: 'order',
-          entity_id: orderId,
+          entity_id: order_id,
           action: 'STATUS_CHANGE',
           before_data: { status: order.status },
           after_data: { status: targetStatus },
@@ -433,9 +433,9 @@ export async function transitionOrderStatus(
 /**
  * Get valid transitions for an order's current status
  */
-export async function getValidTransitions(orderId: string, userRole: Role): Promise<OrderStateTransition[]> {
+export async function getValidTransitions(order_id: string, userRole: Role): Promise<OrderStateTransition[]> {
   const order = await prisma.order.findUnique({
-    where: { id: orderId }
+    where: { id: order_id }
   })
 
   if (!order) return []
@@ -447,11 +447,11 @@ export async function getValidTransitions(orderId: string, userRole: Role): Prom
 }
 
 // Helper functions for transition actions
-async function createDesignAssetPlaceholder(orderId: string, userId: string) {
+async function createDesignAssetPlaceholder(order_id: string, user_id: string) {
   await prisma.designAsset.create({
     data: {
       id: nanoid(),
-      order_id: orderId,
+      order_id: order_id,
       version: 1,
       type: 'MOCKUP',
       file_url: 'placeholder://pending-design',
@@ -461,90 +461,90 @@ async function createDesignAssetPlaceholder(orderId: string, userId: string) {
   })
 }
 
-async function notifyDesignTeam(orderId: string) {
+async function notifyDesignTeam(order_id: string) {
   // Implementation: Send notification to design team
-  console.log(`🎨 Design team notified for order ${orderId}`)
+  console.log(`🎨 Design team notified for order ${order_id}`)
 }
 
-async function notifyClientDesignReady(orderId: string) {
+async function notifyClientDesignReady(order_id: string) {
   // Implementation: Send email to client with portal link
-  console.log(`📧 Client notified - design ready for approval: ${orderId}`)
+  console.log(`📧 Client notified - design ready for approval: ${order_id}`)
 }
 
-async function applyRoutingTemplate(orderId: string) {
+async function applyRoutingTemplate(order_id: string) {
   // Implementation: Create routing steps from template
-  console.log(`🛣️ Routing template applied for order ${orderId}`)
+  console.log(`🛣️ Routing template applied for order ${order_id}`)
 }
 
-async function runCapacityPlanning(orderId: string) {
+async function runCapacityPlanning(order_id: string) {
   // Implementation: Ashley AI capacity analysis
-  console.log(`🤖 Ashley AI capacity planning for order ${orderId}`)
+  console.log(`🤖 Ashley AI capacity planning for order ${order_id}`)
 }
 
-async function generateProductionTimeline(orderId: string) {
+async function generateProductionTimeline(order_id: string) {
   // Implementation: Generate production timeline
-  console.log(`📅 Production timeline generated for order ${orderId}`)
+  console.log(`📅 Production timeline generated for order ${order_id}`)
 }
 
-async function createProductionTasks(orderId: string) {
+async function createProductionTasks(order_id: string) {
   // Implementation: Create production tasks
-  console.log(`📋 Production tasks created for order ${orderId}`)
+  console.log(`📋 Production tasks created for order ${order_id}`)
 }
 
-async function createQCTasks(orderId: string) {
+async function createQCTasks(order_id: string) {
   // Implementation: Create QC inspection tasks
-  console.log(`🔍 QC tasks created for order ${orderId}`)
+  console.log(`🔍 QC tasks created for order ${order_id}`)
 }
 
-async function notifyQCTeam(orderId: string) {
-  console.log(`🔍 QC team notified for order ${orderId}`)
+async function notifyQCTeam(order_id: string) {
+  console.log(`🔍 QC team notified for order ${order_id}`)
 }
 
-async function createPackingTasks(orderId: string) {
-  console.log(`📦 Packing tasks created for order ${orderId}`)
+async function createPackingTasks(order_id: string) {
+  console.log(`📦 Packing tasks created for order ${order_id}`)
 }
 
-async function generateShippingLabels(orderId: string) {
-  console.log(`🏷️ Shipping labels generated for order ${orderId}`)
+async function generateShippingLabels(order_id: string) {
+  console.log(`🏷️ Shipping labels generated for order ${order_id}`)
 }
 
-async function scheduleDelivery(orderId: string) {
-  console.log(`🚚 Delivery scheduled for order ${orderId}`)
+async function scheduleDelivery(order_id: string) {
+  console.log(`🚚 Delivery scheduled for order ${order_id}`)
 }
 
-async function notifyClientOrderReady(orderId: string) {
-  console.log(`📧 Client notified - order ready for delivery: ${orderId}`)
+async function notifyClientOrderReady(order_id: string) {
+  console.log(`📧 Client notified - order ready for delivery: ${order_id}`)
 }
 
-async function generateInvoice(orderId: string) {
-  console.log(`💰 Invoice generated for order ${orderId}`)
+async function generateInvoice(order_id: string) {
+  console.log(`💰 Invoice generated for order ${order_id}`)
 }
 
-async function finalizeOrderClosure(orderId: string) {
-  console.log(`✅ Order closure finalized for ${orderId}`)
+async function finalizeOrderClosure(order_id: string) {
+  console.log(`✅ Order closure finalized for ${order_id}`)
 }
 
-async function updateClientAnalytics(clientId: string) {
-  console.log(`📊 Client analytics updated for ${clientId}`)
+async function updateClientAnalytics(client_id: string) {
+  console.log(`📊 Client analytics updated for ${client_id}`)
 }
 
-async function logOrderHold(orderId: string, reason: string, userId: string) {
-  console.log(`⏸️ Order ${orderId} put on hold: ${reason}`)
+async function logOrderHold(order_id: string, reason: string, user_id: string) {
+  console.log(`⏸️ Order ${order_id} put on hold: ${reason}`)
 }
 
-async function logOrderResume(orderId: string, userId: string) {
-  console.log(`▶️ Order ${orderId} resumed`)
+async function logOrderResume(order_id: string, user_id: string) {
+  console.log(`▶️ Order ${order_id} resumed`)
 }
 
-async function handleOrderCancellation(orderId: string, reason: string, userId: string) {
-  console.log(`❌ Order ${orderId} cancelled: ${reason}`)
+async function handleOrderCancellation(order_id: string, reason: string, user_id: string) {
+  console.log(`❌ Order ${order_id} cancelled: ${reason}`)
 }
 
-async function getPreviousStatus(orderId: string): Promise<OrderStatus | null> {
+async function getPreviousStatus(order_id: string): Promise<OrderStatus | null> {
   const lastTransition = await prisma.auditLog.findFirst({
     where: {
       entity_type: 'order',
-      entity_id: orderId,
+      entity_id: order_id,
       action: 'STATUS_CHANGE'
     },
     orderBy: { created_at: 'desc' },

@@ -127,7 +127,7 @@ class BIRComplianceService {
     dateTo: Date,
     reportType: 'MONTHLY' | 'QUARTERLY'
   ): Promise<VATReport> {
-    const period = this.formatPeriod(dateFrom, dateTo, reportType)
+    const _period = this.formatPeriod(dateFrom, dateTo, reportType)
 
     // Get sales (output VAT)
     const invoices = await db.invoice.findMany({
@@ -176,7 +176,7 @@ class BIRComplianceService {
       outputVAT += vatAmount
 
       details.push({
-        date: format(invoice.createdAt, 'yyyy-MM-dd'),
+        date: format(invoice.created_at, 'yyyy-MM-dd'),
         reference: invoice.invoiceNumber,
         customer: invoice.client?.name || 'Unknown',
         amount: vatableAmount,
@@ -192,7 +192,7 @@ class BIRComplianceService {
         inputVAT += vatAmount
 
         details.push({
-          date: format(bill.createdAt, 'yyyy-MM-dd'),
+          date: format(bill.created_at, 'yyyy-MM-dd'),
           reference: bill.billNumber,
           customer: bill.vendor?.name || 'Unknown Vendor',
           amount: bill.amount - vatAmount,
@@ -219,7 +219,7 @@ class BIRComplianceService {
     dateFrom: Date,
     dateTo: Date
   ): Promise<WithholdingTaxReport> {
-    const period = this.formatPeriod(dateFrom, dateTo, 'MONTHLY')
+    const _period = this.formatPeriod(dateFrom, dateTo, 'MONTHLY')
 
     // Get payments subject to withholding tax
     const _payments = await db.payment.findMany({
@@ -294,7 +294,7 @@ class BIRComplianceService {
     dateFrom: Date,
     dateTo: Date
   ): Promise<IncomeStatement> {
-    const period = this.formatPeriod(dateFrom, dateTo, 'MONTHLY')
+    const _period = this.formatPeriod(dateFrom, dateTo, 'MONTHLY')
 
     // Revenue calculations
     const invoices = await db.invoice.findMany({
@@ -373,7 +373,7 @@ class BIRComplianceService {
     dateFrom: Date,
     dateTo: Date
   ): Promise<CashFlowStatement> {
-    const period = this.formatPeriod(dateFrom, dateTo, 'MONTHLY')
+    const _period = this.formatPeriod(dateFrom, dateTo, 'MONTHLY')
     const incomeStatement = await this.generateIncomeStatement(dateFrom, dateTo)
 
     // Get cash transactions

@@ -146,7 +146,7 @@ export class EnhancedAIAssistant {
       if (query.includes('delay') || query.includes('late')) {
         const delayedOrders = orders.filter(order => {
           const prediction = ashAI.predictDeliveryDate(order)
-          const _targetDate = new Date(order.targetDeliveryDate)
+          const _targetDate = new Date(order.target_delivery_date)
           const predictedDate = new Date(prediction.estimatedDate)
           return predictedDate > targetDate
         })
@@ -194,7 +194,7 @@ export class EnhancedAIAssistant {
       else if (query.includes('revenue') || query.includes('profit')) {
         const totalRevenue = orders.reduce((sum, order) => {
           const pricing = ashAI.recommendPricing(order)
-          return sum + (pricing.suggestedPrice * order.totalQty)
+          return sum + (pricing.suggestedPrice * order.total_qty)
         }, 0)
 
         content = `Based on AI-optimized pricing analysis:\n\n`
@@ -236,8 +236,8 @@ export class EnhancedAIAssistant {
         const silkscreenOrders = context.orders.filter(order => order.method === 'SILKSCREEN')
         if (silkscreenOrders.length > 0) {
           content += `\n\n**Current Silkscreen Orders**: ${silkscreenOrders.length} orders`
-          const totalQty = silkscreenOrders.reduce((sum, order) => sum + order.totalQty, 0)
-          content += `\n**Total Quantity**: ${totalQty} pieces`
+          const total_qty = silkscreenOrders.reduce((sum, order) => sum + order.total_qty, 0)
+          content += `\n**Total Quantity**: ${total_qty} pieces`
         }
       }
 
@@ -291,7 +291,7 @@ export class EnhancedAIAssistant {
       if (context.orders && context.orders.length > 0) {
         const onTimeOrders = context.orders.filter(order => {
           const prediction = ashAI.predictDeliveryDate(order)
-          const _targetDate = new Date(order.targetDeliveryDate)
+          const _targetDate = new Date(order.target_delivery_date)
           const predictedDate = new Date(prediction.estimatedDate)
           return predictedDate <= targetDate
         })

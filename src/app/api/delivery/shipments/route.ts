@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth'
-import { Role } from '@prisma/client'
+
 import { db } from '@/lib/db'
 import { get3PLQuotes, recommendDeliveryMethod } from '@/lib/delivery-calculations'
 import { validateAshleyAI } from '@/lib/ashley-ai'
@@ -201,7 +199,7 @@ export async function POST(request: NextRequest) {
           // Create carton items if provided
           if (carton.items && carton.items.length > 0) {
             await db.cartonItem.createMany({
-              data: carton.items.map((item: any) => ({
+              data: carton.items.map((_item: any) => ({
                 carton_id: created_carton.id,
                 order_item_id: item.order_item_id,
                 quantity: item.quantity,

@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
 
     switch (action) {
       case 'analyzeDeadlineRisk':
-        if (!data.orderId) {
+        if (!data.order_id) {
           return NextResponse.json({ error: 'Order ID is required' }, { status: 400 })
         }
         result = await callAIAgent('kai', 'analyzeDeadlineRisk', data, session.user.id)

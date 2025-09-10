@@ -81,7 +81,7 @@ interface AnalyticsData {
   }
   capacity: {
     users: Array<{
-      userId: string
+      user_id: string
       name: string
       role: string
       activeTasks: number
@@ -349,7 +349,7 @@ export function ProductionAnalytics({ userRole }: ProductionAnalyticsProps) {
           <CardContent>
             <div className="space-y-3">
               {data.capacity.users.slice(0, 8).map((user) => (
-                <div key={user.userId} className="flex items-center space-x-3">
+                <div key={user.user_id} className="flex items-center space-x-3">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 truncate">
                       {user.name}

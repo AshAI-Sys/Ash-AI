@@ -116,7 +116,7 @@ export function withErrorHandler(
   return async (request: NextRequest): Promise<NextResponse> => {
     try {
       return await handler(request);
-    } catch (error) {
+    } catch (_error) {
       console.error('API Error:', error);
       
       // Log error for monitoring
@@ -191,7 +191,7 @@ export async function checkSystemHealth() {
     const { db } = await import('./db');
     await db.$queryRaw`SELECT 1`;
     health.database = true;
-  } catch (error) {
+  } catch (_error) {
     console.error('Database health check failed:', error);
   }
 

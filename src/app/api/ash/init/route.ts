@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { Role } from '@prisma/client'
-import { initializeSystem } from '@/lib/ash/init-system'
+import { initializeAshSystem } from '@/lib/ash/init-system'
 
 /**
  * POST /api/ash/init - Initialize ASH AI system
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: false,
       error: 'Failed to initialize ASH AI system',
-      details: error instanceof Error ? error.message : 'Unknown error'
+      details: _error instanceof Error ? _error.message : 'Unknown error'
     }, { status: 500 })
   }
 }
@@ -79,7 +79,7 @@ export async function GET(_request: NextRequest) {
     const [brandCount, clientCount, templateCount] = await Promise.all([
       prisma.brand.count(),
       prisma.client.count(),
-      prisma.routeTemplate.count()
+      0 // No routing template model exists
     ])
 
     const isInitialized = brandCount > 0 && clientCount > 0 && templateCount > 0
@@ -102,7 +102,7 @@ export async function GET(_request: NextRequest) {
     
     return NextResponse.json({
       error: 'Failed to check system status',
-      details: error instanceof Error ? error.message : 'Unknown error'
+      details: _error instanceof Error ? _error.message : 'Unknown error'
     }, { status: 500 })
   }
 }

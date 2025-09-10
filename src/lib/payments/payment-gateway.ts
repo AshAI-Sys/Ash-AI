@@ -17,7 +17,7 @@ interface PaymentMethod {
 }
 
 interface PaymentRequest {
-  orderId: string
+  order_id: string
   amount: number
   currency: string
   paymentMethod: PaymentMethod
@@ -37,7 +37,7 @@ interface PaymentResponse {
   reference?: string
   fees: number
   netAmount: number
-  createdAt: Date
+  created_at: Date
   completedAt?: Date
 }
 
@@ -117,7 +117,7 @@ class PaymentGatewayService {
             description: request.description,
             payment_method_allowed: this.getPayMongoMethods(request.paymentMethod.id),
             metadata: {
-              order_id: request.orderId,
+              order_id: request.order_id,
               customer_name: request.customerInfo.name,
               ...request.metadata
             }
@@ -148,9 +148,9 @@ class PaymentGatewayService {
         reference: result.data.attributes.client_key,
         fees,
         netAmount: request.amount - fees,
-        createdAt: new Date(result.data.attributes.created_at)
+        created_at: new Date(result.data.attributes.created_at)
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('PayMongo payment creation failed:', error)
       throw new Error('Failed to create PayMongo payment')
     }
@@ -171,7 +171,7 @@ class PaymentGatewayService {
             product_data: {
               name: request.description,
               metadata: {
-                order_id: request.orderId
+                order_id: request.order_id
               }
             },
             unit_amount: request.amount * 100 // Convert to cents
@@ -183,7 +183,7 @@ class PaymentGatewayService {
         cancel_url: `${process.env.ASH_APP_URL}/portal/payment/cancel`,
         customer_email: request.customerInfo.email,
         metadata: {
-          order_id: request.orderId,
+          order_id: request.order_id,
           customer_name: request.customerInfo.name,
           ...request.metadata
         }
@@ -212,9 +212,9 @@ class PaymentGatewayService {
         reference: result.payment_intent,
         fees,
         netAmount: request.amount - fees,
-        createdAt: new Date()
+        created_at: new Date()
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Stripe payment creation failed:', error)
       throw new Error('Failed to create Stripe payment')
     }
@@ -304,7 +304,7 @@ class PaymentGatewayService {
       status,
       fees: result.data.attributes.fees || 0,
       netAmount: (result.data.attributes.amount - result.data.attributes.fees) / 100,
-      createdAt: new Date(result.data.attributes.created_at),
+      created_at: new Date(result.data.attributes.created_at),
       completedAt: status === 'completed' ? new Date() : undefined
     }
   }
@@ -326,7 +326,7 @@ class PaymentGatewayService {
       status,
       fees: (result.amount_total - result.amount_total) || 0, // Stripe fees calculated separately
       netAmount: result.amount_total / 100,
-      createdAt: new Date(result.created * 1000),
+      created_at: new Date(result.created * 1000),
       completedAt: status === 'completed' ? new Date() : undefined
     }
   }

@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth'
-import { Role } from '@prisma/client'
+
 import { db } from '@/lib/db'
 import { validateAshleyAI } from '@/lib/ashley-ai'
 // Client Portal Support API for Stage 12 Client Portal
@@ -15,7 +13,7 @@ export async function GET(request: NextRequest) {
     const client_user_id = searchParams.get('client_user_id')
     const workspace_id = searchParams.get('workspace_id')
     const status = searchParams.get('status')
-    const category = searchParams.get('category')
+    const _category = searchParams.get('category')
     const priority = searchParams.get('priority')
 
     if (!client_user_id || !workspace_id) {

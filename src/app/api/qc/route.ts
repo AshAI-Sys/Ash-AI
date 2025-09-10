@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
       status: getQCStatus(task.status, task.qcRecords),
       priority: task.priority,
       submittedBy: getSubmittedBy(task),
-      submittedAt: task.createdAt,
+      submittedAt: task.created_at,
       assignedTo: task.assignee,
       dueDate: task.dueDate,
       lastQCRecord: task.qcRecords[0] || null,
@@ -193,9 +193,9 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { taskId, orderId, action } = body
+    const { taskId, order_id, action } = body
 
-    if (!taskId && !orderId) {
+    if (!taskId && !order_id) {
       return NextResponse.json(
         { error: 'Task ID or Order ID is required' },
         { status: 400 }

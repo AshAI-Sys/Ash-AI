@@ -87,7 +87,7 @@ async function getProductionMetrics(startDate: Date, department?: string | null)
 
   if (department) {
     // Filter by task type based on department
-    const departmentTaskTypes: { [key: string]: string[] } = {
+    const _departmentTaskTypes: { [key: string]: string[] } = {
       'design': ['DESIGN', 'ARTWORK_CREATION'],
       'printing': ['SILKSCREEN', 'SUBLIMATION', 'DTF', 'EMBROIDERY'],
       'production': ['CUTTING', 'SEWING', 'ASSEMBLY'],
@@ -96,8 +96,8 @@ async function getProductionMetrics(startDate: Date, department?: string | null)
     }
     
     // Skip task type filtering as Task model doesn't have task_type field
-    // if (departmentTaskTypes[department]) {
-    //   taskFilter.task_type = { in: departmentTaskTypes[department] }
+    // if (_departmentTaskTypes[department]) {
+    //   taskFilter.task_type = { in: _departmentTaskTypes[department] }
     // }
   }
 
@@ -167,15 +167,15 @@ async function getTaskMetrics(startDate: Date, department?: string | null) {
   return {
     byStatus: tasksByStatus.map(item => ({
       status: item.status,
-      count: item._count.id
+      count: _item._count.id
     })),
-    byType: tasksByType.map(item => ({
+    byType: tasksByType.map(_item => ({
       type: 'GENERIC',
       count: 0
     })),
     byPriority: tasksByPriority.map(item => ({
       priority: item.priority,
-      count: item._count.id
+      count: _item._count.id
     }))
   }
 }
@@ -204,7 +204,7 @@ async function getOrderMetrics(startDate: Date) {
   return {
     byStatus: ordersByStatus.map(item => ({
       status: item.status,
-      count: item._count.id
+      count: _item._count.id
     })),
     totalRevenue: revenueData._sum?.total_qty || 0,
     completedOrders: revenueData._count || 0,
@@ -249,7 +249,7 @@ async function getBottleneckAnalysis(startDate: Date) {
       dueDate: task.due_date,
       daysOverdue: task.due_date ? Math.ceil((new Date().getTime() - new Date(task.due_date).getTime()) / (1000 * 3600 * 24)) : 0
     })),
-    roleBottlenecks: roleBottlenecks.map(item => ({
+    roleBottlenecks: roleBottlenecks.map(_item => ({
       task_type: 'GENERIC',
       pendingCount: 0,
       avgEstimatedHours: 0
@@ -350,25 +350,25 @@ async function getQualityMetrics(startDate: Date) {
 async function getAverageCompletionTime(startDate: Date, _department?: string | null): Promise<number> {
   const whereClause: {
     status: TaskStatus;
-    completedAt: { gte: Date };
+    updated_at: { gte: Date };
   } = {
     status: TaskStatus.COMPLETED,
-    completedAt: { gte: startDate }
+    updated_at: { gte: startDate }
   }
 
   const completedTasks = await prisma.task.findMany({
     where: whereClause,
     select: {
       created_at: true,
-      completedAt: true
+      updated_at: true
     }
   })
 
   if (completedTasks.length === 0) return 0
 
   const totalHours = completedTasks.reduce((sum, task) => {
-    if (task.completedAt) {
-      const hours = (new Date(task.completedAt).getTime() - new Date(task.created_at).getTime()) / (1000 * 60 * 60)
+    if (task.updated_at) {
+      const hours = (new Date(task.updated_at).getTime() - new Date(task.created_at).getTime()) / (1000 * 60 * 60)
       return sum + hours
     }
     return sum

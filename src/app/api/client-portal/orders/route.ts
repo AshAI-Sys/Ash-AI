@@ -27,8 +27,8 @@ export async function GET(request: NextRequest) {
     }
 
     const decoded = jwt.verify(token, JWT_SECRET) as any
-    const clientId = decoded.clientId
-    const workspaceId = decoded.workspaceId
+    const client_id = decoded.client_id
+    const workspace_id = decoded.workspace_id
 
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status')
@@ -39,8 +39,8 @@ export async function GET(request: NextRequest) {
 
     // Build filter conditions
     const whereConditions: any = {
-      client_id: clientId,
-      workspace_id: workspaceId
+      client_id: client_id,
+      workspace_id: workspace_id
     }
 
     if (status && status !== 'all') {
@@ -197,7 +197,7 @@ export async function GET(request: NextRequest) {
     })
 
     // Get summary statistics
-    const summaryStats = await getOrderSummaryStats(clientId, workspaceId)
+    const summaryStats = await getOrderSummaryStats(client_id, workspace_id)
 
     return NextResponse.json({
       success: true,
@@ -225,7 +225,7 @@ export async function GET(request: NextRequest) {
 }
 
 // Helper functions
-function calculateOrderProgress(routingSteps: any[]): number {
+function calculateOrderProgress(routing_steps: any[]): number {
   if (routingSteps.length === 0) return 0
   
   const statusWeights = {
@@ -243,7 +243,7 @@ function calculateOrderProgress(routingSteps: any[]): number {
   return Math.round(totalProgress / routingSteps.length)
 }
 
-function getCurrentStep(routingSteps: any[]): string {
+function getCurrentStep(routing_steps: any[]): string {
   const activeStep = routingSteps.find(step => 
     step.status === 'IN_PROGRESS' || step.status === 'READY'
   )
@@ -265,7 +265,7 @@ function getCurrentStep(routingSteps: any[]): string {
   return 'Not started'
 }
 
-function getDesignStatus(designAssets: any[]): { status: string; details: any } {
+function getDesignStatus(design_assets: any[]): { status: string; details: any } {
   if (designAssets.length === 0) {
     return {
       status: 'No designs uploaded',
@@ -407,7 +407,7 @@ function getQualitySummary(qcRecords: any[]): { status: string; details: any } {
   }
 }
 
-function calculateEstimatedCompletion(order: any, routingSteps: any[]): Date {
+function calculateEstimatedCompletion(order: any, routing_steps: any[]): Date {
   // Simple estimation based on remaining steps
   const remainingSteps = routingSteps.filter(step => 
     step.status !== 'DONE'
@@ -420,12 +420,12 @@ function calculateEstimatedCompletion(order: any, routingSteps: any[]): Date {
   return new Date(new Date(now).getTime() + estimatedDays * 24 * 60 * 60 * 1000)
 }
 
-async function getOrderSummaryStats(clientId: string, workspaceId: string) {
+async function getOrderSummaryStats(client_id: string, workspace_id: string) {
   const statusCounts = await prisma.order.groupBy({
     by: ['status'],
     where: {
-      client_id: clientId,
-      workspace_id: workspaceId
+      client_id: client_id,
+      workspace_id: workspace_id
     },
     _count: true
   })
@@ -433,8 +433,8 @@ async function getOrderSummaryStats(clientId: string, workspaceId: string) {
   const brandCounts = await prisma.order.groupBy({
     by: ['brand_id'],
     where: {
-      client_id: clientId,
-      workspace_id: workspaceId
+      client_id: client_id,
+      workspace_id: workspace_id
     },
     _count: true,
     _sum: {
@@ -447,8 +447,8 @@ async function getOrderSummaryStats(clientId: string, workspaceId: string) {
     where: {
       approval_status: 'PENDING_CLIENT_APPROVAL',
       order: {
-        client_id: clientId,
-        workspace_id: workspaceId
+        client_id: client_id,
+        workspace_id: workspace_id
       }
     }
   })
@@ -461,7 +461,7 @@ async function getOrderSummaryStats(clientId: string, workspaceId: string) {
     brand_distribution: brandCounts.map(item => ({
       brand_id: item.brand_id,
       order_count: item._count,
-      total_quantity: item._sum.total_qty || 0
+      total_quantity: _item._sum.total_qty || 0
     })),
     pending_design_approvals: pendingApprovals,
     total_orders: statusCounts.reduce((sum, item) => sum + item._count, 0)

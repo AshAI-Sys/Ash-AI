@@ -13,15 +13,15 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url)
-    const orderId = searchParams.get('orderId')
+    const order_id = searchParams.get('order_id')
     const status = searchParams.get('status')
     const method = searchParams.get('method')
 
     // Build where clause
     const where: any = {}
     
-    if (orderId) {
-      where.orderId = orderId
+    if (order_id) {
+      where.order_id = order_id
     }
     if (status) {
       where.status = status
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
     const transformedAssets = assets.map(asset => ({
       id: asset.id,
       name: asset.name,
-      orderId: asset.orderId,
+      order_id: asset.order_id,
       orderNumber: asset.order?.orderNumber || '',
       brandName: asset.order?.brand?.name || '',
       clientName: asset.order?.client?.name || '',
@@ -60,8 +60,8 @@ export async function GET(request: NextRequest) {
       type: asset.type,
       fileUrl: asset.fileUrl,
       created_by: asset.createdBy?.name || 'Unknown',
-      created_at: asset.createdAt,
-      updated_at: asset.updatedAt
+      created_at: asset.created_at,
+      updated_at: asset.updated_at
     }))
 
     return NextResponse.json({ assets: transformedAssets })
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     
     // Validate required fields
-    const requiredFields = ['name', 'orderId', 'method', 'type']
+    const requiredFields = ['name', 'order_id', 'method', 'type']
     const missingFields = requiredFields.filter(field => !body[field])
     
     if (missingFields.length > 0) {
@@ -99,8 +99,8 @@ export async function POST(request: NextRequest) {
     const asset = await prisma.designAsset.create({
       data: {
         name: body.name,
-        orderId: body.orderId,
-        brandId: body.brandId,
+        order_id: body.order_id,
+        brand_id: body.brand_id,
         method: body.method,
         type: body.type || 'MOCKUP',
         fileUrl: body.fileUrl,
@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
     // Create audit log
     await prisma.auditLog.create({
       data: {
-        userId: session.user.id,
+        user_id: session.user.id,
         action: 'CREATE_DESIGN_ASSET',
         entityType: 'DesignAsset',
         entityId: asset.id,

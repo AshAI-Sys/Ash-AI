@@ -37,7 +37,7 @@ interface Order {
   status: string
   totalAmount: number
   dueDate: string
-  createdAt: string
+  created_at: string
   items: number
   priority: 'HIGH' | 'MEDIUM' | 'LOW'
 }
@@ -50,7 +50,7 @@ const sampleOrders: Order[] = [
     status: 'IN_PRODUCTION',
     totalAmount: 45000,
     dueDate: '2025-09-15',
-    createdAt: '2025-08-30',
+    created_at: '2025-08-30',
     items: 100,
     priority: 'HIGH'
   },
@@ -61,7 +61,7 @@ const sampleOrders: Order[] = [
     status: 'QC_PASSED',
     totalAmount: 32500,
     dueDate: '2025-09-10',
-    createdAt: '2025-08-28',
+    created_at: '2025-08-28',
     items: 75,
     priority: 'MEDIUM'
   },
@@ -72,7 +72,7 @@ const sampleOrders: Order[] = [
     status: 'DELIVERED',
     totalAmount: 28000,
     dueDate: '2025-09-01',
-    createdAt: '2025-08-25',
+    created_at: '2025-08-25',
     items: 60,
     priority: 'LOW'
   },
@@ -83,7 +83,7 @@ const sampleOrders: Order[] = [
     status: 'CONFIRMED',
     totalAmount: 85000,
     dueDate: '2025-09-20',
-    createdAt: '2025-09-01',
+    created_at: '2025-09-01',
     items: 200,
     priority: 'HIGH'
   },
@@ -94,7 +94,7 @@ const sampleOrders: Order[] = [
     status: 'DRAFT',
     totalAmount: 15000,
     dueDate: '2025-09-12',
-    createdAt: '2025-09-02',
+    created_at: '2025-09-02',
     items: 30,
     priority: 'MEDIUM'
   },
@@ -105,7 +105,7 @@ const sampleOrders: Order[] = [
     status: 'READY_FOR_QC',
     totalAmount: 38000,
     dueDate: '2025-09-08',
-    createdAt: '2025-08-22',
+    created_at: '2025-08-22',
     items: 80,
     priority: 'HIGH'
   }
@@ -165,7 +165,7 @@ export default function OrdersPage() {
             status: order.status,
             totalAmount: order.commercials?.unit_price * order.total_qty || 0,
             dueDate: order.target_delivery_date || new Date().toISOString(),
-            createdAt: order.created_at,
+            created_at: order.created_at,
             items: order.total_qty || 0,
             priority: order.ai_risk_assessment?.includes('urgent') ? 'HIGH' : 
                      order.ai_risk_assessment?.includes('delay') ? 'MEDIUM' : 'LOW'
@@ -480,7 +480,7 @@ export default function OrdersPage() {
                         </div>
                         <div className="flex items-center gap-2">
                           <User className="w-4 h-4 text-cyan-400" />
-                          <span className="text-cyan-200">Created {formatDate(order.createdAt)}</span>
+                          <span className="text-cyan-200">Created {formatDate(order.created_at)}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Peso className="w-4 h-4 text-cyan-400" />

@@ -160,7 +160,7 @@ export async function PUT(
     // Create audit log
     await prisma.auditLog.create({
       data: {
-        userId: session.user.id,
+        user_id: session.user.id,
         action: 'UPDATE_SEWING_OPERATION',
         entityType: 'SewingOperation',
         entityId: operationId,
@@ -234,7 +234,7 @@ export async function DELETE(
     // Create audit log
     await prisma.auditLog.create({
       data: {
-        userId: session.user.id,
+        user_id: session.user.id,
         action: 'DELETE_SEWING_OPERATION',
         entityType: 'SewingOperation',
         entityId: operationId,

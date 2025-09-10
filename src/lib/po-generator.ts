@@ -13,18 +13,18 @@ export interface PONumberResult {
  * Generates the next PO number for a brand following the format:
  * BRANDCODE-YYYY-NNNNNN (e.g., REEF-2025-000123)
  */
-export async function generatePONumber(brandId: string): Promise<PONumberResult> {
+export async function generatePONumber(brand_id: string): Promise<PONumberResult> {
   const currentYear = new Date().getFullYear();
   
   return await db.$transaction(async (tx) => {
     // Get the brand to get its code
     const brand = await tx.brand.findUnique({
-      where: { id: brandId },
+      where: { id: brand_id },
       select: { code: true, name: true }
     });
     
     if (!brand) {
-      throw new Error(`Brand with ID ${brandId} not found`);
+      throw new Error(`Brand with ID ${brand_id} not found`);
     }
     
     if (!brand.code) {
@@ -34,7 +34,7 @@ export async function generatePONumber(brandId: string): Promise<PONumberResult>
     // Get or create the sequence record for this brand and year
     const sequenceRecord = await tx.$queryRaw<Array<{ sequence: number }>>`
       SELECT sequence FROM po_number_sequences 
-      WHERE brand_id = ${brandId} AND year = ${currentYear}
+      WHERE brand_id = ${brand_id} AND year = ${currentYear}
     `;
     
     let nextSequence: number;
@@ -44,7 +44,7 @@ export async function generatePONumber(brandId: string): Promise<PONumberResult>
       nextSequence = 1;
       await tx.$executeRaw`
         INSERT INTO po_number_sequences (id, brand_id, year, sequence, created_at, updated_at)
-        VALUES (${generateId()}, ${brandId}, ${currentYear}, ${nextSequence}, ${new Date().toISOString()}, ${new Date().toISOString()})
+        VALUES (${generateId()}, ${brand_id}, ${currentYear}, ${nextSequence}, ${new Date().toISOString()}, ${new Date().toISOString()})
       `;
     } else {
       // Increment the existing sequence
@@ -52,7 +52,7 @@ export async function generatePONumber(brandId: string): Promise<PONumberResult>
       await tx.$executeRaw`
         UPDATE po_number_sequences 
         SET sequence = ${nextSequence}, updated_at = ${new Date().toISOString()}
-        WHERE brand_id = ${brandId} AND year = ${currentYear}
+        WHERE brand_id = ${brand_id} AND year = ${currentYear}
       `;
     }
     
@@ -69,7 +69,7 @@ export async function generatePONumber(brandId: string): Promise<PONumberResult>
 /**
  * Validates if a PO number follows the correct format
  */
-export function validatePONumber(poNumber: string): boolean {
+export function validatePONumber(po_number: string): boolean {
   // Pattern: BRANDCODE-YYYY-NNNNNN
   const pattern = /^[A-Z]{2,6}-\d{4}-\d{6}$/;
   return pattern.test(poNumber);
@@ -78,7 +78,7 @@ export function validatePONumber(poNumber: string): boolean {
 /**
  * Parses a PO number to extract its components
  */
-export function parsePONumber(poNumber: string): {
+export function parsePONumber(po_number: string): {
   brandCode: string;
   year: number;
   sequence: number;
@@ -98,7 +98,7 @@ export function parsePONumber(poNumber: string): {
 /**
  * Checks if a PO number already exists in the database
  */
-export async function isPONumberExists(poNumber: string): Promise<boolean> {
+export async function isPONumberExists(po_number: string): Promise<boolean> {
   const count = await db.order.count({
     where: {
       po_number: poNumber
@@ -122,16 +122,16 @@ function generateId(): string {
 /**
  * Get the next available PO number for a brand (preview without saving)
  */
-export async function previewNextPONumber(brandId: string): Promise<string> {
+export async function previewNextPONumber(brand_id: string): Promise<string> {
   const currentYear = new Date().getFullYear();
   
   const brand = await db.brand.findUnique({
-    where: { id: brandId },
+    where: { id: brand_id },
     select: { code: true, name: true }
   });
   
   if (!brand) {
-    throw new Error(`Brand with ID ${brandId} not found`);
+    throw new Error(`Brand with ID ${brand_id} not found`);
   }
   
   if (!brand.code) {
@@ -141,7 +141,7 @@ export async function previewNextPONumber(brandId: string): Promise<string> {
   // Get current sequence
   const sequenceRecord = await db.$queryRaw<Array<{ sequence: number }>>`
     SELECT sequence FROM po_number_sequences 
-    WHERE brand_id = ${brandId} AND year = ${currentYear}
+    WHERE brand_id = ${brand_id} AND year = ${currentYear}
   `;
   
   const nextSequence = sequenceRecord.length === 0 ? 1 : sequenceRecord[0].sequence + 1;

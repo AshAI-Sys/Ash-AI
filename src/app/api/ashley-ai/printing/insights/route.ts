@@ -198,7 +198,7 @@ async function calculatePrintingInsights(printRuns: any[]) {
       if (!rejectStats[reject.reasonCode]) {
         rejectStats[reject.reasonCode] = {
           reasonCode: reject.reasonCode,
-          totalQty: 0,
+          total_qty: 0,
           occurrences: 0,
           methods: new Set(),
           costAttribution: {}
@@ -206,7 +206,7 @@ async function calculatePrintingInsights(printRuns: any[]) {
       }
       
       const stats = rejectStats[reject.reasonCode]
-      stats.totalQty += reject.qty
+      stats.total_qty += reject.qty
       stats.occurrences++
       stats.methods.add(run.method)
       
@@ -220,10 +220,10 @@ async function calculatePrintingInsights(printRuns: any[]) {
   const rejectAnalysis = Object.values(rejectStats).map((stats: any) => ({
     ...stats,
     methods: Array.from(stats.methods),
-    averageQtyPerOccurrence: stats.occurrences > 0 ? stats.totalQty / stats.occurrences : 0,
+    averageQtyPerOccurrence: stats.occurrences > 0 ? stats.total_qty / stats.occurrences : 0,
     primaryCostAttribution: Object.keys(stats.costAttribution).reduce((a, b) => 
       stats.costAttribution[a] > stats.costAttribution[b] ? a : b, 'UNKNOWN')
-  })).sort((a, b) => b.totalQty - a.totalQty)
+  })).sort((a, b) => b.total_qty - a.total_qty)
 
   return {
     overallQualityRate: Math.round(overallQualityRate * 10) / 10,

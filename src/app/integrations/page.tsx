@@ -39,7 +39,7 @@ interface Integration {
   type: string
   provider: string
   status: "CONNECTED" | "DISCONNECTED" | "ERROR" | "CONNECTING"
-  isActive: boolean
+  is_active: boolean
   lastSync: string
   healthStatus: "HEALTHY" | "WARNING" | "CRITICAL"
   healthScore: number
@@ -57,7 +57,7 @@ interface Webhook {
   name: string
   url: string
   events: string[]
-  isActive: boolean
+  is_active: boolean
   successCount: number
   failureCount: number
   integration: { name: string; provider: string }
@@ -74,7 +74,7 @@ interface Workflow {
   name: string
   description: string
   status: "DRAFT" | "ACTIVE" | "PAUSED" | "ARCHIVED"
-  isActive: boolean
+  is_active: boolean
   runCount: number
   successCount: number
   failureCount: number
@@ -91,7 +91,7 @@ interface AutomationRule {
   id: string
   name: string
   description: string
-  isActive: boolean
+  is_active: boolean
   priority: number
   triggerCount: number
   lastTriggered: string
@@ -195,11 +195,11 @@ export default function IntegrationsPage() {
 
   const overviewMetrics = {
     totalIntegrations: integrations.length,
-    activeIntegrations: integrations.filter(i => i.isActive).length,
+    activeIntegrations: integrations.filter(i => i.is_active).length,
     healthyIntegrations: integrations.filter(i => i.healthStatus === "HEALTHY").length,
     totalWebhooks: webhooks.length,
-    activeWorkflows: workflows.filter(w => w.isActive).length,
-    activeAutomationRules: automationRules.filter(r => r.isActive).length
+    activeWorkflows: workflows.filter(w => w.is_active).length,
+    activeAutomationRules: automationRules.filter(r => r.is_active).length
   }
 
   if (loading) {
@@ -443,8 +443,8 @@ export default function IntegrationsPage() {
                         <Webhook className="h-5 w-5 mr-2 text-purple-600" />
                         {webhook.name}
                       </CardTitle>
-                      <Badge variant={webhook.isActive ? "default" : "secondary"}>
-                        {webhook.isActive ? "Active" : "Inactive"}
+                      <Badge variant={webhook.is_active ? "default" : "secondary"}>
+                        {webhook.is_active ? "Active" : "Inactive"}
                       </Badge>
                     </div>
                   </CardHeader>
@@ -497,7 +497,7 @@ export default function IntegrationsPage() {
                         <Workflow className="h-5 w-5 mr-2 text-indigo-600" />
                         {workflow.name}
                       </CardTitle>
-                      <Badge variant={workflow.isActive ? "default" : "secondary"}>
+                      <Badge variant={workflow.is_active ? "default" : "secondary"}>
                         {workflow.status}
                       </Badge>
                     </div>
@@ -561,8 +561,8 @@ export default function IntegrationsPage() {
                       </CardTitle>
                       <div className="flex items-center space-x-2">
                         <Badge variant="outline">P{rule.priority}</Badge>
-                        <Badge variant={rule.isActive ? "default" : "secondary"}>
-                          {rule.isActive ? "Active" : "Inactive"}
+                        <Badge variant={rule.is_active ? "default" : "secondary"}>
+                          {rule.is_active ? "Active" : "Inactive"}
                         </Badge>
                       </div>
                     </div>

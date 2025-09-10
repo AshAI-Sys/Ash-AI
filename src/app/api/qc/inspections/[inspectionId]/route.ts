@@ -177,7 +177,7 @@ export async function PUT(
     // Create audit log
     await prisma.auditLog.create({
       data: {
-        userId: session.user.id,
+        user_id: session.user.id,
         action: 'UPDATE_QC_INSPECTION',
         entityType: 'QCInspection',
         entityId: inspectionId,
@@ -195,7 +195,7 @@ export async function PUT(
     if (status) {
       await prisma.trackingUpdate.create({
         data: {
-          orderId: inspection.orderId,
+          order_id: inspection.order_id,
           stage: 'Quality Control',
           status: status === 'PASSED' ? 'COMPLETED' : status === 'FAILED' ? 'FAILED' : 'IN_PROGRESS',
           message: `QC inspection ${status.toLowerCase()} - ${inspection.stage} stage`,

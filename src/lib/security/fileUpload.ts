@@ -133,7 +133,7 @@ export class FileUploadSecurity {
   /**
    * Process uploaded file securely
    */
-  static async processUpload(file: File, userId: string): Promise<SecureFile> {
+  static async processUpload(file: File, user_id: string): Promise<SecureFile> {
     // Validate file
     const validation = this.validateFile(file)
     if (!validation.valid) {
@@ -155,7 +155,7 @@ export class FileUploadSecurity {
       secureName,
       size: file.size,
       type: file.type,
-      path: `${FILE_CONFIG.SAFE_PATH}${userId}/${secureName}`,
+      path: `${FILE_CONFIG.SAFE_PATH}${user_id}/${secureName}`,
       isSecure: true
     }
   }

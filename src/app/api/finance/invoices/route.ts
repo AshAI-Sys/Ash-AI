@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth'
-import { Role } from '@prisma/client'
+
 import { db, createAuditLog } from '@/lib/db'
 import { calculateInvoiceTotals, generateInvoiceNumber, generateBIRSalesEntry } from '@/lib/finance-calculations'
 // Finance Invoices API

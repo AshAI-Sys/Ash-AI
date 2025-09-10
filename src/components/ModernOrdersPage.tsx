@@ -30,7 +30,7 @@ interface Order {
   status: string
   totalAmount: number
   dueDate: string
-  createdAt: string
+  created_at: string
   items: number
   priority: 'HIGH' | 'MEDIUM' | 'LOW'
 }
@@ -43,7 +43,7 @@ const sampleOrders: Order[] = [
     status: 'IN_PRODUCTION',
     totalAmount: 25000,
     dueDate: '2024-09-05',
-    createdAt: '2024-08-20',
+    created_at: '2024-08-20',
     items: 50,
     priority: 'HIGH'
   },
@@ -54,7 +54,7 @@ const sampleOrders: Order[] = [
     status: 'QC_PASSED',
     totalAmount: 18500,
     dueDate: '2024-09-03',
-    createdAt: '2024-08-18',
+    created_at: '2024-08-18',
     items: 35,
     priority: 'MEDIUM'
   },
@@ -65,7 +65,7 @@ const sampleOrders: Order[] = [
     status: 'DELIVERED',
     totalAmount: 12000,
     dueDate: '2024-08-30',
-    createdAt: '2024-08-15',
+    created_at: '2024-08-15',
     items: 20,
     priority: 'LOW'
   }

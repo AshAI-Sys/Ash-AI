@@ -18,7 +18,7 @@ export async function createTestUser() {
     const hashedPassword = await bcrypt.hash('admin123', 12)
 
     // Create workspace first
-    const workspace = await prisma.workspace.create({
+    const _workspace = await prisma.workspace.create({
       data: {
         id: crypto.randomUUID(),
         name: 'ASH AI Demo Workspace',

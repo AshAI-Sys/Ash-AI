@@ -36,7 +36,7 @@ import {
 interface Carton {
   id: string
   cartonNumber: string
-  orderId: string | null
+  order_id: string | null
   status: string
   dimensions: {
     length_cm: number
@@ -48,7 +48,7 @@ interface Carton {
   qrCode: string
   barcode: string | null
   sealedAt: string | null
-  createdAt: string
+  created_at: string
   order?: {
     orderNumber: string
     clientName: string
@@ -116,7 +116,7 @@ export default function PackingPage() {
 
   // New carton form
   const [newCarton, setNewCarton] = useState({
-    orderId: "",
+    order_id: "",
     cartonType: "Medium",
     maxWeightKg: 10,
     autoPackUnits: true
@@ -124,13 +124,13 @@ export default function PackingPage() {
 
   // Optimization form
   const [optimizationForm, setOptimizationForm] = useState({
-    orderId: "",
+    order_id: "",
     algorithm: "ASHLEY_AI"
   })
 
   const [filters, setFilters] = useState({
     status: "",
-    orderId: ""
+    order_id: ""
   })
 
   useEffect(() => {
@@ -161,7 +161,7 @@ export default function PackingPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          orderId: newCarton.orderId || null,
+          order_id: newCarton.order_id || null,
           dimensions: {
             length_cm: cartonType.length_cm,
             width_cm: cartonType.width_cm,
@@ -175,7 +175,7 @@ export default function PackingPage() {
       if (response.ok) {
         await fetchCartons()
         setNewCarton({
-          orderId: "",
+          order_id: "",
           cartonType: "Medium",
           maxWeightKg: 10,
           autoPackUnits: true
@@ -219,7 +219,7 @@ export default function PackingPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          orderId: optimizationForm.orderId,
+          order_id: optimizationForm.order_id,
           cartonTypes: CARTON_TYPES,
           items,
           algorithm: optimizationForm.algorithm
@@ -237,7 +237,7 @@ export default function PackingPage() {
 
   const filteredCartons = cartons.filter(carton => {
     if (filters.status && carton.status !== filters.status) return false
-    if (filters.orderId && carton.orderId !== filters.orderId) return false
+    if (filters.order_id && carton.order_id !== filters.order_id) return false
     return true
   })
 
@@ -308,8 +308,8 @@ export default function PackingPage() {
                   <Label htmlFor="order">Order (Optional)</Label>
                   <Input
                     placeholder="Order ID"
-                    value={newCarton.orderId}
-                    onChange={(e) => setNewCarton(prev => ({ ...prev, orderId: e.target.value }))}
+                    value={newCarton.order_id}
+                    onChange={(e) => setNewCarton(prev => ({ ...prev, order_id: e.target.value }))}
                   />
                 </div>
                 
@@ -442,8 +442,8 @@ export default function PackingPage() {
                 <Label>Order ID</Label>
                 <Input
                   placeholder="Enter order ID"
-                  value={optimizationForm.orderId}
-                  onChange={(e) => setOptimizationForm(prev => ({ ...prev, orderId: e.target.value }))}
+                  value={optimizationForm.order_id}
+                  onChange={(e) => setOptimizationForm(prev => ({ ...prev, order_id: e.target.value }))}
                 />
               </div>
               <div>
@@ -537,11 +537,11 @@ export default function PackingPage() {
                   <Label>Order ID</Label>
                   <Input
                     placeholder="Filter by order"
-                    value={filters.orderId}
-                    onChange={(e) => setFilters(prev => ({ ...prev, orderId: e.target.value }))}
+                    value={filters.order_id}
+                    onChange={(e) => setFilters(prev => ({ ...prev, order_id: e.target.value }))}
                   />
                 </div>
-                <Button variant="outline" onClick={() => setFilters({ status: "", orderId: "" })}>
+                <Button variant="outline" onClick={() => setFilters({ status: "", order_id: "" })}>
                   Clear Filters
                 </Button>
               </div>
@@ -770,7 +770,7 @@ export default function PackingPage() {
                   
                   <div>
                     <Label className="text-sm font-medium">Created</Label>
-                    <p>{new Date(selectedCarton.createdAt).toLocaleString()}</p>
+                    <p>{new Date(selectedCarton.created_at).toLocaleString()}</p>
                   </div>
                 </div>
               </div>

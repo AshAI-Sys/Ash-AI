@@ -21,7 +21,7 @@ interface Automation {
   conditionSql?: string
   action: {
     type: string
-    templateId?: string
+    template_id?: string
     channel: string
     to: string
   }
@@ -30,7 +30,7 @@ interface Automation {
   nextTrigger?: string
   successCount: number
   failureCount: number
-  createdAt: string
+  created_at: string
 }
 
 interface NotificationTemplate {
@@ -51,7 +51,7 @@ interface OutboxMessage {
   status: 'PENDING' | 'SENT' | 'FAILED'
   sentAt?: string
   errorMessage?: string
-  createdAt: string
+  created_at: string
 }
 
 export default function AutomationPage() {
@@ -82,7 +82,7 @@ export default function AutomationPage() {
           nextTrigger: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
           successCount: 45,
           failureCount: 2,
-          createdAt: new Date().toISOString()
+          created_at: new Date().toISOString()
         },
         {
           id: '2',
@@ -94,7 +94,7 @@ export default function AutomationPage() {
           lastTriggered: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
           successCount: 12,
           failureCount: 0,
-          createdAt: new Date().toISOString()
+          created_at: new Date().toISOString()
         },
         {
           id: '3',
@@ -105,7 +105,7 @@ export default function AutomationPage() {
           enabled: false,
           successCount: 8,
           failureCount: 1,
-          createdAt: new Date().toISOString()
+          created_at: new Date().toISOString()
         }
       ])
 
@@ -136,7 +136,7 @@ export default function AutomationPage() {
           body: 'Production summary...',
           status: 'SENT',
           sentAt: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
-          createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+          created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
         },
         {
           id: '2',
@@ -144,7 +144,7 @@ export default function AutomationPage() {
           toRef: 'user123',
           body: 'Order ORD-001 is delayed...',
           status: 'PENDING',
-          createdAt: new Date().toISOString()
+          created_at: new Date().toISOString()
         }
       ])
     } catch (error) {
@@ -507,7 +507,7 @@ export default function AutomationPage() {
                         </div>
                         
                         <div className="text-xs text-gray-500 mt-2">
-                          Created: {new Date(message.createdAt).toLocaleString()}
+                          Created: {new Date(message.created_at).toLocaleString()}
                           {message.sentAt && (
                             <span> • Sent: {new Date(message.sentAt).toLocaleString()}</span>
                           )}

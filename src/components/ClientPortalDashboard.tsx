@@ -206,9 +206,9 @@ export default function ClientPortalDashboard() {
     console.log(`Initiating payment for invoice ${invoiceId}`)
   }
 
-  const handleReorder = (orderId: string) => {
+  const handleReorder = (order_id: string) => {
     // In real implementation, this would create a new order based on the existing one
-    console.log(`Creating reorder based on ${orderId}`)
+    console.log(`Creating reorder based on ${order_id}`)
   }
 
   const handleDesignApproval = (approvalId: string, action: 'approve' | 'request_changes', comments?: string) => {

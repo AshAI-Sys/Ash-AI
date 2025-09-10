@@ -40,9 +40,9 @@ export async function POST(request: NextRequest) {
     const order = await prisma.order.create({
       data: {
         orderNumber: `QT-${Date.now()}`,
-        clientId: client.id,
+        client_id: client.id,
         clientName: validatedData.clientName,
-        brandId: await getDefaultBrand(),
+        brand_id: await getDefaultBrand(),
         designName: 'Quote Request',
         apparelType: validatedData.apparelType,
         quantity: parseInt(validatedData.quantity) || 1,
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     // Create notification task for CSR to follow up
     await prisma.task.create({
       data: {
-        orderId: order.id,
+        order_id: order.id,
         taskType: 'QUOTE_FOLLOW_UP',
         description: `Follow up on quote request from ${validatedData.clientName} - ${validatedData.apparelType} (${validatedData.quantity} pieces)`,
         status: 'OPEN',

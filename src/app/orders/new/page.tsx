@@ -64,8 +64,8 @@ interface Variant {
 
 interface OrderFormData {
   // Client & Brand
-  clientId: string
-  brandId: string
+  client_id: string
+  brand_id: string
   channel?: string
   
   // Product & Design
@@ -74,13 +74,13 @@ interface OrderFormData {
   designAssets?: File[]
   
   // Quantities & Size Curve
-  totalQty: number
+  total_qty: number
   sizeCurve: SizeCurve
   variants: Variant[]
   addons: string[]
   
   // Dates & SLAs
-  targetDeliveryDate: string
+  target_delivery_date: string
   
   // Commercials
   unitPrice: number
@@ -124,16 +124,16 @@ export default function NewOrderPage() {
   const [loadingData, setLoadingData] = useState(true)
   
   const [formData, setFormData] = useState<OrderFormData>({
-    clientId: '',
-    brandId: '',
+    client_id: '',
+    brand_id: '',
     channel: '',
     productType: '',
     method: '',
-    totalQty: 0,
+    total_qty: 0,
     sizeCurve: {},
     variants: [],
     addons: [],
-    targetDeliveryDate: '',
+    target_delivery_date: '',
     unitPrice: 0,
     depositPercentage: 50,
     paymentTerms: '50/50',
@@ -205,7 +205,7 @@ export default function NewOrderPage() {
   }, [formData.method])
 
   // Validate size curve totals
-  const sizeCurveValid = Object.values(formData.sizeCurve).reduce((sum, qty) => sum + qty, 0) === formData.totalQty
+  const sizeCurveValid = Object.values(formData.sizeCurve).reduce((sum, qty) => sum + qty, 0) === formData.total_qty
 
   // Ashley AI Validation
   const runAshleyValidation = async () => {
@@ -249,7 +249,7 @@ export default function NewOrderPage() {
     setIsLoading(true)
     
     // Validate form
-    if (!formData.clientId || !formData.brandId || !formData.productType || !formData.method) {
+    if (!formData.client_id || !formData.brand_id || !formData.productType || !formData.method) {
       alert('Please fill in all required fields')
       setIsLoading(false)
       return
@@ -393,8 +393,8 @@ export default function NewOrderPage() {
                     <Label className="text-sm font-semibold text-cyan-300 mb-2 block">Client *</Label>
                     <div className="flex space-x-2">
                       <select
-                        value={formData.clientId}
-                        onChange={(e) => setFormData(prev => ({ ...prev, clientId: e.target.value }))}
+                        value={formData.client_id}
+                        onChange={(e) => setFormData(prev => ({ ...prev, client_id: e.target.value }))}
                         className="cyber-select flex-1"
                         required
                       >
@@ -417,8 +417,8 @@ export default function NewOrderPage() {
                   <div>
                     <Label className="text-sm font-semibold text-cyan-300 mb-2 block">Brand *</Label>
                     <select
-                      value={formData.brandId}
-                      onChange={(e) => setFormData(prev => ({ ...prev, brandId: e.target.value }))}
+                      value={formData.brand_id}
+                      onChange={(e) => setFormData(prev => ({ ...prev, brand_id: e.target.value }))}
                       className="cyber-select w-full"
                       required
                     >
@@ -549,8 +549,8 @@ export default function NewOrderPage() {
                   <Label className="text-sm font-semibold text-cyan-300 mb-2 block">Total Quantity *</Label>
                   <Input
                     type="number"
-                    value={formData.totalQty}
-                    onChange={(e) => setFormData(prev => ({ ...prev, totalQty: parseInt(e.target.value) || 0 }))}
+                    value={formData.total_qty}
+                    onChange={(e) => setFormData(prev => ({ ...prev, total_qty: parseInt(e.target.value) || 0 }))}
                     placeholder="Enter total quantity"
                     className="cyber-input w-full md:w-1/2"
                     required
@@ -577,7 +577,7 @@ export default function NewOrderPage() {
                     <span className="text-sm text-cyan-300">
                       Total: {Object.values(formData.sizeCurve).reduce((sum, qty) => sum + qty, 0)} pieces
                     </span>
-                    {!sizeCurveValid && formData.totalQty > 0 && (
+                    {!sizeCurveValid && formData.total_qty > 0 && (
                       <Badge variant="destructive" className="text-xs bg-red-500/20 text-red-300 border-red-500/30">
                         Size curve must equal total quantity
                       </Badge>
@@ -649,8 +649,8 @@ export default function NewOrderPage() {
                   <Label className="text-sm font-semibold text-cyan-300 mb-2 block">Target Delivery Date *</Label>
                   <Input
                     type="date"
-                    value={formData.targetDeliveryDate}
-                    onChange={(e) => setFormData(prev => ({ ...prev, targetDeliveryDate: e.target.value }))}
+                    value={formData.target_delivery_date}
+                    onChange={(e) => setFormData(prev => ({ ...prev, target_delivery_date: e.target.value }))}
                     className="cyber-input w-full md:w-1/2"
                     required
                   />
@@ -775,7 +775,7 @@ export default function NewOrderPage() {
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
                     <span className="text-cyan-300">Total Quantity:</span>
-                    <span className="font-semibold text-white">{formData.totalQty} pcs</span>
+                    <span className="font-semibold text-white">{formData.total_qty} pcs</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-cyan-300">Unit Price:</span>
@@ -783,12 +783,12 @@ export default function NewOrderPage() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-cyan-300">Subtotal:</span>
-                    <span className="font-semibold text-white">₱{(formData.totalQty * formData.unitPrice).toFixed(2)}</span>
+                    <span className="font-semibold text-white">₱{(formData.total_qty * formData.unitPrice).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between border-t border-cyan-500/30 pt-2">
                     <span className="text-cyan-300">Deposit ({formData.depositPercentage}%):</span>
                     <span className="font-bold text-green-400">
-                      ₱{((formData.totalQty * formData.unitPrice) * (formData.depositPercentage / 100)).toFixed(2)}
+                      ₱{((formData.total_qty * formData.unitPrice) * (formData.depositPercentage / 100)).toFixed(2)}
                     </span>
                   </div>
                 </div>

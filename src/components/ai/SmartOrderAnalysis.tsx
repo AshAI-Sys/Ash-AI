@@ -67,10 +67,10 @@ export function SmartOrderAnalysis({ order, className = '' }: SmartOrderAnalysis
   // Calculate days difference
   const daysDifference = useMemo(() => {
     if (!insights) return 0
-    const targetDate = new Date(order.targetDeliveryDate)
+    const targetDate = new Date(order.target_delivery_date)
     const predictedDate = new Date(insights.deliveryPrediction.estimatedDate)
     return Math.round((targetDate.getTime() - predictedDate.getTime()) / (1000 * 60 * 60 * 24))
-  }, [insights, order.targetDeliveryDate])
+  }, [insights, order.target_delivery_date])
 
   if (loading) {
     return (
@@ -179,7 +179,7 @@ export function SmartOrderAnalysis({ order, className = '' }: SmartOrderAnalysis
           <div>
             <div className="text-sm text-cyan-300 mb-2">Target Delivery</div>
             <div className="text-xl font-bold text-white mb-1">
-              {new Date(order.targetDeliveryDate).toLocaleDateString('en-US', {
+              {new Date(order.target_delivery_date).toLocaleDateString('en-US', {
                 month: 'short',
                 day: 'numeric',
                 year: 'numeric'
@@ -313,10 +313,10 @@ export function SmartOrderAnalysis({ order, className = '' }: SmartOrderAnalysis
           <div>
             <div className="text-sm text-cyan-300 mb-2">Total Order Value</div>
             <div className="text-3xl font-bold text-white mb-1">
-              ₱{(insights.pricingRecommendation.suggestedPrice * order.totalQty).toLocaleString()}
+              ₱{(insights.pricingRecommendation.suggestedPrice * order.total_qty).toLocaleString()}
             </div>
             <div className="text-sm text-cyan-400">
-              {order.totalQty} units × ₱{insights.pricingRecommendation.suggestedPrice.toLocaleString()}
+              {order.total_qty} units × ₱{insights.pricingRecommendation.suggestedPrice.toLocaleString()}
             </div>
           </div>
         </div>

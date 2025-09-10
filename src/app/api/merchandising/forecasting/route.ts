@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
 
     const historicalOrders = await prisma.order.findMany({
       where: {
-        workspace_id: session.user.workspaceId,
+        workspace_id: session.user.workspace_id,
         created_at: { gte: historicalStartDate },
         status: { in: ['COMPLETED', 'DELIVERED', 'PAID'] },
         ...(query.product_category && {
@@ -168,7 +168,7 @@ export async function POST(request: NextRequest) {
     const customScenario = await prisma.forecastScenario.create({
       data: {
         id: require('nanoid').nanoid(),
-        workspace_id: session.user.workspaceId,
+        workspace_id: session.user.workspace_id,
         name: scenario_name,
         parameters,
         adjustments: adjustments || {},
@@ -181,7 +181,7 @@ export async function POST(request: NextRequest) {
     // Generate forecast based on custom scenario
     const customForecast = await generateCustomScenarioForecast(
       customScenario, 
-      session.user.workspaceId
+      session.user.workspace_id
     )
 
     return NextResponse.json({
@@ -286,7 +286,7 @@ function generateTimeSeries(orders: any[], horizon: string) {
       })
     }
 
-    const period = timeSeries.get(periodKey)
+    const _period = timeSeries.get(periodKey)
     period.orders += 1
     period.quantity += order.order_items.reduce((sum: number, item: any) => sum + item.quantity, 0)
     period.revenue += order.invoices.reduce((sum: number, invoice: any) => sum + invoice.total_amount, 0)
@@ -552,7 +552,7 @@ function generateForecastRiskAssessment(forecast: any, historicalOrders: any[]) 
 // Helper function to calculate demand variability
 function calculateDemandVariability(orders: any[]): number {
   const demands = orders.map(order => 
-    order.order_items.reduce((sum: number, item: any) => sum + item.quantity, 0)
+    order.order_items.reduce((sum: number, _item: any) => sum + item.quantity, 0)
   )
   
   if (demands.length < 2) return 0
@@ -614,7 +614,7 @@ function generateForecastingInsights(forecast: any, ashleyForecast: any, riskAss
 }
 
 // Generate custom scenario forecast
-async function generateCustomScenarioForecast(scenario: any, workspaceId: string) {
+async function generateCustomScenarioForecast(scenario: any, workspace_id: string) {
   // This would apply custom parameters and adjustments to create a scenario-based forecast
   return {
     scenario_name: scenario.name,

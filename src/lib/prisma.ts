@@ -26,7 +26,7 @@ export async function checkDatabaseConnection() {
   try {
     await prisma.$queryRaw`SELECT 1`
     return { status: 'healthy', message: 'Database connection successful' }
-  } catch (error) {
+  } catch (_error) {
     console.error('Database connection failed:', error)
     return { 
       status: 'unhealthy', 

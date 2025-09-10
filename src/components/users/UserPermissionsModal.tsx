@@ -47,7 +47,7 @@ interface UserPermissionsModalProps {
     role: Role
     active: boolean
   }
-  onPermissionsUpdate?: (userId: string, permissions: Permission[]) => void
+  onPermissionsUpdate?: (user_id: string, permissions: Permission[]) => void
 }
 
 const PERMISSION_TEMPLATES = {

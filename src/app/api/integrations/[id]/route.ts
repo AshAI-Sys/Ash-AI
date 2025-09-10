@@ -44,7 +44,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         },
         automationRules: {
           where: {
-            isActive: true
+            is_active: true
           },
           select: {
             id: true,
@@ -68,7 +68,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     // Calculate integration metrics
     const logs = integration.logs
     const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000)
-    const recentLogs = logs.filter(log => log.createdAt >= last24Hours)
+    const recentLogs = logs.filter(log => log.created_at >= last24Hours)
     
     const metrics = {
       totalRequests: logs.length,
@@ -81,7 +81,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         logs.filter(log => log.duration).length || 0,
       errorRate: logs.length > 0 ? 
         (logs.filter(log => log.status === "ERROR").length / logs.length) * 100 : 0,
-      lastActivity: logs.length > 0 ? logs[0].createdAt : null
+      lastActivity: logs.length > 0 ? logs[0].created_at : null
     }
 
     // Webhook metrics
@@ -93,7 +93,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       failureCount: webhook.failureCount,
       successRate: webhook.successCount + webhook.failureCount > 0 ? 
         (webhook.successCount / (webhook.successCount + webhook.failureCount)) * 100 : 0,
-      lastDelivery: webhook.deliveries[0]?.createdAt || null
+      lastDelivery: webhook.deliveries[0]?.created_at || null
     }))
 
     return NextResponse.json({
@@ -173,7 +173,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         apiVersion: apiVersion || existingIntegration.apiVersion,
         rateLimits: rateLimits || existingIntegration.rateLimits,
         syncFrequency: syncFrequency || existingIntegration.syncFrequency,
-        isActive: isActive !== undefined ? isActive : existingIntegration.isActive,
+        is_active: isActive !== undefined ? isActive : existingIntegration.is_active,
         status: connectionTest ? (connectionTest.success ? "CONNECTED" : "ERROR") : existingIntegration.status,
         lastSync: connectionTest?.success ? new Date() : existingIntegration.lastSync,
         updated_at: new Date()
@@ -243,14 +243,14 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     const hasActiveWebhooks = await prisma.webhook.count({
       where: {
         integrationId: id,
-        isActive: true
+        is_active: true
       }
     })
 
     const hasActiveAutomationRules = await prisma.automationRule.count({
       where: {
         integrationId: id,
-        isActive: true
+        is_active: true
       }
     })
 
@@ -272,7 +272,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     const deactivatedIntegration = await prisma.integration.update({
       where: { id },
       data: {
-        isActive: false,
+        is_active: false,
         status: "DISCONNECTED",
         updated_at: new Date()
       }

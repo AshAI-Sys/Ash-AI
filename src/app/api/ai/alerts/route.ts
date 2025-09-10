@@ -17,7 +17,7 @@ import {
 
 export async function GET(request: NextRequest) {
   const startTime = Date.now()
-  let userId: string | undefined
+  let user_id: string | undefined
 
   try {
     const clientIP = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
@@ -32,10 +32,10 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    userId = session.user.id
+    user_id = session.user.id
 
     // Rate limiting for alert queries
-    const rateLimitKey = `alerts:${userId}:${Math.floor(Date.now() / 60000)}`
+    const rateLimitKey = `alerts:${user_id}:${Math.floor(Date.now() / 60000)}`
     if (!rateLimit.check(rateLimitKey, 120, 60000)) {
       return NextResponse.json({ 
         error: 'Rate limit exceeded' 
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
     // Validate and sanitize query parameters
     const status = sanitize.sql(searchParams.get('status') || '')
     const severity = sanitize.sql(searchParams.get('severity') || '')
-    const category = sanitize.sql(searchParams.get('category') || '')
+    const _category = sanitize.sql(searchParams.get('category') || '')
     const limitParam = searchParams.get('limit')
     
     // Validate limit parameter
@@ -152,7 +152,7 @@ export async function GET(request: NextRequest) {
 
     await auditLog.log({
       action: 'alerts_viewed',
-      userId,
+      user_id,
       ip: clientIP,
       userAgent,
       success: true,
@@ -173,7 +173,7 @@ export async function GET(request: NextRequest) {
   } catch (_error) {
     await auditLog.log({
       action: 'alerts_error',
-      userId,
+      user_id,
       success: false,
       error: _error instanceof Error ? _error.message : 'Unknown error'
     })
@@ -190,7 +190,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now()
-  let userId: string | undefined
+  let user_id: string | undefined
 
   try {
     const clientIP = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
@@ -205,10 +205,10 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    userId = session.user.id
+    user_id = session.user.id
 
     // Rate limiting for alert actions (more restrictive)
-    const rateLimitKey = `alerts_action:${userId}:${Math.floor(Date.now() / 60000)}`
+    const rateLimitKey = `alerts_action:${user_id}:${Math.floor(Date.now() / 60000)}`
     if (!rateLimit.check(rateLimitKey, 30, 60000)) {
       return NextResponse.json({ 
         error: 'Rate limit exceeded. Please try again later.' 
@@ -238,7 +238,7 @@ export async function POST(request: NextRequest) {
     if (!validation.success) {
       await auditLog.log({
         action: 'alert_action_invalid_input',
-        userId,
+        user_id,
         ip: clientIP,
         success: false,
         error: validation.error
@@ -259,7 +259,7 @@ export async function POST(request: NextRequest) {
     if (!alert) {
       await auditLog.log({
         action: 'alert_action_not_found',
-        userId,
+        user_id,
         ip: clientIP,
         success: false,
         error: 'Alert not found'
@@ -283,7 +283,7 @@ export async function POST(request: NextRequest) {
     try {
       switch (action) {
         case 'acknowledge':
-          result = await alertEngine.acknowledgeAlert(alertId, userId, note ? sanitize.text(note) : undefined)
+          result = await alertEngine.acknowledgeAlert(alertId, user_id, note ? sanitize.text(note) : undefined)
           break
 
         case 'resolve':
@@ -291,7 +291,7 @@ export async function POST(request: NextRequest) {
           if (!['ADMIN', 'MANAGER'].includes(session.user.role)) {
             await auditLog.log({
               action: 'alert_resolve_denied',
-              userId,
+              user_id,
               ip: clientIP,
               success: false,
               error: 'Insufficient permissions to resolve alerts'
@@ -301,7 +301,7 @@ export async function POST(request: NextRequest) {
               headers: securityHeaders
             })
           }
-          result = await alertEngine.resolveAlert(alertId, userId, note ? sanitize.text(note) : undefined)
+          result = await alertEngine.resolveAlert(alertId, user_id, note ? sanitize.text(note) : undefined)
           break
 
         case 'ignore':
@@ -309,7 +309,7 @@ export async function POST(request: NextRequest) {
           if (session.user.role !== Role.ADMIN) {
             await auditLog.log({
               action: 'alert_ignore_denied',
-              userId,
+              user_id,
               ip: clientIP,
               success: false,
               error: 'Only admins can ignore alerts'
@@ -329,7 +329,7 @@ export async function POST(request: NextRequest) {
             data: {
               alert_id: alertId,
               action: 'IGNORE',
-              actor_id: userId,
+              actor_id: user_id,
               note: note ? sanitize.text(note) : null
             }
           })
@@ -356,7 +356,7 @@ export async function POST(request: NextRequest) {
 
       await auditLog.log({
         action: `alert_${action}`,
-        userId,
+        user_id,
         ip: clientIP,
         userAgent,
         success: true,
@@ -377,7 +377,7 @@ export async function POST(request: NextRequest) {
     } catch (alertError) {
       await auditLog.log({
         action: `alert_${action}_error`,
-        userId,
+        user_id,
         ip: clientIP,
         success: false,
         error: alertError instanceof Error ? alertError.message : 'Alert processing error'
@@ -394,7 +394,7 @@ export async function POST(request: NextRequest) {
   } catch (_error) {
     await auditLog.log({
       action: 'alert_unexpected_error',
-      userId,
+      user_id,
       success: false,
       error: _error instanceof Error ? _error.message : 'Unknown error'
     })

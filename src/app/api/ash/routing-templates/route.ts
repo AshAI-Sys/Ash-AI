@@ -44,13 +44,13 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url)
-    const category = searchParams.get('category')
+    const _category = searchParams.get('category')
     const active_only = searchParams.get('active_only') === 'true'
     const include_steps = searchParams.get('include_steps') === 'true'
 
     const templates = await prisma.routeTemplate.findMany({
       where: {
-        workspace_id: session.user.workspaceId,
+        workspace_id: session.user.workspace_id,
         ...(category && { category }),
         ...(active_only && { is_active: true })
       },
@@ -106,7 +106,7 @@ export async function GET(request: NextRequest) {
 
         try {
           const analysis = await validateAshleyRoutingOptimization({
-            templateId: template.id,
+            template_id: template.id,
             steps: template.steps,
             category: template.category
           })
@@ -186,7 +186,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate template ID
-    const templateId = crypto.randomUUID()
+    const template_id = crypto.randomUUID()
 
     // Create template with steps in transaction
     const template = await prisma.$transaction(async (tx) => {
@@ -194,7 +194,7 @@ export async function POST(request: NextRequest) {
       if (validatedData.is_default) {
         await tx.routeTemplate.updateMany({
           where: {
-            workspace_id: session.user.workspaceId,
+            workspace_id: session.user.workspace_id,
             category: validatedData.category,
             is_default: true
           },
@@ -205,8 +205,8 @@ export async function POST(request: NextRequest) {
       // Create the template
       const newTemplate = await tx.routeTemplate.create({
         data: {
-          id: templateId,
-          workspace_id: session.user.workspaceId,
+          id: template_id,
+          workspace_id: session.user.workspace_id,
           name: validatedData.name,
           description: validatedData.description,
           category: validatedData.category,
@@ -227,8 +227,8 @@ export async function POST(request: NextRequest) {
           tx.routingStep.create({
             data: {
               id: crypto.randomUUID(),
-              workspace_id: session.user.workspaceId,
-              route_template_id: templateId,
+              workspace_id: session.user.workspace_id,
+              route_template_id: template_id,
               name: step.name,
               description: step.description,
               workcenter: step.workcenter,
@@ -246,10 +246,10 @@ export async function POST(request: NextRequest) {
     await prisma.auditLog.create({
       data: {
         id: crypto.randomUUID(),
-        workspace_id: session.user.workspaceId,
+        workspace_id: session.user.workspace_id,
         actor_id: session.user.id,
         entity_type: 'route_template',
-        entity_id: templateId,
+        entity_id: template_id,
         action: 'CREATE',
         after_data: {
           template: validatedData,

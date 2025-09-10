@@ -8,8 +8,8 @@ export class QueryOptimizer {
   static async getOrdersWithOptimization(
     filters: {
       status?: string;
-      brandId?: string;
-      clientId?: string;
+      brand_id?: string;
+      client_id?: string;
       dateFrom?: Date;
       dateTo?: Date;
     } = {},
@@ -21,12 +21,12 @@ export class QueryOptimizer {
     const where: Prisma.OrderWhereInput = {};
     
     if (filters.status) where.status = filters.status as Prisma.EnumOrderStatusFilter;
-    if (filters.brandId) where.brandId = filters.brandId;
-    if (filters.clientId) where.clientId = filters.clientId;
+    if (filters.brand_id) where.brand_id = filters.brand_id;
+    if (filters.client_id) where.client_id = filters.client_id;
     if (filters.dateFrom || filters.dateTo) {
-      where.createdAt = {};
-      if (filters.dateFrom) where.createdAt.gte = filters.dateFrom;
-      if (filters.dateTo) where.createdAt.lte = filters.dateTo;
+      where.created_at = {};
+      if (filters.dateFrom) where.created_at.gte = filters.dateFrom;
+      if (filters.dateTo) where.created_at.lte = filters.dateTo;
     }
 
     const [orders, totalCount] = await Promise.all([
@@ -150,7 +150,7 @@ export class QueryOptimizer {
     filters: {
       category?: string;
       lowStock?: boolean;
-      brandId?: string;
+      brand_id?: string;
       search?: string;
     } = {},
     pagination: { page?: number; limit?: number } = {}
@@ -161,7 +161,7 @@ export class QueryOptimizer {
     const where: Prisma.InventoryItemWhereInput = {};
     
     if (filters.category) where.category = filters.category;
-    if (filters.brandId) where.brandId = filters.brandId;
+    if (filters.brand_id) where.brand_id = filters.brand_id;
     if (filters.lowStock) {
       where.OR = [
         { quantity: { lte: prisma.inventoryItem.fields.reorderPoint } },

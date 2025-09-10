@@ -111,11 +111,11 @@ export const AGENTS = {
 // AI Agent Base Class
 export class AIAgentBase {
   protected agent: AIAgent
-  protected userId?: string
+  protected user_id?: string
 
-  constructor(agent: AIAgent, userId?: string) {
+  constructor(agent: AIAgent, user_id?: string) {
     this.agent = agent
-    this.userId = userId
+    this.user_id = user_id
   }
 
   async logInteraction(input: Record<string, unknown>, output: Record<string, unknown>, confidence?: number, accepted?: boolean) {
@@ -126,7 +126,7 @@ export class AIAgentBase {
         output: typeof output === 'string' ? output : JSON.stringify(output),
         confidence,
         accepted,
-        userId: this.userId,
+        user_id: this.user_id,
         timestamp: new Date().toISOString()
       })
     } catch (_error) {
@@ -175,8 +175,8 @@ export class AIAgentBase {
 
 // Ashley - Main Supervisor Agent
 export class AshleyAgent extends AIAgentBase {
-  constructor(userId?: string) {
-    super('ashley', userId)
+  constructor(user_id?: string) {
+    super('ashley', user_id)
   }
 
   async generateWeeklyReport(dateRange: { start: Date; end: Date }) {
@@ -236,13 +236,13 @@ export class AshleyAgent extends AIAgentBase {
 
 // Kai - Industrial Engineer Agent
 export class KaiAgent extends AIAgentBase {
-  constructor(userId?: string) {
-    super('kai', userId)
+  constructor(user_id?: string) {
+    super('kai', user_id)
   }
 
-  async analyzeDeadlineRisk(orderId: string) {
+  async analyzeDeadlineRisk(order_id: string) {
     const order = await prisma.order.findUnique({
-      where: { id: orderId },
+      where: { id: order_id },
       include: {
         tasks: {
           where: {
@@ -265,7 +265,7 @@ export class KaiAgent extends AIAgentBase {
     const response = await this.callOpenAI(messages)
     
     await this.logInteraction(
-      { action: 'analyzeDeadlineRisk', orderId },
+      { action: 'analyzeDeadlineRisk', order_id },
       response,
       0.8
     )
@@ -352,13 +352,13 @@ export class KaiAgent extends AIAgentBase {
 
 // Mira - Finance Analyst Agent
 export class MiraAgent extends AIAgentBase {
-  constructor(userId?: string) {
-    super('mira', userId)
+  constructor(user_id?: string) {
+    super('mira', user_id)
   }
 
-  async analyzeProfitability(orderId: string) {
+  async analyzeProfitability(order_id: string) {
     const order = await prisma.order.findUnique({
-      where: { id: orderId },
+      where: { id: order_id },
       include: {
         orderCosts: true,
         tasks: {
@@ -380,7 +380,7 @@ export class MiraAgent extends AIAgentBase {
     const response = await this.callOpenAI(messages)
     
     await this.logInteraction(
-      { action: 'analyzeProfitability', orderId },
+      { action: 'analyzeProfitability', order_id },
       response,
       0.85
     )
@@ -471,8 +471,8 @@ export class MiraAgent extends AIAgentBase {
 
 // Nova - Warehouse Planner Agent
 export class NovaAgent extends AIAgentBase {
-  constructor(userId?: string) {
-    super('nova', userId)
+  constructor(user_id?: string) {
+    super('nova', user_id)
   }
 
   async analyzeInventoryHealth() {
@@ -508,16 +508,16 @@ export class NovaAgent extends AIAgentBase {
 }
 
 // Factory function to create AI agents
-export function createAgent(agent: AIAgent, userId?: string) {
+export function createAgent(agent: AIAgent, user_id?: string) {
   switch (agent) {
     case 'ashley':
-      return new AshleyAgent(userId)
+      return new AshleyAgent(user_id)
     case 'kai':
-      return new KaiAgent(userId)
+      return new KaiAgent(user_id)
     case 'mira':
-      return new MiraAgent(userId)
+      return new MiraAgent(user_id)
     case 'nova':
-      return new NovaAgent(userId)
+      return new NovaAgent(user_id)
     default:
       throw new Error(`Agent ${agent} not implemented yet`)
   }
@@ -528,9 +528,9 @@ export async function callAIAgent(
   agent: AIAgent,
   action: string,
   data: Record<string, unknown>,
-  userId?: string
+  user_id?: string
 ) {
-  const agentInstance = createAgent(agent, userId)
+  const agentInstance = createAgent(agent, user_id)
   
   // Route to appropriate method based on action
   switch (action) {
@@ -546,12 +546,12 @@ export async function callAIAgent(
       break
     case 'analyzeDeadlineRisk':
       if (agent === 'kai') {
-        return await (agentInstance as KaiAgent).analyzeDeadlineRisk(data.orderId as string)
+        return await (agentInstance as KaiAgent).analyzeDeadlineRisk(data.order_id as string)
       }
       break
     case 'analyzeProfitability':
       if (agent === 'mira') {
-        return await (agentInstance as MiraAgent).analyzeProfitability(data.orderId as string)
+        return await (agentInstance as MiraAgent).analyzeProfitability(data.order_id as string)
       }
       break
     case 'analyzeInventoryHealth':

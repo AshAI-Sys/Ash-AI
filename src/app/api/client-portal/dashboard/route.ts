@@ -27,16 +27,16 @@ export async function GET(request: NextRequest) {
     }
 
     const decoded = jwt.verify(token, JWT_SECRET) as any
-    const clientId = decoded.clientId
+    const client_id = decoded.client_id
     const clientUserId = decoded.clientUserId
-    const workspaceId = decoded.workspaceId
+    const workspace_id = decoded.workspace_id
 
     // Verify client user still exists and has portal access
     const clientUser = await prisma.clientUser.findFirst({
       where: {
         id: clientUserId,
-        client_id: clientId,
-        workspace_id: workspaceId,
+        client_id: client_id,
+        workspace_id: workspace_id,
         status: 'ACTIVE'
       },
       include: {
@@ -51,8 +51,8 @@ export async function GET(request: NextRequest) {
     // Get client orders with detailed information
     const orders = await prisma.order.findMany({
       where: {
-        client_id: clientId,
-        workspace_id: workspaceId
+        client_id: client_id,
+        workspace_id: workspace_id
       },
       include: {
         brand: {
@@ -128,8 +128,8 @@ export async function GET(request: NextRequest) {
     const pendingDesignApprovals = await prisma.designAsset.findMany({
       where: {
         order: {
-          client_id: clientId,
-          workspace_id: workspaceId
+          client_id: client_id,
+          workspace_id: workspace_id
         },
         approval_status: 'PENDING_CLIENT_APPROVAL'
       },
@@ -153,7 +153,7 @@ export async function GET(request: NextRequest) {
     })
 
     // Get communication notifications
-    const notifications = await getClientNotifications(clientId, workspaceId)
+    const notifications = await getClientNotifications(client_id, workspace_id)
 
     return NextResponse.json({
       success: true,
@@ -198,7 +198,7 @@ export async function GET(request: NextRequest) {
       }
     })
 
-  } catch (error) {
+  } catch (_error) {
     if (error instanceof jwt.JsonWebTokenError) {
       return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
     }
@@ -212,7 +212,7 @@ export async function GET(request: NextRequest) {
 }
 
 // Helper functions
-function calculateOrderProgress(routingSteps: any[]): number {
+function calculateOrderProgress(routing_steps: any[]): number {
   if (routingSteps.length === 0) return 0
   
   const statusWeights = {
@@ -251,7 +251,7 @@ function getNextMilestone(order: any): string | null {
   return null
 }
 
-function getDesignStatus(designAssets: any[]): string {
+function getDesignStatus(design_assets: any[]): string {
   if (designAssets.length === 0) return 'No designs uploaded'
   
   const statuses = designAssets.map(asset => asset.approval_status)
@@ -312,15 +312,15 @@ function calculateOrderInsights(orders: any[]) {
   return insights
 }
 
-async function getClientNotifications(clientId: string, workspaceId: string) {
+async function getClientNotifications(client_id: string, workspace_id: string) {
   // Get recent audit logs that might be relevant to the client
   const recentLogs = await prisma.auditLog.findMany({
     where: {
-      workspace_id: workspaceId,
+      workspace_id: workspace_id,
       entity_type: 'order',
       entity_id: {
         in: await prisma.order.findMany({
-          where: { client_id: clientId, workspace_id: workspaceId },
+          where: { client_id: client_id, workspace_id: workspace_id },
           select: { id: true }
         }).then(orders => orders.map(o => o.id))
       },

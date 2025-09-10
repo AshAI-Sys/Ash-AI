@@ -62,7 +62,7 @@ interface QCItem {
     inspector: {
       name: string
     }
-    createdAt: string
+    created_at: string
   } | null
   order: {
     id: string

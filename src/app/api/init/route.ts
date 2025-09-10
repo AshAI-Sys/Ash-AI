@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     console.log('🚀 Initializing ASH AI Production Database...');
 
     // Create workspace
-    const workspace = await db.workspace.create({
+    const _workspace = await db.workspace.create({
       data: {
         name: 'ASH AI Production',
         slug: 'ash-ai-prod',
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
       }
     });
 
-  } catch (error) {
+  } catch (_error) {
     console.error('❌ Failed to initialize database:', error);
     
     return NextResponse.json({

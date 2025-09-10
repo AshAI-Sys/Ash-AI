@@ -12,8 +12,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
     const { searchParams } = new URL(request.url)
-    const category = searchParams.get("category")
-    const impact = searchParams.get("impact")
+    const _category = searchParams.get("category")
+    const _impact = searchParams.get("impact")
     const status = searchParams.get("status")
     const assignedTo = searchParams.get("assigned_to")
     
@@ -102,8 +102,8 @@ export async function POST(request: NextRequest) {
       impact,
       confidence,
       dataSource,
-      evidence,
-      recommendation,
+      _evidence,
+      _recommendation,
       assignedTo
     } = body
 

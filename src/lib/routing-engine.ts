@@ -31,8 +31,8 @@ export interface OrderContext {
   productType: string
   method: string
   quantity: number
-  targetDeliveryDate: Date
-  brandId: string
+  target_delivery_date: Date
+  brand_id: string
   hasComplexDesign?: boolean
   isPriority?: boolean
 }
@@ -405,11 +405,11 @@ export class RoutingEngine {
     }
     
     // Timeline warnings
-    const _targetDate = new Date(context.targetDeliveryDate)
-    const _daysAvailable = Math.ceil((new Date(targetDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+    const _targetDate = new Date(context.target_delivery_date)
+    const _daysAvailable = Math.ceil((_targetDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
     
     if (recommended) {
-      const criticalPath = this.calculateCriticalPath(recommended, context.quantity, targetDate)
+      const criticalPath = this.calculateCriticalPath(recommended, context.quantity, _targetDate)
       
       if (!criticalPath.feasible) {
         warnings.push(`Tight deadline - recommend expediting or splitting into batches`)

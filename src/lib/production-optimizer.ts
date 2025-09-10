@@ -1,4 +1,4 @@
-import { ashAI, type OrderData } from './ai-engine'
+// import { ashAI, type OrderData } from './ai-engine'
 // Real-Time Production Optimization Engine
 // Monitors production metrics and provides instant recommendations
 
@@ -162,9 +162,9 @@ export class RealTimeProductionOptimizer {
     const operationQuality = this.groupBy(recentMetrics, 'operationType')
     
     Object.entries(operationQuality).forEach(([operation, metrics]) => {
-      const totalQty = metrics.reduce((sum, m) => sum + m.completedQty, 0)
+      const total_qty = metrics.reduce((sum, m) => sum + m.completedQty, 0)
       const totalDefects = metrics.reduce((sum, m) => sum + m.defectQty, 0)
-      const defectRate = totalQty > 0 ? (totalDefects / totalQty) * 100 : 0
+      const defectRate = total_qty > 0 ? (totalDefects / total_qty) * 100 : 0
 
       if (defectRate > this.thresholds.qualityDefectRate) {
         this.alerts.push({
@@ -172,7 +172,7 @@ export class RealTimeProductionOptimizer {
           type: 'QUALITY',
           severity: defectRate > 10 ? 'CRITICAL' : 'HIGH',
           title: `High Defect Rate - ${operation}`,
-          description: `Defect rate at ${defectRate.toFixed(1)}% (${totalDefects}/${totalQty} units)`,
+          description: `Defect rate at ${defectRate.toFixed(1)}% (${totalDefects}/${total_qty} units)`,
           recommendation: 'Stop production, investigate root cause, implement quality controls',
           affectedOrders: [...new Set(metrics.map(m => m.currentOrder))],
           estimatedImpact: `Risk of customer rejection, potential rework needed`,

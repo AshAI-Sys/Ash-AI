@@ -36,14 +36,14 @@ import {
 interface Design {
   id: string
   name: string
-  orderId: string
-  poNumber: string
+  order_id: string
+  po_number: string
   brand: string
   method: string
   status: 'draft' | 'pending_approval' | 'approved' | 'rejected' | 'revision_needed'
   version: number
   createdBy: string
-  createdAt: string
+  created_at: string
   approvedBy?: string
   approvedAt?: string
   mockupUrl?: string
@@ -55,14 +55,14 @@ const mockDesigns: Design[] = [
   {
     id: '1',
     name: 'Corporate Logo Tee Design',
-    orderId: 'order_1',
-    poNumber: 'REEF-2024-000123',
+    order_id: 'order_1',
+    po_number: 'REEF-2024-000123',
     brand: 'Reefer',
     method: 'Silkscreen',
     status: 'approved',
     version: 2,
     createdBy: 'John Doe (GA)',
-    createdAt: '2024-09-01T08:00:00Z',
+    created_at: '2024-09-01T08:00:00Z',
     approvedBy: 'ABC Corporation',
     approvedAt: '2024-09-01T14:30:00Z',
     notes: 'Updated logo placement per client feedback'
@@ -70,49 +70,49 @@ const mockDesigns: Design[] = [
   {
     id: '2',
     name: 'Sports Jersey All-Over Print',
-    orderId: 'order_2',
-    poNumber: 'SORB-2024-000098',
+    order_id: 'order_2',
+    po_number: 'SORB-2024-000098',
     brand: 'Sorbetes',
     method: 'Sublimation',
     status: 'pending_approval',
     version: 1,
     createdBy: 'Maria Garcia (GA)',
-    createdAt: '2024-09-01T10:15:00Z',
+    created_at: '2024-09-01T10:15:00Z',
     notes: 'Full-color sublimation design with team logos'
   },
   {
     id: '3',
     name: 'Event Merchandise Design',
-    orderId: 'order_3',
-    poNumber: 'REEF-2024-000124',
+    order_id: 'order_3',
+    po_number: 'REEF-2024-000124',
     brand: 'Reefer',
     method: 'DTF',
     status: 'revision_needed',
     version: 1,
     createdBy: 'Alex Thompson (GA)',
-    createdAt: '2024-08-31T16:45:00Z',
+    created_at: '2024-08-31T16:45:00Z',
     clientComments: 'Please adjust text size and change background color'
   },
   {
     id: '4',
     name: 'Premium Hoodie Embroidery',
-    orderId: 'order_4',
-    poNumber: 'SORB-2024-000099',
+    order_id: 'order_4',
+    po_number: 'SORB-2024-000099',
     brand: 'Sorbetes',
     method: 'Embroidery',
     status: 'draft',
     version: 1,
     createdBy: 'Sarah Chen (GA)',
-    createdAt: '2024-09-01T09:30:00Z',
+    created_at: '2024-09-01T09:30:00Z',
     notes: 'Complex embroidery pattern - needs stitch count optimization'
   }
 ]
 
 const mockOrders = [
-  { id: 'order_1', poNumber: 'REEF-2024-000123', method: 'Silkscreen', brand: 'Reefer' },
-  { id: 'order_2', poNumber: 'SORB-2024-000098', method: 'Sublimation', brand: 'Sorbetes' },
-  { id: 'order_3', poNumber: 'REEF-2024-000124', method: 'DTF', brand: 'Reefer' },
-  { id: 'order_4', poNumber: 'SORB-2024-000099', method: 'Embroidery', brand: 'Sorbetes' }
+  { id: 'order_1', po_number: 'REEF-2024-000123', method: 'Silkscreen', brand: 'Reefer' },
+  { id: 'order_2', po_number: 'SORB-2024-000098', method: 'Sublimation', brand: 'Sorbetes' },
+  { id: 'order_3', po_number: 'REEF-2024-000124', method: 'DTF', brand: 'Reefer' },
+  { id: 'order_4', po_number: 'SORB-2024-000099', method: 'Embroidery', brand: 'Sorbetes' }
 ]
 
 export default function DesignPage() {
@@ -127,7 +127,7 @@ export default function DesignPage() {
 
   const filteredDesigns = designs.filter(design => {
     const matchesSearch = design.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         design.poNumber.toLowerCase().includes(searchTerm.toLowerCase())
+                         design.po_number.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesStatus = statusFilter === 'all' || design.status === statusFilter
     const matchesMethod = methodFilter === 'all' || design.method === methodFilter
     
@@ -160,7 +160,7 @@ export default function DesignPage() {
     try {
       const apiData = {
         name: designData.name,
-        orderId: designData.orderId,
+        order_id: designData.order_id,
         method: designData.method,
         type: 'MOCKUP',
         fileUrl: designData.mockupFile ? URL.createObjectURL(designData.mockupFile) : '',
@@ -188,14 +188,14 @@ export default function DesignPage() {
         const newDesign: Design = {
           id: result.asset.id,
           name: result.asset.name,
-          orderId: designData.orderId,
-          poNumber: mockOrders.find(o => o.id === designData.orderId)?.poNumber || '',
-          brand: mockOrders.find(o => o.id === designData.orderId)?.brand || '',
+          order_id: designData.order_id,
+          po_number: mockOrders.find(o => o.id === designData.order_id)?.po_number || '',
+          brand: mockOrders.find(o => o.id === designData.order_id)?.brand || '',
           method: designData.method,
           status: 'draft',
           version: 1,
           createdBy: 'Current User (GA)',
-          createdAt: new Date().toISOString(),
+          created_at: new Date().toISOString(),
           notes: designData.notes
         }
         
@@ -206,14 +206,14 @@ export default function DesignPage() {
         const fallbackDesign: Design = {
           id: `design_${Date.now()}`,
           name: designData.name,
-          orderId: designData.orderId,
-          poNumber: mockOrders.find(o => o.id === designData.orderId)?.poNumber || '',
-          brand: mockOrders.find(o => o.id === designData.orderId)?.brand || '',
+          order_id: designData.order_id,
+          po_number: mockOrders.find(o => o.id === designData.order_id)?.po_number || '',
+          brand: mockOrders.find(o => o.id === designData.order_id)?.brand || '',
           method: designData.method,
           status: 'draft',
           version: 1,
           createdBy: 'Current User (GA)',
-          createdAt: new Date().toISOString(),
+          created_at: new Date().toISOString(),
           notes: designData.notes
         }
         setDesigns([fallbackDesign, ...designs])
@@ -224,14 +224,14 @@ export default function DesignPage() {
       const fallbackDesign: Design = {
         id: `design_${Date.now()}`,
         name: designData.name,
-        orderId: designData.orderId,
-        poNumber: mockOrders.find(o => o.id === designData.orderId)?.poNumber || '',
-        brand: mockOrders.find(o => o.id === designData.orderId)?.brand || '',
+        order_id: designData.order_id,
+        po_number: mockOrders.find(o => o.id === designData.order_id)?.po_number || '',
+        brand: mockOrders.find(o => o.id === designData.order_id)?.brand || '',
         method: designData.method,
         status: 'draft',
         version: 1,
         createdBy: 'Current User (GA)',
-        createdAt: new Date().toISOString(),
+        created_at: new Date().toISOString(),
         notes: designData.notes
       }
       setDesigns([fallbackDesign, ...designs])
@@ -249,7 +249,7 @@ export default function DesignPage() {
       id: `${design.id}_v${design.version + 1}`,
       version: design.version + 1,
       status: 'draft',
-      createdAt: new Date().toISOString(),
+      created_at: new Date().toISOString(),
       notes: `New version based on v${design.version}`
     }
     setDesigns([newVersion, ...designs])
@@ -330,7 +330,7 @@ export default function DesignPage() {
     // Update design status to indicate it's been handed off to production
     setDesigns(prev => 
       prev.map(d => 
-        d.id === handoffData.designId 
+        d.id === handoffData.design_id 
           ? { ...d, status: 'in_production' as any }
           : d
       )
@@ -488,7 +488,7 @@ export default function DesignPage() {
                       {design.name}
                     </CardTitle>
                     <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 text-xs md:text-sm text-gray-600">
-                      <span>{design.poNumber}</span>
+                      <span>{design.po_number}</span>
                       <span className="hidden sm:inline">•</span>
                       <span>{design.brand}</span>
                     </div>
@@ -528,7 +528,7 @@ export default function DesignPage() {
                     <span>by {design.createdBy}</span>
                   </div>
                   <div className="mt-1">
-                    Created {new Date(design.createdAt).toLocaleDateString()}
+                    Created {new Date(design.created_at).toLocaleDateString()}
                   </div>
                 </div>
 
@@ -675,7 +675,7 @@ export default function DesignPage() {
         {/* Design Version History Modal */}
         {selectedDesign && (
           <DesignVersionHistory
-            designId={selectedDesign.id}
+            design_id={selectedDesign.id}
             designName={selectedDesign.name}
             isOpen={showVersionHistory}
             onClose={() => {

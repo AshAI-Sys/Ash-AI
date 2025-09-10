@@ -157,11 +157,11 @@ export default function UsersPage() {
     setBulkAction('')
   }
 
-  const handleUserSelection = (userId: string, checked: boolean) => {
+  const handleUserSelection = (user_id: string, checked: boolean) => {
     if (checked) {
-      setSelectedUsers(prev => [...prev, userId])
+      setSelectedUsers(prev => [...prev, user_id])
     } else {
-      setSelectedUsers(prev => prev.filter(id => id !== userId))
+      setSelectedUsers(prev => prev.filter(id => id !== user_id))
     }
   }
 
@@ -556,8 +556,8 @@ export default function UsersPage() {
                         </button>
                         <UserPermissionsModal 
                           user={user} 
-                          onPermissionsUpdate={(userId, permissions) => {
-                            alert(`PERMISSIONS UPDATED FOR ${user.name}\n\nUser ID: ${userId}\nActive Permissions: ${permissions.filter(p => p.enabled).length}\n\nPermissions have been synchronized with the neural network.`)
+                          onPermissionsUpdate={(user_id, permissions) => {
+                            alert(`PERMISSIONS UPDATED FOR ${user.name}\n\nUser ID: ${user_id}\nActive Permissions: ${permissions.filter(p => p.enabled).length}\n\nPermissions have been synchronized with the neural network.`)
                           }}
                         />
                         <button

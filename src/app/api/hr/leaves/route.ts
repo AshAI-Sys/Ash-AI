@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth'
-import { Role } from '@prisma/client'
+
 import { db } from '@/lib/db'
 import { validateAshleyAI } from '@/lib/ashley-ai'
 // HR Leave Management API for Stage 10 HR System

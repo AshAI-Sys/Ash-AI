@@ -12,15 +12,15 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
     const { searchParams } = new URL(request.url)
-    const category = searchParams.get("category")
+    const _category = searchParams.get("category")
     const active = searchParams.get("active")
-    const period = searchParams.get("period")
-    const periodType = searchParams.get("periodType")
+    const _period = searchParams.get("period")
+    const _periodType = searchParams.get("periodType")
     
     const where: { isActive?: boolean } = {}
     
     if (active !== null) {
-      where.isActive = active === "true"
+      where.is_active = active === "true"
     }
 
     // Fetch KPI metrics - remove non-existent relations

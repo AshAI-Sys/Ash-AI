@@ -22,9 +22,9 @@ import { AshleyInsights } from './AshleyInsights'
 
 const createPOSchema = z.object({
   // Client & Brand
-  clientId: z.string().optional(),
+  client_id: z.string().optional(),
   clientName: z.string().min(2, 'Client name must be at least 2 characters'),
-  brandId: z.string().min(1, 'Brand is required'),
+  brand_id: z.string().min(1, 'Brand is required'),
   channel: z.string().optional(),
 
   // Product & Design  
@@ -32,14 +32,14 @@ const createPOSchema = z.object({
   method: z.enum(['SILKSCREEN', 'SUBLIMATION', 'DTF', 'EMBROIDERY']),
   
   // Quantities & Sizes
-  totalQty: z.number().min(1, 'Quantity must be at least 1'),
+  total_qty: z.number().min(1, 'Quantity must be at least 1'),
   sizeCurve: z.record(z.number()).refine(
     (curve) => Object.values(curve).reduce((a, b) => a + b, 0) > 0,
     'Size curve must have at least one item'
   ),
 
   // Dates & SLAs
-  targetDeliveryDate: z.date(),
+  target_delivery_date: z.date(),
 
   // Commercials
   unitPrice: z.number().min(0).optional(),
@@ -79,7 +79,7 @@ export function CreatePOForm({ onSuccess, onCancel }: CreatePOFormProps) {
     }
   })
 
-  const watchedTotalQty = form.watch('totalQty')
+  const watchedTotalQty = form.watch('total_qty')
   const watchedSizeCurve = form.watch('sizeCurve')
 
   // Load brands and clients
@@ -178,7 +178,7 @@ export function CreatePOForm({ onSuccess, onCancel }: CreatePOFormProps) {
 
       const result = await response.json()
       setClients([result.client, ...clients])
-      form.setValue('clientId', result.client.id)
+      form.setValue('client_id', result.client.id)
       form.setValue('clientName', result.client.name)
       setShowNewClientModal(false)
     } catch (error) {
@@ -192,7 +192,7 @@ export function CreatePOForm({ onSuccess, onCancel }: CreatePOFormProps) {
   }
 
   const distributeEvenly = () => {
-    const total = form.getValues('totalQty') || 0
+    const total = form.getValues('total_qty') || 0
     if (total > 0) {
       const perSize = Math.floor(total / 4)
       const remainder = total % 4
@@ -264,9 +264,9 @@ export function CreatePOForm({ onSuccess, onCancel }: CreatePOFormProps) {
                       <div className="space-y-2">
                         <Label>Client</Label>
                         <Select 
-                          value={form.watch('clientId')} 
+                          value={form.watch('client_id')} 
                           onValueChange={(value) => {
-                            form.setValue('clientId', value)
+                            form.setValue('client_id', value)
                             const client = clients.find(c => c.id === value)
                             if (client) form.setValue('clientName', client.name)
                           }}
@@ -316,8 +316,8 @@ export function CreatePOForm({ onSuccess, onCancel }: CreatePOFormProps) {
                       <div className="space-y-2">
                         <Label>Brand *</Label>
                         <Select 
-                          value={form.watch('brandId')}
-                          onValueChange={(value) => form.setValue('brandId', value)}
+                          value={form.watch('brand_id')}
+                          onValueChange={(value) => form.setValue('brand_id', value)}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Select brand" />
@@ -330,9 +330,9 @@ export function CreatePOForm({ onSuccess, onCancel }: CreatePOFormProps) {
                             ))}
                           </SelectContent>
                         </Select>
-                        {form.formState.errors.brandId && (
+                        {form.formState.errors.brand_id && (
                           <p className="text-sm text-destructive">
-                            {form.formState.errors.brandId.message}
+                            {form.formState.errors.brand_id.message}
                           </p>
                         )}
                       </div>
@@ -435,17 +435,17 @@ export function CreatePOForm({ onSuccess, onCancel }: CreatePOFormProps) {
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="totalQty">Total Quantity *</Label>
+                        <Label htmlFor="total_qty">Total Quantity *</Label>
                         <Input
-                          id="totalQty"
+                          id="total_qty"
                           type="number"
                           min="1"
-                          {...form.register('totalQty', { valueAsNumber: true })}
+                          {...form.register('total_qty', { valueAsNumber: true })}
                           placeholder="Enter total quantity"
                         />
-                        {form.formState.errors.totalQty && (
+                        {form.formState.errors.total_qty && (
                           <p className="text-sm text-destructive">
-                            {form.formState.errors.totalQty.message}
+                            {form.formState.errors.total_qty.message}
                           </p>
                         )}
                       </div>
@@ -506,12 +506,12 @@ export function CreatePOForm({ onSuccess, onCancel }: CreatePOFormProps) {
                             variant="outline"
                             className={cn(
                               "w-full justify-start text-left font-normal",
-                              !form.watch('targetDeliveryDate') && "text-muted-foreground"
+                              !form.watch('target_delivery_date') && "text-muted-foreground"
                             )}
                           >
                             <CalendarIcon className="mr-2 h-4 w-4" />
-                            {form.watch('targetDeliveryDate') 
-                              ? format(form.watch('targetDeliveryDate'), 'PPP') 
+                            {form.watch('target_delivery_date') 
+                              ? format(form.watch('target_delivery_date'), 'PPP') 
                               : "Pick a date"
                             }
                           </Button>
@@ -519,16 +519,16 @@ export function CreatePOForm({ onSuccess, onCancel }: CreatePOFormProps) {
                         <PopoverContent className="w-auto p-0">
                           <Calendar
                             mode="single"
-                            selected={form.watch('targetDeliveryDate')}
-                            onSelect={(date) => date && form.setValue('targetDeliveryDate', date)}
+                            selected={form.watch('target_delivery_date')}
+                            onSelect={(date) => date && form.setValue('target_delivery_date', date)}
                             disabled={(date) => date < new Date()}
                             initialFocus
                           />
                         </PopoverContent>
                       </Popover>
-                      {form.formState.errors.targetDeliveryDate && (
+                      {form.formState.errors.target_delivery_date && (
                         <p className="text-sm text-destructive">
-                          {form.formState.errors.targetDeliveryDate.message}
+                          {form.formState.errors.target_delivery_date.message}
                         </p>
                       )}
                     </div>
@@ -683,7 +683,7 @@ export function CreatePOForm({ onSuccess, onCancel }: CreatePOFormProps) {
             <CardContent className="space-y-3">
               <div className="flex justify-between text-sm">
                 <span>Total Quantity:</span>
-                <span className="font-medium">{form.watch('totalQty') || 0} pcs</span>
+                <span className="font-medium">{form.watch('total_qty') || 0} pcs</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span>Method:</span>
@@ -692,7 +692,7 @@ export function CreatePOForm({ onSuccess, onCancel }: CreatePOFormProps) {
               <div className="flex justify-between text-sm">
                 <span>Estimated Value:</span>
                 <span className="font-medium">
-                  ₱{((form.watch('unitPrice') || 0) * (form.watch('totalQty') || 0)).toLocaleString()}
+                  ₱{((form.watch('unitPrice') || 0) * (form.watch('total_qty') || 0)).toLocaleString()}
                 </span>
               </div>
             </CardContent>

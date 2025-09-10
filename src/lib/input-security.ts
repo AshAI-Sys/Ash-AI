@@ -130,7 +130,7 @@ export class InputSanitizer {
     }
     
     if (Array.isArray(input)) {
-      return input.map(item => this.sanitizeJson(item))
+      return input.map(item => this.sanitizeJson(_item))
     }
     
     if (typeof input === 'object' && input !== null) {

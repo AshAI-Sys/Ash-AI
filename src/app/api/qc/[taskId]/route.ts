@@ -122,9 +122,9 @@ export async function POST(
     }
 
     // Ensure quantities are valid against order quantity
-    const totalQty = task.order.quantity
+    const total_qty = task.order.quantity
 
-    if (validPassedQty + validRejectedQty > totalQty) {
+    if (validPassedQty + validRejectedQty > total_qty) {
       return NextResponse.json(
         { error: 'Total passed and rejected quantities cannot exceed order quantity' },
         { status: 400 }
@@ -136,7 +136,7 @@ export async function POST(
       const qcRecord = await tx.qCRecord.create({
         data: {
           taskId: task.id,
-          orderId: task.orderId,
+          order_id: task.order_id,
           inspectorId: session.user.id,
           status,
           passedQty: validPassedQty,
@@ -180,7 +180,7 @@ export async function POST(
 
       // Update order status
       await tx.order.update({
-        where: { id: task.orderId },
+        where: { id: task.order_id },
         data: { status: orderStatus }
       })
 
@@ -188,7 +188,7 @@ export async function POST(
       if (status === 'PASS' || status === 'PARTIAL') {
         await tx.task.updateMany({
           where: {
-            orderId: task.orderId,
+            order_id: task.order_id,
             taskType: 'FINISHING',
             status: TaskStatus.PENDING
           },

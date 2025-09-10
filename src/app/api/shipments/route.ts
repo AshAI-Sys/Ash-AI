@@ -7,13 +7,13 @@ import { prisma } from "@/lib/prisma"
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const orderId = searchParams.get("orderId")
+    const order_id = searchParams.get("order_id")
     const status = searchParams.get("status")
     const tplProvider = searchParams.get("tplProvider")
 
     const where: any = {}
     
-    if (orderId) where.orderId = orderId
+    if (order_id) where.order_id = order_id
     if (status) where.status = status
     if (tplProvider) where.tplProvider = tplProvider
 
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const {
-      orderId,
+      order_id,
       tplProvider,
       recipientName,
       recipientPhone,
@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
       const shipment = await tx.shipment.create({
         data: {
           shipmentNumber,
-          orderId,
+          order_id,
           status: "DRAFT",
           tplProvider,
           recipientName,

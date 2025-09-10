@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     }
     const { searchParams } = new URL(request.url)
     const reportType = searchParams.get("reportType")
-    const period = searchParams.get("period")
+    const _period = searchParams.get("period")
     
     const where: any = {}
     
@@ -267,7 +267,7 @@ async function generateTrialBalanceReport(period: string) {
     : new Date(parseInt(year) + 1, 0, 0)
 
   const accounts = await prisma.chartOfAccount.findMany({
-    where: { isActive: true },
+    where: { is_active: true },
     include: {
       journalEntries: {
         where: {

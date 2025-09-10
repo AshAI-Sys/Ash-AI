@@ -26,7 +26,7 @@ interface ProductionAlert {
   description: string
   affectedEntity: string
   actionRequired: string
-  createdAt: string
+  created_at: string
   data?: Record<string, unknown>
 }
 
@@ -254,7 +254,7 @@ export function ProductionAlerts({ userRole }: ProductionAlertsProps) {
                           {alert.type}
                         </Badge>
                         <span className="text-xs text-gray-500">
-                          {formatTimeAgo(alert.createdAt)}
+                          {formatTimeAgo(alert.created_at)}
                         </span>
                       </div>
                       

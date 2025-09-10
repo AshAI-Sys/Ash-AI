@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
     const order = await prisma.order.findFirst({
       where: {
         id: validatedData.order_id,
-        workspace_id: session.user.workspaceId
+        workspace_id: session.user.workspace_id
       },
       include: {
         brand: { select: { name: true, code: true } },
@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
       const inspectionRecord = await tx.qualityInspection.create({
         data: {
           id: inspectionId,
-          workspace_id: session.user.workspaceId,
+          workspace_id: session.user.workspace_id,
           order_id: validatedData.order_id,
           inspector_id: session.user.id,
           inspection_type: validatedData.inspection_type,
@@ -162,7 +162,7 @@ export async function POST(request: NextRequest) {
         await tx.qualityDefect.create({
           data: {
             id: require('nanoid').nanoid(),
-            workspace_id: session.user.workspaceId,
+            workspace_id: session.user.workspace_id,
             inspection_id: inspectionId,
             type: defect.type,
             severity: defect.severity,
@@ -187,7 +187,7 @@ export async function POST(request: NextRequest) {
         await tx.cuttingBundle.updateMany({
           where: { 
             id: bundleId,
-            workspace_id: session.user.workspaceId 
+            workspace_id: session.user.workspace_id 
           },
           data: {
             status: newStatus,
@@ -216,7 +216,7 @@ export async function POST(request: NextRequest) {
     await prisma.auditLog.create({
       data: {
         id: require('nanoid').nanoid(),
-        workspace_id: session.user.workspaceId,
+        workspace_id: session.user.workspace_id,
         actor_id: session.user.id,
         entity_type: 'quality_inspection',
         entity_id: inspection.id,
@@ -298,7 +298,7 @@ export async function PUT(request: NextRequest) {
     const inspection = await prisma.qualityInspection.findFirst({
       where: {
         id: validatedData.inspection_id,
-        workspace_id: session.user.workspaceId
+        workspace_id: session.user.workspace_id
       },
       include: {
         quality_defects: {
@@ -322,7 +322,7 @@ export async function PUT(request: NextRequest) {
       const rework = await tx.reworkOrder.create({
         data: {
           id: reworkId,
-          workspace_id: session.user.workspaceId,
+          workspace_id: session.user.workspace_id,
           inspection_id: validatedData.inspection_id,
           created_by_id: session.user.id,
           rework_type: validatedData.rework_type,
@@ -389,7 +389,7 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0')
 
     const whereConditions: any = {
-      workspace_id: session.user.workspaceId
+      workspace_id: session.user.workspace_id
     }
 
     if (order_id) whereConditions.order_id = order_id
@@ -435,7 +435,7 @@ export async function GET(request: NextRequest) {
     })
 
     // Get summary statistics
-    const summaryStats = await getQCSummary(session.user.workspaceId)
+    const summaryStats = await getQCSummary(session.user.workspace_id)
 
     return NextResponse.json({
       success: true,
@@ -495,16 +495,16 @@ async function runAshleyQualityAnalysis(params: any) {
   }
 }
 
-async function getQCSummary(workspaceId: string) {
+async function getQCSummary(workspace_id: string) {
   const [statusCounts, todayInspections, avgPassRate, defectTypes] = await Promise.all([
     prisma.qualityInspection.groupBy({
       by: ['status'],
-      where: { workspace_id: workspaceId },
+      where: { workspace_id: workspace_id },
       _count: true
     }),
     prisma.qualityInspection.count({
       where: {
-        workspace_id: workspaceId,
+        workspace_id: workspace_id,
         created_at: {
           gte: new Date(Date.now() - 24 * 60 * 60 * 1000)
         }
@@ -512,7 +512,7 @@ async function getQCSummary(workspaceId: string) {
     }),
     prisma.qualityInspection.aggregate({
       where: {
-        workspace_id: workspaceId,
+        workspace_id: workspace_id,
         created_at: {
           gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // Last 7 days
         }
@@ -523,7 +523,7 @@ async function getQCSummary(workspaceId: string) {
     }),
     prisma.qualityDefect.groupBy({
       by: ['type'],
-      where: { workspace_id: workspaceId },
+      where: { workspace_id: workspace_id },
       _count: true,
       orderBy: {
         _count: {

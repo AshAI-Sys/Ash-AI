@@ -46,8 +46,8 @@ import {
 
 interface CuttingJob {
   id: string
-  orderId: string
-  poNumber: string
+  order_id: string
+  po_number: string
   designName: string
   brand: string
   method: string
@@ -78,8 +78,8 @@ interface CuttingJob {
 const mockCuttingJobs: CuttingJob[] = [
   {
     id: 'cut_001',
-    orderId: 'order_1',
-    poNumber: 'REEF-2024-000123',
+    order_id: 'order_1',
+    po_number: 'REEF-2024-000123',
     designName: 'Corporate Logo Tee Design',
     brand: 'Reefer',
     method: 'Silkscreen',
@@ -105,8 +105,8 @@ const mockCuttingJobs: CuttingJob[] = [
   },
   {
     id: 'cut_002',
-    orderId: 'order_2',
-    poNumber: 'SORB-2024-000098',
+    order_id: 'order_2',
+    po_number: 'SORB-2024-000098',
     designName: 'Sports Jersey All-Over Print',
     brand: 'Sorbetes',
     method: 'Sublimation',
@@ -127,8 +127,8 @@ const mockCuttingJobs: CuttingJob[] = [
   },
   {
     id: 'cut_003',
-    orderId: 'order_3',
-    poNumber: 'REEF-2024-000124',
+    order_id: 'order_3',
+    po_number: 'REEF-2024-000124',
     designName: 'Event Merchandise Design',
     brand: 'Reefer',
     method: 'DTF',
@@ -155,8 +155,8 @@ const mockCuttingJobs: CuttingJob[] = [
   },
   {
     id: 'cut_004',
-    orderId: 'order_4',
-    poNumber: 'SORB-2024-000099',
+    order_id: 'order_4',
+    po_number: 'SORB-2024-000099',
     designName: 'Premium Hoodie Embroidery',
     brand: 'Sorbetes',
     method: 'Embroidery',
@@ -201,7 +201,7 @@ export default function CuttingPage() {
 
   const filteredJobs = jobs.filter(job => {
     const matchesSearch = job.designName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         job.poNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         job.po_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          job.brand.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesStatus = statusFilter === 'all' || job.status === statusFilter
     const matchesPriority = priorityFilter === 'all' || job.priority === priorityFilter
@@ -448,7 +448,7 @@ export default function CuttingPage() {
                       {job.designName}
                     </CardTitle>
                     <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 text-xs md:text-sm text-gray-600">
-                      <span>{job.poNumber}</span>
+                      <span>{job.po_number}</span>
                       <span className="hidden sm:inline">•</span>
                       <span>{job.brand}</span>
                     </div>

@@ -70,22 +70,22 @@ export async function GET(request: NextRequest) {
     }
 
     const url = new URL(request.url)
-    const workspaceId = url.searchParams.get('workspace_id')
+    const workspace_id = url.searchParams.get('workspace_id')
     const type = url.searchParams.get('type') || 'alerts' // 'alerts' or 'rules'
     const status = url.searchParams.get('status')
     const severity = url.searchParams.get('severity')
-    const category = url.searchParams.get('category')
+    const _category = url.searchParams.get('category')
     const limit = parseInt(url.searchParams.get('limit') || '50')
     const offset = parseInt(url.searchParams.get('offset') || '0')
 
-    if (!workspaceId) {
+    if (!workspace_id) {
       return NextResponse.json({ error: 'Workspace ID required' }, { status: 400 })
     }
 
     // Verify workspace access
-    const workspace = await secureDb.getPrisma().workspace.findFirst({
+    const _workspace = await secureDb.getPrisma().workspace.findFirst({
       where: {
-        id: workspaceId,
+        id: workspace_id,
         OR: [
           { owner_id: user.id },
           { members: { some: { user_id: user.id } } }
@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
     if (type === 'rules') {
       // Get alert rules
       const alertRules = await secureDb.getPrisma().alertRule.findMany({
-        where: { workspace_id: workspaceId },
+        where: { workspace_id: workspace_id },
         orderBy: { created_at: 'desc' },
         take: limit,
         skip: offset,
@@ -134,7 +134,7 @@ export async function GET(request: NextRequest) {
 
     // Get alerts
     const whereClause: any = {
-      workspace_id: workspaceId
+      workspace_id: workspace_id
     }
 
     if (status) {
@@ -179,7 +179,7 @@ export async function GET(request: NextRequest) {
     })
 
     // Get alert statistics
-    const alertStats = await getAlertStatistics(workspaceId)
+    const alertStats = await getAlertStatistics(workspace_id)
 
     return NextResponse.json({
       alerts,
@@ -298,7 +298,7 @@ async function createAlertRule(ruleData: any, user: any, request: NextRequest) {
   const validatedData = alertRuleSchema.parse(ruleData)
 
   // Verify workspace access
-  const workspace = await secureDb.getPrisma().workspace.findFirst({
+  const _workspace = await secureDb.getPrisma().workspace.findFirst({
     where: {
       id: validatedData.workspace_id,
       OR: [
@@ -363,7 +363,7 @@ async function createAlert(alertData: any, user: any, request: NextRequest) {
   const validatedData = alertSchema.parse(alertData)
 
   // Verify workspace access
-  const workspace = await secureDb.getPrisma().workspace.findFirst({
+  const _workspace = await secureDb.getPrisma().workspace.findFirst({
     where: {
       id: validatedData.workspace_id,
       OR: [
@@ -422,12 +422,12 @@ async function createAlert(alertData: any, user: any, request: NextRequest) {
 }
 
 // Alert actions
-async function acknowledgeAlert(alertId: string, userId: string, comment?: string) {
+async function acknowledgeAlert(alertId: string, user_id: string, comment?: string) {
   // Create acknowledgment record
   await secureDb.getPrisma().alertAcknowledgment.create({
     data: {
       alert_id: alertId,
-      user_id: userId,
+      user_id: user_id,
       comment: comment || null
     }
   })
@@ -438,24 +438,24 @@ async function acknowledgeAlert(alertId: string, userId: string, comment?: strin
     data: {
       status: 'ACKNOWLEDGED',
       acknowledged_at: new Date(),
-      acknowledged_by: userId
+      acknowledged_by: user_id
     }
   })
 }
 
-async function resolveAlert(alertId: string, userId: string, resolutionNote?: string) {
+async function resolveAlert(alertId: string, user_id: string, resolutionNote?: string) {
   await secureDb.getPrisma().alert.update({
     where: { id: alertId },
     data: {
       status: 'RESOLVED',
       resolved_at: new Date(),
-      resolved_by: userId,
+      resolved_by: user_id,
       resolution_note: resolutionNote || null
     }
   })
 }
 
-async function escalateAlert(alertId: string, userId: string, escalationReason?: string) {
+async function escalateAlert(alertId: string, user_id: string, escalationReason?: string) {
   // Get current alert
   const alert = await secureDb.getPrisma().alert.findUnique({
     where: { id: alertId },
@@ -468,7 +468,7 @@ async function escalateAlert(alertId: string, userId: string, escalationReason?:
   await secureDb.getPrisma().alertEscalation.create({
     data: {
       alert_id: alertId,
-      escalated_by: userId,
+      escalated_by: user_id,
       reason: escalationReason || null,
       previous_severity: alert.severity
     }
@@ -482,7 +482,7 @@ async function escalateAlert(alertId: string, userId: string, escalationReason?:
     data: {
       severity: newSeverity,
       escalated_at: new Date(),
-      escalated_by: userId
+      escalated_by: user_id
     }
   })
 
@@ -492,13 +492,13 @@ async function escalateAlert(alertId: string, userId: string, escalationReason?:
   }
 }
 
-async function snoozeAlert(alertId: string, userId: string, snoozeUntil: Date) {
+async function snoozeAlert(alertId: string, user_id: string, snoozeUntil: Date) {
   await secureDb.getPrisma().alert.update({
     where: { id: alertId },
     data: {
       status: 'SNOOZED',
       snoozed_until: snoozeUntil,
-      snoozed_by: userId
+      snoozed_by: user_id
     }
   })
 }
@@ -543,7 +543,7 @@ async function evaluateAlertRule(alertRule: any) {
       })
 
       // Send notifications
-      const workspace = await secureDb.getPrisma().workspace.findUnique({
+      const _workspace = await secureDb.getPrisma().workspace.findUnique({
         where: { id: alertRule.workspace_id }
       })
       
@@ -606,7 +606,7 @@ async function sendEscalationNotifications(alert: any, newSeverity: string) {
 }
 
 // Helper functions
-async function getAlertStatistics(workspaceId: string) {
+async function getAlertStatistics(workspace_id: string) {
   const now = new Date()
   const last24h = new Date(new Date(now).getTime() - 24 * 60 * 60 * 1000)
   const last7d = new Date(new Date(now).getTime() - 7 * 24 * 60 * 60 * 1000)
@@ -619,12 +619,12 @@ async function getAlertStatistics(workspaceId: string) {
     alerts7d,
     resolvedAlerts
   ] = await Promise.all([
-    secureDb.getPrisma().alert.count({ where: { workspace_id: workspaceId } }),
-    secureDb.getPrisma().alert.count({ where: { workspace_id: workspaceId, status: 'OPEN' } }),
-    secureDb.getPrisma().alert.count({ where: { workspace_id: workspaceId, severity: 'CRITICAL', status: { in: ['OPEN', 'ACKNOWLEDGED'] } } }),
-    secureDb.getPrisma().alert.count({ where: { workspace_id: workspaceId, created_at: { gte: last24h } } }),
-    secureDb.getPrisma().alert.count({ where: { workspace_id: workspaceId, created_at: { gte: last7d } } }),
-    secureDb.getPrisma().alert.count({ where: { workspace_id: workspaceId, status: 'RESOLVED' } })
+    secureDb.getPrisma().alert.count({ where: { workspace_id: workspace_id } }),
+    secureDb.getPrisma().alert.count({ where: { workspace_id: workspace_id, status: 'OPEN' } }),
+    secureDb.getPrisma().alert.count({ where: { workspace_id: workspace_id, severity: 'CRITICAL', status: { in: ['OPEN', 'ACKNOWLEDGED'] } } }),
+    secureDb.getPrisma().alert.count({ where: { workspace_id: workspace_id, created_at: { gte: last24h } } }),
+    secureDb.getPrisma().alert.count({ where: { workspace_id: workspace_id, created_at: { gte: last7d } } }),
+    secureDb.getPrisma().alert.count({ where: { workspace_id: workspace_id, status: 'RESOLVED' } })
   ])
 
   return {
@@ -682,7 +682,7 @@ function generateAlertMessage(alertRule: any, currentValue: number): string {
 }
 
 // Placeholder implementations for metric collection and notification sending
-async function getCurrentMetricValue(metric: string, workspaceId: string): Promise<number> {
+async function getCurrentMetricValue(metric: string, workspace_id: string): Promise<number> {
   // Implementation would query the actual metric from the system
   // This is a placeholder that returns a random value for demonstration
   return Math.random() * 100

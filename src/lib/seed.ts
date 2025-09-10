@@ -1,4 +1,4 @@
-import { PrismaClient, Role, WorkcenterType } from '@prisma/client'
+import { PrismaClient, Role } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
@@ -8,14 +8,14 @@ async function main() {
   console.log('🤖 Loading Neural Network Components...')
 
   const hashedPassword = await bcrypt.hash('admin123', 10)
-  const workspaceId = 'ash_ai_main_workspace'
+  const workspace_id = 'ash_ai_main_workspace'
 
   // Create workspace first
-  const workspace = await prisma.workspace.upsert({
-    where: { id: workspaceId },
+  const _workspace = await prisma.workspace.upsert({
+    where: { id: workspace_id },
     update: {},
     create: {
-      id: workspaceId,
+      id: workspace_id,
       name: 'ASH AI Main Workspace',
       settings: {
         theme: 'futuristic',
@@ -27,7 +27,7 @@ async function main() {
   // 🧠 Create AI-Enhanced User Accounts
   console.log('🧠 Creating AI-Enhanced User Accounts...')
   
-  const admin = await prisma.user.upsert({
+  const _admin = await prisma.user.upsert({
     where: { email: 'admin@ash-ai.com' },
     update: {},
     create: {
@@ -42,11 +42,11 @@ async function main() {
         user_management: true,
         financial_access: true
       },
-      workspace_id: workspaceId,
+      workspace_id: workspace_id,
     },
   })
 
-  const manager = await prisma.user.upsert({
+  const _manager = await prisma.user.upsert({
     where: { email: 'manager@ash-ai.com' },
     update: {},
     create: {
@@ -61,11 +61,11 @@ async function main() {
         team_management: true,
         quality_oversight: true
       },
-      workspace_id: workspaceId,
+      workspace_id: workspace_id,
     },
   })
 
-  const ashley_ai = await prisma.user.upsert({
+  const _ashley_ai = await prisma.user.upsert({
     where: { email: 'ashley@ash-ai.com' },
     update: {},
     create: {
@@ -79,7 +79,7 @@ async function main() {
         optimization_engine: true,
         neural_insights: true
       },
-      workspace_id: workspaceId,
+      workspace_id: workspace_id,
     },
   })
 
@@ -91,7 +91,7 @@ async function main() {
       full_name: 'Graphic Artist',
       password: hashedPassword,
       role: Role.GRAPHIC_ARTIST,
-      workspace_id: workspaceId,
+      workspace_id: workspace_id,
     },
   })
 
@@ -103,7 +103,7 @@ async function main() {
       full_name: 'Sewing Operator',
       password: hashedPassword,
       role: Role.SEWING_OPERATOR,
-      workspace_id: workspaceId,
+      workspace_id: workspace_id,
     },
   })
 
@@ -115,35 +115,35 @@ async function main() {
       full_name: 'QC Inspector',
       password: hashedPassword,
       role: Role.QC_INSPECTOR,
-      workspace_id: workspaceId,
+      workspace_id: workspace_id,
     },
   })
 
-  const reefer = await prisma.brand.upsert({
+  const _reefer = await prisma.brand.upsert({
     where: { 
       workspace_id_code: {
-        workspace_id: workspaceId,
+        workspace_id: workspace_id,
         code: 'REF'
       }
     },
     update: {},
     create: {
-      workspace_id: workspaceId,
+      workspace_id: workspace_id,
       name: 'Reefer',
       code: 'REF',
     },
   })
 
-  const sorbetes = await prisma.brand.upsert({
+  const _sorbetes = await prisma.brand.upsert({
     where: { 
       workspace_id_code: {
-        workspace_id: workspaceId,
+        workspace_id: workspace_id,
         code: 'SOR'
       }
     },
     update: {},
     create: {
-      workspace_id: workspaceId,
+      workspace_id: workspace_id,
       name: 'Sorbetes',
       code: 'SOR',
     },
@@ -154,7 +154,7 @@ async function main() {
     where: { sku: 'CT-WHT-001' },
     update: {},
     create: {
-      workspace_id: workspaceId,
+      workspace_id: workspace_id,
       name: 'White Cotton T-Shirt',
       sku: 'CT-WHT-001',
       category: 'Apparel',
@@ -168,7 +168,7 @@ async function main() {
     where: { sku: 'CT-BLK-001' },
     update: {},
     create: {
-      workspace_id: workspaceId,
+      workspace_id: workspace_id,
       name: 'Black Cotton T-Shirt',
       sku: 'CT-BLK-001',
       category: 'Apparel',
@@ -182,7 +182,7 @@ async function main() {
     where: { sku: 'INK-BLU-001' },
     update: {},
     create: {
-      workspace_id: workspaceId,
+      workspace_id: workspace_id,
       name: 'Screen Printing Ink - Blue',
       sku: 'INK-BLU-001',
       category: 'Printing Materials',
@@ -194,12 +194,12 @@ async function main() {
 
   console.log('💰 Creating Wallets...')
   // Check if wallets already exist
-  const walletCount = await prisma.wallet.count({ where: { workspace_id: workspaceId } })
+  const walletCount = await prisma.wallet.count({ where: { workspace_id: workspace_id } })
   if (walletCount === 0) {
     await prisma.wallet.createMany({
       data: [
-        { workspace_id: workspaceId, balance: 50000.00 },
-        { workspace_id: workspaceId, balance: 15000.00 },
+        { workspace_id: workspace_id, balance: 50000.00 },
+        { workspace_id: workspace_id, balance: 15000.00 },
       ],
     })
   }
@@ -209,7 +209,7 @@ async function main() {
     where: { plate_no: 'ABC-123' },
     update: {},
     create: {
-      workspace_id: workspaceId,
+      workspace_id: workspace_id,
       plate_no: 'ABC-123',
       type: 'Van',
     },
@@ -219,7 +219,7 @@ async function main() {
     where: { plate_no: 'DEF-456' },
     update: {},
     create: {
-      workspace_id: workspaceId,
+      workspace_id: workspace_id,
       plate_no: 'DEF-456',
       type: 'Motorcycle',
     },

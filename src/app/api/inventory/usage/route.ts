@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '20')
-    const orderId = searchParams.get('orderId')
+    const order_id = searchParams.get('order_id')
     const taskId = searchParams.get('taskId')
     const inventoryId = searchParams.get('inventoryId')
     const dateFrom = searchParams.get('dateFrom')
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
 
     const where: Prisma.UsageRecordWhereInput = {}
 
-    if (orderId) where.orderId = orderId
+    if (order_id) where.order_id = order_id
     if (taskId) where.taskId = taskId
     if (inventoryId) where.inventoryId = inventoryId
     
@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const {
       inventoryId,
-      orderId,
+      order_id,
       taskId,
       quantityUsed,
       notes
@@ -193,9 +193,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate order/task if provided
-    if (orderId) {
+    if (order_id) {
       const order = await prisma.order.findUnique({
-        where: { id: orderId }
+        where: { id: order_id }
       })
       if (!order) {
         return NextResponse.json(
@@ -226,7 +226,7 @@ export async function POST(request: NextRequest) {
       const usageRecord = await tx.materialUsage.create({
         data: {
           inventoryId,
-          orderId: orderId || null,
+          order_id: order_id || null,
           taskId: taskId || null,
           quantityUsed: quantityNum,
           unitCost,
@@ -250,10 +250,10 @@ export async function POST(request: NextRequest) {
           inventoryId,
           type: 'OUT',
           quantity: Math.floor(quantityNum), // Round down for discrete units
-          reason: orderId 
-            ? `Used for order ${orderId}${taskId ? ` (Task: ${taskId})` : ''}` 
+          reason: order_id 
+            ? `Used for order ${order_id}${taskId ? ` (Task: ${taskId})` : ''}` 
             : `Material usage${taskId ? ` (Task: ${taskId})` : ''}`,
-          reference: orderId || taskId || `USAGE_${usageRecord.id}`
+          reference: order_id || taskId || `USAGE_${usageRecord.id}`
         }
       })
 

@@ -109,7 +109,7 @@ async function handleReconcile(body: any) {
         results.push({ 
           saleId, 
           status: 'reconciled', 
-          orderId: matchingOrder.id,
+          order_id: matchingOrder.id,
           orderNumber: matchingOrder.orderNumber 
         })
         reconciledCount++
@@ -184,7 +184,7 @@ async function handleCreateOrder(body: any) {
     data: {
       orderNumber: `LS-${Date.now()}`,
       clientName: `${sale.platform.name} Customer`,
-      brandId: await getDefaultBrandId(),
+      brand_id: await getDefaultBrandId(),
       designName: orderData.designName,
       apparelType: orderData.apparelType,
       quantity: sale.quantity,
@@ -283,7 +283,7 @@ async function handleReturn(body: any) {
     await prisma.rMARequest.create({
       data: {
         rmaNumber: `RMA-LS-${Date.now()}`,
-        clientId: client.id,
+        client_id: client.id,
         reason: returnData?.reason || 'Platform return',
         quantity: sale.quantity,
         condition: returnData?.condition || 'USED',
@@ -338,7 +338,7 @@ async function getSystemUserId() {
   return user?.id || 'system'
 }
 
-async function createProductionTasks(orderId: string, printMethod: string) {
+async function createProductionTasks(order_id: string, printMethod: string) {
   const tasks = [
     { type: 'DESIGN_APPROVAL', description: 'Review and approve design for live selling order' },
     { type: 'MATERIAL_PREPARATION', description: 'Prepare materials for production' },
@@ -350,7 +350,7 @@ async function createProductionTasks(orderId: string, printMethod: string) {
   for (let i = 0; i < tasks.length; i++) {
     await prisma.task.create({
       data: {
-        orderId,
+        order_id,
         taskType: tasks[i].type,
         description: tasks[i].description,
         status: 'OPEN',

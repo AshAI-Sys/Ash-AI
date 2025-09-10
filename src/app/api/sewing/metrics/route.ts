@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth'
-import { Role } from '@prisma/client'
+
 import { db } from '@/lib/db'
 import { analyzeLineEfficiency, calculateSewingPayrollAccruals } from '@/lib/sewing-calculations'
 // Sewing Metrics API for Stage 5 Sewing System

@@ -389,7 +389,7 @@ export default function OrdersPageOptimized() {
                             <td className="p-4">
                               <div className="font-mono text-white">{order.orderNumber}</div>
                               <div className="text-xs text-cyan-400">
-                                Created {formatDate(order.createdAt)}
+                                Created {formatDate(order.created_at)}
                               </div>
                             </td>
                             <td className="p-4">

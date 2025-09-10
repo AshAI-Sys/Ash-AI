@@ -2,7 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { NextRequest } from 'next/server';
 
 export interface AuditContext {
-  userId?: string;
+  user_id?: string;
   sessionId?: string;
   ipAddress?: string;
   userAgent?: string;
@@ -33,7 +33,7 @@ export class AuditLogger {
 
       await prisma.auditLog.create({
         data: {
-          userId: context.userId,
+          user_id: context.user_id,
           action: event.action,
           entity: event.entity,
           entityId: event.entityId,
@@ -56,43 +56,43 @@ export class AuditLogger {
     }
   }
 
-  static async logLogin(userId: string, success: boolean, context: AuditContext): Promise<void> {
+  static async logLogin(user_id: string, success: boolean, context: AuditContext): Promise<void> {
     await this.log({
       action: success ? 'LOGIN_SUCCESS' : 'LOGIN_FAILED',
       entity: 'User',
-      entityId: userId,
+      entityId: user_id,
       metadata: { success },
       severity: success ? 'LOW' : 'MEDIUM',
       category: 'AUTHENTICATION'
     }, context);
   }
 
-  static async logLogout(userId: string, context: AuditContext): Promise<void> {
+  static async logLogout(user_id: string, context: AuditContext): Promise<void> {
     await this.log({
       action: 'LOGOUT',
       entity: 'User',
-      entityId: userId,
+      entityId: user_id,
       severity: 'LOW',
       category: 'AUTHENTICATION'
     }, context);
   }
 
-  static async log2FASetup(userId: string, success: boolean, context: AuditContext): Promise<void> {
+  static async log2FASetup(user_id: string, success: boolean, context: AuditContext): Promise<void> {
     await this.log({
       action: success ? '2FA_ENABLED' : '2FA_SETUP_FAILED',
       entity: 'TwoFactorAuth',
-      entityId: userId,
+      entityId: user_id,
       metadata: { success },
       severity: success ? 'MEDIUM' : 'HIGH',
       category: 'SECURITY'
     }, context);
   }
 
-  static async log2FADisable(userId: string, context: AuditContext): Promise<void> {
+  static async log2FADisable(user_id: string, context: AuditContext): Promise<void> {
     await this.log({
       action: '2FA_DISABLED',
       entity: 'TwoFactorAuth',
-      entityId: userId,
+      entityId: user_id,
       severity: 'HIGH',
       category: 'SECURITY'
     }, context);
@@ -102,7 +102,7 @@ export class AuditLogger {
     entity: string,
     entityId: string,
     data: Record<string, any>,
-    userId?: string,
+    user_id?: string,
     context: AuditContext = {}
   ): Promise<void> {
     await this.log({
@@ -112,7 +112,7 @@ export class AuditLogger {
       newValues: data,
       severity: 'LOW',
       category: 'DATA_CHANGE'
-    }, { ...context, userId });
+    }, { ...context, user_id });
   }
 
   static async logDataUpdate(
@@ -120,7 +120,7 @@ export class AuditLogger {
     entityId: string,
     oldData: Record<string, any>,
     newData: Record<string, any>,
-    userId?: string,
+    user_id?: string,
     context: AuditContext = {}
   ): Promise<void> {
     const changes = this.getChanges(oldData, newData);
@@ -133,14 +133,14 @@ export class AuditLogger {
       newValues: changes.new,
       severity: this.determineSeverity(entity, changes),
       category: 'DATA_CHANGE'
-    }, { ...context, userId });
+    }, { ...context, user_id });
   }
 
   static async logDataDelete(
     entity: string,
     entityId: string,
     data: Record<string, any>,
-    userId?: string,
+    user_id?: string,
     context: AuditContext = {}
   ): Promise<void> {
     await this.log({
@@ -150,13 +150,13 @@ export class AuditLogger {
       oldValues: data,
       severity: 'MEDIUM',
       category: 'DATA_CHANGE'
-    }, { ...context, userId });
+    }, { ...context, user_id });
   }
 
   static async logAccessDenied(
     resource: string,
     action: string,
-    userId?: string,
+    user_id?: string,
     context: AuditContext = {}
   ): Promise<void> {
     await this.log({
@@ -165,14 +165,14 @@ export class AuditLogger {
       metadata: { attemptedAction: action },
       severity: 'MEDIUM',
       category: 'AUTHORIZATION'
-    }, { ...context, userId });
+    }, { ...context, user_id });
   }
 
   static async logFinancialTransaction(
     transactionType: string,
     amount: number,
     walletId: string,
-    userId?: string,
+    user_id?: string,
     context: AuditContext = {}
   ): Promise<void> {
     await this.log({
@@ -182,7 +182,7 @@ export class AuditLogger {
       metadata: { amount, transactionType },
       severity: amount > 10000 ? 'HIGH' : 'MEDIUM',
       category: 'DATA_CHANGE'
-    }, { ...context, userId });
+    }, { ...context, user_id });
   }
 
   static async logInventoryChange(
@@ -190,7 +190,7 @@ export class AuditLogger {
     type: string,
     quantity: number,
     reason: string,
-    userId?: string,
+    user_id?: string,
     context: AuditContext = {}
   ): Promise<void> {
     await this.log({
@@ -200,7 +200,7 @@ export class AuditLogger {
       metadata: { type, quantity, reason },
       severity: 'LOW',
       category: 'DATA_CHANGE'
-    }, { ...context, userId });
+    }, { ...context, user_id });
   }
 
   static async logSystemEvent(
@@ -221,7 +221,7 @@ export class AuditLogger {
     event: string,
     entityId?: string,
     metadata?: Record<string, any>,
-    userId?: string,
+    user_id?: string,
     context: AuditContext = {}
   ): Promise<void> {
     await this.log({
@@ -231,7 +231,7 @@ export class AuditLogger {
       metadata,
       severity: 'HIGH',
       category: 'SECURITY'
-    }, { ...context, userId });
+    }, { ...context, user_id });
   }
 
   private static sanitizeValues(values?: Record<string, any>): Record<string, any> | null {
@@ -337,7 +337,7 @@ export class AuditLogger {
       action: event.action,
       entity: event.entity,
       entityId: event.entityId,
-      userId: context.userId,
+      user_id: context.user_id,
       ipAddress: this.extractIpAddress(context),
       timestamp: new Date().toISOString()
     });
@@ -354,7 +354,7 @@ export class AuditLogger {
       timestamp: new Date().toISOString(),
       event,
       context: {
-        userId: context.userId,
+        user_id: context.user_id,
         ipAddress: this.extractIpAddress(context),
         userAgent: this.extractUserAgent(context)
       },
@@ -369,7 +369,7 @@ export class AuditLogger {
   static async getAuditTrail(
     entityType?: string,
     entityId?: string,
-    userId?: string,
+    user_id?: string,
     dateRange?: { from: Date; to: Date },
     limit: number = 100
   ) {
@@ -377,7 +377,7 @@ export class AuditLogger {
 
     if (entityType) where.entity = entityType;
     if (entityId) where.entityId = entityId;
-    if (userId) where.userId = userId;
+    if (user_id) where.user_id = user_id;
     if (dateRange) {
       where.timestamp = {
         gte: dateRange.from,

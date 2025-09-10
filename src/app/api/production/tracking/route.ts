@@ -61,7 +61,7 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
 
     return createSuccessResponse(productionData);
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Production Tracking API Error:', error);
     throw Errors.DATABASE_ERROR;
   }
@@ -85,7 +85,7 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
 
   try {
     const workspace_id = 'default';
-    const userId = session.user.id;
+    const user_id = session.user.id;
 
     // Update production tracking with stage transition
     const updatedTracking = await db.$transaction(async (tx) => {
@@ -106,15 +106,15 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
             stage: validatedData.stage,
             status: validatedData.status,
             started_at: validatedData.status === 'IN_PROGRESS' ? new Date() : null,
-            started_by: validatedData.status === 'IN_PROGRESS' ? userId : null,
+            started_by: validatedData.status === 'IN_PROGRESS' ? user_id : null,
             completed_at: validatedData.status === 'COMPLETED' ? new Date() : null,
-            completed_by: validatedData.status === 'COMPLETED' ? userId : null,
+            completed_by: validatedData.status === 'COMPLETED' ? user_id : null,
             notes: validatedData.notes,
             quality_score: validatedData.quality_score,
             efficiency_percentage: validatedData.efficiency_percentage,
             defect_count: validatedData.defect_count || 0,
             machine_id: validatedData.machine_id,
-            operator_id: validatedData.operator_id || userId,
+            operator_id: validatedData.operator_id || user_id,
             workspace_id
           }
         });
@@ -133,12 +133,12 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
         // Set timestamps based on status
         if (validatedData.status === 'IN_PROGRESS' && !tracking.started_at) {
           updateData.started_at = new Date();
-          updateData.started_by = userId;
+          updateData.started_by = user_id;
         }
         
         if (validatedData.status === 'COMPLETED') {
           updateData.completed_at = new Date();
-          updateData.completed_by = userId;
+          updateData.completed_by = user_id;
           updateData.actual_duration = tracking.started_at 
             ? Math.round((Date.now() - tracking.started_at.getTime()) / 60000) // minutes
             : null;
@@ -156,7 +156,7 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
           production_tracking_id: tracking.id,
           stage: validatedData.stage,
           status: validatedData.status,
-          changed_by: userId,
+          changed_by: user_id,
           notes: validatedData.notes || `Status changed to ${validatedData.status}`,
           quality_score: validatedData.quality_score,
           efficiency_percentage: validatedData.efficiency_percentage,
@@ -173,7 +173,7 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
       await tx.auditLog.create({
         data: {
           workspace_id,
-          actor_id: userId,
+          actor_id: user_id,
           entity_type: 'PRODUCTION_TRACKING',
           entity_id: tracking.id,
           action: 'UPDATE',
@@ -203,7 +203,7 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
       'Production tracking updated successfully'
     );
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Production Tracking Update Error:', error);
     throw error;
   }

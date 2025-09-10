@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth'
-import { Role } from '@prisma/client'
+
 import { prisma } from '@/lib/prisma'
 import { EventBus } from '@/lib/ash/event-bus'
 import { randomUUID } from 'crypto'
@@ -51,8 +49,7 @@ export async function POST(
     // Check if already has pending approval for current version
     const existingApproval = await prisma.designApproval.findFirst({
       where: {
-        assetId,
-        version: designAsset.currentVersion,
+        design_asset_id: assetId,
         status: 'SENT'
       }
     })
@@ -67,17 +64,16 @@ export async function POST(
     // Create approval record
     const approval = await prisma.designApproval.create({
       data: {
-        assetId,
-        version: designAsset.currentVersion,
-        clientId: client_id,
-        esignEnvelopeId: require_esign ? `pending-${randomUUID()}` : null
+        design_asset_id: assetId,
+        client_id: client_id,
+        status: require_esign ? 'PENDING' : 'SENT'
       }
     })
 
     // Update design asset status
     await prisma.designAsset.update({
       where: { id: assetId },
-      data: { status: 'PENDING_APPROVAL' }
+      data: { approval_status: 'PENDING' }
     })
 
     // Generate portal link (magic link)
@@ -85,12 +81,11 @@ export async function POST(
     const expiresAt = new Date()
     expiresAt.setHours(expiresAt.getHours() + 72) // 3 days expiry
 
-    await prisma.portalSession.create({
+    await prisma.clientPortalSession.create({
       data: {
-        clientId: client_id,
-        brandId: designAsset.order.brandId,
-        token: portalToken,
-        expiresAt
+        client_user_id: client_id,
+        session_token: portalToken,
+        expires_at: expiresAt
       }
     })
 
@@ -100,10 +95,10 @@ export async function POST(
     await EventBus.emit('ash.design.approval.sent', {
       approval_id: approval.id,
       asset_id: assetId,
-      version: designAsset.currentVersion,
+      version: designAsset.version,
       client_id,
-      brand_id: designAsset.order.brandId,
-      order_id: designAsset.orderId,
+      brand_id: designAsset.order.brand_id,
+      order_id: designAsset.order_id,
       portal_link: portalLink,
       require_esign
     })

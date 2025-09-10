@@ -4,9 +4,9 @@
 export interface OrderData {
   id: string
   status: string
-  totalQty: number
+  total_qty: number
   created_at: string
-  targetDeliveryDate: string
+  target_delivery_date: string
   method: string
   complexity: number
   clientHistory?: ClientHistory
@@ -89,9 +89,9 @@ export class ASHAIEngine {
                         (methodMultipliers[order.method as keyof typeof methodMultipliers] || 1.2)
 
     // Quantity impact
-    if (order.totalQty > 500) {
-      baseProductionDays += Math.ceil(order.totalQty / 500) * 2
-      factors.push(`Large quantity (${order.totalQty}) adds ${Math.ceil(order.totalQty / 500) * 2} days`)
+    if (order.total_qty > 500) {
+      baseProductionDays += Math.ceil(order.total_qty / 500) * 2
+      factors.push(`Large quantity (${order.total_qty}) adds ${Math.ceil(order.total_qty / 500) * 2} days`)
     }
 
     // Complexity impact
@@ -176,8 +176,8 @@ export class ASHAIEngine {
     const riskFactors: string[] = []
     const mitigations: string[] = []
 
-    const _targetDate = new Date(order.targetDeliveryDate)
-    const created = new Date(order.createdAt)
+    const _targetDate = new Date(order.target_delivery_date)
+    const created = new Date(order.created_at)
     const timeToDelivery = (new Date(targetDate).getTime() - new Date(created).getTime()) / (1000 * 60 * 60 * 24)
 
     // Time pressure analysis
@@ -196,9 +196,9 @@ export class ASHAIEngine {
     }
 
     // Quantity risk
-    if (order.totalQty > 1000) {
+    if (order.total_qty > 1000) {
       riskScore += 15
-      riskFactors.push(`Large quantity (${order.totalQty}) increases complexity`)
+      riskFactors.push(`Large quantity (${order.total_qty}) increases complexity`)
       mitigations.push('Consider batch production and staggered delivery')
     }
 
@@ -265,7 +265,7 @@ export class ASHAIEngine {
     const insights: AIInsight[] = []
 
     // Capacity optimization
-    const totalQty = orders.reduce((sum, order) => sum + order.totalQty, 0)
+    const total_qty = orders.reduce((sum, order) => sum + order.total_qty, 0)
     const capacityUtilization = this.productionMetrics.currentCapacity / this.productionMetrics.maxCapacity
 
     if (capacityUtilization > 0.9) {
@@ -325,7 +325,7 @@ export class ASHAIEngine {
     // Delivery predictions
     const urgentOrders = orders.filter(order => {
       const prediction = this.predictDeliveryDate(order)
-      const _targetDate = new Date(order.targetDeliveryDate)
+      const _targetDate = new Date(order.target_delivery_date)
       const predictedDate = new Date(prediction.estimatedDate)
       return targetDate < predictedDate
     })
@@ -420,8 +420,8 @@ export class ASHAIEngine {
     factors.push(`Base ${order.method} rate: ₱${basePrice}`)
 
     // Quantity discounts
-    if (order.totalQty > 100) {
-      const discount = Math.min(0.25, order.totalQty / 1000)
+    if (order.total_qty > 100) {
+      const discount = Math.min(0.25, order.total_qty / 1000)
       basePrice *= (1 - discount)
       factors.push(`Volume discount: ${Math.round(discount * 100)}%`)
     }
@@ -434,7 +434,7 @@ export class ASHAIEngine {
     }
 
     // Rush order premium
-    const _targetDate = new Date(order.targetDeliveryDate)
+    const _targetDate = new Date(order.target_delivery_date)
     const prediction = this.predictDeliveryDate(order)
     const predictedDate = new Date(prediction.estimatedDate)
     const daysDiff = (new Date(targetDate).getTime() - new Date(predictedDate).getTime()) / (1000 * 60 * 60 * 24)
@@ -480,7 +480,7 @@ export class ASHAIEngine {
     const methodHours = baseHours[order.method as keyof typeof baseHours] || 0.6
     const complexityMultiplier = 1 + ((order.complexity || 5) / 10)
     
-    return order.totalQty * methodHours * complexityMultiplier
+    return order.total_qty * methodHours * complexityMultiplier
   }
 
   private getCompetitiveAnalysis(price: number, method: string): string {

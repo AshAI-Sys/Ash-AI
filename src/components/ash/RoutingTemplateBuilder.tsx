@@ -89,20 +89,20 @@ const workcenters = [
 ]
 
 interface RoutingTemplateBuilderProps {
-  templateId?: string
+  template_id?: string
   method?: string
   onSave?: (template: RouteTemplate) => void
   onCancel?: () => void
 }
 
 export function RoutingTemplateBuilder({ 
-  templateId, 
+  template_id, 
   method = 'SILKSCREEN', 
   onSave, 
   onCancel 
 }: RoutingTemplateBuilderProps) {
   const [template, setTemplate] = useState<RouteTemplate>({
-    id: templateId || 'new-template',
+    id: template_id || 'new-template',
     template_key: '',
     name: '',
     method: method,
@@ -117,17 +117,17 @@ export function RoutingTemplateBuilder({
   const [ashleyAnalysis, setAshleyAnalysis] = useState<any>(null)
 
   useEffect(() => {
-    if (templateId) {
+    if (template_id) {
       loadTemplate()
     } else {
       // Load default template for method
       loadDefaultTemplate()
     }
-  }, [templateId, method])
+  }, [template_id, method])
 
   const loadTemplate = async () => {
     try {
-      const response = await fetch(`/api/ash/routing-templates/${templateId}`)
+      const response = await fetch(`/api/ash/routing-templates/${template_id}`)
       if (response.ok) {
         const data = await response.json()
         setTemplate(data.template)
@@ -326,7 +326,7 @@ export function RoutingTemplateBuilder({
     setSaving(true)
     try {
       const response = await fetch('/api/ash/routing-templates', {
-        method: templateId ? 'PUT' : 'POST',
+        method: template_id ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(template)
       })

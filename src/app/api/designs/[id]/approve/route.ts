@@ -16,7 +16,7 @@ interface RouteParams {
 // POST /api/designs/[id]/approve - Submit design approval
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
-    const { id: designId } = await params
+    const { id: design_id } = await params
     const body = await request.json()
     const {
       client_id,
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     // Validate design exists
     const design = await db.designAsset.findUnique({
-      where: { id: designId },
+      where: { id: design_id },
       include: {
         order: {
           include: {
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // Check if approval already exists
     const existingApproval = await db.designApproval.findFirst({
       where: {
-        design_asset_id: designId,
+        design_asset_id: design_id,
         client_id
       }
     })
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       // Create new approval
       approval = await db.designApproval.create({
         data: {
-          design_asset_id: designId,
+          design_asset_id: design_id,
           client_id,
           status,
           feedback,
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     // Update design asset approval status
     const updatedDesign = await db.designAsset.update({
-      where: { id: designId },
+      where: { id: design_id },
       data: {
         approval_status: status
       }
@@ -161,11 +161,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 // GET /api/designs/[id]/approve - Get approval status
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const { id: designId } = await params
+    const { id: design_id } = await params
 
     const approvals = await db.designApproval.findMany({
       where: {
-        design_asset_id: designId
+        design_asset_id: design_id
       },
       include: {
         client: {
@@ -181,7 +181,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     })
 
     const design = await db.designAsset.findUnique({
-      where: { id: designId },
+      where: { id: design_id },
       select: {
         approval_status: true,
         print_ready: true,

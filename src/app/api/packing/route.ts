@@ -7,13 +7,13 @@ import { prisma } from "@/lib/prisma"
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const orderId = searchParams.get("orderId")
+    const order_id = searchParams.get("order_id")
     const status = searchParams.get("status")
     const cartonId = searchParams.get("cartonId")
 
     const where: any = {}
     
-    if (orderId) where.orderId = orderId
+    if (order_id) where.order_id = order_id
     if (status) where.status = status
     if (cartonId) where.id = cartonId
 
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
             order: {
               select: {
                 apparelType: true,
-                brandId: true
+                brand_id: true
               }
             }
           }
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const {
-      orderId,
+      order_id,
       dimensions, // {length_cm, width_cm, height_cm}
       maxWeightKg,
       notes,
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
       const carton = await tx.carton.create({
         data: {
           cartonNumber,
-          orderId,
+          order_id,
           dimensions,
           maxWeightKg,
           notes,
@@ -110,10 +110,10 @@ export async function POST(request: NextRequest) {
       })
 
       // Auto-pack available units if requested
-      if (autoPackUnits && orderId) {
+      if (autoPackUnits && order_id) {
         const availableUnits = await tx.finishedUnit.findMany({
           where: {
-            orderId,
+            order_id,
             status: "READY",
             cartonId: null
           },

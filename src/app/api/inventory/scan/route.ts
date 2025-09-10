@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
       code, // The scanned barcode/QR code
       action = 'lookup', // 'lookup', 'stock_in', 'stock_out', 'usage'
       quantity,
-      orderId,
+      order_id,
       taskId,
       reason,
       reference
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
         return await handleStockOut(inventoryItem, quantityNum, reason, reference)
       
       case 'usage':
-        return await handleUsage(inventoryItem, quantityNum, orderId, taskId, reason)
+        return await handleUsage(inventoryItem, quantityNum, order_id, taskId, reason)
       
       default:
         return NextResponse.json(
@@ -227,7 +227,7 @@ async function handleStockOut(item: InventoryItem, quantity: number, reason?: st
 }
 
 // Helper function to handle material usage recording
-async function handleUsage(item: InventoryItem, quantity: number, orderId?: string, taskId?: string, reason?: string) {
+async function handleUsage(item: InventoryItem, quantity: number, order_id?: string, taskId?: string, reason?: string) {
   // Check sufficient stock
   if (item.quantity < Math.floor(quantity)) {
     return NextResponse.json({
@@ -241,7 +241,7 @@ async function handleUsage(item: InventoryItem, quantity: number, orderId?: stri
     const usageRecord = await tx.materialUsage.create({
       data: {
         inventoryId: item.id,
-        orderId: orderId || null,
+        order_id: order_id || null,
         taskId: taskId || null,
         quantityUsed: quantity,
         unitCost: item.unitCost,
@@ -255,8 +255,8 @@ async function handleUsage(item: InventoryItem, quantity: number, orderId?: stri
         inventoryId: item.id,
         type: 'OUT',
         quantity: Math.floor(quantity),
-        reason: reason || `Material usage ${orderId ? `for order ${orderId}` : ''}`.trim(),
-        reference: orderId || taskId || `USAGE_${usageRecord.id}`
+        reason: reason || `Material usage ${order_id ? `for order ${order_id}` : ''}`.trim(),
+        reference: order_id || taskId || `USAGE_${usageRecord.id}`
       }
     })
 

@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     }
     
     if (active !== null) {
-      where.isActive = active === "true"
+      where.is_active = active === "true"
     }
     
     if (provider) {
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
         },
         webhooks: {
           where: {
-            isActive: true
+            is_active: true
           },
           select: {
             id: true,
@@ -107,7 +107,7 @@ export async function GET(request: NextRequest) {
         healthScore: Math.round(healthScore),
         errorCount: errorLogs.length,
         lastError: errorLogs[0]?.errorMessage || null,
-        lastSync: integration.lastSync || integration.updatedAt,
+        lastSync: integration.lastSync || integration.updated_at,
         webhookSuccessRate: Math.round(webhookSuccessRate),
         totalWebhookCalls
       }

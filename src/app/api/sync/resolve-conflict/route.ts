@@ -79,10 +79,10 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
+    const user_id = searchParams.get('user_id');
     
     const conflicts = await ConflictResolver.getConflicts(
-      userId || session.user.id
+      user_id || session.user.id
     );
 
     const summary = await ConflictResolver.getConflictSummary();

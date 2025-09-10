@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     const fabricIssue = await prisma.fabricIssue.findFirst({
       where: {
         id: validatedData.fabric_issue_id,
-        workspace_id: session.user.workspaceId,
+        workspace_id: session.user.workspace_id,
         status: 'ISSUED'
       },
       include: {
@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
       const plan = await tx.layPlan.create({
         data: {
           id: layPlanId,
-          workspace_id: session.user.workspaceId,
+          workspace_id: session.user.workspace_id,
           fabric_issue_id: validatedData.fabric_issue_id,
           fabric_batch_id: validatedData.fabric_batch_id,
           order_id: validatedData.order_id,
@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
     await prisma.auditLog.create({
       data: {
         id: require('nanoid').nanoid(),
-        workspace_id: session.user.workspaceId,
+        workspace_id: session.user.workspace_id,
         actor_id: session.user.id,
         entity_type: 'lay_plan',
         entity_id: layPlan.id,
@@ -241,7 +241,7 @@ export async function PUT(request: NextRequest) {
     const layPlan = await prisma.layPlan.findFirst({
       where: {
         id: validatedData.lay_plan_id,
-        workspace_id: session.user.workspaceId,
+        workspace_id: session.user.workspace_id,
         status: { in: ['PLANNED', 'APPROVED'] }
       },
       include: {
@@ -272,7 +272,7 @@ export async function PUT(request: NextRequest) {
         bundlePromises.push(tx.cuttingBundle.create({
           data: {
             id: bundleId,
-            workspace_id: session.user.workspaceId,
+            workspace_id: session.user.workspace_id,
             lay_plan_id: validatedData.lay_plan_id,
             bundle_number: bundleNumber,
             bundle_sequence: i + 1,
@@ -359,7 +359,7 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0')
 
     const whereConditions: any = {
-      workspace_id: session.user.workspaceId
+      workspace_id: session.user.workspace_id
     }
 
     if (order_id) whereConditions.order_id = order_id

@@ -39,7 +39,7 @@ import {
 } from 'lucide-react'
 
 interface DesignUploadCenterProps {
-  orderId: string
+  order_id: string
   onUploadComplete?: (asset: any) => void
   onClose?: () => void
 }
@@ -73,7 +73,7 @@ const DESIGN_TYPES = [
   { value: 'PROOF', label: 'Client Proof', icon: CheckCircle }
 ]
 
-export function DesignUploadCenter({ orderId, onUploadComplete, onClose }: DesignUploadCenterProps) {
+export function DesignUploadCenter({ order_id, onUploadComplete, onClose }: DesignUploadCenterProps) {
   const [uploads, setUploads] = useState<Map<string, UploadProgress>>(new Map())
   const [designType, setDesignType] = useState('MOCKUP')
   const [description, setDescription] = useState('')
@@ -111,7 +111,7 @@ export function DesignUploadCenter({ orderId, onUploadComplete, onClose }: Desig
     try {
       const formData = new FormData()
       formData.append('file', file)
-      formData.append('order_id', orderId)
+      formData.append('order_id', order_id)
       formData.append('design_type', designType)
       formData.append('description', description)
       formData.append('is_replacement', isReplacement.toString())

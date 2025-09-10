@@ -38,21 +38,21 @@ export async function GET(request: NextRequest) {
 
 interface SyncChange {
   timestamp: number;
-  userId: string;
+  user_id: string;
   entity: string;
   entityId: string;
   operation: string;
   data: Record<string, unknown>;
 }
 
-async function getChangesForUser(userId: string, since: Date) {
+async function getChangesForUser(user_id: string, since: Date) {
   const changes: SyncChange[] = [];
 
   const tasks = await prisma.task.findMany({
     where: {
       OR: [
-        { assignedTo: userId },
-        { order: { createdById: userId } }
+        { assignedTo: user_id },
+        { order: { createdById: user_id } }
       ],
       updated_at: { gt: since }
     },
@@ -63,8 +63,8 @@ async function getChangesForUser(userId: string, since: Date) {
 
   tasks.forEach(task => {
     changes.push({
-      timestamp: new Date(task.updatedAt).getTime(),
-      userId,
+      timestamp: new Date(task.updated_at).getTime(),
+      user_id,
       entity: 'Task',
       entityId: task.id,
       operation: 'UPDATE',
@@ -80,15 +80,15 @@ async function getChangesForUser(userId: string, since: Date) {
 
   const timeRecords = await prisma.timeRecord.findMany({
     where: {
-      employeeId: userId,
+      employeeId: user_id,
       created_at: { gt: since }
     }
   });
 
   timeRecords.forEach(record => {
     changes.push({
-      timestamp: new Date(record.createdAt).getTime(),
-      userId,
+      timestamp: new Date(record.created_at).getTime(),
+      user_id,
       entity: 'TimeRecord',
       entityId: record.id,
       operation: 'CREATE',
@@ -113,8 +113,8 @@ async function getChangesForUser(userId: string, since: Date) {
 
   inventoryUpdates.forEach(movement => {
     changes.push({
-      timestamp: new Date(movement.createdAt).getTime(),
-      userId,
+      timestamp: new Date(movement.created_at).getTime(),
+      user_id,
       entity: 'StockMovement',
       entityId: movement.id,
       operation: 'CREATE',
@@ -130,20 +130,20 @@ async function getChangesForUser(userId: string, since: Date) {
 
   const qcRecords = await prisma.qCRecord.findMany({
     where: {
-      inspectorId: userId,
+      inspectorId: user_id,
       created_at: { gt: since }
     }
   });
 
   qcRecords.forEach(record => {
     changes.push({
-      timestamp: new Date(record.createdAt).getTime(),
-      userId,
+      timestamp: new Date(record.created_at).getTime(),
+      user_id,
       entity: 'QCRecord',
       entityId: record.id,
       operation: 'CREATE',
       data: {
-        orderId: record.orderId,
+        order_id: record.order_id,
         taskId: record.taskId,
         status: record.status,
         passedQty: record.passedQty,

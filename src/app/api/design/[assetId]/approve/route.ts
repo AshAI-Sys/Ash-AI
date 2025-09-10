@@ -25,7 +25,7 @@ export async function POST(
         order: {
           select: {
             orderNumber: true,
-            clientId: true,
+            client_id: true,
             client: { select: { name: true } }
           }
         }
@@ -61,7 +61,7 @@ export async function POST(
     // Update order status if needed
     if (asset.order) {
       await prisma.order.update({
-        where: { id: asset.orderId },
+        where: { id: asset.order_id },
         data: {
           status: 'DESIGN_APPROVED'
         }
@@ -71,7 +71,7 @@ export async function POST(
     // Create tracking update
     await prisma.trackingUpdate.create({
       data: {
-        orderId: asset.orderId,
+        order_id: asset.order_id,
         stage: 'Design Approval',
         status: 'COMPLETED',
         message: body.comments ? 
@@ -117,7 +117,7 @@ export async function POST(
     // Create audit log
     await prisma.auditLog.create({
       data: {
-        userId: session.user.id,
+        user_id: session.user.id,
         action: 'APPROVE_DESIGN',
         entityType: 'DesignAsset',
         entityId: assetId,

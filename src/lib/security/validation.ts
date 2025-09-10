@@ -38,10 +38,10 @@ export const schemas = {
   }),
 
   // Order ID validation
-  orderId: z.string().uuid(),
+  order_id: z.string().uuid(),
 
   // User ID validation  
-  userId: z.string().uuid(),
+  user_id: z.string().uuid(),
 
   // Pagination validation
   pagination: z.object({
@@ -168,7 +168,7 @@ export const securityHeaders = {
 export const auditLog = {
   log: async (event: {
     action: string
-    userId?: string
+    user_id?: string
     ip?: string
     userAgent?: string
     resource?: string
@@ -199,10 +199,10 @@ export const validateInput = <T>(schema: z.ZodSchema<T>, input: unknown): { succ
     const data = schema.parse(input)
     return { success: true, data }
   } catch (_error) {
-    if (error instanceof z.ZodError) {
+    if (_error instanceof z.ZodError) {
       return { 
         success: false, 
-        error: 'Invalid input: ' + error.errors.map(e => e.message).join(', ')
+        error: 'Invalid input: ' + _error.errors.map((e: any) => e.message).join(', ')
       }
     }
     return { success: false, error: 'Invalid input format' }

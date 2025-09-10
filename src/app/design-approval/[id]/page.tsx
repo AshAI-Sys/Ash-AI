@@ -28,7 +28,7 @@ import { Textarea } from '@/components/ui/textarea'
 
 interface DesignDetail {
   id: string
-  orderId: string
+  order_id: string
   clientName: string
   designName: string
   version: number
@@ -77,7 +77,7 @@ export default function DesignDetailPage({ params }: { params: Promise<{ id: str
     
     const mockDesign: DesignDetail = {
       id: resolvedParams.id,
-      orderId: 'ORD-2024-001',
+      order_id: 'ORD-2024-001',
       clientName: 'Premium Apparel Co.',
       designName: 'Summer Collection Logo',
       version: 1,
@@ -237,7 +237,7 @@ export default function DesignDetailPage({ params }: { params: Promise<{ id: str
                 </div>
               </div>
               <p className="text-cyan-300">
-                {design.clientName} • {design.orderId} • Version {design.version}
+                {design.clientName} • {design.order_id} • Version {design.version}
               </p>
             </div>
           </div>

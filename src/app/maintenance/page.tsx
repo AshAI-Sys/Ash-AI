@@ -29,7 +29,7 @@ interface MaintenanceTask {
   partsCost?: number
   laborCost?: number
   completedAt?: string
-  createdAt: string
+  created_at: string
 }
 
 interface MaintenanceSchedule {
@@ -39,7 +39,7 @@ interface MaintenanceSchedule {
   frequency: string
   lastCompletedDate?: string
   nextDueDate?: string
-  isActive: boolean
+  is_active: boolean
 }
 
 interface EquipmentDowntime {

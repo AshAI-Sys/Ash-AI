@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth'
-import { Role } from '@prisma/client'
+
 import { secureDb } from '@/lib/db-security'
 import { verifyToken } from '@/lib/auth'
 import { InputSanitizer } from '@/lib/input-security'

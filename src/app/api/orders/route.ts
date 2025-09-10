@@ -109,7 +109,7 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
       }
     });
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Orders API Error:', error);
     throw Errors.DATABASE_ERROR;
   }
@@ -127,7 +127,7 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
 
   try {
     const workspace_id = 'default';
-    const userId = session.user.id;
+    const user_id = session.user.id;
 
     // Generate PO number if not provided
     const po_number = validatedData.po_number || await generatePONumber(workspace_id);
@@ -144,7 +144,7 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
           due_date: validatedData.due_date ? new Date(validatedData.due_date) : null,
           notes: validatedData.notes,
           workspace_id,
-          created_by: userId
+          created_by: user_id
         }
       });
 
@@ -156,9 +156,9 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
           quantity: item.quantity,
           unit_price: item.unit_price,
           total_price: item.quantity * item.unit_price,
-          specifications: item.specifications ? JSON.stringify(item.specifications) : null,
+          specifications: item.specifications ? JSON.stringify(_item.specifications) : null,
           workspace_id,
-          created_by: userId
+          created_by: user_id
         }))
       });
 
@@ -167,7 +167,7 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
         data: {
           order_id: newOrder.id,
           status: 'INTAKE',
-          changed_by: userId,
+          changed_by: user_id,
           notes: 'Order created',
           workspace_id
         }
@@ -177,7 +177,7 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
       await tx.auditLog.create({
         data: {
           workspace_id,
-          actor_id: userId,
+          actor_id: user_id,
           entity_type: 'ORDER',
           entity_id: newOrder.id,
           action: 'CREATE',
@@ -211,7 +211,7 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
       201
     );
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Order Creation Error:', error);
     throw error;
   }

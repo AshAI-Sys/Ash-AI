@@ -15,7 +15,7 @@ import {
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now()
-  let userId: string | undefined
+  let user_id: string | undefined
   let clientIP: string = 'unknown'
 
   try {
@@ -39,13 +39,13 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    userId = session.user.id
+    user_id = session.user.id
 
     // Role-based access control - Allow more roles to access AI
     if (!['ADMIN', 'MANAGER', 'CSR', 'GA', 'GRAPHIC_ARTIST', 'SALES_STAFF'].includes(session.user.role as Role)) {
       await auditLog.log({
         action: 'ai_access_denied',
-        userId,
+        user_id,
         ip: clientIP,
         userAgent,
         success: false,
@@ -58,11 +58,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Rate limiting - 30 requests per minute for AI endpoints
-    const rateLimitKey = `ai_ashley:${userId}:${Math.floor(Date.now() / 60000)}`
+    const rateLimitKey = `ai_ashley:${user_id}:${Math.floor(Date.now() / 60000)}`
     if (!rateLimit.check(rateLimitKey, 30, 60000)) {
       await auditLog.log({
         action: 'ai_rate_limit_exceeded',
-        userId,
+        user_id,
         ip: clientIP,
         userAgent,
         success: false,
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
     } catch (_error) {
       await auditLog.log({
         action: 'ai_invalid_input',
-        userId,
+        user_id,
         ip: clientIP,
         success: false,
         error: 'Invalid JSON or body too large'
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
     if (!validation.success) {
       await auditLog.log({
         action: 'ai_validation_failed',
-        userId,
+        user_id,
         ip: clientIP,
         success: false,
         error: validation.error
@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
       if (suspiciousPatterns.some(pattern => pattern.test(data.message as string))) {
         await auditLog.log({
           action: 'ai_prompt_injection_attempt',
-          userId,
+          user_id,
           ip: clientIP,
           success: false,
           error: 'Suspicious prompt detected'
@@ -172,7 +172,7 @@ export async function POST(request: NextRequest) {
             result = await callAIAgent('ashley', 'generateWeeklyReport', {
               start: startDate,
               end: endDate
-            }, userId)
+            }, user_id)
           } else {
             return NextResponse.json({ error: 'Start and end dates required' }, { 
               status: 400,
@@ -182,7 +182,7 @@ export async function POST(request: NextRequest) {
           break
 
         case 'analyzeBusinessHealth':
-          result = await callAIAgent('ashley', 'analyzeBusinessHealth', {}, userId)
+          result = await callAIAgent('ashley', 'analyzeBusinessHealth', {}, user_id)
           break
 
         case 'chat':
@@ -215,7 +215,7 @@ export async function POST(request: NextRequest) {
       // Log successful operation
       await auditLog.log({
         action: `ai_${action}`,
-        userId,
+        user_id,
         ip: clientIP,
         userAgent,
         success: true,
@@ -242,7 +242,7 @@ export async function POST(request: NextRequest) {
       // Log AI-specific errors
       await auditLog.log({
         action: `ai_${action}_error`,
-        userId,
+        user_id,
         ip: clientIP,
         success: false,
         error: _aiError instanceof Error ? _aiError.message : 'AI processing error'
@@ -260,7 +260,7 @@ export async function POST(request: NextRequest) {
     // Log unexpected errors
     await auditLog.log({
       action: 'ai_unexpected_error',
-      userId,
+      user_id,
       ip: clientIP,
       success: false,
       error: _error instanceof Error ? _error.message : 'Unknown error'

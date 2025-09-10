@@ -54,7 +54,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<DesignUpl
 
     const formData = await request.formData()
     const file = formData.get('file') as File | null
-    const orderId = formData.get('order_id') as string
+    const order_id = formData.get('order_id') as string
     const designType = formData.get('design_type') as string || 'MOCKUP'
     const description = formData.get('description') as string || ''
     const isReplacement = formData.get('is_replacement') === 'true'
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<DesignUpl
       }, { status: 400 })
     }
 
-    if (!orderId) {
+    if (!order_id) {
       return NextResponse.json({
         success: false,
         error: 'Order ID is required'
@@ -91,8 +91,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<DesignUpl
     // Verify order exists and user has access
     const order = await prisma.order.findFirst({
       where: {
-        id: orderId,
-        workspace_id: session.user.workspaceId
+        id: order_id,
+        workspace_id: session.user.workspace_id
       },
       include: {
         brand: { select: { name: true, code: true } },
@@ -120,9 +120,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<DesignUpl
     // Create directory structure: designs/BRAND_CODE/YEAR/ORDER_ID/
     const brandDir = order.brand.code.toUpperCase()
     const year = new Date().getFullYear().toString()
-    const uploadDir = join(process.cwd(), 'uploads', 'designs', brandDir, year, orderId)
+    const uploadDir = join(process.cwd(), 'uploads', 'designs', brandDir, year, order_id)
     const filePath = join(uploadDir, fileName)
-    const relativePath = join('designs', brandDir, year, orderId, fileName)
+    const relativePath = join('designs', brandDir, year, order_id, fileName)
 
     // Ensure directory exists
     await mkdir(uploadDir, { recursive: true })
@@ -136,7 +136,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<DesignUpl
       try {
         const thumbnailFileName = `thumb_${fileName}`
         const thumbnailFullPath = join(uploadDir, thumbnailFileName)
-        thumbnailPath = join('designs', brandDir, year, orderId, thumbnailFileName)
+        thumbnailPath = join('designs', brandDir, year, order_id, thumbnailFileName)
 
         await sharp(buffer)
           .resize(400, 400, { fit: 'inside', withoutEnlargement: true })
@@ -150,7 +150,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<DesignUpl
     // Get current version number
     const existingVersions = await prisma.designAsset.count({
       where: {
-        order_id: orderId,
+        order_id: order_id,
         type: designType
       }
     })
@@ -206,8 +206,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<DesignUpl
     const designAsset = await prisma.designAsset.create({
       data: {
         id: assetId,
-        workspace_id: session.user.workspaceId,
-        order_id: orderId,
+        workspace_id: session.user.workspace_id,
+        order_id: order_id,
         version: newVersion,
         type: designType,
         file_name: fileName,
@@ -232,7 +232,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<DesignUpl
     if (isReplacement) {
       await prisma.designAsset.updateMany({
         where: {
-          order_id: orderId,
+          order_id: order_id,
           type: designType,
           version: { lt: newVersion },
           approval_status: { not: 'SUPERSEDED' }
@@ -249,7 +249,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<DesignUpl
     await prisma.auditLog.create({
       data: {
         id: require('nanoid').nanoid(),
-        workspace_id: session.user.workspaceId,
+        workspace_id: session.user.workspace_id,
         actor_id: session.user.id,
         entity_type: 'design_asset',
         entity_id: assetId,
@@ -275,7 +275,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<DesignUpl
     // Emit design upload event
     await emitDesignEvent('ash.design.uploaded', {
       asset_id: assetId,
-      order_id: orderId,
+      order_id: order_id,
       design_type: designType,
       version: newVersion,
       ashley_risk: ashleyAnalysis.risk,

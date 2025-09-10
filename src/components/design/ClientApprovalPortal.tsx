@@ -29,7 +29,7 @@ import Image from 'next/image'
 interface DesignApproval {
   id: string
   designName: string
-  poNumber: string
+  po_number: string
   brand: string
   method: string
   version: number
@@ -60,7 +60,7 @@ interface ClientApprovalPortalProps {
 const mockDesignApproval: DesignApproval = {
   id: 'approval_001',
   designName: 'Corporate Event T-Shirt Design',
-  poNumber: 'REEF-2024-000123',
+  po_number: 'REEF-2024-000123',
   brand: 'Reefer',
   method: 'Silkscreen',
   version: 2,
@@ -150,7 +150,7 @@ export function ClientApprovalPortal({
                 <div className="mt-2 flex items-center space-x-4 text-sm text-gray-600">
                   <span className="flex items-center space-x-1">
                     <Package className="w-4 h-4" />
-                    <span>{designData.poNumber}</span>
+                    <span>{designData.po_number}</span>
                   </span>
                   <span className="flex items-center space-x-1">
                     <User className="w-4 h-4" />
@@ -424,7 +424,7 @@ export function ClientApprovalPortal({
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-600">PO Number:</span>
-                    <span className="font-medium">{designData.poNumber}</span>
+                    <span className="font-medium">{designData.po_number}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Brand:</span>

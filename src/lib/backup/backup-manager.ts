@@ -232,7 +232,7 @@ export class BackupManager {
           brandName: order.brand.name,
           status: order.status,
           quantity: order.quantity,
-          created_at: order.createdAt,
+          created_at: order.created_at,
           dueDate: order.dueDate
         })),
         inventory: inventory.map(item => ({
@@ -242,14 +242,14 @@ export class BackupManager {
           quantity: item.quantity,
           unit: item.unit,
           unitCost: item.unitCost,
-          lastUpdated: item.lastUpdated
+          lastUpdated: _item.lastUpdated
         })),
         financial: financial.map(tx => ({
           walletName: tx.wallet.name,
           type: tx.type,
           amount: tx.amount,
           description: tx.description,
-          date: tx.createdAt
+          date: tx.created_at
         }))
       };
 

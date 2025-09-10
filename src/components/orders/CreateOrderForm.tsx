@@ -27,7 +27,7 @@ import {
 
 interface OrderFormData {
   // Client & Brand
-  clientId?: string
+  client_id?: string
   newClient?: {
     name: string
     company: string
@@ -35,16 +35,16 @@ interface OrderFormData {
     phones: string[]
     billingAddress: any
   }
-  brandId: string
+  brand_id: string
   channel?: string
 
   // Product & Design
   productType: string
-  designAssets: string[]
+  design_assets: string[]
   method: 'SILKSCREEN' | 'SUBLIMATION' | 'DTF' | 'EMBROIDERY'
 
   // Quantities & Size Curve
-  totalQty: number
+  total_qty: number
   sizeCurve: Record<string, number>
 
   // Variants & Add-ons
@@ -52,7 +52,7 @@ interface OrderFormData {
   addons?: string[]
 
   // Dates & SLAs
-  targetDeliveryDate: string
+  target_delivery_date: string
   targetStageDates?: Record<string, string>
 
   // Commercials
@@ -63,7 +63,7 @@ interface OrderFormData {
   currency: string
 
   // Production Route
-  routingTemplate: string
+  routeTemplate: string
   customRouting?: any[]
 
   // Files & Notes
@@ -115,21 +115,21 @@ const ROUTING_TEMPLATES = {
 
 export default function CreateOrderForm() {
   const [formData, setFormData] = useState<OrderFormData>({
-    brandId: '',
+    brand_id: '',
     productType: '',
     method: 'SILKSCREEN',
-    totalQty: 0,
+    total_qty: 0,
     sizeCurve: { S: 0, M: 0, L: 0, XL: 0 },
-    targetDeliveryDate: '',
+    target_delivery_date: '',
     unitPrice: 0,
     depositPercent: 50,
     paymentTerms: '50/50',
     taxMode: 'INCLUSIVE',
     currency: 'PHP',
-    routingTemplate: '',
+    routeTemplate: '',
     attachments: [],
     notes: '',
-    designAssets: []
+    design_assets: []
   })
 
   const [ashleyAdvisories, setAshleyAdvisories] = useState<AshleyAdvisory[]>([])
@@ -140,7 +140,7 @@ export default function CreateOrderForm() {
   useEffect(() => {
     const validateOrder = async () => {
       // Skip validation if required fields are missing
-      if (!formData.method || !formData.totalQty || !formData.targetDeliveryDate) {
+      if (!formData.method || !formData.total_qty || !formData.target_delivery_date) {
         setAshleyAdvisories([])
         return
       }
@@ -153,11 +153,11 @@ export default function CreateOrderForm() {
           body: JSON.stringify({
             method: formData.method,
             productType: formData.productType,
-            totalQty: formData.totalQty,
+            total_qty: formData.total_qty,
             sizeCurve: formData.sizeCurve,
-            targetDeliveryDate: formData.targetDeliveryDate,
-            routingTemplate: formData.routingTemplate,
-            brandId: formData.brandId
+            target_delivery_date: formData.target_delivery_date,
+            routeTemplate: formData.routeTemplate,
+            brand_id: formData.brand_id
           })
         })
 
@@ -169,7 +169,7 @@ export default function CreateOrderForm() {
           const advisories: AshleyAdvisory[] = []
 
           // Check for large AOP warning
-          if (formData.method === 'SUBLIMATION' && formData.totalQty > 500) {
+          if (formData.method === 'SUBLIMATION' && formData.total_qty > 500) {
             advisories.push({
               type: 'WARNING',
               title: 'Large AOP Order',
@@ -179,8 +179,8 @@ export default function CreateOrderForm() {
           }
 
           // Check delivery date feasibility
-          if (formData.targetDeliveryDate) {
-            const deliveryDate = new Date(formData.targetDeliveryDate)
+          if (formData.target_delivery_date) {
+            const deliveryDate = new Date(formData.target_delivery_date)
             const today = new Date()
             const daysDiff = Math.ceil((deliveryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
             
@@ -196,11 +196,11 @@ export default function CreateOrderForm() {
 
           // Size curve validation
           const sizeCurveTotal = Object.values(formData.sizeCurve).reduce((a, b) => a + b, 0)
-          if (formData.totalQty > 0 && sizeCurveTotal !== formData.totalQty) {
+          if (formData.total_qty > 0 && sizeCurveTotal !== formData.total_qty) {
             advisories.push({
               type: 'ERROR',
               title: 'Size Curve Mismatch',
-              message: `Size curve total (${sizeCurveTotal}) doesn't match total quantity (${formData.totalQty}).`,
+              message: `Size curve total (${sizeCurveTotal}) doesn't match total quantity (${formData.total_qty}).`,
               suggestion: 'Adjust size breakdown to match total quantity.'
             })
           }
@@ -216,7 +216,7 @@ export default function CreateOrderForm() {
     // Debounce validation calls
     const timeoutId = setTimeout(validateOrder, 500)
     return () => clearTimeout(timeoutId)
-  }, [formData.method, formData.productType, formData.totalQty, formData.sizeCurve, formData.targetDeliveryDate, formData.routingTemplate, formData.brandId])
+  }, [formData.method, formData.productType, formData.total_qty, formData.sizeCurve, formData.target_delivery_date, formData.routingTemplate, formData.brand_id])
 
   const handleSizeCurveChange = (size: string, value: number) => {
     setFormData(prev => ({
@@ -241,7 +241,7 @@ export default function CreateOrderForm() {
       }
 
       // Validate required fields
-      if (!formData.brandId || !formData.productType || !formData.totalQty || !formData.targetDeliveryDate) {
+      if (!formData.brand_id || !formData.productType || !formData.total_qty || !formData.target_delivery_date) {
         alert('Please fill in all required fields.')
         return
       }
@@ -402,8 +402,8 @@ export default function CreateOrderForm() {
                   <Label htmlFor="brand">Brand *</Label>
                   <select
                     id="brand"
-                    value={formData.brandId}
-                    onChange={(e) => setFormData(prev => ({ ...prev, brandId: e.target.value }))}
+                    value={formData.brand_id}
+                    onChange={(e) => setFormData(prev => ({ ...prev, brand_id: e.target.value }))}
                     className="w-full mt-1 p-2 border border-gray-300 rounded-md"
                     required
                   >
@@ -446,8 +446,8 @@ export default function CreateOrderForm() {
                 
                 {!isCreatingClient ? (
                   <select
-                    value={formData.clientId || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, clientId: e.target.value }))}
+                    value={formData.client_id || ''}
+                    onChange={(e) => setFormData(prev => ({ ...prev, client_id: e.target.value }))}
                     className="w-full p-2 border border-gray-300 rounded-md"
                   >
                     <option value="">Select Client</option>
@@ -545,7 +545,7 @@ export default function CreateOrderForm() {
                     onChange={(e) => setFormData(prev => ({ 
                       ...prev, 
                       method: e.target.value as any,
-                      routingTemplate: getDefaultRouting(e.target.value)
+                      routeTemplate: getDefaultRouting(e.target.value)
                     }))}
                     className="w-full mt-1 p-2 border border-gray-300 rounded-md"
                     required
@@ -591,12 +591,12 @@ export default function CreateOrderForm() {
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
-                <Label htmlFor="totalQty">Total Quantity *</Label>
+                <Label htmlFor="total_qty">Total Quantity *</Label>
                 <Input
-                  id="totalQty"
+                  id="total_qty"
                   type="number"
-                  value={formData.totalQty}
-                  onChange={(e) => setFormData(prev => ({ ...prev, totalQty: parseInt(e.target.value) || 0 }))}
+                  value={formData.total_qty}
+                  onChange={(e) => setFormData(prev => ({ ...prev, total_qty: parseInt(e.target.value) || 0 }))}
                   placeholder="Total pieces"
                   min="1"
                   required
@@ -621,7 +621,7 @@ export default function CreateOrderForm() {
                 </div>
                 <p className="text-sm text-gray-500 mt-2">
                   Size curve total: {Object.values(formData.sizeCurve).reduce((a, b) => a + b, 0)}
-                  {formData.totalQty > 0 && Object.values(formData.sizeCurve).reduce((a, b) => a + b, 0) !== formData.totalQty && (
+                  {formData.total_qty > 0 && Object.values(formData.sizeCurve).reduce((a, b) => a + b, 0) !== formData.total_qty && (
                     <span className="text-red-600 ml-2">⚠️ Doesn't match total quantity</span>
                   )}
                 </p>
@@ -643,12 +643,12 @@ export default function CreateOrderForm() {
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <Label htmlFor="targetDeliveryDate">Target Delivery Date *</Label>
+                  <Label htmlFor="target_delivery_date">Target Delivery Date *</Label>
                   <Input
-                    id="targetDeliveryDate"
+                    id="target_delivery_date"
                     type="date"
-                    value={formData.targetDeliveryDate}
-                    onChange={(e) => setFormData(prev => ({ ...prev, targetDeliveryDate: e.target.value }))}
+                    value={formData.target_delivery_date}
+                    onChange={(e) => setFormData(prev => ({ ...prev, target_delivery_date: e.target.value }))}
                     required
                   />
                 </div>
@@ -743,7 +743,7 @@ export default function CreateOrderForm() {
                   <Label htmlFor="totalAmount">Total Amount</Label>
                   <Input
                     id="totalAmount"
-                    value={`₱${(formData.unitPrice * formData.totalQty).toLocaleString()}`}
+                    value={`₱${(formData.unitPrice * formData.total_qty).toLocaleString()}`}
                     disabled
                     className="bg-gray-50"
                   />
@@ -766,7 +766,7 @@ export default function CreateOrderForm() {
                     />
                     <span className="text-gray-500">%</span>
                     <span className="text-sm text-gray-600 ml-2">
-                      = ₱{((formData.unitPrice * formData.totalQty * formData.depositPercent) / 100).toLocaleString()}
+                      = ₱{((formData.unitPrice * formData.total_qty * formData.depositPercent) / 100).toLocaleString()}
                     </span>
                   </div>
                 </div>
@@ -835,8 +835,8 @@ export default function CreateOrderForm() {
                         id={template.key}
                         name="routingTemplate"
                         value={template.key}
-                        checked={formData.routingTemplate === template.key}
-                        onChange={(e) => setFormData(prev => ({ ...prev, routingTemplate: e.target.value }))}
+                        checked={formData.routeTemplate === template.key}
+                        onChange={(e) => setFormData(prev => ({ ...prev, routeTemplate: e.target.value }))}
                         className="text-blue-600"
                       />
                       <div className="flex-1">

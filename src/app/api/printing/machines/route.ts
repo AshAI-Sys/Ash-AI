@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
       where.workcenter = workcenter
     }
     if (isActive !== null) {
-      where.isActive = isActive === 'true'
+      where.is_active = isActive === 'true'
     }
 
     const machines = await prisma.machine.findMany({
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
         } : false
       },
       orderBy: [
-        { isActive: 'desc' },
+        { is_active: 'desc' },
         { workcenter: 'asc' },
         { name: 'asc' }
       ]
@@ -73,8 +73,8 @@ export async function GET(request: NextRequest) {
         name: machine.name,
         workcenter: machine.workcenter,
         spec: machine.spec,
-        isActive: machine.isActive,
-        created_at: machine.createdAt
+        is_active: machine.is_active,
+        created_at: machine.created_at
       }
 
       if (!includeStats || !machine.printRuns) {
@@ -126,8 +126,8 @@ export async function GET(request: NextRequest) {
     // Summary statistics for the workcenter
     const summary = includeStats ? {
       totalMachines: machines.length,
-      activeMachines: machines.filter(m => m.isActive).length,
-      inactiveMachines: machines.filter(m => !m.isActive).length,
+      activeMachines: machines.filter(m => m.is_active).length,
+      inactiveMachines: machines.filter(m => !m.is_active).length,
       workcenters: [...new Set(machines.map(m => m.workcenter))]
     } : null
 
@@ -195,11 +195,11 @@ export async function POST(request: NextRequest) {
     // Create machine
     const machine = await prisma.machine.create({
       data: {
-        workspaceId: 'default', // You might want to get this from session/tenant context
+        workspace_id: 'default', // You might want to get this from session/tenant context
         name: body.name,
         workcenter: body.workcenter,
         spec: body.spec || {},
-        isActive: body.isActive !== false // Default to true
+        is_active: body.is_active !== false // Default to true
       }
     })
 
@@ -221,7 +221,7 @@ export async function POST(request: NextRequest) {
     // Create audit log
     await prisma.auditLog.create({
       data: {
-        userId: session.user.id,
+        user_id: session.user.id,
         action: 'CREATE_MACHINE',
         entityType: 'Machine',
         entityId: machine.id,
@@ -240,7 +240,7 @@ export async function POST(request: NextRequest) {
         id: machine.id,
         name: machine.name,
         workcenter: machine.workcenter,
-        isActive: machine.isActive,
+        is_active: machine.is_active,
         spec: machine.spec
       }
     }, { status: 201 })

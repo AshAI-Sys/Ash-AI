@@ -119,11 +119,11 @@ export class AshEventBus {
    * Handler for order creation
    */
   private static async handleOrderCreated(payload: any): Promise<void> {
-    const { orderId, poNumber, method, brandId, actorId } = payload
+    const { order_id, poNumber, method, brand_id, actorId } = payload
 
     // Update order status progression
     await prisma.order.update({
-      where: { id: orderId },
+      where: { id: order_id },
       data: { status: 'CONFIRMED' }
     })
 
@@ -134,7 +134,7 @@ export class AshEventBus {
         title: `New ${method} Order Created`,
         description: `Order ${poNumber} created and routing established. Monitor for capacity constraints.`,
         priority: 'MEDIUM',
-        data: { orderId, method, brandId }
+        data: { order_id, method, brand_id }
       }
     })
 
@@ -174,23 +174,23 @@ export class AshEventBus {
    * Handler for design approval
    */
   private static async handleDesignApproved(payload: any): Promise<void> {
-    const { orderId, assetId, version, approved_by } = payload
+    const { order_id, assetId, version, approved_by } = payload
 
     try {
       // Transition order status using state machine
-      await transitionOrderStatus(orderId, 'APPROVE_DESIGN', {
+      await transitionOrderStatus(order_id, 'APPROVE_DESIGN', {
         actor_id: approved_by,
         reason: 'Design approved by client',
         metadata: { asset_id: assetId, version }
       })
 
-      console.log(`ASH: Design approved for order ${orderId}, production can begin`)
+      console.log(`ASH: Design approved for order ${order_id}, production can begin`)
 
       // Emit fabric readiness check
       await AshEventBus.emit('ash.production.ready_for_fabric_issue', {
         entityType: 'order',
-        entityId: orderId,
-        order_id: orderId
+        entityId: order_id,
+        order_id: order_id
       })
 
     } catch (_error) {
@@ -375,11 +375,11 @@ export class AshEventBus {
    * Handler for routing changes
    */
   private static async handleRoutingChanged(payload: any): Promise<void> {
-    const { orderId, actorId } = payload
+    const { order_id, actorId } = payload
 
     // Run Ashley capacity re-analysis
     // This would trigger Ashley AI to re-evaluate capacity constraints
-    console.log(`ASH: Routing changed for order ${orderId}, re-analyzing capacity`)
+    console.log(`ASH: Routing changed for order ${order_id}, re-analyzing capacity`)
 
     // Create AI insight for management
     await prisma.aIInsight.create({
@@ -388,7 +388,7 @@ export class AshEventBus {
         title: 'Routing Changed - Review Required',
         description: `Production routing was modified. Review capacity impact and task assignments.`,
         priority: 'HIGH',
-        data: { orderId, changedBy: actorId }
+        data: { order_id, changedBy: actorId }
       }
     })
   }
@@ -397,14 +397,14 @@ export class AshEventBus {
    * Handler for bundle creation
    */
   private static async handleBundleCreated(payload: any): Promise<void> {
-    const { orderId, bundleIds, totalQty } = payload
+    const { order_id, bundleIds, total_qty } = payload
 
     // Mark cutting step as DONE if all bundles created
     const order = await prisma.order.findUnique({
-      where: { id: orderId },
+      where: { id: order_id },
       include: {
         bundles: true,
-        routingSteps: {
+        routing_steps: {
           where: { workcenter: 'CUTTING' }
         }
       }
@@ -417,7 +417,7 @@ export class AshEventBus {
         // Mark cutting complete and ready next steps
         await prisma.routingStep.updateMany({
           where: {
-            orderId,
+            order_id,
             workcenter: 'CUTTING',
             status: 'IN_PROGRESS'
           },
@@ -427,7 +427,7 @@ export class AshEventBus {
         // Enable next steps that depend on cutting
         await prisma.routingStep.updateMany({
           where: {
-            orderId,
+            order_id,
             dependsOn: { hasEvery: ['cutting'] },
             status: 'PLANNED'
           },
@@ -436,7 +436,7 @@ export class AshEventBus {
       }
     }
 
-    console.log(`ASH: Bundles created for order ${orderId}`)
+    console.log(`ASH: Bundles created for order ${order_id}`)
   }
 
   /**
@@ -691,51 +691,51 @@ export class AshEventBus {
 
 // Event emitter helpers for common events
 export const EventEmitters = {
-  orderCreated: (orderId: string, poNumber: string, method: string, actorId: string) =>
+  orderCreated: (order_id: string, po_number: string, method: string, actorId: string) =>
     AshEventBus.emit('ash.order.created', {
       entityType: 'order',
-      entityId: orderId,
-      order_id: orderId,
+      entityId: order_id,
+      order_id: order_id,
       po_number: poNumber,
       method,
       actor_id: actorId
     }),
 
-  designUploaded: (assetId: string, orderId: string, designType: string, uploadedBy: string) =>
+  designUploaded: (assetId: string, order_id: string, designType: string, uploadedBy: string) =>
     AshEventBus.emit('ash.design.uploaded', {
       entityType: 'design_asset',
       entityId: assetId,
       asset_id: assetId,
-      order_id: orderId,
+      order_id: order_id,
       design_type: designType,
       uploaded_by: uploadedBy
     }),
 
-  designApproved: (assetId: string, orderId: string, approvedBy: string) =>
+  designApproved: (assetId: string, order_id: string, approvedBy: string) =>
     AshEventBus.emit('ash.design.approved', {
       entityType: 'design_asset',
       entityId: assetId,
       assetId,
-      orderId,
+      order_id,
       approved_by: approvedBy
     }),
 
-  fabricIssued: (issueId: string, orderId: string, totalMeters: number, batchCount: number) =>
+  fabricIssued: (issueId: string, order_id: string, totalMeters: number, batchCount: number) =>
     AshEventBus.emit('ash.fabric.issued', {
       entityType: 'fabric_issue',
       entityId: issueId,
       issue_id: issueId,
-      order_id: orderId,
+      order_id: order_id,
       total_meters: totalMeters,
       batch_count: batchCount
     }),
 
-  layPlanned: (layPlanId: string, orderId: string, efficiency: number, totalPieces: number) =>
+  layPlanned: (layPlanId: string, order_id: string, efficiency: number, totalPieces: number) =>
     AshEventBus.emit('ash.cutting.lay_planned', {
       entityType: 'lay_plan',
       entityId: layPlanId,
       lay_plan_id: layPlanId,
-      order_id: orderId,
+      order_id: order_id,
       efficiency,
       total_pieces: totalPieces
     }),
@@ -752,22 +752,22 @@ export const EventEmitters = {
       lay_plan_id: layPlanId
     }),
 
-  qcCompleted: (inspectionId: string, orderId: string, passRate: number, defectCount: number, inspectorId: string) =>
+  qcCompleted: (inspectionId: string, order_id: string, passRate: number, defectCount: number, inspectorId: string) =>
     AshEventBus.emit('ash.qc.inspection_completed', {
       entityType: 'quality_inspection',
       entityId: inspectionId,
       inspection_id: inspectionId,
-      order_id: orderId,
+      order_id: order_id,
       pass_rate: passRate,
       defect_count: defectCount,
       inspector_id: inspectorId
     }),
 
-  orderStatusChanged: (orderId: string, oldStatus: string, newStatus: string, actorId: string) =>
+  orderStatusChanged: (order_id: string, oldStatus: string, newStatus: string, actorId: string) =>
     AshEventBus.emit('ash.order.status_changed', {
       entityType: 'order',
-      entityId: orderId,
-      order_id: orderId,
+      entityId: order_id,
+      order_id: order_id,
       old_status: oldStatus,
       new_status: newStatus,
       actor_id: actorId

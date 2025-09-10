@@ -22,11 +22,11 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id: orderId } = await params
+    const { id: order_id } = await params
 
     // Get detailed order information
     const order = await prisma.order.findUnique({
-      where: { id: orderId },
+      where: { id: order_id },
       include: {
         brand: {
           select: {
@@ -42,14 +42,7 @@ export async function GET(
             company: true,
             emails: true,
             phones: true,
-            portal_access: true
-          }
-        },
-        created_by: {
-          select: {
-            id: true,
-            full_name: true,
-            email: true
+            // portal_access: true // This field doesn't exist
           }
         },
         routing_steps: {
@@ -61,8 +54,6 @@ export async function GET(
             status: true,
             planned_start: true,
             planned_end: true,
-            actual_start: true,
-            actual_end: true,
             standard_spec: true
           },
           orderBy: { sequence: 'asc' }
@@ -78,54 +69,25 @@ export async function GET(
           },
           orderBy: { created_at: 'desc' }
         },
-        tasks: {
+        // tasks don't have direct relation to orders - removing this include
+        qc_inspections: {
           select: {
             id: true,
-            title: true,
             status: true,
-            assigned_to: true,
-            due_at: true,
-            assignee: {
-              select: {
-                full_name: true
-              }
-            }
-          },
-          where: {
-            status: {
-              not: 'COMPLETED'
-            }
-          }
-        },
-        qc_records: {
-          select: {
-            id: true,
-            passed: true,
             passed_qty: true,
             rejected_qty: true,
-            created_at: true,
-            inspector: {
-              select: {
-                full_name: true
-              }
-            }
+            created_at: true
           },
           orderBy: { created_at: 'desc' }
         },
-        deliveries: {
+        shipments: {
           select: {
             id: true,
             status: true,
-            scheduled_at: true,
-            completed_at: true,
-            vehicle: {
-              select: {
-                plate: true,
-                type: true
-              }
-            }
+            delivery_method: true,
+            created_at: true
           },
-          orderBy: { scheduled_at: 'desc' }
+          orderBy: { created_at: 'desc' }
         }
       }
     })
@@ -137,10 +99,8 @@ export async function GET(
     // Role-based access control
     if (session.user.role !== Role.ADMIN && session.user.role !== Role.MANAGER) {
       // Check if user has access to this order
-      const hasAccess = order.created_by_id === session.user.id ||
-                       order.routing_steps.some(step => 
-                         step.tasks?.some(task => task.assigned_to === session.user.id)
-                       )
+      const hasAccess = order.created_by === session.user.id
+                       // Tasks don't have direct relation to orders
       
       if (!hasAccess) {
         return NextResponse.json({ error: 'Access denied' }, { status: 403 })
@@ -155,8 +115,8 @@ export async function GET(
         (Date.now() - new Date(order.created_at).getTime()) / (1000 * 60 * 60 * 24)
       ),
       is_overdue: order.target_delivery_date < new Date(),
-      active_tasks_count: order.tasks.length,
-      completed_routing_steps: order.routing_steps.filter(s => s.status === 'DONE').length,
+      active_tasks_count: 0, // Tasks don't have direct relation to orders
+      completed_routing_steps: order.routing_steps.filter((s: any) => s.status === 'DONE').length,
       total_routing_steps: order.routing_steps.length
     }
 
@@ -191,16 +151,17 @@ export async function PATCH(
     }
 
     // Only certain roles can update orders
-    if (![Role.ADMIN, Role.MANAGER, Role.CSR].includes(session.user.role as Role)) {
+    const allowedRoles = ['ADMIN', 'MANAGER', 'CSR'];
+    if (!allowedRoles.includes(session.user.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const { id: orderId } = await params
+    const { id: order_id } = await params
     const body = await request.json()
 
     // Get existing order
     const existingOrder = await prisma.order.findUnique({
-      where: { id: orderId }
+      where: { id: order_id }
     })
 
     if (!existingOrder) {
@@ -209,7 +170,7 @@ export async function PATCH(
 
     // Update order
     const updatedOrder = await prisma.order.update({
-      where: { id: orderId },
+      where: { id: order_id },
       data: {
         ...body,
         updated_at: new Date()
@@ -223,14 +184,11 @@ export async function PATCH(
         workspace_id: existingOrder.workspace_id,
         actor_id: session.user.id,
         entity_type: 'order',
-        entity_id: orderId,
+        entity_id: order_id,
         action: 'UPDATE',
         before_data: existingOrder,
-        after_data: updatedOrder,
-        metadata: {
-          fields_updated: Object.keys(body),
-          source: 'order_details_api'
-        }
+        after_data: updatedOrder
+        // metadata field doesn't exist in AuditLog model
       }
     })
 
@@ -250,8 +208,8 @@ export async function PATCH(
 }
 
 // Helper functions
-function calculateProgressPercentage(routingSteps: any[]): number {
-  if (routingSteps.length === 0) return 0
+function calculateProgressPercentage(routing_steps: any[]): number {
+  if (routing_steps.length === 0) return 0
   
   const statusWeights = {
     'PLANNED': 0,
@@ -261,11 +219,11 @@ function calculateProgressPercentage(routingSteps: any[]): number {
     'BLOCKED': 0
   }
 
-  const totalProgress = routingSteps.reduce((sum, step) => {
+  const totalProgress = routing_steps.reduce((sum: number, step: any) => {
     return sum + (statusWeights[step.status as keyof typeof statusWeights] || 0)
   }, 0)
 
-  return Math.round(totalProgress / routingSteps.length)
+  return Math.round(totalProgress / routing_steps.length)
 }
 
 function calculateEstimatedCompletion(order: any): Date {

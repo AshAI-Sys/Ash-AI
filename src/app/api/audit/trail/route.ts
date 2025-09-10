@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const entityType = searchParams.get('entity') || undefined;
     const entityId = searchParams.get('entityId') || undefined;
-    const userId = searchParams.get('userId') || undefined;
+    const user_id = searchParams.get('user_id') || undefined;
     const fromDate = searchParams.get('from');
     const toDate = searchParams.get('to');
     const limit = parseInt(searchParams.get('limit') || '100');
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
     const auditTrail = await AuditLogger.getAuditTrail(
       entityType,
       entityId,
-      userId,
+      user_id,
       dateRange,
       limit
     );
@@ -59,13 +59,13 @@ export async function GET(request: NextRequest) {
       metadata: { 
         entityType, 
         entityId, 
-        userId: userId || 'all',
+        user_id: user_id || 'all',
         dateRange: dateRange ? `${dateRange.from} to ${dateRange.to}` : 'all',
         resultCount: auditTrail.length
       },
       severity: 'LOW',
       category: 'SYSTEM'
-    }, { userId: user.id, request });
+    }, { user_id: user.id, request });
 
     return NextResponse.json({
       success: true,

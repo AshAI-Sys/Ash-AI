@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth'
-import { Role } from '@prisma/client'
+
 import { db } from '@/lib/db'
 import { validateAshleyAI } from '@/lib/ashley-ai'
 // Maintenance Parts Inventory API for Stage 11 Maintenance System
@@ -13,7 +11,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const workspace_id = searchParams.get('workspace_id')
-    const category = searchParams.get('category')
+    const _category = searchParams.get('category')
     const status = searchParams.get('status')
     const low_stock_only = searchParams.get('low_stock_only')
     const search = searchParams.get('search') // Search in part_name, part_number, description
@@ -127,7 +125,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate workspace exists
-    const workspace = await db.workspace.findUnique({
+    const _workspace = await db.workspace.findUnique({
       where: { id: workspace_id }
     })
 

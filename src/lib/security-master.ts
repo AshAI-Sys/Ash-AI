@@ -107,7 +107,7 @@ export class SecurityMaster {
 
       // Log security initialization
       await securityAuditLogger.logSecurityEvent({
-        type: 'CONFIGURATION_CHANGE',
+        type: 'SUSPICIOUS_ACTIVITY',
         severity: 'MEDIUM',
         ip: 'system',
         userAgent: 'SecurityMaster',
@@ -439,7 +439,7 @@ export class SecurityMaster {
     const monitoringStatus = securityMonitor ? 'PASS' : 'FAIL'
     checks.push({
       name: 'Security Monitoring',
-      status: monitoringStatus as const,
+      status: monitoringStatus,
       message: monitoringStatus === 'PASS' 
         ? 'Security monitoring active'
         : 'Security monitoring not initialized'
@@ -473,7 +473,7 @@ export class SecurityMaster {
 
     // Log the lockdown
     await securityAuditLogger.logSecurityEvent({
-      type: 'CONFIGURATION_CHANGE',
+      type: 'SUSPICIOUS_ACTIVITY',
       severity: 'CRITICAL',
       ip: 'system',
       userAgent: 'SecurityMaster',
@@ -508,7 +508,7 @@ if (process.env.NODE_ENV === 'production') {
       console.warn('[SECURITY_MASTER] Issues:', result.issues)
     }
   }).catch((error) => {
-    console.error('[SECURITY_MASTER] Critical security initialization failure:', _error)
+    console.error('[SECURITY_MASTER] Critical security initialization failure:', error)
     process.exit(1)
   })
 }

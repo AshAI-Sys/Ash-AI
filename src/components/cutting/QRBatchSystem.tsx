@@ -30,11 +30,11 @@ import {
 interface QRBatch {
   id: string
   batchNumber: string
-  orderId: string
-  poNumber: string
+  order_id: string
+  po_number: string
   designName: string
   cuttingJobId: string
-  createdAt: string
+  created_at: string
   createdBy: string
   totalPieces: number
   scannedPieces: number
@@ -71,11 +71,11 @@ const mockQRBatches: QRBatch[] = [
   {
     id: 'batch_001',
     batchNumber: 'QR-CUT-001-20240901',
-    orderId: 'order_1',
-    poNumber: 'REEF-2024-000123',
+    order_id: 'order_1',
+    po_number: 'REEF-2024-000123',
     designName: 'Corporate Logo Tee Design',
     cuttingJobId: 'cut_001',
-    createdAt: '2024-09-01T08:30:00Z',
+    created_at: '2024-09-01T08:30:00Z',
     createdBy: 'Maria Santos',
     totalPieces: 50,
     scannedPieces: 35,
@@ -118,11 +118,11 @@ const mockQRBatches: QRBatch[] = [
   {
     id: 'batch_002',
     batchNumber: 'QR-CUT-002-20240901',
-    orderId: 'order_2',
-    poNumber: 'SORB-2024-000098',
+    order_id: 'order_2',
+    po_number: 'SORB-2024-000098',
     designName: 'Sports Jersey All-Over Print',
     cuttingJobId: 'cut_002',
-    createdAt: '2024-09-01T10:00:00Z',
+    created_at: '2024-09-01T10:00:00Z',
     createdBy: 'Jose Cruz',
     totalPieces: 55,
     scannedPieces: 0,
@@ -144,7 +144,7 @@ export function QRBatchSystem({ isOpen, onClose, cuttingJob }: QRBatchSystemProp
   const filteredBatches = batches.filter(batch => {
     const matchesSearch = batch.batchNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          batch.designName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         batch.poNumber.toLowerCase().includes(searchTerm.toLowerCase())
+                         batch.po_number.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesStatus = statusFilter === 'all' || batch.status === statusFilter
     return matchesSearch && matchesStatus
   })
@@ -175,11 +175,11 @@ export function QRBatchSystem({ isOpen, onClose, cuttingJob }: QRBatchSystemProp
     const newBatch: QRBatch = {
       id: `batch_${Date.now()}`,
       batchNumber: `QR-CUT-${job.id.toUpperCase()}-${new Date().toISOString().split('T')[0].replace(/-/g, '')}`,
-      orderId: job.orderId,
-      poNumber: job.poNumber,
+      order_id: job.order_id,
+      po_number: job.po_number,
       designName: job.designName,
       cuttingJobId: job.id,
-      createdAt: new Date().toISOString(),
+      created_at: new Date().toISOString(),
       createdBy: 'Current User',
       totalPieces: job.pieces.reduce((acc: number, p: any) => acc + p.quantity, 0),
       scannedPieces: 0,
@@ -329,13 +329,13 @@ export function QRBatchSystem({ isOpen, onClose, cuttingJob }: QRBatchSystemProp
                               <span className="font-medium">Design:</span> {batch.designName}
                             </div>
                             <div>
-                              <span className="font-medium">PO Number:</span> {batch.poNumber}
+                              <span className="font-medium">PO Number:</span> {batch.po_number}
                             </div>
                             <div>
                               <span className="font-medium">Station:</span> {batch.currentStation}
                             </div>
                             <div>
-                              <span className="font-medium">Created:</span> {new Date(batch.createdAt).toLocaleDateString()}
+                              <span className="font-medium">Created:</span> {new Date(batch.created_at).toLocaleDateString()}
                             </div>
                           </div>
 
@@ -406,7 +406,7 @@ export function QRBatchSystem({ isOpen, onClose, cuttingJob }: QRBatchSystemProp
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900">{selectedBatch.batchNumber}</h2>
-                  <p className="text-gray-600">{selectedBatch.designName} • {selectedBatch.poNumber}</p>
+                  <p className="text-gray-600">{selectedBatch.designName} • {selectedBatch.po_number}</p>
                 </div>
                 <Button onClick={() => setSelectedBatch(null)} variant="outline">
                   ← Back to Batches

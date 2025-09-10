@@ -46,7 +46,7 @@ interface PrintRun {
   startedAt?: string
   endedAt?: string
   createdBy: string
-  createdAt: string
+  created_at: string
   totalGood: number
   totalReject: number
   materialsUsed: number
@@ -57,7 +57,7 @@ interface Machine {
   id: string
   name: string
   workcenter: string
-  isActive: boolean
+  is_active: boolean
   spec: any
   stats?: {
     totalRuns: number
@@ -80,7 +80,7 @@ const mockPrintRuns: PrintRun[] = [
     machineName: 'Press A1',
     startedAt: '2024-09-02T08:00:00Z',
     createdBy: 'John Doe',
-    createdAt: '2024-09-02T07:30:00Z',
+    created_at: '2024-09-02T07:30:00Z',
     totalGood: 85,
     totalReject: 3,
     materialsUsed: 4,
@@ -97,7 +97,7 @@ const mockPrintRuns: PrintRun[] = [
     stepName: 'Sublimation Printing',
     machineName: 'Epson F570',
     createdBy: 'Maria Garcia',
-    createdAt: '2024-09-02T09:15:00Z',
+    created_at: '2024-09-02T09:15:00Z',
     totalGood: 0,
     totalReject: 0,
     materialsUsed: 0,
@@ -116,7 +116,7 @@ const mockPrintRuns: PrintRun[] = [
     startedAt: '2024-09-01T14:00:00Z',
     endedAt: '2024-09-01T16:30:00Z',
     createdBy: 'Alex Thompson',
-    createdAt: '2024-09-01T13:45:00Z',
+    created_at: '2024-09-01T13:45:00Z',
     totalGood: 120,
     totalReject: 5,
     materialsUsed: 3,
@@ -129,7 +129,7 @@ const mockMachines: Machine[] = [
     id: '1',
     name: 'Press A1',
     workcenter: 'PRINTING',
-    isActive: true,
+    is_active: true,
     spec: { bedSize: '40x50cm', colors: 6 },
     stats: { totalRuns: 12, completedRuns: 11, utilization: 78, qualityRate: 96.5 }
   },
@@ -137,7 +137,7 @@ const mockMachines: Machine[] = [
     id: '2',
     name: 'Epson F570',
     workcenter: 'PRINTING',
-    isActive: true,
+    is_active: true,
     spec: { width: '44inch', technology: 'PrecisionCore' },
     stats: { totalRuns: 8, completedRuns: 8, utilization: 65, qualityRate: 98.2 }
   },
@@ -145,7 +145,7 @@ const mockMachines: Machine[] = [
     id: '3',
     name: 'Heat Press B2',
     workcenter: 'HEAT_PRESS',
-    isActive: true,
+    is_active: true,
     spec: { bedSize: '38x38cm', maxTemp: '200C' },
     stats: { totalRuns: 15, completedRuns: 14, utilization: 82, qualityRate: 97.8 }
   }
@@ -371,8 +371,8 @@ export default function PrintingPage() {
                 <div key={machine.id} className="p-4 border rounded-lg bg-gray-50">
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-medium text-gray-900">{machine.name}</span>
-                    <Badge className={machine.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
-                      {machine.isActive ? 'Active' : 'Inactive'}
+                    <Badge className={machine.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
+                      {machine.is_active ? 'Active' : 'Inactive'}
                     </Badge>
                   </div>
                   <p className="text-sm text-gray-600 mb-2">{machine.workcenter}</p>

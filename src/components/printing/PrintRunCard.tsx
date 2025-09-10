@@ -32,7 +32,7 @@ interface PrintRunCardProps {
     startedAt?: string
     endedAt?: string
     createdBy: string
-    createdAt: string
+    created_at: string
     totalGood: number
     totalReject: number
     materialsUsed: number
@@ -269,7 +269,7 @@ export function PrintRunCard({
 
         {/* Timestamps */}
         <div className="text-xs text-gray-500 pt-2 border-t">
-          <div>Created: {new Date(run.createdAt).toLocaleString()}</div>
+          <div>Created: {new Date(run.created_at).toLocaleString()}</div>
           {run.startedAt && (
             <div>Started: {new Date(run.startedAt).toLocaleString()}</div>
           )}

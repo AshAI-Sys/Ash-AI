@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth'
-import { Role } from '@prisma/client'
+
 import { db } from '@/lib/db'
 import { AutomationEngine, AutomationRule, TriggerType, ActionType } from '@/lib/automation-engine'
 // Automation Engine API - Stage 14 Implementation

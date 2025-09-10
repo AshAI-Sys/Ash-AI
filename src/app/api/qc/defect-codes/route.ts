@@ -20,10 +20,10 @@ export async function GET(request: NextRequest) {
 
     const defectCodes = await prisma.qCDefectCode.findMany({
       where: {
-        workspaceId: 'default', // TODO: Get from session
+        workspace_id: 'default', // TODO: Get from session
         ...(method && { method }),
         ...(severity && { severity: severity as any }),
-        ...(active !== null && { isActive: active === 'true' }),
+        ...(active !== null && { is_active: active === 'true' }),
         ...(search && {
           OR: [
             { code: { contains: search, mode: 'insensitive' } },
@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
     // Check for duplicate codes
     const existingCode = await prisma.qCDefectCode.findFirst({
       where: {
-        workspaceId: 'default',
+        workspace_id: 'default',
         code: { equals: code.toUpperCase(), mode: 'insensitive' }
       }
     })
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
 
     const defectCode = await prisma.qCDefectCode.create({
       data: {
-        workspaceId: 'default',
+        workspace_id: 'default',
         code: code.toUpperCase(),
         severity: severity as any,
         method,
@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
     // Create audit log
     await prisma.auditLog.create({
       data: {
-        userId: session.user.id,
+        user_id: session.user.id,
         action: 'CREATE_QC_DEFECT_CODE',
         entityType: 'QCDefectCode',
         entityId: defectCode.id,

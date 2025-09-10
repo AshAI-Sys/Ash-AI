@@ -476,7 +476,7 @@ export class AutomationEngine {
     console.log('📧 Delivered automated report')
   }
 
-  private static async triggerChurnPrevention(clientId: string, interventionType: string, data: any): Promise<void> {
-    console.log(`🛡️ Triggered churn prevention for client ${clientId}`)
+  private static async triggerChurnPrevention(client_id: string, interventionType: string, data: any): Promise<void> {
+    console.log(`🛡️ Triggered churn prevention for client ${client_id}`)
   }
 }

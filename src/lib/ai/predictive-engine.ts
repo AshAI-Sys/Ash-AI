@@ -41,12 +41,12 @@ class PredictiveAnalyticsEngine {
 
   // 📊 PRODUCTION EFFICIENCY PREDICTION
   async predictProductionEfficiency(
-    orderId: string, 
+    order_id: string, 
     historicalData?: any[]
   ): Promise<PredictionResult> {
     try {
       // Get historical production data
-      const history = historicalData || await this.getProductionHistory(orderId)
+      const history = historicalData || await this.getProductionHistory(order_id)
       
       // Extract features for prediction
       const features = this.extractProductionFeatures(history)
@@ -93,7 +93,7 @@ class PredictiveAnalyticsEngine {
         timeframe: '48-72 hours',
         modelVersion: 'v2.1-production'
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Production efficiency prediction failed:', error)
       throw new Error('Failed to predict production efficiency')
     }
@@ -140,7 +140,7 @@ class PredictiveAnalyticsEngine {
       const forecast = JSON.parse(response.choices[0].message.content || '{"forecasts": []}')
       
       return forecast.forecasts || []
-    } catch (error) {
+    } catch (_error) {
       console.error('Demand forecasting failed:', error)
       throw new Error('Failed to forecast demand')
     }
@@ -148,18 +148,18 @@ class PredictiveAnalyticsEngine {
 
   // 🚨 QUALITY PREDICTION & ANOMALY DETECTION
   async predictQualityIssues(
-    orderId: string,
+    order_id: string,
     productionStage: string
   ): Promise<PredictionResult> {
     try {
       // Get QC history and production parameters
-      const qcHistory = await this.getQCHistory(orderId)
-      const productionData = await this.getStageParameters(orderId, productionStage)
+      const qcHistory = await this.getQCHistory(order_id)
+      const productionData = await this.getStageParameters(order_id, productionStage)
       
       const prompt = `
         Predict quality issues based on production parameters:
         
-        Order ID: ${orderId}
+        Order ID: ${order_id}
         Production Stage: ${productionStage}
         QC History: ${JSON.stringify(qcHistory)}
         Production Parameters: ${JSON.stringify(productionData)}
@@ -193,7 +193,7 @@ class PredictiveAnalyticsEngine {
         timeframe: 'Next 24 hours',
         modelVersion: 'v2.1-quality'
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Quality prediction failed:', error)
       throw new Error('Failed to predict quality issues')
     }
@@ -201,11 +201,11 @@ class PredictiveAnalyticsEngine {
 
   // 💰 COST OPTIMIZATION ANALYSIS
   async analyzeCostOptimization(
-    orderId: string,
+    order_id: string,
     currentCosts: any
   ): Promise<PredictionResult> {
     try {
-      const historicalCosts = await this.getCostHistory(orderId)
+      const historicalCosts = await this.getCostHistory(order_id)
       const marketRates = await this.getMarketRates()
       
       const prompt = `
@@ -245,7 +245,7 @@ class PredictiveAnalyticsEngine {
         timeframe: '30-60 days',
         modelVersion: 'v2.1-cost'
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Cost optimization analysis failed:', error)
       throw new Error('Failed to analyze cost optimization')
     }
@@ -297,7 +297,7 @@ class PredictiveAnalyticsEngine {
         timeframe: `${timeHorizon} days`,
         modelVersion: 'v2.1-capacity'
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Capacity planning prediction failed:', error)
       throw new Error('Failed to predict capacity requirements')
     }
@@ -305,7 +305,7 @@ class PredictiveAnalyticsEngine {
 
   // 🏆 PERFORMANCE BENCHMARKING
   async benchmarkPerformance(
-    orderId: string,
+    order_id: string,
     metrics: ProductionMetrics
   ): Promise<PredictionResult> {
     try {
@@ -348,17 +348,17 @@ class PredictiveAnalyticsEngine {
         timeframe: 'Continuous improvement',
         modelVersion: 'v2.1-benchmark'
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Performance benchmarking failed:', error)
       throw new Error('Failed to benchmark performance')
     }
   }
 
   // HELPER METHODS
-  private async getProductionHistory(orderId: string) {
+  private async getProductionHistory(order_id: string) {
     return await prisma.productionLog.findMany({
-      where: { orderId },
-      orderBy: { createdAt: 'desc' },
+      where: { order_id },
+      orderBy: { created_at: 'desc' },
       take: 100
     })
   }
@@ -370,22 +370,22 @@ class PredictiveAnalyticsEngine {
     return await prisma.order.findMany({
       where: {
         productType: category,
-        createdAt: { gte: startDate },
+        created_at: { gte: startDate },
         status: { in: ['DELIVERED', 'COMPLETED'] }
       },
       select: {
         id: true,
-        totalQty: true,
+        total_qty: true,
         commercials: true,
-        createdAt: true,
+        created_at: true,
         deliveredAt: true
       }
     })
   }
 
-  private async getQCHistory(orderId: string) {
+  private async getQCHistory(order_id: string) {
     return await prisma.qcInspection.findMany({
-      where: { orderId },
+      where: { order_id },
       include: {
         defects: true,
         samples: true
@@ -474,7 +474,7 @@ class PredictiveAnalyticsEngine {
   private identifySeasonalPatterns(history: any[]): any {
     // Simple seasonal analysis - in production, use more sophisticated time series analysis
     const monthlyData = history.reduce((acc, item) => {
-      const month = new Date(item.createdAt).getMonth()
+      const month = new Date(item.created_at).getMonth()
       acc[month] = (acc[month] || []).concat(item)
       return acc
     }, {} as any)
@@ -496,11 +496,11 @@ class PredictiveAnalyticsEngine {
   }
 
   // Mock methods for data that would come from external sources
-  private async getStageParameters(orderId: string, stage: string) {
+  private async getStageParameters(order_id: string, stage: string) {
     return { temperature: 25, humidity: 45, pressure: 1013, speed: 100 }
   }
 
-  private async getCostHistory(orderId: string) {
+  private async getCostHistory(order_id: string) {
     return { materials: 1000, labor: 500, overhead: 200, total: 1700 }
   }
 

@@ -14,7 +14,7 @@ interface ProductListing {
   stock: number
   category: string
   tags: string[]
-  isActive: boolean
+  is_active: boolean
 }
 
 interface ProductVariant {
@@ -75,7 +75,7 @@ class EcommercePlatformIntegrator {
   }
 
   // SHOPEE INTEGRATION
-  async shopee_syncProducts(brandId: string): Promise<ProductListing[]> {
+  async shopee_syncProducts(brand_id: string): Promise<ProductListing[]> {
     try {
       const apiKey = this.apiKeys.get('shopee')
       const shopId = process.env.ASH_SHOPEE_SHOP_ID
@@ -85,7 +85,7 @@ class EcommercePlatformIntegrator {
       }
 
       // Get products from ASH AI database
-      const ashProducts = await this.getASHProducts(brandId)
+      const ashProducts = await this.getASHProducts(brand_id)
       const listings: ProductListing[] = []
       
       for (const product of ashProducts) {
@@ -105,7 +105,7 @@ class EcommercePlatformIntegrator {
       }
       
       return listings
-    } catch (error) {
+    } catch (_error) {
       console.error('Shopee product sync failed:', error)
       throw new Error('Failed to sync products with Shopee')
     }
@@ -173,19 +173,19 @@ class EcommercePlatformIntegrator {
           stock: product.stock,
           category: product.category,
           tags: product.tags || [],
-          isActive: true
+          is_active: true
         }
       }
       
       return null
-    } catch (error) {
+    } catch (_error) {
       console.error('Shopee product creation failed:', error)
       return null
     }
   }
 
   // LAZADA INTEGRATION
-  async lazada_syncProducts(brandId: string): Promise<ProductListing[]> {
+  async lazada_syncProducts(brand_id: string): Promise<ProductListing[]> {
     try {
       const apiKey = this.apiKeys.get('lazada')
       const appSecret = process.env.ASH_LAZADA_APP_SECRET
@@ -195,7 +195,7 @@ class EcommercePlatformIntegrator {
         throw new Error('Lazada credentials not configured')
       }
 
-      const ashProducts = await this.getASHProducts(brandId)
+      const ashProducts = await this.getASHProducts(brand_id)
       const listings: ProductListing[] = []
       
       for (const product of ashProducts) {
@@ -206,7 +206,7 @@ class EcommercePlatformIntegrator {
       }
       
       return listings
-    } catch (error) {
+    } catch (_error) {
       console.error('Lazada product sync failed:', error)
       throw new Error('Failed to sync products with Lazada')
     }
@@ -277,19 +277,19 @@ class EcommercePlatformIntegrator {
           stock: product.stock,
           category: product.category,
           tags: product.tags || [],
-          isActive: true
+          is_active: true
         }
       }
       
       return null
-    } catch (error) {
+    } catch (_error) {
       console.error('Lazada product creation failed:', error)
       return null
     }
   }
 
   // TIKTOK SHOP INTEGRATION
-  async tiktok_syncProducts(brandId: string): Promise<ProductListing[]> {
+  async tiktok_syncProducts(brand_id: string): Promise<ProductListing[]> {
     try {
       const apiKey = this.apiKeys.get('tiktok')
       const appSecret = process.env.ASH_TIKTOK_APP_SECRET
@@ -299,7 +299,7 @@ class EcommercePlatformIntegrator {
         throw new Error('TikTok Shop credentials not configured')
       }
 
-      const ashProducts = await this.getASHProducts(brandId)
+      const ashProducts = await this.getASHProducts(brand_id)
       const listings: ProductListing[] = []
       
       for (const product of ashProducts) {
@@ -310,7 +310,7 @@ class EcommercePlatformIntegrator {
       }
       
       return listings
-    } catch (error) {
+    } catch (_error) {
       console.error('TikTok Shop product sync failed:', error)
       throw new Error('Failed to sync products with TikTok Shop')
     }
@@ -327,7 +327,7 @@ class EcommercePlatformIntegrator {
         product_name: product.name,
         description: product.description,
         category_id: this.mapToTikTokCategory(product.category),
-        brand_id: product.brandId || '',
+        brand_id: product.brand_id || '',
         images: product.images.map((img: string) => ({ uri: img })),
         video: product.videoUrl ? { uri: product.videoUrl } : undefined,
         skus: [{
@@ -384,12 +384,12 @@ class EcommercePlatformIntegrator {
           stock: product.stock,
           category: product.category,
           tags: product.tags || [],
-          isActive: true
+          is_active: true
         }
       }
       
       return null
-    } catch (error) {
+    } catch (_error) {
       console.error('TikTok Shop product creation failed:', error)
       return null
     }
@@ -414,7 +414,7 @@ class EcommercePlatformIntegrator {
       }
       
       return null
-    } catch (error) {
+    } catch (_error) {
       console.error(`Order sync from ${platform} failed:`, error)
       throw new Error(`Failed to sync order from ${platform}`)
     }
@@ -440,13 +440,13 @@ class EcommercePlatformIntegrator {
       })
       
       await Promise.allSettled(updatePromises)
-    } catch (error) {
+    } catch (_error) {
       console.error('Inventory sync failed:', error)
     }
   }
 
   // HELPER METHODS
-  private async getASHProducts(brandId: string) {
+  private async getASHProducts(brand_id: string) {
     // Mock implementation - in reality, this would query the ASH database
     return [
       {
@@ -474,7 +474,7 @@ class EcommercePlatformIntegrator {
   private mapPlatformOrder(orderData: any, platform: string): OrderSync {
     // This would map platform-specific order data to our standard format
     return {
-      platformOrderId: orderData.order_id || orderData.orderId,
+      platformOrderId: orderData.order_id || orderData.order_id,
       platform,
       customer: {
         name: orderData.customer?.name || orderData.buyer_name,
@@ -482,7 +482,7 @@ class EcommercePlatformIntegrator {
         phone: orderData.customer?.phone || orderData.buyer_phone,
         address: orderData.shipping_address || orderData.address
       },
-      items: (orderData.items || []).map((item: any) => ({
+      items: (orderData.items || []).map((_item: any) => ({
         productId: item.product_id || item.item_id,
         variantId: item.variant_id || item.sku_id,
         sku: item.sku || item.item_sku,
@@ -584,7 +584,7 @@ class EcommercePlatformIntegrator {
     return { id: 'ash_order_' + Date.now() }
   }
 
-  private async updatePlatformOrderStatus(orderId: string, platform: string, status: string): Promise<void> {
+  private async updatePlatformOrderStatus(order_id: string, platform: string, status: string): Promise<void> {
     // Implementation to update order status on platform
   }
 

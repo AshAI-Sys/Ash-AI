@@ -16,7 +16,7 @@ export interface TwoFactorVerification {
 
 export class TwoFactorAuth {
   
-  static async generateSecret(userId: string, userEmail: string): Promise<TwoFactorSetup> {
+  static async generateSecret(user_id: string, userEmail: string): Promise<TwoFactorSetup> {
     const secret = speakeasy.generateSecret({
       name: `Sorbetes Apparel (${userEmail})`,
       issuer: 'Sorbetes Apparel Studio',
@@ -28,9 +28,9 @@ export class TwoFactorAuth {
     const qrCodeUrl = await qrcode.toDataURL(secret.otpauth_url!);
 
     await prisma.twoFactorAuth.upsert({
-      where: { userId },
+      where: { user_id },
       create: {
-        userId,
+        user_id,
         secret: secret.base32!,
         enabled: false,
         backupCodes: backupCodes,
@@ -48,9 +48,9 @@ export class TwoFactorAuth {
     };
   }
 
-  static async enableTwoFactor(userId: string, token: string): Promise<boolean> {
+  static async enableTwoFactor(user_id: string, token: string): Promise<boolean> {
     const twoFactorAuth = await prisma.twoFactorAuth.findUnique({
-      where: { userId }
+      where: { user_id }
     });
 
     if (!twoFactorAuth) {
@@ -65,7 +65,7 @@ export class TwoFactorAuth {
 
     if (isValid) {
       await prisma.twoFactorAuth.update({
-        where: { userId },
+        where: { user_id },
         data: { enabled: true }
       });
     }
@@ -73,16 +73,16 @@ export class TwoFactorAuth {
     return isValid;
   }
 
-  static async disableTwoFactor(userId: string): Promise<void> {
+  static async disableTwoFactor(user_id: string): Promise<void> {
     await prisma.twoFactorAuth.update({
-      where: { userId },
+      where: { user_id },
       data: { enabled: false }
     });
   }
 
-  static async verifyToken(userId: string, token: string): Promise<TwoFactorVerification> {
+  static async verifyToken(user_id: string, token: string): Promise<TwoFactorVerification> {
     const twoFactorAuth = await prisma.twoFactorAuth.findUnique({
-      where: { userId }
+      where: { user_id }
     });
 
     if (!twoFactorAuth || !twoFactorAuth.enabled) {
@@ -97,7 +97,7 @@ export class TwoFactorAuth {
 
     if (isValidTotp) {
       await prisma.twoFactorAuth.update({
-        where: { userId },
+        where: { user_id },
         data: { lastUsed: new Date() }
       });
       return { isValid: true };
@@ -109,7 +109,7 @@ export class TwoFactorAuth {
     if (isBackupCode) {
       const updatedBackupCodes = backupCodes.filter(code => code !== token.toUpperCase());
       await prisma.twoFactorAuth.update({
-        where: { userId },
+        where: { user_id },
         data: { 
           backupCodes: updatedBackupCodes,
           lastUsed: new Date()
@@ -121,9 +121,9 @@ export class TwoFactorAuth {
     return { isValid: false };
   }
 
-  static async isTwoFactorEnabled(userId: string): Promise<boolean> {
+  static async isTwoFactorEnabled(user_id: string): Promise<boolean> {
     const twoFactorAuth = await prisma.twoFactorAuth.findUnique({
-      where: { userId }
+      where: { user_id }
     });
 
     return twoFactorAuth?.enabled ?? false;
@@ -142,11 +142,11 @@ export class TwoFactorAuth {
     return crypto.createHash('sha256').update(code).digest('hex');
   }
 
-  static async regenerateBackupCodes(userId: string): Promise<string[]> {
+  static async regenerateBackupCodes(user_id: string): Promise<string[]> {
     const newCodes = this.generateBackupCodes();
     
     await prisma.twoFactorAuth.update({
-      where: { userId },
+      where: { user_id },
       data: { backupCodes: newCodes }
     });
 

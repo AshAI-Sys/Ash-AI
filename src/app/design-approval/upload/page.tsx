@@ -27,7 +27,7 @@ export default function DesignUploadPage() {
   const router = useRouter()
   
   const [designData, setDesignData] = useState({
-    orderId: '',
+    order_id: '',
     designName: '',
     printingMethod: 'Silkscreen',
     placementAreas: [] as string[],
@@ -170,11 +170,11 @@ export default function DesignUploadPage() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="orderId" className="text-white">Order ID</Label>
+                    <Label htmlFor="order_id" className="text-white">Order ID</Label>
                     <Input
-                      id="orderId"
-                      value={designData.orderId}
-                      onChange={(e) => setDesignData(prev => ({ ...prev, orderId: e.target.value }))}
+                      id="order_id"
+                      value={designData.order_id}
+                      onChange={(e) => setDesignData(prev => ({ ...prev, order_id: e.target.value }))}
                       placeholder="ORD-2024-001"
                       className="neural-input"
                       required

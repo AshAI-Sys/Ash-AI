@@ -183,9 +183,9 @@ export async function POST(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const url = new URL(request.url)
-    const designId = url.pathname.split('/').pop()
+    const design_id = url.pathname.split('/').pop()
     
-    if (!designId) {
+    if (!design_id) {
       return NextResponse.json(
         { error: 'Design ID is required' },
         { status: 400 }
@@ -201,7 +201,7 @@ export async function PATCH(request: NextRequest) {
     } = body
 
     const existingDesign = await db.designAsset.findUnique({
-      where: { id: designId },
+      where: { id: design_id },
       include: {
         order: true
       }
@@ -215,7 +215,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const updatedDesign = await db.designAsset.update({
-      where: { id: designId },
+      where: { id: design_id },
       data: {
         ...(approval_status && { approval_status }),
         ...(print_ready !== undefined && { print_ready }),
@@ -229,7 +229,7 @@ export async function PATCH(request: NextRequest) {
     await createAuditLog({
       workspace_id: existingDesign.order.workspace_id,
       entity_type: 'design_asset',
-      entity_id: designId,
+      entity_id: design_id,
       action: 'UPDATE',
       before_data: {
         approval_status: existingDesign.approval_status,

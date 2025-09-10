@@ -157,32 +157,32 @@ export class AppCache {
   }
 
   // Orders cache
-  static cacheOrder(orderId: string, orderData: unknown): void {
-    this.cache.set(`order:${orderId}`, orderData, {
+  static cacheOrder(order_id: string, orderData: unknown): void {
+    this.cache.set(`order:${order_id}`, orderData, {
       ttl: 10 * 60 * 1000, // 10 minutes
-      tags: ['orders', `order-${orderId}`]
+      tags: ['orders', `order-${order_id}`]
     });
   }
 
-  static getOrder(orderId: string): unknown | null {
-    return this.cache.get(`order:${orderId}`);
+  static getOrder(order_id: string): unknown | null {
+    return this.cache.get(`order:${order_id}`);
   }
 
-  static invalidateOrder(orderId: string): void {
-    this.cache.delete(`order:${orderId}`);
-    this.cache.invalidateByTag(`order-${orderId}`);
+  static invalidateOrder(order_id: string): void {
+    this.cache.delete(`order:${order_id}`);
+    this.cache.invalidateByTag(`order-${order_id}`);
   }
 
   // User session cache
-  static cacheUserSession(userId: string, sessionData: unknown): void {
-    this.cache.set(`user:${userId}`, sessionData, {
+  static cacheUserSession(user_id: string, sessionData: unknown): void {
+    this.cache.set(`user:${user_id}`, sessionData, {
       ttl: 30 * 60 * 1000, // 30 minutes
-      tags: ['users', `user-${userId}`]
+      tags: ['users', `user-${user_id}`]
     });
   }
 
-  static getUserSession(userId: string): unknown | null {
-    return this.cache.get(`user:${userId}`);
+  static getUserSession(user_id: string): unknown | null {
+    return this.cache.get(`user:${user_id}`);
   }
 
   // Inventory cache

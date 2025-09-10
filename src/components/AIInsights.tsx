@@ -358,7 +358,7 @@ export function AIInsights({ userRole, limit = 10, showActions = true }: AIInsig
 
                 {/* Time indicator */}
                 <div className="text-xs text-gray-500 whitespace-nowrap">
-                  {new Date(insight.createdAt).toLocaleTimeString('en-US', { 
+                  {new Date(insight.created_at).toLocaleTimeString('en-US', { 
                     hour: '2-digit', 
                     minute: '2-digit' 
                   })}

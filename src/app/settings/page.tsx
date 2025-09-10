@@ -263,9 +263,9 @@ export default function SettingsPage() {
     }
   }
 
-  const toggleBrandStatus = async (brandId: string) => {
+  const toggleBrandStatus = async (brand_id: string) => {
     const updatedBrands = brands.map(brand =>
-      brand.id === brandId ? { ...brand, active: !brand.active } : brand
+      brand.id === brand_id ? { ...brand, active: !brand.active } : brand
     )
     setBrands(updatedBrands)
 

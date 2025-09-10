@@ -92,7 +92,7 @@ export async function createAuditLog(params: {
         after_data: params.after_data ? JSON.stringify(params.after_data) : undefined,
       },
     });
-  } catch (error) {
+  } catch (_error) {
     console.error('Failed to create audit log:', error);
     // Don't throw - audit logging shouldn't break the main operation
   }

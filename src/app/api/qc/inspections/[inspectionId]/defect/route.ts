@@ -190,7 +190,7 @@ export async function POST(
     // Create audit log
     await prisma.auditLog.create({
       data: {
-        userId: session.user.id,
+        user_id: session.user.id,
         action: 'LOG_QC_DEFECT',
         entityType: 'QCDefect',
         entityId: defect.id,
@@ -212,7 +212,7 @@ export async function POST(
     if (autoDisposition === 'FAILED') {
       await prisma.trackingUpdate.create({
         data: {
-          orderId: inspection.orderId,
+          order_id: inspection.order_id,
           stage: 'Quality Control',
           status: 'FAILED',
           message: `QC inspection FAILED - ${inspection.stage} stage. ${newDefectCount} defects found (limit: ${inspection.acceptance}). Shipment on hold.`,
@@ -224,8 +224,8 @@ export async function POST(
       // Auto-create CAPA task for failed inspections
       await prisma.cAPATask.create({
         data: {
-          workspaceId: 'default',
-          orderId: inspection.orderId,
+          workspace_id: 'default',
+          order_id: inspection.order_id,
           sourceInspectionId: inspectionId,
           title: `QC Failure Investigation - ${inspection.order.orderNumber}`,
           description: `Investigate root cause of QC failure in ${inspection.stage} stage. ${newDefectCount} defects found exceeding acceptance limit of ${inspection.acceptance}.`,

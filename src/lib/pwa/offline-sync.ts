@@ -13,11 +13,11 @@ interface SyncQueue {
   priority: 'low' | 'medium' | 'high' | 'critical'
 }
 
-interface OfflineStorage {
-  orders: any[]
-  production: any[]
-  qc: any[]
-  inventory: any[]
+// interface OfflineStorage {
+//   orders: any[]
+//   production: any[]
+//   qc: any[]
+//   inventory: any[]
   sync_queue: SyncQueue[]
   user_data: any
   last_sync: Date
@@ -49,14 +49,14 @@ class OfflineSyncManager {
         if (!db.objectStoreNames.contains('orders')) {
           const ordersStore = db.createObjectStore('orders', { keyPath: 'id' })
           ordersStore.createIndex('status', 'status', { unique: false })
-          ordersStore.createIndex('clientId', 'clientId', { unique: false })
+          ordersStore.createIndex('client_id', 'client_id', { unique: false })
           ordersStore.createIndex('updatedAt', 'updatedAt', { unique: false })
         }
 
         // Production tracking store
         if (!db.objectStoreNames.contains('production')) {
           const productionStore = db.createObjectStore('production', { keyPath: 'id' })
-          productionStore.createIndex('orderId', 'orderId', { unique: false })
+          productionStore.createIndex('order_id', 'order_id', { unique: false })
           productionStore.createIndex('stage', 'stage', { unique: false })
           productionStore.createIndex('status', 'status', { unique: false })
         }
@@ -64,7 +64,7 @@ class OfflineSyncManager {
         // QC inspections store
         if (!db.objectStoreNames.contains('qc')) {
           const qcStore = db.createObjectStore('qc', { keyPath: 'id' })
-          qcStore.createIndex('orderId', 'orderId', { unique: false })
+          qcStore.createIndex('order_id', 'order_id', { unique: false })
           qcStore.createIndex('status', 'status', { unique: false })
           qcStore.createIndex('inspector', 'inspector', { unique: false })
         }
@@ -127,7 +127,7 @@ class OfflineSyncManager {
       await syncStore.put(syncItem)
       
       console.log(`📱 Stored ${entity} offline:`, operation, data.id)
-    } catch (error) {
+    } catch (_error) {
       console.error('Failed to store data offline:', error)
       throw error
     }
@@ -201,7 +201,7 @@ class OfflineSyncManager {
           const progress = Math.round((processed / totalItems) * 100)
           this.notifyProgress(progress, `Synced ${processed}/${totalItems} items`)
 
-        } catch (error) {
+        } catch (_error) {
           console.error(`Failed to sync item ${item.id}:`, error)
           
           // Increment retry count
@@ -221,7 +221,7 @@ class OfflineSyncManager {
       this.notifyProgress(100, 'Sync completed successfully')
       console.log('✅ Offline sync completed')
 
-    } catch (error) {
+    } catch (_error) {
       console.error('Sync failed:', error)
       this.notifyProgress(0, 'Sync failed')
       throw error
@@ -316,7 +316,7 @@ class OfflineSyncManager {
       }
 
       console.log('✅ Essential data cached successfully')
-    } catch (error) {
+    } catch (_error) {
       console.error('Failed to cache essential data:', error)
     }
   }

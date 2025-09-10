@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url)
-    const orderId = searchParams.get('orderId')
+    const order_id = searchParams.get('order_id')
     const stage = searchParams.get('stage')
     const status = searchParams.get('status')
     const inspector = searchParams.get('inspector')
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
 
     const inspections = await prisma.qCInspection.findMany({
       where: {
-        ...(orderId && { orderId }),
+        ...(order_id && { order_id }),
         ...(stage && { stage: stage as any }),
         ...(status && { status: status as any }),
         ...(inspector && { created_by: inspector })
@@ -125,8 +125,8 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
     const { 
-      orderId, 
-      routingStepId, 
+      order_id, 
+      routing_step_id, 
       stage, 
       lotSize, 
       aql = 2.5, 
@@ -136,15 +136,15 @@ export async function POST(request: NextRequest) {
     } = body
 
     // Validate required fields
-    if (!orderId || !stage || !lotSize) {
+    if (!order_id || !stage || !lotSize) {
       return NextResponse.json({ 
-        error: 'Missing required fields: orderId, stage, lotSize' 
+        error: 'Missing required fields: order_id, stage, lotSize' 
       }, { status: 400 })
     }
 
     // Validate order exists
     const order = await prisma.order.findUnique({
-      where: { id: orderId },
+      where: { id: order_id },
       select: { id: true, orderNumber: true, status: true }
     })
 
@@ -166,7 +166,7 @@ export async function POST(request: NextRequest) {
     // Check for existing open inspections for same order/stage
     const existingInspection = await prisma.qCInspection.findFirst({
       where: {
-        orderId,
+        order_id,
         stage: stage as any,
         status: { in: ['OPEN', 'IN_PROGRESS'] }
       }
@@ -182,8 +182,8 @@ export async function POST(request: NextRequest) {
     // Create the inspection
     const inspection = await prisma.qCInspection.create({
       data: {
-        orderId,
-        routingStepId,
+        order_id,
+        routing_step_id,
         stage: stage as any,
         lotSize,
         aql: parseFloat(aql.toString()),
@@ -208,13 +208,13 @@ export async function POST(request: NextRequest) {
     // Create audit log
     await prisma.auditLog.create({
       data: {
-        userId: session.user.id,
+        user_id: session.user.id,
         action: 'CREATE_QC_INSPECTION',
         entityType: 'QCInspection',
         entityId: inspection.id,
         details: `Created QC inspection for ${order.orderNumber} - ${stage}`,
         metadata: {
-          orderId,
+          order_id,
           stage,
           lotSize,
           aql,
@@ -228,7 +228,7 @@ export async function POST(request: NextRequest) {
     // Generate tracking update
     await prisma.trackingUpdate.create({
       data: {
-        orderId,
+        order_id,
         stage: 'Quality Control',
         status: 'IN_PROGRESS',
         message: `QC inspection started for ${stage} stage - Sample size: ${aqlPlan.sampleSize}`,
@@ -242,7 +242,7 @@ export async function POST(request: NextRequest) {
       message: 'QC inspection created successfully',
       inspection: {
         id: inspection.id,
-        orderId: inspection.orderId,
+        order_id: inspection.order_id,
         stage: inspection.stage,
         sampleSize: inspection.sampleSize,
         acceptance: inspection.acceptance,

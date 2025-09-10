@@ -31,7 +31,7 @@ export async function POST(
     }
 
     const { id } = await params
-    const orderId = id
+    const order_id = id
     const body = await request.json()
     const { steps } = body
 
@@ -44,9 +44,9 @@ export async function POST(
 
     // Validate order exists
     const order = await prisma.order.findUnique({
-      where: { id: orderId },
+      where: { id: order_id },
       include: {
-        routingSteps: true,
+        routing_steps: true,
         brand: true
       }
     })
@@ -59,8 +59,8 @@ export async function POST(
     }
 
     // Check if any steps are already in progress
-    const stepsInProgress = order.routingSteps.filter(
-      step => ['IN_PROGRESS', 'DONE'].includes(step.status)
+    const stepsInProgress = order.routing_steps.filter(
+      (step: any) => ['IN_PROGRESS', 'DONE'].includes(step.status)
     )
 
     if (stepsInProgress.length > 0) {
@@ -84,8 +84,8 @@ export async function POST(
 
     // Run Ashley AI route safety check
     const routeCheck = await AshleyAI.validateRouteCustomization({
-      orderId,
-      method: order.printMethod,
+      order_id,
+      method: order.method,
       customSteps: steps
     })
 
@@ -102,12 +102,12 @@ export async function POST(
 
     const result = await prisma.$transaction(async (tx) => {
       // Store old routing steps for audit
-      const oldSteps = order.routingSteps
+      const oldSteps = order.routing_steps
 
       // Delete existing PLANNED routing steps
       await tx.routingStep.deleteMany({
         where: {
-          orderId,
+          order_id: order_id,
           status: 'PLANNED'
         }
       })
@@ -117,19 +117,18 @@ export async function POST(
       for (const stepData of steps) {
         const step = await tx.routingStep.create({
           data: {
-            orderId,
-            workspaceId: 'default',
+            order_id: order_id,
             name: stepData.name,
             workcenter: stepData.workcenter,
             sequence: stepData.sequence,
-            dependsOn: stepData.dependsOn || [],
-            joinType: stepData.joinType,
-            standardSpec: stepData.standardSpec || {},
-            expectedInputs: stepData.expectedInputs || {},
-            expectedOutputs: stepData.expectedOutputs || {},
-            canRunParallel: stepData.canRunParallel || false,
-            plannedStart: stepData.plannedStart ? new Date(stepData.plannedStart) : undefined,
-            plannedEnd: stepData.plannedEnd ? new Date(stepData.plannedEnd) : undefined,
+            depends_on: stepData.dependsOn || [],
+            join_type: stepData.joinType,
+            standard_spec: stepData.standard_spec || {},
+            expected_inputs: stepData.expectedInputs || {},
+            expected_outputs: stepData.expectedOutputs || {},
+            can_run_parallel: stepData.canRunParallel || false,
+            planned_start: stepData.plannedStart ? new Date(stepData.plannedStart) : undefined,
+            planned_end: stepData.plannedEnd ? new Date(stepData.plannedEnd) : undefined,
             status: 'PLANNED'
           }
         })
@@ -141,17 +140,17 @@ export async function POST(
 
     // Log audit event
     await AuditLogger.log({
-      userId: session.user.id,
+      user_id: session.user.id,
       action: 'CUSTOMIZE_ROUTING',
       entity: 'routing_step',
-      entityId: orderId,
+      entityId: order_id,
       oldValues: { steps: result.oldSteps },
       newValues: { steps: result.newSteps, customization: true }
     })
 
     // Emit event
     await AshEventBus.emit('ash.routing.customized', {
-      orderId,
+      order_id,
       actorId: session.user.id,
       stepsCreated: result.newSteps.length,
       ashleyWarnings: routeCheck.warnings || []
@@ -198,10 +197,10 @@ function validateRoutingSteps(steps: RoutingStep[]): { valid: boolean; error?: s
   const stepNames = new Set(steps.map(s => s.name))
 
   for (const step of steps) {
-    graph.set(step.name, step.dependsOn || [])
+    graph.set(step.name, (step as any).dependsOn || [])
     
     // Check if all dependencies exist
-    for (const dep of (step.dependsOn || [])) {
+    for (const dep of ((step as any).dependsOn || [])) {
       if (!stepNames.has(dep)) {
         return {
           valid: false,

@@ -94,7 +94,7 @@ interface TripExpense {
   type: string
   amount: number
   receiptUrl: string | null
-  createdAt: string
+  created_at: string
 }
 
 const EXPENSE_TYPES = [
@@ -726,7 +726,7 @@ export default function DriverPage() {
                                   {EXPENSE_TYPES.find(t => t.value === expense.type)?.label || expense.type}
                                 </div>
                                 <div className="text-sm text-muted-foreground">
-                                  {new Date(expense.createdAt).toLocaleString()}
+                                  {new Date(expense.created_at).toLocaleString()}
                                 </div>
                               </div>
                             </div>

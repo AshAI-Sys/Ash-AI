@@ -4,10 +4,10 @@ import { authOptions } from '@/lib/auth'
 import { Role } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 
-// POST /api/client-portal/orders/[orderId]/request-revision - Request design revision
+// POST /api/client-portal/orders/[order_id]/request-revision - Request design revision
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ orderId: string }> }
+  { params }: { params: Promise<{ order_id: string }> }
 ) {
   try {
     const session = await getServerSession()
@@ -15,7 +15,7 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { orderId } = await params
+    const { order_id } = await params
     const body = await request.json()
 
     // Validate required fields
@@ -27,9 +27,9 @@ export async function POST(
 
     // Find the order
     const order = await prisma.order.findUnique({
-      where: { id: orderId },
+      where: { id: order_id },
       include: {
-        routingSteps: true,
+        routing_steps: true,
         client: true
       }
     })
@@ -40,14 +40,14 @@ export async function POST(
 
     // Update order status to revision requested
     await prisma.order.update({
-      where: { id: orderId },
+      where: { id: order_id },
       data: {
         status: 'DESIGN_REVISION'
       }
     })
 
     // Reset design approval routing step if exists
-    const designStep = order.routingSteps.find(step => 
+    const designStep = order.routing_steps.find(step => 
       step.name.toLowerCase().includes('design') || 
       step.name.toLowerCase().includes('approval')
     )
@@ -64,7 +64,7 @@ export async function POST(
     // Create tracking update
     await prisma.trackingUpdate.create({
       data: {
-        orderId,
+        order_id,
         stage: 'Design Revision',
         status: 'OPEN',
         message: `Client requested design revision: ${body.comments}`,
@@ -83,7 +83,7 @@ export async function POST(
         status: 'OPEN',
         assignedToRole: 'GRAPHIC_ARTIST',
         entityType: 'order',
-        entityId: orderId,
+        entityId: order_id,
         dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
         createdById: session.user.id
       }
@@ -94,7 +94,7 @@ export async function POST(
       data: {
         eventType: 'client.design.revision_requested',
         entityType: 'order',
-        entityId: orderId,
+        entityId: order_id,
         payload: {
           orderNumber: order.orderNumber,
           revisionComments: body.comments,
@@ -107,10 +107,10 @@ export async function POST(
     // Create audit log
     await prisma.auditLog.create({
       data: {
-        userId: session.user.id,
+        user_id: session.user.id,
         action: 'REQUEST_DESIGN_REVISION',
         entityType: 'Order',
-        entityId: orderId,
+        entityId: order_id,
         details: `Client requested design revision for order ${order.orderNumber}`,
         metadata: {
           orderNumber: order.orderNumber,

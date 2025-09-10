@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth'
-import { Role } from '@prisma/client'
+
 import { db } from '@/lib/db'
 import { validateAshleyAI } from '@/lib/ashley-ai'
 // HR Employees API for Stage 10 HR System
@@ -134,7 +132,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate workspace exists
-    const workspace = await db.workspace.findUnique({
+    const _workspace = await db.workspace.findUnique({
       where: { id: workspace_id }
     })
 

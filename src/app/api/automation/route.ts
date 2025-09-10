@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     }
     
     if (active !== null) {
-      where.isActive = active === "true"
+      where.is_active = active === "true"
     }
     
     if (priority) {
@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
       },
       orderBy: [
         { priority: "desc" },
-        { isActive: "desc" },
+        { is_active: "desc" },
         { updated_at: "desc" }
       ]
     })

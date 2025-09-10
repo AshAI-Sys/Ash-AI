@@ -45,8 +45,8 @@ export async function POST(request: NextRequest) {
       // Send to specific users
       const userSubscriptions = await prisma.pushSubscription.findMany({
         where: {
-          userId: { in: targetUsers },
-          isActive: true
+          user_id: { in: targetUsers },
+          is_active: true
         }
       })
       
@@ -68,9 +68,9 @@ export async function POST(request: NextRequest) {
         const workspaceSubscriptions = await prisma.pushSubscription.findMany({
           where: {
             user: {
-              workspaceId: user.workspaceId
+              workspace_id: user.workspace_id
             },
-            isActive: true
+            is_active: true
           }
         })
 
@@ -97,14 +97,14 @@ export async function POST(request: NextRequest) {
         try {
           await webpush.sendNotification(sub, JSON.stringify(payload))
           return { success: true, endpoint: sub.endpoint }
-        } catch (error) {
+        } catch (_error) {
           console.error('Failed to send push notification:', error)
           
           // If subscription is invalid, mark as inactive
           if (error.statusCode === 410 || error.statusCode === 404) {
             await prisma.pushSubscription.updateMany({
               where: { endpoint: sub.endpoint },
-              data: { isActive: false }
+              data: { is_active: false }
             })
           }
           
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
     // Store notification in database
     await prisma.notification.create({
       data: {
-        userId: session.user.id,
+        user_id: session.user.id,
         title: payload.title,
         message: payload.body,
         type: payload.data?.type || 'system_alert',
@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
       )
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Failed to send push notifications:', error)
     return NextResponse.json(
       { error: 'Failed to send notifications' },
@@ -180,8 +180,8 @@ export async function PUT(request: NextRequest) {
     // Get active subscriptions for target users
     const subscriptions = await prisma.pushSubscription.findMany({
       where: {
-        userId: { in: userIds },
-        isActive: true
+        user_id: { in: userIds },
+        is_active: true
       },
       include: {
         user: {
@@ -227,7 +227,7 @@ export async function PUT(request: NextRequest) {
           // Store notification for this user
           await prisma.notification.create({
             data: {
-              userId: sub.userId,
+              user_id: sub.user_id,
               title,
               message: body,
               type,
@@ -239,24 +239,24 @@ export async function PUT(request: NextRequest) {
 
           return { 
             success: true, 
-            userId: sub.userId, 
+            user_id: sub.user_id, 
             userName: sub.user.name,
             endpoint: sub.endpoint 
           }
-        } catch (error) {
-          console.error(`Failed to send notification to user ${sub.userId}:`, error)
+        } catch (_error) {
+          console.error(`Failed to send notification to user ${sub.user_id}:`, error)
           
           // Mark invalid subscriptions as inactive
           if (error.statusCode === 410 || error.statusCode === 404) {
             await prisma.pushSubscription.update({
               where: { id: sub.id },
-              data: { isActive: false }
+              data: { is_active: false }
             })
           }
           
           return { 
             success: false, 
-            userId: sub.userId, 
+            user_id: sub.user_id, 
             userName: sub.user.name,
             error: error.message 
           }
@@ -278,7 +278,7 @@ export async function PUT(request: NextRequest) {
       )
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Failed to send targeted notifications:', error)
     return NextResponse.json(
       { error: 'Failed to send notifications' },

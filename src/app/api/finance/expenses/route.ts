@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
     }
     const body = await request.json()
     const {
-      orderId,
+      order_id,
       tripId,
       categoryId,
       vendorId,
@@ -143,7 +143,7 @@ export async function POST(request: NextRequest) {
     const expense = await prisma.expense.create({
       data: {
         expenseNumber,
-        orderId: orderId || null,
+        order_id: order_id || null,
         tripId: tripId || null,
         categoryId,
         vendorId: vendorId || null,

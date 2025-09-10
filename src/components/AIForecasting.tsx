@@ -157,7 +157,7 @@ export function AIForecasting({ orderIds, showDetails = true }: AIForecastingPro
             
             return (
               <div
-                key={forecast.orderId}
+                key={forecast.order_id}
                 className="group p-5 rounded-xl bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300 stagger-animation border border-white/10 hover:border-white/20"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
@@ -169,7 +169,7 @@ export function AIForecasting({ orderIds, showDetails = true }: AIForecastingPro
                     </div>
                     <div>
                       <h4 className="font-semibold text-white group-hover:text-gradient">
-                        Order #{forecast.orderId.slice(-8)}
+                        Order #{forecast.order_id.slice(-8)}
                       </h4>
                       <p className="text-sm text-white/70">
                         Estimated completion: {forecast.estimatedCompletionDate.toDateString()}

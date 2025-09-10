@@ -1,7 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth'
-import { Role } from '@prisma/client'
 import { db } from '@/lib/db'
 import { AshleyMerchandisingAI, OrderHistoryItem, MarketTrendData } from '@/lib/ashley-ai-merchandising'
 // Ashley AI Merchandising API - Stage 13 Implementation
@@ -218,7 +215,7 @@ export async function POST(request: NextRequest) {
       { 
         success: false,
         error: 'Failed to generate AI merchandising insights',
-        details: process.env.NODE_ENV === 'development' ? error : undefined
+        details: process.env.NODE_ENV === 'development' ? _error : undefined
       },
       { status: 500 }
     )

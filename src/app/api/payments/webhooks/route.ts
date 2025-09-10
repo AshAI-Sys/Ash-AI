@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     } else {
       return NextResponse.json({ error: 'Invalid webhook source' }, { status: 400 })
     }
-  } catch (error) {
+  } catch (_error) {
     console.error('Webhook processing error:', error)
     return NextResponse.json(
       { error: 'Webhook processing failed' }, 
@@ -120,8 +120,8 @@ async function handleStripeWebhook(payload: string, signature: string) {
 }
 
 async function processPaymentSuccess(paymentData: any, provider: string) {
-  const orderId = paymentData.metadata?.order_id || paymentData.attributes?.metadata?.order_id
-  if (!orderId) {
+  const order_id = paymentData.metadata?.order_id || paymentData.attributes?.metadata?.order_id
+  if (!order_id) {
     console.error('No order ID found in payment metadata')
     return
   }
@@ -140,30 +140,30 @@ async function processPaymentSuccess(paymentData: any, provider: string) {
       create: {
         id: crypto.randomUUID(),
         reference: paymentData.id,
-        orderId: orderId,
+        order_id: order_id,
         amount: (paymentData.amount || paymentData.attributes?.amount) / 100, // Convert from cents
         currency: paymentData.currency || paymentData.attributes?.currency || 'PHP',
         provider: provider,
         status: 'COMPLETED',
         completedAt: new Date(),
         providerResponse: JSON.stringify(paymentData),
-        createdAt: new Date()
+        created_at: new Date()
       }
     })
 
     // Update order payment status
     await prisma.order.update({
-      where: { id: orderId },
+      where: { id: order_id },
       data: {
         paymentStatus: 'PAID',
         paidAt: new Date(),
-        updatedAt: new Date()
+        updated_at: new Date()
       }
     })
 
     // Create invoice payment allocation
     const order = await prisma.order.findUnique({
-      where: { id: orderId },
+      where: { id: order_id },
       include: { invoices: true }
     })
 
@@ -176,7 +176,7 @@ async function processPaymentSuccess(paymentData: any, provider: string) {
           paymentId: paymentData.id,
           invoiceId: invoice.id,
           amount: (paymentData.amount || paymentData.attributes?.amount) / 100,
-          createdAt: new Date()
+          created_at: new Date()
         }
       })
 
@@ -186,39 +186,39 @@ async function processPaymentSuccess(paymentData: any, provider: string) {
         data: {
           balance: Math.max(0, invoice.balance - ((paymentData.amount || paymentData.attributes?.amount) / 100)),
           status: invoice.balance <= ((paymentData.amount || paymentData.attributes?.amount) / 100) ? 'PAID' : 'PARTIAL',
-          updatedAt: new Date()
+          updated_at: new Date()
         }
       })
     }
 
     // Send success notification
-    await sendPaymentSuccessNotification(orderId, paymentData)
+    await sendPaymentSuccessNotification(order_id, paymentData)
     
     // Log audit trail
     await prisma.auditLog.create({
       data: {
         id: crypto.randomUUID(),
-        workspaceId: order?.workspaceId || '',
+        workspace_id: order?.workspace_id || '',
         entityType: 'payment',
         entityId: paymentData.id,
         action: 'payment_completed',
         actorId: 'system',
-        after: JSON.stringify({ orderId, amount: paymentData.amount, provider }),
-        createdAt: new Date()
+        after: JSON.stringify({ order_id, amount: paymentData.amount, provider }),
+        created_at: new Date()
       }
     })
 
-    console.log(`Payment ${paymentData.id} completed successfully for order ${orderId}`)
+    console.log(`Payment ${paymentData.id} completed successfully for order ${order_id}`)
     
-  } catch (error) {
+  } catch (_error) {
     console.error('Error processing payment success:', error)
     throw error
   }
 }
 
 async function processPaymentFailure(paymentData: any, provider: string) {
-  const orderId = paymentData.metadata?.order_id || paymentData.attributes?.metadata?.order_id
-  if (!orderId) {
+  const order_id = paymentData.metadata?.order_id || paymentData.attributes?.metadata?.order_id
+  if (!order_id) {
     console.error('No order ID found in payment metadata')
     return
   }
@@ -237,40 +237,40 @@ async function processPaymentFailure(paymentData: any, provider: string) {
       create: {
         id: crypto.randomUUID(),
         reference: paymentData.id,
-        orderId: orderId,
+        order_id: order_id,
         amount: (paymentData.amount || paymentData.attributes?.amount) / 100,
         currency: paymentData.currency || paymentData.attributes?.currency || 'PHP',
         provider: provider,
         status: 'FAILED',
         failureReason: paymentData.last_payment_error?.message || 'Payment failed',
         providerResponse: JSON.stringify(paymentData),
-        createdAt: new Date()
+        created_at: new Date()
       }
     })
 
     // Update order payment status
     await prisma.order.update({
-      where: { id: orderId },
+      where: { id: order_id },
       data: {
         paymentStatus: 'FAILED',
-        updatedAt: new Date()
+        updated_at: new Date()
       }
     })
 
     // Send failure notification
-    await sendPaymentFailureNotification(orderId, paymentData)
+    await sendPaymentFailureNotification(order_id, paymentData)
 
-    console.log(`Payment ${paymentData.id} failed for order ${orderId}`)
+    console.log(`Payment ${paymentData.id} failed for order ${order_id}`)
     
-  } catch (error) {
+  } catch (_error) {
     console.error('Error processing payment failure:', error)
     throw error
   }
 }
 
 async function processStripeCheckoutSuccess(session: any) {
-  const orderId = session.metadata?.order_id
-  if (!orderId) {
+  const order_id = session.metadata?.order_id
+  if (!order_id) {
     console.error('No order ID found in Stripe session metadata')
     return
   }
@@ -284,21 +284,21 @@ async function processStripeCheckoutSuccess(session: any) {
   }, 'stripe')
 }
 
-async function sendPaymentSuccessNotification(orderId: string, paymentData: any) {
+async function sendPaymentSuccessNotification(order_id: string, paymentData: any) {
   // Implementation for sending success notifications
   // This could integrate with your notification system
-  console.log(`Sending payment success notification for order ${orderId}`)
+  console.log(`Sending payment success notification for order ${order_id}`)
   
   // You could emit events here for real-time updates
-  // await notificationService.emit('payment.completed', { orderId, paymentData })
+  // await notificationService.emit('payment.completed', { order_id, paymentData })
 }
 
-async function sendPaymentFailureNotification(orderId: string, paymentData: any) {
+async function sendPaymentFailureNotification(order_id: string, paymentData: any) {
   // Implementation for sending failure notifications
-  console.log(`Sending payment failure notification for order ${orderId}`)
+  console.log(`Sending payment failure notification for order ${order_id}`)
   
   // You could emit events here for real-time updates
-  // await notificationService.emit('payment.failed', { orderId, paymentData })
+  // await notificationService.emit('payment.failed', { order_id, paymentData })
 }
 
 // GET method for webhook verification (some providers require this)

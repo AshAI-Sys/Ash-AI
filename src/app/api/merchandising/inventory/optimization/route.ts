@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     const query = optimizationQuerySchema.parse(sanitizedBody)
 
     // Verify workspace access
-    const workspace = await secureDb.getPrisma().workspace.findFirst({
+    const _workspace = await secureDb.getPrisma().workspace.findFirst({
       where: {
         id: query.workspace_id,
         OR: [
@@ -112,9 +112,9 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function getInventoryData(workspaceId: string, query: any) {
+async function getInventoryData(workspace_id: string, query: any) {
   const whereClause: any = {
-    workspace_id: workspaceId
+    workspace_id: workspace_id
   }
 
   if (query.category && query.category !== 'all') {
@@ -146,7 +146,7 @@ async function getInventoryData(workspaceId: string, query: any) {
     sku: item.sku,
     category: item.category,
     quantity: item.quantity,
-    cost: parseFloat(item.cost.toString()),
+    cost: parseFloat(_item.cost.toString()),
     price: item.price ? parseFloat(item.price.toString()) : 0,
     reorder_point: item.reorder_point,
     max_stock: item.max_stock,
@@ -193,7 +193,7 @@ async function performInventoryOptimization(inventoryData: any[], query: any) {
       affected_items: excessInventory.length,
       potential_saving: excessValue,
       priority: 'HIGH',
-      items: excessInventory.map(item => ({ sku: item.sku, name: item.name, excess_days: item.days_on_hand }))
+      items: excessInventory.map(item => ({ sku: item.sku, name: item.name, excess_days: _item.days_on_hand }))
     })
     potential_savings += excessValue
   }
@@ -211,7 +211,7 @@ async function performInventoryOptimization(inventoryData: any[], query: any) {
       affected_items: understockedItems.length,
       potential_saving: lostSales * 0.3, // 30% profit margin
       priority: 'CRITICAL',
-      items: understockedItems.map(item => ({ sku: item.sku, name: item.name, stockout_risk: item.stockout_risk }))
+      items: understockedItems.map(item => ({ sku: item.sku, name: item.name, stockout_risk: _item.stockout_risk }))
     })
     potential_savings += lostSales * 0.3
   }
@@ -233,7 +233,7 @@ async function performInventoryOptimization(inventoryData: any[], query: any) {
         sku: item.sku,
         name: item.name,
         current_reorder_point: item.reorder_point,
-        recommended_reorder_point: Math.round(item.turnover_rate * 7)
+        recommended_reorder_point: Math.round(_item.turnover_rate * 7)
       }))
     })
     potential_savings += totalValue * 0.05
@@ -265,7 +265,7 @@ async function generateReorderRecommendations(inventoryData: any[], query: any) 
     .map(item => {
       const recommendedQuantity = Math.max(
         item.max_stock - item.quantity,
-        Math.round(item.turnover_rate * 30) // 30 days supply
+        Math.round(_item.turnover_rate * 30) // 30 days supply
       )
       
       return {
@@ -292,7 +292,7 @@ async function performABCAnalysis(inventoryData: any[]) {
   const sortedItems = inventoryData
     .map(item => ({
       ...item,
-      total_value: item.quantity * item.cost
+      total_value: item.quantity * _item.cost
     }))
     .sort((a, b) => b.total_value - a.total_value)
 
@@ -300,7 +300,7 @@ async function performABCAnalysis(inventoryData: any[]) {
   let cumulativeValue = 0
   let cumulativePercentage = 0
 
-  const categorizedItems = sortedItems.map((item, index) => {
+  const categorizedItems = sortedItems.map((_item, index) => {
     cumulativeValue += item.total_value
     cumulativePercentage = (cumulativeValue / totalValue) * 100
 
@@ -364,7 +364,7 @@ async function identifySlowMovingInventory(inventoryData: any[], query: any) {
       return daysSinceLastMovement > slowMovingThreshold || item.turnover_rate < lowTurnoverThreshold
     })
     .map(item => {
-      const daysSinceLastMovement = item.last_movement 
+      const daysSinceLastMovement = _item.last_movement 
         ? Math.floor((Date.now() - new Date(item.last_movement).getTime()) / (1000 * 60 * 60 * 24))
         : 365
 

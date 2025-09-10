@@ -9,7 +9,7 @@ interface Order {
   status: string
   totalAmount: number
   dueDate: string
-  createdAt: string
+  created_at: string
   items: number
   priority: 'HIGH' | 'MEDIUM' | 'LOW'
 }
@@ -48,7 +48,7 @@ const sampleOrders: Order[] = [
     status: 'IN_PRODUCTION',
     totalAmount: 45000,
     dueDate: '2025-09-15',
-    createdAt: '2025-08-01',
+    created_at: '2025-08-01',
     items: 120,
     priority: 'HIGH'
   },
@@ -59,7 +59,7 @@ const sampleOrders: Order[] = [
     status: 'CONFIRMED',
     totalAmount: 28000,
     dueDate: '2025-09-20',
-    createdAt: '2025-08-05',
+    created_at: '2025-08-05',
     items: 50,
     priority: 'MEDIUM'
   },
@@ -70,7 +70,7 @@ const sampleOrders: Order[] = [
     status: 'QC_PASSED',
     totalAmount: 67000,
     dueDate: '2025-09-10',
-    createdAt: '2025-07-28',
+    created_at: '2025-07-28',
     items: 200,
     priority: 'HIGH'
   },
@@ -81,7 +81,7 @@ const sampleOrders: Order[] = [
     status: 'DELIVERED',
     totalAmount: 32000,
     dueDate: '2025-08-30',
-    createdAt: '2025-07-15',
+    created_at: '2025-07-15',
     items: 75,
     priority: 'LOW'
   },
@@ -92,7 +92,7 @@ const sampleOrders: Order[] = [
     status: 'READY_FOR_DELIVERY',
     totalAmount: 55000,
     dueDate: '2025-09-12',
-    createdAt: '2025-08-10',
+    created_at: '2025-08-10',
     items: 150,
     priority: 'MEDIUM'
   }
@@ -184,7 +184,7 @@ export function useOptimizedOrders(): UseOptimizedOrdersReturn {
           status: order.status || 'DRAFT',
           totalAmount: (order.commercials?.unit_price || 0) * (order.total_qty || 0),
           dueDate: order.target_delivery_date || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-          createdAt: order.created_at || new Date().toISOString(),
+          created_at: order.created_at || new Date().toISOString(),
           items: order.total_qty || 0,
           priority: order.ai_risk_assessment?.includes('urgent') ? 'HIGH' : 
                    order.ai_risk_assessment?.includes('delay') ? 'MEDIUM' : 'LOW'

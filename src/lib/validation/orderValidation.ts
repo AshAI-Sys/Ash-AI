@@ -22,8 +22,8 @@ export const sanitizeNumber = (input: unknown): number => {
 // Order validation schema with sanitization
 export const orderValidationSchema = z.object({
   // Client & Brand - Required and validated
-  clientId: z.string().uuid('Invalid client ID').optional(),
-  brandId: z.string().uuid('Invalid brand ID'),
+  client_id: z.string().uuid('Invalid client ID').optional(),
+  brand_id: z.string().uuid('Invalid brand ID'),
   channel: z.string().max(50).optional().transform(sanitizeString),
   
   // Product & Design - Required with constraints
@@ -35,7 +35,7 @@ export const orderValidationSchema = z.object({
   }),
   
   // Quantities - Strict validation
-  totalQty: z.number()
+  total_qty: z.number()
     .int('Quantity must be a whole number')
     .min(1, 'Quantity must be at least 1')
     .max(100000, 'Quantity too large'),
@@ -56,7 +56,7 @@ export const orderValidationSchema = z.object({
   addons: z.array(z.string().max(100).transform(sanitizeString)).optional(),
   
   // Dates - Proper date validation
-  targetDeliveryDate: z.string().refine(
+  target_delivery_date: z.string().refine(
     (date) => {
       const parsed = new Date(date)
       const now = new Date()
@@ -89,9 +89,9 @@ export const orderValidationSchema = z.object({
 })
 
 // Size curve validation helper
-export const validateSizeCurve = (sizeCurve: Record<string, number>, totalQty: number) => {
+export const validateSizeCurve = (sizeCurve: Record<string, number>, total_qty: number) => {
   const total = Object.values(sizeCurve).reduce((sum, qty) => sum + qty, 0)
-  return total === totalQty
+  return total === total_qty
 }
 
 // File validation for uploads

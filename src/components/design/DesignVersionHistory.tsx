@@ -25,7 +25,7 @@ interface DesignVersion {
   version: number
   status: 'draft' | 'pending_approval' | 'approved' | 'rejected' | 'revision_needed'
   createdBy: string
-  createdAt: string
+  created_at: string
   changes: string[]
   fileUrl: string
   fileSize: string
@@ -36,7 +36,7 @@ interface DesignVersion {
 }
 
 interface DesignVersionHistoryProps {
-  designId: string
+  design_id: string
   designName: string
   isOpen: boolean
   onClose: () => void
@@ -48,7 +48,7 @@ const mockVersions: DesignVersion[] = [
     version: 3,
     status: 'approved',
     createdBy: 'John Doe (GA)',
-    createdAt: '2024-09-01T14:30:00Z',
+    created_at: '2024-09-01T14:30:00Z',
     changes: ['Updated logo placement', 'Adjusted color saturation', 'Fixed typography alignment'],
     fileUrl: '/designs/corporate-logo-v3.ai',
     fileSize: '2.4 MB',
@@ -61,7 +61,7 @@ const mockVersions: DesignVersion[] = [
     version: 2,
     status: 'revision_needed',
     createdBy: 'John Doe (GA)',
-    createdAt: '2024-08-31T16:15:00Z',
+    created_at: '2024-08-31T16:15:00Z',
     changes: ['Increased logo size', 'Changed background color', 'Added company tagline'],
     fileUrl: '/designs/corporate-logo-v2.ai',
     fileSize: '2.2 MB',
@@ -72,7 +72,7 @@ const mockVersions: DesignVersion[] = [
     version: 1,
     status: 'draft',
     createdBy: 'John Doe (GA)',
-    createdAt: '2024-08-31T10:00:00Z',
+    created_at: '2024-08-31T10:00:00Z',
     changes: ['Initial design creation', 'Basic layout setup', 'Color scheme applied'],
     fileUrl: '/designs/corporate-logo-v1.ai',
     fileSize: '1.8 MB',
@@ -80,7 +80,7 @@ const mockVersions: DesignVersion[] = [
   }
 ]
 
-export function DesignVersionHistory({ designId, designName, isOpen, onClose }: DesignVersionHistoryProps) {
+export function DesignVersionHistory({ design_id, designName, isOpen, onClose }: DesignVersionHistoryProps) {
   const [selectedVersions, setSelectedVersions] = useState<string[]>([])
   const [showComparison, setShowComparison] = useState(false)
 
@@ -194,7 +194,7 @@ export function DesignVersionHistory({ designId, designName, isOpen, onClose }: 
                               </span>
                               <span className="flex items-center space-x-1">
                                 <Clock className="w-4 h-4" />
-                                <span>{new Date(version.createdAt).toLocaleString()}</span>
+                                <span>{new Date(version.created_at).toLocaleString()}</span>
                               </span>
                             </div>
                           </div>
@@ -313,7 +313,7 @@ export function DesignVersionHistory({ designId, designName, isOpen, onClose }: 
                         </div>
                         <div className="space-y-2 text-sm">
                           <div><strong>Status:</strong> {version.status.replace('_', ' ')}</div>
-                          <div><strong>Created:</strong> {new Date(version.createdAt).toLocaleDateString()}</div>
+                          <div><strong>Created:</strong> {new Date(version.created_at).toLocaleDateString()}</div>
                           <div><strong>Size:</strong> {version.fileSize}</div>
                         </div>
                       </CardContent>

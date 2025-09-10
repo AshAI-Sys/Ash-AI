@@ -73,7 +73,7 @@ export async function POST(
     // Create audit log
     await prisma.auditLog.create({
       data: {
-        userId: session.user.id,
+        user_id: session.user.id,
         action: 'ADD_QC_SAMPLE',
         entityType: 'QCSample',
         entityId: sample.id,

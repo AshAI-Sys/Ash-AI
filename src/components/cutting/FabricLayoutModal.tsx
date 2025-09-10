@@ -248,7 +248,7 @@ export function FabricLayoutModal({ job, isOpen, onClose, onOptimize }: FabricLa
               </div>
               <div>
                 <CardTitle className="text-xl font-bold text-white">Fabric Layout Optimizer</CardTitle>
-                <p className="text-white/70">{job.designName} • {job.poNumber}</p>
+                <p className="text-white/70">{job.designName} • {job.po_number}</p>
               </div>
             </div>
             <div className="flex items-center space-x-3">

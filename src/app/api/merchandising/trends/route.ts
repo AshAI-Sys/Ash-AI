@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
 
     // Build query filters
     const orderFilters: any = {
-      workspace_id: session.user.workspaceId,
+      workspace_id: session.user.workspace_id,
       created_at: {
         gte: startDate,
         lte: endDate
@@ -381,10 +381,10 @@ async function analyzeDemographicTrends(orders: any[]) {
     }
 
     // Order size analysis
-    const totalQty = order.order_items.reduce((sum: number, item: any) => sum + item.quantity, 0)
-    if (totalQty < 50) demographics.order_sizes.small++
-    else if (totalQty < 200) demographics.order_sizes.medium++
-    else if (totalQty < 500) demographics.order_sizes.large++
+    const total_qty = order.order_items.reduce((sum: number, item: any) => sum + item.quantity, 0)
+    if (total_qty < 50) demographics.order_sizes.small++
+    else if (total_qty < 200) demographics.order_sizes.medium++
+    else if (total_qty < 500) demographics.order_sizes.large++
     else demographics.order_sizes.bulk++
   })
 

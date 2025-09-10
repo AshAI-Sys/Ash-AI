@@ -80,7 +80,7 @@ export default function OrderDetailsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const orderId = params.id as string
+  const order_id = params.id as string
 
   useEffect(() => {
     if (status === 'loading') return
@@ -90,12 +90,12 @@ export default function OrderDetailsPage() {
     }
     
     fetchOrderDetails()
-  }, [session, status, orderId, router])
+  }, [session, status, order_id, router])
 
   const fetchOrderDetails = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/ash/orders/${orderId}`)
+      const response = await fetch(`/api/ash/orders/${order_id}`)
       
       if (response.ok) {
         const data = await response.json()
@@ -307,7 +307,7 @@ export default function OrderDetailsPage() {
 
             {/* Enhanced Status Dashboard */}
             <TabsContent value="status">
-              <OrderStatusDashboard orderId={orderId} />
+              <OrderStatusDashboard order_id={order_id} />
             </TabsContent>
 
             {/* Enhanced Order Details */}

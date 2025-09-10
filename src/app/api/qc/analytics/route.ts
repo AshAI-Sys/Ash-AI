@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url)
-    const period = searchParams.get('period') || '30d' // 7d, 30d, 90d, 1y
+    const _period = searchParams.get('period') || '30d' // 7d, 30d, 90d, 1y
     const stage = searchParams.get('stage')
     const includeCharts = searchParams.get('charts') === 'true'
 

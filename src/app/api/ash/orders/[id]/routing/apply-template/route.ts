@@ -24,7 +24,7 @@ export async function POST(
     }
 
     const { id } = await params
-    const orderId = id
+    const order_id = id
     const body = await request.json()
     const { routeTemplateKey } = body
 
@@ -37,9 +37,9 @@ export async function POST(
 
     // Validate order exists
     const order = await prisma.order.findUnique({
-      where: { id: orderId },
+      where: { id: order_id },
       include: {
-        routingSteps: true,
+        routing_steps: true,
         brand: true
       }
     })
@@ -52,8 +52,11 @@ export async function POST(
     }
 
     // Get the routing template
-    const template = await prisma.routingTemplate.findUnique({
-      where: { templateKey: routeTemplateKey }
+    const template = await prisma.routeTemplate.findUnique({
+      where: { id: routeTemplateKey },
+      include: {
+        steps: true
+      }
     })
 
     if (!template) {
@@ -64,8 +67,8 @@ export async function POST(
     }
 
     // Check if any steps are already in progress
-    const stepsInProgress = order.routingSteps.filter(
-      step => ['IN_PROGRESS', 'DONE'].includes(step.status)
+    const stepsInProgress = order.routing_steps.filter(
+      (step: any) => ['IN_PROGRESS', 'DONE'].includes(step.status)
     )
 
     if (stepsInProgress.length > 0) {
@@ -80,12 +83,12 @@ export async function POST(
 
     const result = await prisma.$transaction(async (tx) => {
       // Store old routing steps for audit
-      const oldSteps = order.routingSteps
+      const oldSteps = order.routing_steps
 
       // Delete existing PLANNED routing steps
       await tx.routingStep.deleteMany({
         where: {
-          orderId,
+          order_id: order_id,
           status: 'PLANNED'
         }
       })
@@ -93,9 +96,9 @@ export async function POST(
       // Create new routing steps from template
       const newSteps = await RoutingTemplateService.createRoutingSteps(
         tx,
-        orderId,
+        order_id,
         template,
-        order.dueDate || undefined
+        order.target_delivery_date || undefined
       )
 
       return { oldSteps, newSteps }
@@ -103,17 +106,17 @@ export async function POST(
 
     // Log audit event
     await AuditLogger.log({
-      userId: session.user.id,
+      user_id: session.user.id,
       action: 'APPLY_TEMPLATE',
       entity: 'routing_step',
-      entityId: orderId,
+      entityId: order_id,
       oldValues: { steps: result.oldSteps },
       newValues: { steps: result.newSteps, template: routeTemplateKey }
     })
 
     // Emit event
     await AshEventBus.emit('ash.routing.applied', {
-      orderId,
+      order_id,
       templateKey: routeTemplateKey,
       actorId: session.user.id,
       stepsCreated: result.newSteps.length

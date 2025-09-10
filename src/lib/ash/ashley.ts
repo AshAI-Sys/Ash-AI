@@ -50,13 +50,13 @@ export class AshleyAI {
    * Assess order intake and provide recommendations
    */
   static async assessIntake(params: {
-    orderId: string
-    brandId: string
+    order_id: string
+    brand_id: string
     method: PrintMethod
-    totalQty: number
+    total_qty: number
     sizeCurve: Record<string, number>
     targetDate?: Date
-    routingSteps: any[]
+    routing_steps: any[]
   }): Promise<AshleyAssessment> {
     
     const assessment: AshleyAssessment = {
@@ -123,7 +123,7 @@ export class AshleyAI {
           description: `${assessment.issues.length} potential issues found for this order. Review capacity and material requirements.`,
           priority: assessment.risk === 'RED' ? 'HIGH' : 'MEDIUM',
           data: {
-            orderId: params.orderId,
+            order_id: params.order_id,
             riskLevel: assessment.risk,
             issueCount: assessment.issues.length
           }
@@ -164,8 +164,8 @@ export class AshleyAI {
    */
   private static async analyzeCapacity(params: {
     method: PrintMethod
-    totalQty: number
-    routingSteps: any[]
+    total_qty: number
+    routing_steps: any[]
     targetDate?: Date
   }): Promise<CapacityAnalysis[]> {
     
@@ -174,9 +174,9 @@ export class AshleyAI {
     // Get capacity assumptions by method
     const capacityRates = AshleyAI.getCapacityRates(params.method)
     
-    for (const step of params.routingSteps) {
+    for (const step of params.routing_steps) {
       const rate = capacityRates[step.workcenter as keyof typeof capacityRates] || 30 // default 30 pcs/hour
-      const requiredMinutes = (params.totalQty / rate) * 60
+      const requiredMinutes = (params.total_qty / rate) * 60
       
       // Get available capacity (simplified - in real system would check schedules)
       const availableMinutes = 8 * 60 * 0.8 // 8 hours * 80% efficiency
@@ -207,7 +207,7 @@ export class AshleyAI {
    */
   private static async checkStockAvailability(params: {
     method: PrintMethod
-    totalQty: number
+    total_qty: number
     sizeCurve: Record<string, number>
   }): Promise<AshleyIssue[]> {
     
@@ -247,9 +247,9 @@ export class AshleyAI {
    * Validate route safety based on method and placement
    */
   private static async validateRouteSafety(params: {
-    orderId: string
+    order_id: string
     method: PrintMethod
-    routingSteps: any[]
+    routing_steps: any[]
   }): Promise<RouteValidationResult> {
     
     const result: RouteValidationResult = {
@@ -262,7 +262,7 @@ export class AshleyAI {
 
     // Check for risky routing combinations
     if (params.method === PrintMethod.SILKSCREEN) {
-      const hasSewThenPrint = params.routingSteps.some(step => 
+      const hasSewThenPrint = params.routing_steps.some(step => 
         step.workcenter === 'PRINTING' && 
         step.dependsOn.includes('Sewing')
       )
@@ -284,9 +284,9 @@ export class AshleyAI {
     }
 
     if (params.method === PrintMethod.SUBLIMATION) {
-      const cuttingBeforePress = params.routingSteps.some(step =>
+      const cuttingBeforePress = params.routing_steps.some(step =>
         step.workcenter === 'CUTTING' &&
-        !params.routingSteps.some(pressStep => 
+        !params.routing_steps.some(pressStep => 
           pressStep.workcenter === 'HEAT_PRESS' && 
           step.dependsOn.includes(pressStep.name)
         )
@@ -310,16 +310,16 @@ export class AshleyAI {
    * Validate route customization
    */
   static async validateRouteCustomization(params: {
-    orderId: string
+    order_id: string
     method: PrintMethod
     customSteps: any[]
   }): Promise<RouteValidationResult> {
     
     // Run the same safety checks as intake
     const routeSafety = await AshleyAI.validateRouteSafety({
-      orderId: params.orderId,
+      order_id: params.order_id,
       method: params.method,
-      routingSteps: params.customSteps
+      routing_steps: params.customSteps
     })
 
     // Additional customization-specific checks
@@ -374,7 +374,7 @@ export class AshleyAI {
    */
   private static estimateBOM(params: {
     method: PrintMethod
-    totalQty: number
+    total_qty: number
     sizeCurve: Record<string, number>
   }): Array<{ item: string; requiredQty: number; unit: string }> {
     
@@ -384,7 +384,7 @@ export class AshleyAI {
     const avgFabricPerPc = 0.6 // kg per piece (rough estimate)
     bom.push({
       item: 'Fabric',
-      requiredQty: params.totalQty * avgFabricPerPc * 1.05, // 5% wastage
+      requiredQty: params.total_qty * avgFabricPerPc * 1.05, // 5% wastage
       unit: 'kg'
     })
 
@@ -393,21 +393,21 @@ export class AshleyAI {
       case PrintMethod.SILKSCREEN:
         bom.push({
           item: 'Plastisol Ink',
-          requiredQty: Math.ceil(params.totalQty * 0.008), // 8g per print
+          requiredQty: Math.ceil(params.total_qty * 0.008), // 8g per print
           unit: 'kg'
         })
         break
       case PrintMethod.SUBLIMATION:
         bom.push({
           item: 'Transfer Paper',
-          requiredQty: Math.ceil(params.totalQty * 0.1), // 0.1m2 per print
+          requiredQty: Math.ceil(params.total_qty * 0.1), // 0.1m2 per print
           unit: 'm2'
         })
         break
       case PrintMethod.DTF:
         bom.push({
           item: 'DTF Film',
-          requiredQty: Math.ceil(params.totalQty * 0.05),
+          requiredQty: Math.ceil(params.total_qty * 0.05),
           unit: 'm2'
         })
         break
@@ -420,7 +420,7 @@ export class AshleyAI {
    * Analyze timing feasibility
    */
   private static analyzeTimingFeasibility(
-    params: { targetDate?: Date; totalQty: number },
+    params: { targetDate?: Date; total_qty: number },
     capacityAnalysis: CapacityAnalysis[]
   ): { feasible: boolean; reason: string; recommendation: string } {
     

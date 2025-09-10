@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url)
-    const period = searchParams.get('period') || '7d' // 1d, 7d, 30d, 90d
+    const _period = searchParams.get('period') || '7d' // 1d, 7d, 30d, 90d
     const operation = searchParams.get('operation')
     const operator = searchParams.get('operator')
 
@@ -275,7 +275,7 @@ function calculateQualityMetrics(runs: any[]) {
 
   // Calculate quality by operation category
   const categoryQuality = runs.reduce((acc, run) => {
-    const category = run.operation?.category || 'Unknown'
+    const _category = run.operation?.category || 'Unknown'
     const pieces = run.qtyGood + run.qtyDefects + run.qtyRejects
     
     if (!acc[category]) {

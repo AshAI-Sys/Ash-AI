@@ -34,7 +34,7 @@ import {
 } from 'lucide-react'
 
 interface OrderStatusDashboardProps {
-  orderId: string
+  order_id: string
 }
 
 interface OrderStatusInfo {
@@ -143,19 +143,19 @@ const statusConfig = {
   }
 }
 
-export function OrderStatusDashboard({ orderId }: OrderStatusDashboardProps) {
+export function OrderStatusDashboard({ order_id }: OrderStatusDashboardProps) {
   const [statusInfo, setStatusInfo] = useState<OrderStatusInfo | null>(null)
   const [loading, setLoading] = useState(true)
   const [transitioning, setTransitioning] = useState(false)
 
   useEffect(() => {
     fetchStatusInfo()
-  }, [orderId])
+  }, [order_id])
 
   const fetchStatusInfo = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/ash/orders/${orderId}/status`)
+      const response = await fetch(`/api/ash/orders/${order_id}/status`)
       
       if (response.ok) {
         const data = await response.json()
@@ -174,7 +174,7 @@ export function OrderStatusDashboard({ orderId }: OrderStatusDashboardProps) {
     try {
       setTransitioning(true)
       
-      const response = await fetch(`/api/ash/orders/${orderId}/status`, {
+      const response = await fetch(`/api/ash/orders/${order_id}/status`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action, reason })

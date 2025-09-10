@@ -52,7 +52,7 @@ interface ProductionBundle {
   id: string
   bundleNumber: string
   qrCode: string
-  orderId: string
+  order_id: string
   orderNumber: string
   currentStage: string
   status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'ON_HOLD' | 'QUALITY_ISSUE'
@@ -201,7 +201,7 @@ export default function ProductionTrackingPage() {
           id: '1',
           bundleNumber: 'PB-2025-001',
           qrCode: 'QR-PB-2025-001',
-          orderId: 'order-1',
+          order_id: 'order-1',
           orderNumber: 'SORB-2025-001',
           currentStage: 'Sewing',
           status: 'IN_PROGRESS',
@@ -266,7 +266,7 @@ export default function ProductionTrackingPage() {
           id: '2',
           bundleNumber: 'PB-2025-002',
           qrCode: 'QR-PB-2025-002',
-          orderId: 'order-2',
+          order_id: 'order-2',
           orderNumber: 'REEF-2025-012',
           currentStage: 'Quality Control',
           status: 'QUALITY_ISSUE',

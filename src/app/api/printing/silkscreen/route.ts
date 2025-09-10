@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth'
-import { Role } from '@prisma/client'
+
 import { db, createAuditLog } from '@/lib/db'
 import { validateCuring } from '@/lib/printing-calculations'
 // Silkscreen-Specific Printing API

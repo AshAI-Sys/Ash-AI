@@ -7,7 +7,7 @@ async function initializeAshSystem() {
   try {
     // 1. Create default workspace if it doesn't exist
     console.log('📁 Creating default workspace...')
-    const workspace = await prisma.workspace.upsert({
+    const _workspace = await prisma.workspace.upsert({
       where: { id: 'default' },
       update: {},
       create: {
@@ -205,7 +205,7 @@ async function initializeAshSystem() {
     if (existingOperations === 0) {
       const operations = [
         {
-          workspaceId: 'default',
+          workspace_id: 'default',
           productType: 'Tee',
           name: 'Join Shoulders',
           standardMinutes: 3.5,
@@ -213,7 +213,7 @@ async function initializeAshSystem() {
           dependsOn: '[]'
         },
         {
-          workspaceId: 'default',
+          workspace_id: 'default',
           productType: 'Tee',
           name: 'Attach Collar',
           standardMinutes: 4.2,
@@ -221,7 +221,7 @@ async function initializeAshSystem() {
           dependsOn: '["Join Shoulders"]'
         },
         {
-          workspaceId: 'default',
+          workspace_id: 'default',
           productType: 'Tee',
           name: 'Side Seams',
           standardMinutes: 2.8,
@@ -229,7 +229,7 @@ async function initializeAshSystem() {
           dependsOn: '[]'
         },
         {
-          workspaceId: 'default',
+          workspace_id: 'default',
           productType: 'Tee',
           name: 'Hem Bottom',
           standardMinutes: 2.0,
@@ -237,7 +237,7 @@ async function initializeAshSystem() {
           dependsOn: '["Side Seams"]'
         },
         {
-          workspaceId: 'default',
+          workspace_id: 'default',
           productType: 'Tee',
           name: 'Final Assembly',
           standardMinutes: 1.5,

@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth'
-import { Role } from '@prisma/client'
 import { db, createAuditLog } from '@/lib/db'
 import { generatePONumber } from '@/lib/po-generator'
 import { validateOrderIntake } from '@/lib/ashley-ai'
-import { ProductMethod, OrderStatus } from '@prisma/client'
+import { ProductMethod, OrderStatus, WorkcenterType } from '@prisma/client'
 
 // GET /api/ash/orders - Fetch orders based on CLIENT_UPDATED_PLAN.md
 export async function GET(request: NextRequest) {
@@ -80,7 +77,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate workspace exists
-    const workspace = await db.workspace.findUnique({
+    const _workspace = await db.workspace.findUnique({
       where: { id: workspace_id }
     })
     if (!workspace) {
@@ -178,7 +175,7 @@ export async function POST(request: NextRequest) {
             data: {
               order_id: order.id,
               name: step.name,
-              workcenter: step.workcenter,
+              workcenter: step.workcenter as WorkcenterType,
               sequence: index + 1,
               depends_on: step.depends_on || [],
               standard_spec: step.standard_spec || {},
@@ -212,7 +209,7 @@ export async function POST(request: NextRequest) {
       success: true,
       message: `Order ${po_number} created successfully`,
       order: result.order,
-      routing_steps: result.routingSteps,
+      routing_steps: result.routing_steps,
       ashley_assessment: ashleyResult
     }, { status: 201 })
 

@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     const order = await prisma.order.findFirst({
       where: {
         id: validatedData.order_id,
-        workspace_id: session.user.workspaceId,
+        workspace_id: session.user.workspace_id,
         status: {
           in: ['PRODUCTION_PLANNED', 'IN_PROGRESS']
         }
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
     // Check fabric availability in warehouse
     const availabilityCheck = await checkFabricAvailability(
       validatedData.fabric_batches, 
-      session.user.workspaceId
+      session.user.workspace_id
     )
 
     if (!availabilityCheck.available) {
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
       const issue = await tx.fabricIssue.create({
         data: {
           id: issueId,
-          workspace_id: session.user.workspaceId,
+          workspace_id: session.user.workspace_id,
           order_id: validatedData.order_id,
           issued_by_id: session.user.id,
           status: 'ISSUED',
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
         await tx.fabricBatch.create({
           data: {
             id: batchId,
-            workspace_id: session.user.workspaceId,
+            workspace_id: session.user.workspace_id,
             fabric_issue_id: issueId,
             batch_number: batch.batch_id,
             fabric_type: batch.fabric_type,
@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
         })
 
         // Update warehouse inventory
-        await updateWarehouseInventory(tx, batch, session.user.workspaceId)
+        await updateWarehouseInventory(tx, batch, session.user.workspace_id)
       }
 
       return issue
@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
     await prisma.auditLog.create({
       data: {
         id: require('nanoid').nanoid(),
-        workspace_id: session.user.workspaceId,
+        workspace_id: session.user.workspace_id,
         actor_id: session.user.id,
         entity_type: 'fabric_issue',
         entity_id: fabricIssue.id,
@@ -235,7 +235,7 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0')
 
     const whereConditions: any = {
-      workspace_id: session.user.workspaceId
+      workspace_id: session.user.workspace_id
     }
 
     if (order_id) whereConditions.order_id = order_id
@@ -280,7 +280,7 @@ export async function GET(request: NextRequest) {
     })
 
     // Get summary statistics
-    const summaryStats = await getFabricIssueSummary(session.user.workspaceId)
+    const summaryStats = await getFabricIssueSummary(session.user.workspace_id)
 
     return NextResponse.json({
       success: true,
@@ -303,7 +303,7 @@ export async function GET(request: NextRequest) {
 }
 
 // Helper functions
-async function checkFabricAvailability(batches: any[], workspaceId: string) {
+async function checkFabricAvailability(batches: any[], workspace_id: string) {
   const availability = {
     available: true,
     shortfalls: [] as any[]
@@ -312,7 +312,7 @@ async function checkFabricAvailability(batches: any[], workspaceId: string) {
   for (const batch of batches) {
     // In a real system, this would check actual warehouse inventory
     // For now, we'll simulate inventory check
-    const availableStock = await simulateWarehouseCheck(batch, workspaceId)
+    const availableStock = await simulateWarehouseCheck(batch, workspace_id)
     
     if (availableStock < batch.actual_meters) {
       availability.available = false
@@ -330,20 +330,20 @@ async function checkFabricAvailability(batches: any[], workspaceId: string) {
   return availability
 }
 
-async function simulateWarehouseCheck(batch: any, workspaceId: string): Promise<number> {
+async function simulateWarehouseCheck(batch: any, workspace_id: string): Promise<number> {
   // This would interface with your warehouse management system
   // For simulation, return sufficient stock for most cases
   const baseStock = Math.random() * 100 + 50 // 50-150 meters
   return Math.max(baseStock, batch.actual_meters * 1.1) // Usually have 10% extra
 }
 
-async function updateWarehouseInventory(tx: any, batch: any, workspaceId: string) {
+async function updateWarehouseInventory(tx: any, batch: any, workspace_id: string) {
   // In a real system, this would update your warehouse inventory system
   // Create inventory transaction record
   await tx.inventoryTransaction.create({
     data: {
       id: require('nanoid').nanoid(),
-      workspace_id: workspaceId,
+      workspace_id: workspace_id,
       transaction_type: 'ISSUE',
       item_type: 'FABRIC',
       item_code: `${batch.fabric_type}-${batch.color_code}`,
@@ -364,16 +364,16 @@ async function generateQRCode(prefix: string, id: string): Promise<string> {
   return `${prefix}-${id.slice(-8).toUpperCase()}-${timestamp}`
 }
 
-async function getFabricIssueSummary(workspaceId: string) {
+async function getFabricIssueSummary(workspace_id: string) {
   const [statusCounts, totalMeters, recentActivity] = await Promise.all([
     prisma.fabricIssue.groupBy({
       by: ['status'],
-      where: { workspace_id: workspaceId },
+      where: { workspace_id: workspace_id },
       _count: true
     }),
     prisma.fabricBatch.aggregate({
       where: {
-        workspace_id: workspaceId,
+        workspace_id: workspace_id,
         created_at: {
           gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // Last 7 days
         }
@@ -384,7 +384,7 @@ async function getFabricIssueSummary(workspaceId: string) {
     }),
     prisma.fabricIssue.count({
       where: {
-        workspace_id: workspaceId,
+        workspace_id: workspace_id,
         created_at: {
           gte: new Date(Date.now() - 24 * 60 * 60 * 1000) // Last 24 hours
         }

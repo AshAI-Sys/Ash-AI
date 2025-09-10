@@ -215,7 +215,7 @@ export async function PATCH(
       if (action === 'complete') {
         // Get all tasks for this order
         const orderTasks = await tx.task.findMany({
-          where: { orderId: task.orderId },
+          where: { order_id: task.order_id },
           orderBy: { priority: 'desc' }
         })
 
@@ -251,7 +251,7 @@ export async function PATCH(
           if (canStart) {
             await tx.task.updateMany({
               where: {
-                orderId: task.orderId,
+                order_id: task.order_id,
                 taskType: nextTaskType,
                 status: TaskStatus.PENDING
               },
@@ -273,7 +273,7 @@ export async function PATCH(
       // Update order status if needed
       if (orderStatusUpdate) {
         await tx.order.update({
-          where: { id: task.orderId },
+          where: { id: task.order_id },
           data: { status: orderStatusUpdate }
         })
       }

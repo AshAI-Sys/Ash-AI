@@ -27,12 +27,12 @@ interface ProductionStage {
 }
 
 interface RealTimeTrackerProps {
-  workspaceId: string;
+  workspace_id: string;
   refreshInterval?: number;
 }
 
 export default function RealTimeTracker({ 
-  workspaceId, 
+  workspace_id, 
   refreshInterval = 5000 
 }: RealTimeTrackerProps) {
   const [activeProduction, setActiveProduction] = useState<ProductionStage[]>([]);
@@ -79,7 +79,7 @@ export default function RealTimeTracker({
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [workspaceId, refreshInterval]);
+  }, [workspace_id, refreshInterval]);
 
   const updateStageStatus = async (stageId: string, newStatus: string) => {
     try {

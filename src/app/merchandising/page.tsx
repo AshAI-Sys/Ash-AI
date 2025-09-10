@@ -17,7 +17,7 @@ interface TrendInsight {
   impact: 'HIGH' | 'MEDIUM' | 'LOW'
   timeframe: string
   dataPoints: number
-  createdAt: string
+  created_at: string
 }
 
 interface ForecastData {
@@ -41,7 +41,7 @@ interface ReprintRecommendation {
   confidence: number
   potentialRevenue: number
   urgency: 'HIGH' | 'MEDIUM' | 'LOW'
-  createdAt: string
+  created_at: string
 }
 
 export default function MerchandisingPage() {
@@ -69,7 +69,7 @@ export default function MerchandisingPage() {
           impact: 'HIGH',
           timeframe: 'Next 3 months',
           dataPoints: 1250,
-          createdAt: new Date().toISOString()
+          created_at: new Date().toISOString()
         },
         {
           id: '2',
@@ -79,7 +79,7 @@ export default function MerchandisingPage() {
           impact: 'MEDIUM',
           timeframe: 'Next 2 months',
           dataPoints: 890,
-          createdAt: new Date().toISOString()
+          created_at: new Date().toISOString()
         },
         {
           id: '3',
@@ -89,7 +89,7 @@ export default function MerchandisingPage() {
           impact: 'MEDIUM',
           timeframe: 'Next 6 weeks',
           dataPoints: 560,
-          createdAt: new Date().toISOString()
+          created_at: new Date().toISOString()
         }
       ])
 
@@ -130,7 +130,7 @@ export default function MerchandisingPage() {
           confidence: 89,
           potentialRevenue: 45000,
           urgency: 'HIGH',
-          createdAt: new Date().toISOString()
+          created_at: new Date().toISOString()
         },
         {
           id: '2',
@@ -141,7 +141,7 @@ export default function MerchandisingPage() {
           confidence: 76,
           potentialRevenue: 22500,
           urgency: 'MEDIUM',
-          createdAt: new Date().toISOString()
+          created_at: new Date().toISOString()
         }
       ])
     } catch (error) {
@@ -337,7 +337,7 @@ export default function MerchandisingPage() {
                               📊 {trend.dataPoints.toLocaleString()} data points
                             </span>
                             <span>
-                              Generated {new Date(trend.createdAt).toLocaleDateString()}
+                              Generated {new Date(trend.created_at).toLocaleDateString()}
                             </span>
                           </div>
                         </div>

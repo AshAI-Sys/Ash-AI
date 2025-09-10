@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
         }
       }
     )
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       createErrorResponse(error),
       { status: 500 }
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
         duration: Date.now() - dbTestStart,
         details: dbHealth.message
       })
-    } catch (error) {
+    } catch (_error) {
       diagnostics.tests.push({
         name: 'Database Connection',
         status: 'FAIL',
@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       createSuccessResponse(result, 'System diagnostics completed')
     )
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       createErrorResponse(error),
       { status: 500 }

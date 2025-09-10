@@ -31,11 +31,11 @@ export async function GET(
     }
 
     const { id } = await params
-    const orderId = id
+    const order_id = id
 
     // Get order with current status
     const order = await prisma.order.findUnique({
-      where: { id: orderId },
+      where: { id: order_id },
       select: {
         id: true,
         po_number: true,
@@ -61,20 +61,19 @@ export async function GET(
     }
 
     // Get valid transitions for user's role
-    const validTransitions = await getValidTransitions(orderId, session.user.role as Role)
+    const validTransitions = await getValidTransitions(order_id, session.user.role as Role)
 
     // Get status history
     const statusHistory = await prisma.auditLog.findMany({
       where: {
         entity_type: 'order',
-        entity_id: orderId,
+        entity_id: order_id,
         action: 'STATUS_CHANGE'
       },
       select: {
         id: true,
         before_data: true,
         after_data: true,
-        metadata: true,
         created_at: true,
         actor_id: true
       },
@@ -121,15 +120,15 @@ export async function POST(
     }
 
     const { id } = await params
-    const orderId = id
+    const order_id = id
     const body = await request.json()
 
     // Validate input
     const validatedData = transitionSchema.parse(body)
 
     // Perform status transition
-    const result = await transitionOrderStatus(orderId, validatedData.action, {
-      userId: session.user.id,
+    const result = await transitionOrderStatus(order_id, validatedData.action, {
+      user_id: session.user.id,
       userRole: session.user.role as Role,
       reason: validatedData.reason,
       metadata: validatedData.metadata
@@ -146,7 +145,7 @@ export async function POST(
 
     // Get updated order info
     const updatedOrder = await prisma.order.findUnique({
-      where: { id: orderId },
+      where: { id: order_id },
       select: {
         id: true,
         po_number: true,
@@ -163,11 +162,11 @@ export async function POST(
     })
 
   } catch (_error) {
-    if (error instanceof z.ZodError) {
+    if (_error instanceof z.ZodError) {
       return NextResponse.json({
         success: false,
         error: 'Validation failed',
-        details: error.errors
+        details: _error.errors
       }, { status: 400 })
     }
 
@@ -180,8 +179,8 @@ export async function POST(
 }
 
 // Helper function to calculate progress
-function calculateProgressPercentage(routingSteps: any[]): number {
-  if (routingSteps.length === 0) return 0
+function calculateProgressPercentage(routing_steps: any[]): number {
+  if (routing_steps.length === 0) return 0
   
   const statusWeights = {
     'PLANNED': 0,
@@ -191,9 +190,9 @@ function calculateProgressPercentage(routingSteps: any[]): number {
     'BLOCKED': 0
   }
 
-  const totalProgress = routingSteps.reduce((sum, step) => {
+  const totalProgress = routing_steps.reduce((sum: number, step: any) => {
     return sum + (statusWeights[step.status as keyof typeof statusWeights] || 0)
   }, 0)
 
-  return Math.round(totalProgress / routingSteps.length)
+  return Math.round(totalProgress / routing_steps.length)
 }

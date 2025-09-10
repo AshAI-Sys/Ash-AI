@@ -59,7 +59,7 @@ interface Prediction {
   timeline: string
   recommendation: string
   data: any
-  createdAt: string
+  created_at: string
 }
 
 interface ForecastData {
@@ -127,7 +127,7 @@ export function PredictiveAnalytics() {
       timeline: '14 days',
       recommendation: 'Increase fabric inventory by 40% and schedule additional production capacity.',
       data: { expectedIncrease: 35, category: 't-shirts', duration: 14 },
-      createdAt: '2024-08-29T08:00:00Z'
+      created_at: '2024-08-29T08:00:00Z'
     },
     {
       id: 'pred_002',
@@ -140,7 +140,7 @@ export function PredictiveAnalytics() {
       timeline: '3 days',
       recommendation: 'Implement additional quality checks and inspect machine calibration.',
       data: { batchNumber: '247', expectedDefectRate: 15, currentRate: 3.2 },
-      createdAt: '2024-08-29T06:30:00Z'
+      created_at: '2024-08-29T06:30:00Z'
     },
     {
       id: 'pred_003',
@@ -153,7 +153,7 @@ export function PredictiveAnalytics() {
       timeline: '10 days',
       recommendation: 'Schedule maintenance immediately to prevent production downtime.',
       data: { asset: 'Screen Press #2', breakdownProbability: 85, recommendedAction: 'immediate_maintenance' },
-      createdAt: '2024-08-29T05:15:00Z'
+      created_at: '2024-08-29T05:15:00Z'
     }
   ])
 

@@ -68,7 +68,7 @@ export const ALERT_RULES: AlertRule[] = [
     },
     generateAlert: async (data) => {
       const kai = createAgent('kai')
-      const analysis = await kai.analyzeDeadlineRisk(data.orderId)
+      const analysis = await kai.analyzeDeadlineRisk(data.order_id)
       
       return {
         title: 'Order Deadline Risk Detected',
@@ -84,7 +84,7 @@ export const ALERT_RULES: AlertRule[] = [
           outsource: { label: 'Find Subcontractor', endpoint: '/api/subcontractors/recommend' },
           notify_client: { label: 'Notify Client', endpoint: '/api/notifications/client' }
         },
-        entity_ref: { type: 'order', id: data.orderId }
+        entity_ref: { type: 'order', id: data.order_id }
       }
     }
   },
@@ -184,7 +184,7 @@ export const ALERT_RULES: AlertRule[] = [
         optimize_materials: { label: 'Optimize Materials', endpoint: '/api/materials/optimize' },
         review_logistics: { label: 'Review Logistics', endpoint: '/api/logistics/review' }
       },
-      entity_ref: { type: 'order', id: data.orderId }
+      entity_ref: { type: 'order', id: data.order_id }
     })
   },
 
@@ -416,7 +416,7 @@ export class AlertEngine {
 
     if (riskyOrder) {
       return {
-        orderId: riskyOrder.id,
+        order_id: riskyOrder.id,
         orderNumber: riskyOrder.po_no,
         delayHours: calculateDelayHours(riskyOrder)
       }
@@ -452,7 +452,7 @@ export class AlertEngine {
   private async getNegativeMarginData() {
     // Implementation for negative margin data
     return {
-      orderId: 'sample-order-id',
+      order_id: 'sample-order-id',
       orderNumber: 'ORD-001',
       projectedLoss: 1500,
       revenue: 10000
@@ -503,7 +503,7 @@ export class AlertEngine {
     }
   }
 
-  async acknowledgeAlert(alertId: string, userId: string, note?: string) {
+  async acknowledgeAlert(alertId: string, user_id: string, note?: string) {
     await prisma.alert.update({
       where: { id: alertId },
       data: { status: 'ACK' }
@@ -513,13 +513,13 @@ export class AlertEngine {
       data: {
         alert_id: alertId,
         action: 'ACK',
-        actor_id: userId,
+        actor_id: user_id,
         note: note || null
       }
     })
   }
 
-  async resolveAlert(alertId: string, userId: string, note?: string) {
+  async resolveAlert(alertId: string, user_id: string, note?: string) {
     await prisma.alert.update({
       where: { id: alertId },
       data: { 
@@ -532,7 +532,7 @@ export class AlertEngine {
       data: {
         alert_id: alertId,
         action: 'RESOLVE',
-        actor_id: userId,
+        actor_id: user_id,
         note: note || null
       }
     })

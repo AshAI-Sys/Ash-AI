@@ -1,56 +1,78 @@
 'use client'
 
-import { createContext, useContext, ReactNode } from 'react'
-import { useToast, Toast } from '@/hooks/use-toast'
-import { ToastContainer } from '@/components/ui/toast'
+import React, { createContext, useContext, ReactNode } from 'react'
+import { toast } from 'sonner'
 
 interface ToastContextType {
-  toasts: Toast[]
-  addToast: (toast: Omit<Toast, 'id'>) => void
-  removeToast: (id: string) => void
-  clearToasts: () => void
-  toast: {
-    success: (message: string, title?: string) => void
-    error: (message: string, title?: string) => void
-    warning: (message: string, title?: string) => void
-    info: (message: string, title?: string) => void
-  }
+  success: (message: string, description?: string) => void
+  error: (message: string, description?: string) => void
+  info: (message: string, description?: string) => void
+  warning: (message: string, description?: string) => void
+  loading: (message: string) => void
+  promise: <T>(
+    promise: Promise<T>,
+    messages: {
+      loading: string
+      success: string | ((data: T) => string)
+      error: string | ((error: any) => string)
+    }
+  ) => Promise<T>
 }
 
-const ToastContext = createContext<ToastContextType | undefined>(undefined)
+const ToastContext = createContext<ToastContextType | null>(null)
 
-export const ToastProvider = ({ children }: { children: ReactNode }) => {
-  const { toasts, addToast, removeToast, clearToasts } = useToast()
+export function ToastProvider({ children }: { children: ReactNode }) {
+  const success = (message: string, description?: string) => {
+    toast.success(message, { description })
+  }
 
-  const toast = {
-    success: (message: string, title?: string) => 
-      addToast({ type: 'success', description: message, title }),
-    error: (message: string, title?: string) => 
-      addToast({ type: 'error', description: message, title }),
-    warning: (message: string, title?: string) => 
-      addToast({ type: 'warning', description: message, title }),
-    info: (message: string, title?: string) => 
-      addToast({ type: 'info', description: message, title }),
+  const error = (message: string, description?: string) => {
+    toast.error(message, { description })
+  }
+
+  const info = (message: string, description?: string) => {
+    toast.info(message, { description })
+  }
+
+  const warning = (message: string, description?: string) => {
+    toast.warning(message, { description })
+  }
+
+  const loading = (message: string) => {
+    toast.loading(message)
+  }
+
+  const promise = async <T,>(
+    promise: Promise<T>,
+    messages: {
+      loading: string
+      success: string | ((data: T) => string)
+      error: string | ((error: any) => string)
+    }
+  ): Promise<T> => {
+    return toast.promise(promise, messages)
+  }
+
+  const value: ToastContextType = {
+    success,
+    error,
+    info,
+    warning,
+    loading,
+    promise
   }
 
   return (
-    <ToastContext.Provider value={{ 
-      toasts, 
-      addToast, 
-      removeToast, 
-      clearToasts, 
-      toast 
-    }}>
+    <ToastContext.Provider value={value}>
       {children}
-      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </ToastContext.Provider>
   )
 }
 
-export const useToastContext = () => {
+export function useToast() {
   const context = useContext(ToastContext)
-  if (context === undefined) {
-    throw new Error('useToastContext must be used within a ToastProvider')
+  if (!context) {
+    throw new Error('useToast must be used within a ToastProvider')
   }
   return context
 }

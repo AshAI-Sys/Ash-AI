@@ -4,12 +4,12 @@
 interface OrderValidationRequest {
   method: 'SILKSCREEN' | 'SUBLIMATION' | 'DTF' | 'EMBROIDERY'
   productType: string
-  totalQty: number
+  total_qty: number
   sizeCurve: Record<string, number>
-  targetDeliveryDate: string
-  routingTemplate: string
+  target_delivery_date: string
+  routeTemplate: string
   designAssets?: { id: string; url: string; type: string; [key: string]: unknown }[]
-  brandId: string
+  brand_id: string
 }
 
 interface AshleyAdvisory {
@@ -31,7 +31,7 @@ interface CapacityAnalysis {
 }
 
 interface PrintabilityCheck {
-  designId: string
+  design_id: string
   result: 'PASS' | 'WARN' | 'FAIL'
   issues: string[]
   recommendations: string[]
@@ -81,7 +81,7 @@ class AshleyAI {
   ): Promise<void> {
     // Silkscreen routing validation
     if (request.method === 'SILKSCREEN') {
-      if (request.routingTemplate === 'SILK_OPTION_B') {
+      if (request.routeTemplate === 'SILK_OPTION_B') {
         advisories.push({
           type: 'WARNING',
           title: 'Non-Standard Routing Selected',
@@ -94,7 +94,7 @@ class AshleyAI {
     }
 
     // Sublimation large order validation
-    if (request.method === 'SUBLIMATION' && request.totalQty > 500) {
+    if (request.method === 'SUBLIMATION' && request.total_qty > 500) {
       advisories.push({
         type: 'WARNING',
         title: 'Large AOP Order Detected',
@@ -106,7 +106,7 @@ class AshleyAI {
     }
 
     // DTF capacity check
-    if (request.method === 'DTF' && request.totalQty > 200) {
+    if (request.method === 'DTF' && request.total_qty > 200) {
       advisories.push({
         type: 'INFO',
         title: 'DTF High Volume',
@@ -122,7 +122,7 @@ class AshleyAI {
     request: OrderValidationRequest, 
     advisories: AshleyAdvisory[]
   ): Promise<void> {
-    const deliveryDate = new Date(request.targetDeliveryDate)
+    const deliveryDate = new Date(request.target_delivery_date)
     const today = new Date()
     const daysDiff = Math.ceil((new Date(deliveryDate).getTime() - new Date(today).getTime()) / (1000 * 60 * 60 * 24))
 
@@ -161,11 +161,11 @@ class AshleyAI {
   ): void {
     const sizeCurveTotal = Object.values(request.sizeCurve).reduce((a, b) => a + b, 0)
     
-    if (sizeCurveTotal !== request.totalQty) {
+    if (sizeCurveTotal !== request.total_qty) {
       advisories.push({
         type: 'ERROR',
         title: 'Size Curve Mismatch',
-        message: `Size breakdown total (${sizeCurveTotal}) doesn't match total quantity (${request.totalQty}).`,
+        message: `Size breakdown total (${sizeCurveTotal}) doesn't match total quantity (${request.total_qty}).`,
         suggestion: 'Adjust individual size quantities to match the total quantity.',
         severity: 'HIGH',
         category: 'QUALITY'
@@ -174,14 +174,14 @@ class AshleyAI {
 
     // Unusual size distribution warning
     const maxSize = Math.max(...Object.values(request.sizeCurve))
-    const totalQty = request.totalQty
+    const total_qty = request.total_qty
     
-    if (maxSize / totalQty > 0.7) {
+    if (maxSize / total_qty > 0.7) {
       const dominantSize = Object.entries(request.sizeCurve).find(([_, qty]) => qty === maxSize)?.[0]
       advisories.push({
         type: 'INFO',
         title: 'Unusual Size Distribution',
-        message: `${((maxSize / totalQty) * 100).toFixed(1)}% of order is size ${dominantSize}.`,
+        message: `${((maxSize / total_qty) * 100).toFixed(1)}% of order is size ${dominantSize}.`,
         suggestion: 'Verify size distribution is correct. Consider fabric utilization optimization.',
         severity: 'LOW',
         category: 'QUALITY'
@@ -197,7 +197,7 @@ class AshleyAI {
     const _estimatedCost = await this.estimateProductionCost(request)
     
     // Low quantity high setup warning
-    if (request.totalQty < 50 && request.method === 'SILKSCREEN') {
+    if (request.total_qty < 50 && request.method === 'SILKSCREEN') {
       advisories.push({
         type: 'WARNING',
         title: 'Low Quantity Silkscreen',
@@ -243,7 +243,7 @@ class AshleyAI {
       EMBROIDERY: 2.0
     }
 
-    const requiredMinutes = request.totalQty * baseMinutesPerPiece[request.method]
+    const requiredMinutes = request.total_qty * baseMinutesPerPiece[request.method]
     
     // Simulate workcenter availability (8 hours = 480 minutes per day)
     const dailyCapacity = 480
@@ -284,7 +284,7 @@ class AshleyAI {
     }
 
     const setupCost = baseCosts[request.method]
-    const variableCost = perPieceCosts[request.method] * request.totalQty
+    const variableCost = perPieceCosts[request.method] * request.total_qty
 
     return setupCost + variableCost
   }
@@ -310,7 +310,7 @@ class AshleyAI {
     const isGoodProductType = bestSellerPatterns.includes(request.productType)
     const isPreferredMethod = methodPreference[request.productType as keyof typeof methodPreference]?.includes(request.method)
 
-    return isGoodProductType && !!isPreferredMethod && request.totalQty >= 100
+    return isGoodProductType && !!isPreferredMethod && request.total_qty >= 100
   }
 
   /**
@@ -320,7 +320,7 @@ class AshleyAI {
   async analyzeDesignPrintability(designFile: File, method: string): Promise<PrintabilityCheck> {
     // Simulate design analysis
     const mockAnalysis: PrintabilityCheck = {
-      designId: `design_${Date.now()}`,
+      design_id: `design_${Date.now()}`,
       result: 'PASS',
       issues: [],
       recommendations: []

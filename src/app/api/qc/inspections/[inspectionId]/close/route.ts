@@ -35,7 +35,7 @@ export async function POST(
             orderNumber: true, 
             clientName: true,
             status: true,
-            routingSteps: {
+            routing_steps: {
               where: { workcenter: 'PACKING' },
               select: { id: true, status: true }
             }
@@ -128,7 +128,7 @@ export async function POST(
 
         if (criticalDefects.length > 0 || majorDefects.length > 0) {
           const reworkTasks = [...criticalDefects, ...majorDefects].map(defect => ({
-            orderId: inspection.orderId,
+            order_id: inspection.order_id,
             taskType: 'REWORK',
             description: `Rework: ${defect.defectCode.description} (${defect.defectCode.code})`,
             priority: defect.severity === 'CRITICAL' ? 5 : 3,
@@ -172,8 +172,8 @@ export async function POST(
 
         capaTask = await tx.cAPATask.create({
           data: {
-            workspaceId: 'default',
-            orderId: inspection.orderId,
+            workspace_id: 'default',
+            order_id: inspection.order_id,
             sourceInspectionId: inspectionId,
             title: `QC Failure Root Cause Analysis - ${inspection.order.orderNumber}`,
             description: `Systematic analysis required for QC failure in ${inspection.stage} stage. Key defects: ${topDefects}`,
@@ -189,11 +189,11 @@ export async function POST(
       // Update order routing if this affects next steps
       if (disposition === 'PASSED') {
         // Clear any shipment holds from this inspection
-        const packingSteps = inspection.order.routingSteps.filter(s => s.workcenter === 'PACKING')
+        const packingSteps = inspection.order.routing_steps.filter(s => s.workcenter === 'PACKING')
         if (packingSteps.length > 0) {
           await tx.routingStep.updateMany({
             where: {
-              orderId: inspection.orderId,
+              order_id: inspection.order_id,
               workcenter: 'PACKING',
               status: 'BLOCKED'
             },
@@ -208,7 +208,7 @@ export async function POST(
     // Create comprehensive audit log
     await prisma.auditLog.create({
       data: {
-        userId: session.user.id,
+        user_id: session.user.id,
         action: 'CLOSE_QC_INSPECTION',
         entityType: 'QCInspection',
         entityId: inspectionId,
@@ -234,7 +234,7 @@ export async function POST(
     // Generate tracking update
     await prisma.trackingUpdate.create({
       data: {
-        orderId: inspection.orderId,
+        order_id: inspection.order_id,
         stage: 'Quality Control',
         status: disposition === 'PASSED' ? 'COMPLETED' : 'FAILED',
         message: `QC inspection completed - ${disposition}. ${inspection.stage} stage: ${actualDefects} defects found in ${inspection._count.samples} samples.${!aqlCompliant ? ` ${aqlMessage}` : ''}`,

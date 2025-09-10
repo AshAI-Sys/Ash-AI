@@ -49,7 +49,7 @@ interface SecurityEvent {
 
 interface TwoFactorAuth {
   id: string
-  userId: string
+  user_id: string
   method: 'SMS' | 'EMAIL' | 'AUTHENTICATOR' | 'HARDWARE'
   enabled: boolean
   lastUsed?: string
@@ -114,7 +114,7 @@ export function SecurityDashboard() {
   const [twoFactorMethods] = useState<TwoFactorAuth[]>([
     {
       id: '2fa_001',
-      userId: 'user_001',
+      user_id: 'user_001',
       method: 'AUTHENTICATOR',
       enabled: true,
       lastUsed: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
@@ -122,14 +122,14 @@ export function SecurityDashboard() {
     },
     {
       id: '2fa_002',
-      userId: 'user_001',
+      user_id: 'user_001',
       method: 'SMS',
       enabled: false,
       backupCodes: 0
     },
     {
       id: '2fa_003',
-      userId: 'user_001',
+      user_id: 'user_001',
       method: 'EMAIL',
       enabled: true,
       lastUsed: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),

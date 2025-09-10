@@ -63,20 +63,20 @@ export async function GET(request: NextRequest) {
     }
 
     const url = new URL(request.url)
-    const workspaceId = url.searchParams.get('workspace_id')
+    const workspace_id = url.searchParams.get('workspace_id')
     const unreadOnly = url.searchParams.get('unread_only') === 'true'
-    const category = url.searchParams.get('category')
+    const _category = url.searchParams.get('category')
     const limit = parseInt(url.searchParams.get('limit') || '50')
     const offset = parseInt(url.searchParams.get('offset') || '0')
 
-    if (!workspaceId) {
+    if (!workspace_id) {
       return NextResponse.json({ error: 'Workspace ID required' }, { status: 400 })
     }
 
     // Verify workspace access
-    const workspace = await secureDb.getPrisma().workspace.findFirst({
+    const _workspace = await secureDb.getPrisma().workspace.findFirst({
       where: {
-        id: workspaceId,
+        id: workspace_id,
         OR: [
           { owner_id: user.id },
           { members: { some: { user_id: user.id } } }
@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
 
     // Build query conditions
     const whereClause: any = {
-      workspace_id: workspaceId,
+      workspace_id: workspace_id,
       OR: [
         { recipient_id: user.id },
         { recipient_type: 'ALL' },
@@ -191,7 +191,7 @@ export async function POST(request: NextRequest) {
     const notificationData = notificationSchema.parse(sanitizedBody)
 
     // Verify workspace access
-    const workspace = await secureDb.getPrisma().workspace.findFirst({
+    const _workspace = await secureDb.getPrisma().workspace.findFirst({
       where: {
         id: notificationData.workspace_id,
         OR: [
@@ -351,7 +351,7 @@ export async function PATCH(request: NextRequest) {
     const preferencesData = notificationPreferencesSchema.parse(sanitizedBody)
 
     // Verify workspace access
-    const workspace = await secureDb.getPrisma().workspace.findFirst({
+    const _workspace = await secureDb.getPrisma().workspace.findFirst({
       where: {
         id: preferencesData.workspace_id,
         OR: [

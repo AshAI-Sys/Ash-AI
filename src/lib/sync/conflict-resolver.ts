@@ -20,11 +20,11 @@ export interface ConflictData {
 }
 
 export class ConflictResolver {
-  static async getConflicts(userId?: string): Promise<ConflictData[]> {
-    const where = userId ? { 
+  static async getConflicts(user_id?: string): Promise<ConflictData[]> {
+    const where = user_id ? { 
       OR: [
-        { entity: 'Task', entityId: { in: await this.getUserTaskIds(userId) } },
-        { entity: 'TimeRecord', entityId: { in: await this.getUserTimeRecordIds(userId) } }
+        { entity: 'Task', entity_id: { in: await this.getUserTaskIds(user_id) } },
+        { entity: 'TimeRecord', entity_id: { in: await this.getUserTimeRecordIds(user_id) } }
       ]
     } : {};
 
@@ -108,12 +108,12 @@ export class ConflictResolver {
         },
         severity: 'MEDIUM',
         category: 'SYSTEM'
-      }, { userId: user_id });
+      }, { user_id: user_id });
 
       return { success: true };
 
-    } catch (error) {
-      console.error('Conflict resolution failed:', _error);
+    } catch (_error) {
+      console.error('Conflict resolution failed:', error);
       return { 
         success: false, 
         error: error instanceof Error ? error.message : 'Resolution failed' 

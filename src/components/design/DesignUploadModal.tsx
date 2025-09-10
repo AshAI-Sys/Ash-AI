@@ -42,7 +42,7 @@ interface Placement {
 
 interface DesignData {
   name: string
-  orderId: string
+  order_id: string
   method: 'Silkscreen' | 'Sublimation' | 'DTF' | 'Embroidery'
   mockupFile: File | null
   productionFile: File | null
@@ -56,7 +56,7 @@ interface DesignUploadModalProps {
   isOpen: boolean
   onClose: () => void
   onSubmit: (designData: DesignData) => void
-  orderOptions: { id: string, poNumber: string, method: string, brand: string }[]
+  orderOptions: { id: string, po_number: string, method: string, brand: string }[]
 }
 
 const placementAreas = [
@@ -97,7 +97,7 @@ const methodConstraints = {
 export function DesignUploadModal({ isOpen, onClose, onSubmit, orderOptions }: DesignUploadModalProps) {
   const [designData, setDesignData] = useState<DesignData>({
     name: '',
-    orderId: '',
+    order_id: '',
     method: 'Silkscreen',
     mockupFile: null,
     productionFile: null,
@@ -112,17 +112,17 @@ export function DesignUploadModal({ isOpen, onClose, onSubmit, orderOptions }: D
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [dragActive, setDragActive] = useState(false)
 
-  const selectedOrder = orderOptions.find(order => order.id === designData.orderId)
+  const selectedOrder = orderOptions.find(order => order.id === designData.order_id)
   const constraints = methodConstraints[designData.method]
 
-  const handleOrderSelect = (orderId: string) => {
-    const order = orderOptions.find(o => o.id === orderId)
+  const handleOrderSelect = (order_id: string) => {
+    const order = orderOptions.find(o => o.id === order_id)
     if (order) {
       setDesignData({
         ...designData,
-        orderId,
+        order_id,
         method: order.method as any,
-        name: `${order.poNumber} - Design`
+        name: `${order.po_number} - Design`
       })
       
       // Ashley AI insights based on method
@@ -295,7 +295,7 @@ export function DesignUploadModal({ isOpen, onClose, onSubmit, orderOptions }: D
     onClose()
   }
 
-  const canSubmit = designData.name && designData.orderId && designData.mockupFile && designData.productionFile
+  const canSubmit = designData.name && designData.order_id && designData.mockupFile && designData.productionFile
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -329,17 +329,17 @@ export function DesignUploadModal({ isOpen, onClose, onSubmit, orderOptions }: D
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="orderId">Production Order</Label>
+                  <Label htmlFor="order_id">Production Order</Label>
                   <select
-                    id="orderId"
-                    value={designData.orderId}
+                    id="order_id"
+                    value={designData.order_id}
                     onChange={(e) => handleOrderSelect(e.target.value)}
                     className="w-full mt-1 px-3 py-2 border rounded-lg enhanced-input"
                   >
                     <option value="">Select Order</option>
                     {orderOptions.map(order => (
                       <option key={order.id} value={order.id}>
-                        {order.poNumber} - {order.brand} ({order.method})
+                        {order.po_number} - {order.brand} ({order.method})
                       </option>
                     ))}
                   </select>
@@ -364,7 +364,7 @@ export function DesignUploadModal({ isOpen, onClose, onSubmit, orderOptions }: D
                     <span className="font-medium text-blue-800">Order Details</span>
                   </div>
                   <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div><span className="font-medium">PO Number:</span> {selectedOrder.poNumber}</div>
+                    <div><span className="font-medium">PO Number:</span> {selectedOrder.po_number}</div>
                     <div><span className="font-medium">Brand:</span> {selectedOrder.brand}</div>
                     <div><span className="font-medium">Method:</span> {selectedOrder.method}</div>
                     <div><span className="font-medium">Max Colors:</span> {constraints.maxColors === 999 ? 'Unlimited' : constraints.maxColors}</div>

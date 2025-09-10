@@ -8,12 +8,12 @@ export async function seedFuturisticDatabase() {
   console.log('🤖 Loading Neural Network Components...')
 
   const hashedPassword = await bcrypt.hash('admin123', 10)
-  const workspaceId = 'ash_ai_main_workspace'
+  const workspace_id = 'ash_ai_main_workspace'
 
   // 🧠 Create AI-Enhanced User Accounts
   console.log('🧠 Creating AI-Enhanced User Accounts...')
   
-  const admin = await prisma.user.upsert({
+  const _admin = await prisma.user.upsert({
     where: { email: 'admin@ash-ai.com' },
     update: {},
     create: {
@@ -36,7 +36,7 @@ export async function seedFuturisticDatabase() {
     },
   })
 
-  const ashley_ai = await prisma.user.upsert({
+  const _ashley_ai = await prisma.user.upsert({
     where: { email: 'ashley@ash-ai.com' },
     update: {},
     create: {
@@ -62,11 +62,11 @@ export async function seedFuturisticDatabase() {
   // 🏢 Create Futuristic Brands
   console.log('🏢 Creating Quantum-Enhanced Brands...')
   
-  const sorbetes = await prisma.brand.upsert({
+  const _sorbetes = await prisma.brand.upsert({
     where: { name: 'Sorbetes Futuristic' },
     update: {},
     create: {
-      workspace_id: workspaceId,
+      workspace_id: workspace_id,
       name: 'Sorbetes Futuristic',
       code: 'SORB-2024',
       settings: {
@@ -100,11 +100,11 @@ export async function seedFuturisticDatabase() {
     }
   })
 
-  const reefer = await prisma.brand.upsert({
+  const _reefer = await prisma.brand.upsert({
     where: { name: 'Reefer Neural' },
     update: {},
     create: {
-      workspace_id: workspaceId,
+      workspace_id: workspace_id,
       name: 'Reefer Neural',
       code: 'REEF-2024',
       settings: {
@@ -171,7 +171,7 @@ export async function seedFuturisticDatabase() {
   
   const client1 = existingClient || await prisma.client.create({
     data: {
-      workspace_id: workspaceId,
+      workspace_id: workspace_id,
       name: 'Quantum Fashion Co.',
       company: 'Quantum Fashion Corporation',
       emails: ['orders@quantumfashion.com', 'ceo@quantumfashion.com'],

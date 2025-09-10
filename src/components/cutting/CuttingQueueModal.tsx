@@ -27,10 +27,10 @@ import {
 } from 'lucide-react'
 
 interface CuttingQueueData {
-  designId: string
+  design_id: string
   designName: string
-  orderId: string
-  poNumber: string
+  order_id: string
+  po_number: string
   brand: string
   method: string
   priority: 'high' | 'medium' | 'low'
@@ -67,8 +67,8 @@ const mockApprovedDesigns = [
   {
     id: 'design_1',
     name: 'Premium Corporate Hoodie',
-    orderId: 'order_5',
-    poNumber: 'REEF-2024-000125',
+    order_id: 'order_5',
+    po_number: 'REEF-2024-000125',
     brand: 'Reefer',
     method: 'Embroidery',
     fabricType: 'Fleece',
@@ -84,8 +84,8 @@ const mockApprovedDesigns = [
   {
     id: 'design_2',
     name: 'Sports Team Jersey',
-    orderId: 'order_6',
-    poNumber: 'SORB-2024-000100',
+    order_id: 'order_6',
+    po_number: 'SORB-2024-000100',
     brand: 'Sorbetes',
     method: 'Sublimation',
     fabricType: 'Polyester Mesh',
@@ -101,8 +101,8 @@ const mockApprovedDesigns = [
   {
     id: 'design_3',
     name: 'Casual Print T-Shirt',
-    orderId: 'order_7',
-    poNumber: 'REEF-2024-000126',
+    order_id: 'order_7',
+    po_number: 'REEF-2024-000126',
     brand: 'Reefer',
     method: 'DTF',
     fabricType: 'Cotton Jersey',
@@ -131,7 +131,7 @@ export function CuttingQueueModal({ isOpen, onClose, onSubmit, operators }: Cutt
   
   const filteredDesigns = mockApprovedDesigns.filter(design =>
     design.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    design.poNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    design.po_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
     design.brand.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
@@ -151,10 +151,10 @@ export function CuttingQueueModal({ isOpen, onClose, onSubmit, operators }: Cutt
     if (!selectedDesign || !selectedOperator) return
 
     const queueData: CuttingQueueData = {
-      designId: selectedDesign.id,
+      design_id: selectedDesign.id,
       designName: selectedDesign.name,
-      orderId: selectedDesign.orderId,
-      poNumber: selectedDesign.poNumber,
+      order_id: selectedDesign.order_id,
+      po_number: selectedDesign.po_number,
       brand: selectedDesign.brand,
       method: selectedDesign.method,
       priority,
@@ -255,7 +255,7 @@ export function CuttingQueueModal({ isOpen, onClose, onSubmit, operators }: Cutt
                         <div className="flex-1">
                           <h4 className="font-semibold text-gray-900 mb-1">{design.name}</h4>
                           <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
-                            <span>{design.poNumber}</span>
+                            <span>{design.po_number}</span>
                             <span>•</span>
                             <span>{design.brand}</span>
                             <span>•</span>
@@ -318,7 +318,7 @@ export function CuttingQueueModal({ isOpen, onClose, onSubmit, operators }: Cutt
                     </div>
                     <div>
                       <h4 className="font-semibold text-gray-900">{selectedDesign?.name}</h4>
-                      <p className="text-sm text-gray-600">{selectedDesign?.poNumber} • {selectedDesign?.brand}</p>
+                      <p className="text-sm text-gray-600">{selectedDesign?.po_number} • {selectedDesign?.brand}</p>
                     </div>
                   </div>
                 </CardContent>

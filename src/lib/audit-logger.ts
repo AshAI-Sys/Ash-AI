@@ -3,7 +3,7 @@ import { AuditLog, User } from '@prisma/client'
 import { NextRequest } from 'next/server'
 
 export interface AuditLogData {
-  userId?: string
+  user_id?: string
   action: string
   entity: string
   entityId?: string
@@ -16,7 +16,7 @@ export interface AuditLogData {
 }
 
 export interface AuditSearchFilters {
-  userId?: string
+  user_id?: string
   action?: string
   entity?: string
   entityId?: string
@@ -37,14 +37,14 @@ export interface AuditAnalytics {
     count: number
   }>
   userActivity: Array<{
-    userId: string
+    user_id: string
     userName: string
     actionCount: number
     lastActivity: Date
   }>
   suspiciousActivity: Array<{
     type: 'MULTIPLE_LOGINS' | 'HIGH_VOLUME' | 'UNUSUAL_HOURS' | 'FAILED_ATTEMPTS'
-    userId?: string
+    user_id?: string
     count: number
     details: string
   }>
@@ -61,7 +61,7 @@ class AuditLogger {
 
     return db.auditLog.create({
       data: {
-        userId: data.userId,
+        user_id: data.user_id,
         action: data.action,
         entity: data.entity,
         entityId: data.entityId,
@@ -78,7 +78,7 @@ class AuditLogger {
   async logFromRequest(
     request: NextRequest,
     data: {
-      userId?: string
+      user_id?: string
       action: string
       entity: string
       entityId?: string
@@ -101,11 +101,11 @@ class AuditLogger {
     entity: string,
     entityId: string,
     newValues: Record<string, any>,
-    userId?: string,
+    user_id?: string,
     metadata?: Record<string, any>
   ): Promise<AuditLog> {
     return this.log({
-      userId,
+      user_id,
       action: 'CREATE',
       entity,
       entityId,
@@ -119,11 +119,11 @@ class AuditLogger {
     entityId: string,
     oldValues: Record<string, any>,
     newValues: Record<string, any>,
-    userId?: string,
+    user_id?: string,
     metadata?: Record<string, any>
   ): Promise<AuditLog> {
     return this.log({
-      userId,
+      user_id,
       action: 'UPDATE',
       entity,
       entityId,
@@ -137,11 +137,11 @@ class AuditLogger {
     entity: string,
     entityId: string,
     oldValues: Record<string, any>,
-    userId?: string,
+    user_id?: string,
     metadata?: Record<string, any>
   ): Promise<AuditLog> {
     return this.log({
-      userId,
+      user_id,
       action: 'DELETE',
       entity,
       entityId,
@@ -151,17 +151,17 @@ class AuditLogger {
   }
 
   async logLogin(
-    userId: string,
+    user_id: string,
     success: boolean,
     ipAddress?: string,
     userAgent?: string,
     metadata?: Record<string, any>
   ): Promise<AuditLog> {
     return this.log({
-      userId: success ? userId : undefined,
+      user_id: success ? user_id : undefined,
       action: success ? 'LOGIN_SUCCESS' : 'LOGIN_FAILURE',
       entity: 'USER',
-      entityId: userId,
+      entityId: user_id,
       ipAddress,
       userAgent,
       metadata
@@ -169,16 +169,16 @@ class AuditLogger {
   }
 
   async logLogout(
-    userId: string,
+    user_id: string,
     ipAddress?: string,
     userAgent?: string,
     metadata?: Record<string, any>
   ): Promise<AuditLog> {
     return this.log({
-      userId,
+      user_id,
       action: 'LOGOUT',
       entity: 'USER',
-      entityId: userId,
+      entityId: user_id,
       ipAddress,
       userAgent,
       metadata
@@ -193,7 +193,7 @@ class AuditLogger {
     metadata?: Record<string, any>
   ): Promise<AuditLog> {
     return this.log({
-      userId: adminUserId,
+      user_id: adminUserId,
       action: 'PERMISSION_CHANGE',
       entity: 'USER',
       entityId: targetUserId,
@@ -204,14 +204,14 @@ class AuditLogger {
   }
 
   async logDataExport(
-    userId: string,
+    user_id: string,
     entity: string,
     exportType: string,
     recordCount: number,
     metadata?: Record<string, any>
   ): Promise<AuditLog> {
     return this.log({
-      userId,
+      user_id,
       action: 'DATA_EXPORT',
       entity,
       newValues: {
@@ -226,10 +226,10 @@ class AuditLogger {
     event: string,
     entity: string,
     details: Record<string, any>,
-    userId?: string
+    user_id?: string
   ): Promise<AuditLog> {
     return this.log({
-      userId,
+      user_id,
       action: `SYSTEM_${event}`,
       entity,
       newValues: details
@@ -248,7 +248,7 @@ class AuditLogger {
   }> {
     const where: any = {}
 
-    if (filters.userId) where.userId = filters.userId
+    if (filters.user_id) where.user_id = filters.user_id
     if (filters.action) where.action = filters.action
     if (filters.entity) where.entity = filters.entity
     if (filters.entityId) where.entityId = filters.entityId
@@ -305,7 +305,7 @@ class AuditLogger {
     })
 
     const totalLogs = logs.length
-    const uniqueUsers = new Set(logs.map(log => log.userId).filter(Boolean)).size
+    const uniqueUsers = new Set(logs.map(log => log.user_id).filter(Boolean)).size
 
     // Top actions
     const actionCounts = new Map<string, number>()
@@ -332,8 +332,8 @@ class AuditLogger {
     // User activity
     const userActivity = new Map<string, { userName: string, actionCount: number, lastActivity: Date }>()
     logs.forEach(log => {
-      if (log.userId && log.user) {
-        const existing = userActivity.get(log.userId)
+      if (log.user_id && log.user) {
+        const existing = userActivity.get(log.user_id)
         const activity = {
           userName: log.user.name,
           actionCount: (existing?.actionCount || 0) + 1,
@@ -341,12 +341,12 @@ class AuditLogger {
             (log.timestamp > existing.lastActivity ? log.timestamp : existing.lastActivity) :
             log.timestamp
         }
-        userActivity.set(log.userId, activity)
+        userActivity.set(log.user_id, activity)
       }
     })
 
     const userActivityArray = Array.from(userActivity.entries())
-      .map(([userId, data]) => ({ userId, ...data }))
+      .map(([user_id, data]) => ({ user_id, ...data }))
       .sort((a, b) => b.actionCount - a.actionCount)
 
     // Suspicious activity detection
@@ -363,13 +363,13 @@ class AuditLogger {
   }
 
   async getUserActivity(
-    userId: string,
+    user_id: string,
     dateFrom: Date,
     dateTo: Date
   ): Promise<Array<AuditLog>> {
     return db.auditLog.findMany({
       where: {
-        userId,
+        user_id,
         timestamp: {
           gte: dateFrom,
           lte: dateTo
@@ -450,32 +450,32 @@ class AuditLogger {
 
   private async detectSuspiciousActivity(logs: AuditLog[]): Promise<Array<{
     type: 'MULTIPLE_LOGINS' | 'HIGH_VOLUME' | 'UNUSUAL_HOURS' | 'FAILED_ATTEMPTS'
-    userId?: string
+    user_id?: string
     count: number
     details: string
   }>> {
     const suspicious: Array<{
       type: 'MULTIPLE_LOGINS' | 'HIGH_VOLUME' | 'UNUSUAL_HOURS' | 'FAILED_ATTEMPTS'
-      userId?: string
+      user_id?: string
       count: number
       details: string
     }> = []
 
     // Multiple logins from different IPs
     const userIPs = new Map<string, Set<string>>()
-    logs.filter(log => log.action === 'LOGIN_SUCCESS' && log.userId && log.ipAddress)
+    logs.filter(log => log.action === 'LOGIN_SUCCESS' && log.user_id && log.ipAddress)
       .forEach(log => {
-        if (!userIPs.has(log.userId!)) {
-          userIPs.set(log.userId!, new Set())
+        if (!userIPs.has(log.user_id!)) {
+          userIPs.set(log.user_id!, new Set())
         }
-        userIPs.get(log.userId!)!.add(log.ipAddress!)
+        userIPs.get(log.user_id!)!.add(log.ipAddress!)
       })
 
-    userIPs.forEach((ips, userId) => {
+    userIPs.forEach((ips, user_id) => {
       if (ips.size > 5) { // More than 5 different IPs
         suspicious.push({
           type: 'MULTIPLE_LOGINS',
-          userId,
+          user_id,
           count: ips.size,
           details: `User logged in from ${ips.size} different IP addresses`
         })
@@ -485,16 +485,16 @@ class AuditLogger {
     // High volume of actions
     const userActionCounts = new Map<string, number>()
     logs.forEach(log => {
-      if (log.userId) {
-        userActionCounts.set(log.userId, (userActionCounts.get(log.userId) || 0) + 1)
+      if (log.user_id) {
+        userActionCounts.set(log.user_id, (userActionCounts.get(log.user_id) || 0) + 1)
       }
     })
 
-    userActionCounts.forEach((count, userId) => {
+    userActionCounts.forEach((count, user_id) => {
       if (count > 1000) { // More than 1000 actions
         suspicious.push({
           type: 'HIGH_VOLUME',
-          userId,
+          user_id,
           count,
           details: `User performed ${count} actions in the selected period`
         })
@@ -504,21 +504,21 @@ class AuditLogger {
     // Unusual hours (activity between midnight and 6 AM)
     const nightActivity = logs.filter(log => {
       const hour = log.timestamp.getHours()
-      return hour >= 0 && hour < 6 && log.userId
+      return hour >= 0 && hour < 6 && log.user_id
     })
 
     const nightActivityByUser = new Map<string, number>()
     nightActivity.forEach(log => {
-      if (log.userId) {
-        nightActivityByUser.set(log.userId, (nightActivityByUser.get(log.userId) || 0) + 1)
+      if (log.user_id) {
+        nightActivityByUser.set(log.user_id, (nightActivityByUser.get(log.user_id) || 0) + 1)
       }
     })
 
-    nightActivityByUser.forEach((count, userId) => {
+    nightActivityByUser.forEach((count, user_id) => {
       if (count > 20) { // More than 20 actions during night hours
         suspicious.push({
           type: 'UNUSUAL_HOURS',
-          userId,
+          user_id,
           count,
           details: `User had ${count} actions during night hours (12 AM - 6 AM)`
         })
@@ -534,7 +534,7 @@ class AuditLogger {
       if (log.ipAddress) {
         failedByIP.set(log.ipAddress, (failedByIP.get(log.ipAddress) || 0) + 1)
       }
-      if (log.entityId) { // entityId contains the attempted userId
+      if (log.entityId) { // entityId contains the attempted user_id
         failedByUser.set(log.entityId, (failedByUser.get(log.entityId) || 0) + 1)
       }
     })
@@ -549,11 +549,11 @@ class AuditLogger {
       }
     })
 
-    failedByUser.forEach((count, userId) => {
+    failedByUser.forEach((count, user_id) => {
       if (count > 5) { // More than 5 failed attempts for same user
         suspicious.push({
           type: 'FAILED_ATTEMPTS',
-          userId,
+          user_id,
           count,
           details: `${count} failed login attempts for user account`
         })
@@ -568,13 +568,13 @@ class AuditLogger {
     return {
       logRequest: async (
         request: NextRequest,
-        userId?: string,
+        user_id?: string,
         action?: string,
         entity?: string
       ) => {
         if (action && entity) {
           await this.logFromRequest(request, {
-            userId,
+            user_id,
             action,
             entity
           })

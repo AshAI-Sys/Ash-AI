@@ -84,7 +84,7 @@ export class RealTimeProductionTracker {
           error_message: machine.error_message || undefined
         })
       })
-    } catch (error) {
+    } catch (_error) {
       logError(error, 'Failed to initialize machine statuses')
     }
   }
@@ -102,33 +102,33 @@ export class RealTimeProductionTracker {
   }
 
   // Subscribe to real-time updates for an order
-  subscribe(orderId: string, callback: (update: ProductionUpdate) => void): () => void {
-    if (!this.subscribers.has(orderId)) {
-      this.subscribers.set(orderId, new Set())
+  subscribe(order_id: string, callback: (update: ProductionUpdate) => void): () => void {
+    if (!this.subscribers.has(order_id)) {
+      this.subscribers.set(order_id, new Set())
     }
-    this.subscribers.get(orderId)!.add(callback)
+    this.subscribers.get(order_id)!.add(callback)
 
     // Return unsubscribe function
     return () => {
-      const orderSubscribers = this.subscribers.get(orderId)
+      const orderSubscribers = this.subscribers.get(order_id)
       if (orderSubscribers) {
         orderSubscribers.delete(callback)
         if (orderSubscribers.size === 0) {
-          this.subscribers.delete(orderId)
+          this.subscribers.delete(order_id)
         }
       }
     }
   }
 
   // Publish update to all subscribers
-  private publish(orderId: string, update: ProductionUpdate) {
-    const subscribers = this.subscribers.get(orderId)
+  private publish(order_id: string, update: ProductionUpdate) {
+    const subscribers = this.subscribers.get(order_id)
     if (subscribers) {
       subscribers.forEach(callback => {
         try {
           callback(update)
-        } catch (error) {
-          logError(error, `Failed to notify subscriber for order ${orderId}`)
+        } catch (_error) {
+          logError(error, `Failed to notify subscriber for order ${order_id}`)
         }
       })
     }
@@ -136,10 +136,10 @@ export class RealTimeProductionTracker {
 
   // Update production status
   async updateProductionStatus(
-    orderId: string, 
+    order_id: string, 
     stageId: string, 
     updates: Partial<ProductionStage>,
-    userId?: string
+    user_id?: string
   ): Promise<ProductionMetrics> {
     try {
       // Update routing step in database
@@ -157,28 +157,28 @@ export class RealTimeProductionTracker {
       })
 
       // Update local metrics
-      const metrics = await this.calculateProductionMetrics(orderId)
-      this.productionMetrics.set(orderId, metrics)
+      const metrics = await this.calculateProductionMetrics(order_id)
+      this.productionMetrics.set(order_id, metrics)
 
       // Create and publish update
       const update: ProductionUpdate = {
         id: `update_${Date.now()}`,
-        order_id: orderId,
+        order_id: order_id,
         routing_step_id: stageId,
         update_type: 'STATUS_CHANGE',
         data: { updates, metrics },
         timestamp: new Date(),
-        user_id: userId
+        user_id: user_id
       }
 
-      this.publish(orderId, update)
+      this.publish(order_id, update)
 
       // Log the update
       await this.logProductionUpdate(update)
 
       return metrics
-    } catch (error) {
-      logError(error, `Failed to update production status for order ${orderId}`)
+    } catch (_error) {
+      logError(error, `Failed to update production status for order ${order_id}`)
       throw error
     }
   }
@@ -187,7 +187,7 @@ export class RealTimeProductionTracker {
   async updateMachineStatus(
     machineId: string,
     status: MachineStatus['status'],
-    orderId?: string,
+    order_id?: string,
     errorMessage?: string
   ) {
     try {
@@ -199,7 +199,7 @@ export class RealTimeProductionTracker {
       const updatedMachine: MachineStatus = {
         ...machine,
         status,
-        current_order_id: orderId,
+        current_order_id: order_id,
         error_message: errorMessage,
         last_update: new Date()
       }
@@ -211,17 +211,17 @@ export class RealTimeProductionTracker {
         where: { id: machineId },
         data: {
           status,
-          current_order_id: orderId,
+          current_order_id: order_id,
           error_message: errorMessage,
           last_status_update: new Date()
         }
       })
 
       // If machine is assigned to an order, notify subscribers
-      if (orderId) {
+      if (order_id) {
         const update: ProductionUpdate = {
           id: `machine_${Date.now()}`,
-          order_id: orderId,
+          order_id: order_id,
           routing_step_id: '',
           update_type: 'MACHINE_STATUS',
           data: { machine: updatedMachine },
@@ -229,33 +229,33 @@ export class RealTimeProductionTracker {
           machine_id: machineId
         }
 
-        this.publish(orderId, update)
+        this.publish(order_id, update)
         await this.logProductionUpdate(update)
       }
 
       return updatedMachine
-    } catch (error) {
+    } catch (_error) {
       logError(error, `Failed to update machine status for ${machineId}`)
       throw error
     }
   }
 
   // Get current production metrics
-  async getProductionMetrics(orderId: string): Promise<ProductionMetrics> {
-    let metrics = this.productionMetrics.get(orderId)
+  async getProductionMetrics(order_id: string): Promise<ProductionMetrics> {
+    let metrics = this.productionMetrics.get(order_id)
     if (!metrics) {
-      metrics = await this.calculateProductionMetrics(orderId)
-      this.productionMetrics.set(orderId, metrics)
+      metrics = await this.calculateProductionMetrics(order_id)
+      this.productionMetrics.set(order_id, metrics)
     }
     return metrics
   }
 
   // Calculate production metrics from database
-  private async calculateProductionMetrics(orderId: string): Promise<ProductionMetrics> {
+  private async calculateProductionMetrics(order_id: string): Promise<ProductionMetrics> {
     const order = await prisma.order.findUnique({
-      where: { id: orderId },
+      where: { id: order_id },
       include: {
-        routingSteps: {
+        routing_steps: {
           include: {
             operator: true,
             machine: true
@@ -265,10 +265,10 @@ export class RealTimeProductionTracker {
     })
 
     if (!order) {
-      throw new Error(`Order ${orderId} not found`)
+      throw new Error(`Order ${order_id} not found`)
     }
 
-    const stages: ProductionStage[] = order.routingSteps.map(step => ({
+    const stages: ProductionStage[] = order.routing_steps.map(step => ({
       id: step.id,
       name: step.operation_name,
       status: step.status as any,
@@ -292,7 +292,7 @@ export class RealTimeProductionTracker {
     const qualityScore = this.calculateQualityScore(stages)
 
     return {
-      order_id: orderId,
+      order_id: order_id,
       po_number: order.po_number,
       status: order.status,
       progress_percentage: progressPercentage,
@@ -349,7 +349,7 @@ export class RealTimeProductionTracker {
         
         this.publish(order.id, update)
       }
-    } catch (error) {
+    } catch (_error) {
       logError(error, 'Failed to update production metrics')
     }
   }
@@ -381,7 +381,7 @@ export class RealTimeProductionTracker {
           machine_id: update.machine_id || null
         }
       })
-    } catch (error) {
+    } catch (_error) {
       logError(error, 'Failed to log production update')
     }
   }
@@ -402,18 +402,18 @@ export const productionTracker = new RealTimeProductionTracker()
 
 // Helper functions
 export async function updateProductionStatus(
-  orderId: string, 
+  order_id: string, 
   stageId: string, 
   updates: Partial<ProductionStage>,
-  userId?: string
+  user_id?: string
 ) {
-  return await productionTracker.updateProductionStatus(orderId, stageId, updates, userId)
+  return await productionTracker.updateProductionStatus(order_id, stageId, updates, user_id)
 }
 
-export async function getProductionMetrics(orderId: string) {
-  return await productionTracker.getProductionMetrics(orderId)
+export async function getProductionMetrics(order_id: string) {
+  return await productionTracker.getProductionMetrics(order_id)
 }
 
-export function subscribeToProductionUpdates(orderId: string, callback: (update: ProductionUpdate) => void) {
-  return productionTracker.subscribe(orderId, callback)
+export function subscribeToProductionUpdates(order_id: string, callback: (update: ProductionUpdate) => void) {
+  return productionTracker.subscribe(order_id, callback)
 }

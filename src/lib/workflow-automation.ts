@@ -1,9 +1,8 @@
 // Workflow Automation System - CLIENT_UPDATED_PLAN.md Implementation
 // Automated order processing, status updates, and notifications
 
-import { OrderStatus, Role } from '@prisma/client'
 import { prisma } from './prisma'
-import { createErrorResponse, createSuccessResponse, logError } from './error-handler'
+import { logError } from './error-handler'
 
 export interface AutomationRule {
   id: string
@@ -158,10 +157,10 @@ export class WorkflowAutomationEngine {
     ]
   }
 
-  async processAutomation(orderId: string, trigger: string, context: any = {}) {
+  async processAutomation(order_id: string, trigger: string, context: any = {}) {
     try {
       const order = await prisma.order.findUnique({
-        where: { id: orderId },
+        where: { id: order_id },
         include: {
           items: true,
           client: true,
@@ -170,7 +169,7 @@ export class WorkflowAutomationEngine {
       })
 
       if (!order) {
-        throw new Error(`Order ${orderId} not found`)
+        throw new Error(`Order ${order_id} not found`)
       }
 
       const applicableRules = this.rules.filter(rule => 
@@ -184,14 +183,14 @@ export class WorkflowAutomationEngine {
           await this.executeActions(rule.actions, order, context)
           
           // Log automation execution
-          await this.logAutomationExecution(rule.id, orderId, 'SUCCESS')
+          await this.logAutomationExecution(rule.id, order_id, 'SUCCESS')
         }
       }
 
       return { success: true, message: 'Automation processing completed' }
-    } catch (error) {
-      logError(error, `Workflow automation for order ${orderId}`)
-      await this.logAutomationExecution('unknown', orderId, 'ERROR', error)
+    } catch (_error) {
+      logError(error, `Workflow automation for order ${order_id}`)
+      await this.logAutomationExecution('unknown', order_id, 'ERROR', error)
       throw error
     }
   }
@@ -216,13 +215,13 @@ export class WorkflowAutomationEngine {
         return this.compareValues(timeElapsed, condition.operator, condition.value)
       
       case 'production_complete':
-        const completedSteps = order.routingSteps?.filter((step: any) => step.status === 'DONE').length || 0
-        const totalSteps = order.routingSteps?.length || 0
+        const completedSteps = order.routing_steps?.filter((step: any) => step.status === 'DONE').length || 0
+        const totalSteps = order.routing_steps?.length || 0
         return totalSteps > 0 && completedSteps === totalSteps
       
       case 'quality_passed':
         // Check if quality control has passed
-        const qcStep = order.routingSteps?.find((step: any) => step.workcenter_type === 'QC')
+        const qcStep = order.routing_steps?.find((step: any) => step.workcenter_type === 'QC')
         return qcStep?.status === 'DONE' && qcStep?.quality_passed === true
       
       default:
@@ -315,10 +314,10 @@ export class WorkflowAutomationEngine {
     console.log(`Scheduling reminder for order ${order.po_number}:`, params)
   }
 
-  private async logAutomationExecution(ruleId: string, orderId: string, status: string, error?: any) {
+  private async logAutomationExecution(ruleId: string, order_id: string, status: string, error?: any) {
     try {
       // Log automation execution to console for now (automationLog model doesn't exist)
-      console.log(`Automation executed - Rule: ${ruleId}, Order: ${orderId}, Status: ${status}`, error?.message || '')
+      console.log(`Automation executed - Rule: ${ruleId}, Order: ${order_id}, Status: ${status}`, error?.message || '')
     } catch (logError) {
       console.error('Failed to log automation execution:', logError)
     }
@@ -349,6 +348,6 @@ export class WorkflowAutomationEngine {
 export const automationEngine = new WorkflowAutomationEngine()
 
 // Helper function to trigger automation
-export async function triggerWorkflowAutomation(orderId: string, trigger: string, context: any = {}) {
-  return await automationEngine.processAutomation(orderId, trigger, context)
+export async function triggerWorkflowAutomation(order_id: string, trigger: string, context: any = {}) {
+  return await automationEngine.processAutomation(order_id, trigger, context)
 }

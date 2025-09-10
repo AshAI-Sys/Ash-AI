@@ -1,5 +1,5 @@
 import { prisma as db } from './db'
-import { Role, TaskStatus, PrintMethod, User, Task, Order, InventoryItem, UsageRecord, QCRecord, OrderCost, TaskCost } from '@prisma/client'
+import { Role, TaskStatus, ProductMethod, User, Order } from '@prisma/client'
 
 export interface AssignmentSuggestion {
   taskId: string
@@ -12,7 +12,7 @@ export interface AssignmentSuggestion {
 }
 
 export interface ForecastResult {
-  orderId: string
+  order_id: string
   estimatedCompletionDate: Date
   confidence: number
   criticalPath: string[]
@@ -31,8 +31,8 @@ export interface InventorySuggestion {
 }
 
 export interface PricingSuggestion {
-  orderId?: string
-  brandId?: string
+  order_id?: string
+  brand_id?: string
   minimumPrice: number
   suggestedPrice: number
   liquidationPrice: number
@@ -157,7 +157,7 @@ class AIService {
       estimatedCompletionDate.setDate(estimatedCompletionDate.getDate() + estimatedDays)
 
       forecasts.push({
-        orderId: order.id,
+        order_id: order.id,
         estimatedCompletionDate,
         confidence: this.calculateForecastConfidence(order, riskFactors),
         criticalPath,
@@ -228,8 +228,8 @@ class AIService {
       const marketAnalysis = await this.analyzeMarketPricing(order)
       
       suggestions.push({
-        orderId: order.id,
-        brandId: order.brandId,
+        order_id: order.id,
+        brand_id: order.brand_id,
         minimumPrice: totalCost * 1.1, // 10% markup minimum
         suggestedPrice: totalCost * 1.4, // 40% markup suggested
         liquidationPrice: totalCost * 0.9, // 10% loss max for liquidation

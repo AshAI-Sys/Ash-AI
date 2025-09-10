@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
 
     switch (action) {
       case 'analyzeProfitability':
-        if (!data.orderId) {
+        if (!data.order_id) {
           return NextResponse.json({ error: 'Order ID is required' }, { status: 400 })
         }
         result = await callAIAgent('mira', 'analyzeProfitability', data, session.user.id)

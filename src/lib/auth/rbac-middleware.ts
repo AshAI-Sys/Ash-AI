@@ -81,14 +81,14 @@ export async function checkTaskAccess(request: NextRequest) {
 
 export async function checkOrderAccess(request: NextRequest) {
   const url = new URL(request.url);
-  const orderId = url.pathname.split('/').pop();
+  const order_id = url.pathname.split('/').pop();
   
-  if (!orderId) return null;
+  if (!order_id) return null;
 
   const { prisma } = await import('@/lib/prisma');
   
   const order = await prisma.order.findUnique({
-    where: { id: orderId },
+    where: { id: order_id },
     include: {
       brand: true,
       client: true,
@@ -137,7 +137,7 @@ export function requirePermission(resource: string, action: 'CREATE' | 'READ' | 
 }
 
 export async function auditAction(
-  userId: string,
+  user_id: string,
   action: string,
   entity: string,
   entityId?: string,
@@ -150,7 +150,7 @@ export async function auditAction(
     
     await prisma.auditLog.create({
       data: {
-        userId,
+        user_id,
         action,
         entity,
         entityId,

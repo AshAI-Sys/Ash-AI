@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth'
-import { Role } from '@prisma/client'
+
 import { get3PLQuotes, recommendDeliveryMethod, calculateDriverCost } from '@/lib/delivery-calculations'
 // Delivery Quote API for Stage 8 Delivery System
 // Based on CLIENT_UPDATED_PLAN.md specifications

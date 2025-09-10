@@ -39,7 +39,7 @@ interface WorkStation {
   currentJob?: {
     id: string
     name: string
-    poNumber: string
+    po_number: string
     priority: 'high' | 'medium' | 'low'
     estimatedTime: number
     elapsedTime: number
@@ -71,7 +71,7 @@ const mockStation: WorkStation = {
   currentJob: {
     id: 'cut_001',
     name: 'Corporate Logo Tee Design',
-    poNumber: 'REEF-2024-000123',
+    po_number: 'REEF-2024-000123',
     priority: 'high',
     estimatedTime: 45,
     elapsedTime: 23,
@@ -178,7 +178,7 @@ export function MobileProductionInterface() {
                 <CardContent className="space-y-4">
                   <div>
                     <h3 className="font-medium text-gray-900 mb-1">{station.currentJob.name}</h3>
-                    <p className="text-sm text-gray-600">{station.currentJob.poNumber}</p>
+                    <p className="text-sm text-gray-600">{station.currentJob.po_number}</p>
                   </div>
 
                   {/* Progress */}

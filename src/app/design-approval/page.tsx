@@ -27,7 +27,7 @@ import { Badge } from '@/components/ui/badge'
 
 interface Design {
   id: string
-  orderId: string
+  order_id: string
   clientName: string
   designName: string
   version: number
@@ -52,7 +52,7 @@ export default function DesignApprovalPage() {
   const [designs] = useState<Design[]>([
     {
       id: 'DES-2024-001',
-      orderId: 'ORD-2024-001',
+      order_id: 'ORD-2024-001',
       clientName: 'Premium Apparel Co.',
       designName: 'Summer Collection Logo',
       version: 1,
@@ -67,7 +67,7 @@ export default function DesignApprovalPage() {
     },
     {
       id: 'DES-2024-002', 
-      orderId: 'ORD-2024-002',
+      order_id: 'ORD-2024-002',
       clientName: 'Urban Streetwear',
       designName: 'Hoodie Graphics',
       version: 3,
@@ -84,7 +84,7 @@ export default function DesignApprovalPage() {
     },
     {
       id: 'DES-2024-003',
-      orderId: 'ORD-2024-003', 
+      order_id: 'ORD-2024-003', 
       clientName: 'Sports Academy',
       designName: 'Team Jersey Design',
       version: 2,
@@ -139,7 +139,7 @@ export default function DesignApprovalPage() {
   const filteredDesigns = designs.filter(design => {
     const matchesSearch = design.designName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          design.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         design.orderId.toLowerCase().includes(searchTerm.toLowerCase())
+                         design.order_id.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesStatus = statusFilter === 'All' || design.status === statusFilter
     return matchesSearch && matchesStatus
   })
@@ -287,7 +287,7 @@ export default function DesignApprovalPage() {
                   </div>
                   <CardTitle className="text-white text-lg">{design.designName}</CardTitle>
                   <CardDescription className="text-cyan-300">
-                    {design.clientName} • {design.orderId}
+                    {design.clientName} • {design.order_id}
                   </CardDescription>
                 </CardHeader>
                 

@@ -152,7 +152,9 @@ model Workspace {
   clients             Client[]
   brands              Brand[]
   orders              Order[]
+  route_templates     RouteTemplate[]
   audit_logs          AuditLog[]
+  notifications       Notification[]
   machines            Machine[]
   suppliers           Supplier[]
   invoices            Invoice[]
@@ -238,6 +240,8 @@ model User {
   assigned_tasks   Task[]    @relation("AssignedUser")
   created_tasks    Task[]    @relation("CreatedUser")
   pushSubscriptions PushSubscription[]
+  production_logs  ProductionLog[] @relation("ProductionLogUser")
+  notifications    Notification[]
   
   @@map("users")
 }
@@ -354,6 +358,7 @@ model Order {
   clothing_type        String?       // Additional clothing type field
   order_type           String?       // Type of order
   status               OrderStatus   @default(INTAKE)
+  route_template_id    String?       // Optional routing template
   created_by           String        // user id
   created_at           DateTime      @default(now())
   updated_at           DateTime      @updatedAt
@@ -362,6 +367,7 @@ model Order {
   workspace         Workspace         @relation(fields: [workspace_id], references: [id])
   brand             Brand             @relation(fields: [brand_id], references: [id])
   client            Client            @relation(fields: [client_id], references: [id])
+  route_template    RouteTemplate?    @relation(fields: [route_template_id], references: [id])
   routing_steps     RoutingStep[]
   order_attachments OrderAttachment[]
   items             OrderItem[]
@@ -379,6 +385,7 @@ model Order {
   finishing_cartons FinishingCarton[]
   finishing_shipments FinishingShipment[]
   client_payments   ClientPayment[]
+  production_logs   ProductionLog[]
 
   @@index([workspace_id, brand_id, status, created_at])
   @@map("orders")
@@ -427,6 +434,7 @@ model RoutingStep {
   print_runs    PrintRun[]
   sewing_runs   SewingRun[]
   finishing_runs FinishingRun[]
+  production_logs ProductionLog[]
 
   @@index([order_id, status, sequence])
   @@map("routing_steps")
@@ -685,6 +693,7 @@ model Machine {
   workspace    Workspace @relation(fields: [workspace_id], references: [id])
   print_runs   PrintRun[]
   curing_logs  CuringLog[]
+  production_logs ProductionLog[]
 
   @@map("machines")
 }
@@ -826,6 +835,89 @@ model CuringLog {
   dryer       Machine? @relation(fields: [dryer_id], references: [id])
 
   @@map("curing_logs")
+}
+
+// ROUTING TEMPLATES
+model RouteTemplate {
+  id            String   @id @default(uuid())
+  workspace_id  String
+  name          String
+  category      String   // APPAREL/PROMOTIONAL/CUSTOM
+  description   String?
+  is_active     Boolean  @default(true)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  // Relations
+  workspace     Workspace @relation(fields: [workspace_id], references: [id])
+  steps         RouteTemplateStep[]
+  orders        Order[]
+
+  @@map("route_templates")
+}
+
+model RouteTemplateStep {
+  id                  String         @id @default(uuid())
+  route_template_id   String
+  name                String
+  workcenter          WorkcenterType
+  sequence            Int
+  depends_on          Json           @default("[]") // Array of step names
+  standard_spec       Json           @default("{}") // Default specifications
+  expected_inputs     Json           @default("{}") // Input requirements
+  expected_outputs    Json           @default("{}") // Output specifications
+  estimated_minutes   Int?
+  created_at          DateTime       @default(now())
+
+  // Relations
+  route_template      RouteTemplate  @relation(fields: [route_template_id], references: [id], onDelete: Cascade)
+
+  @@map("route_template_steps")
+}
+
+// PRODUCTION TRACKING
+model ProductionLog {
+  id                String      @id @default(uuid())
+  order_id          String
+  routing_step_id   String?
+  update_type       String      // STATUS_CHANGE/PROGRESS_UPDATE/QUALITY_CHECK/MACHINE_STATUS
+  data              Json        // Update details
+  timestamp         DateTime    @default(now())
+  user_id           String?
+  machine_id        String?
+
+  // Relations
+  order             Order       @relation(fields: [order_id], references: [id])
+  routing_step      RoutingStep? @relation(fields: [routing_step_id], references: [id])
+  user              User?       @relation("ProductionLogUser", fields: [user_id], references: [id])
+  machine           Machine?    @relation(fields: [machine_id], references: [id])
+
+  @@map("production_logs")
+}
+
+// NOTIFICATION SYSTEM
+model Notification {
+  id                    String      @id @default(uuid())
+  workspace_id          String
+  recipient_id          String
+  title                 String
+  message               String
+  priority              String      // LOW/NORMAL/HIGH/URGENT
+  channels              Json        @default("[]") // Array of channels
+  related_entity_type   String?
+  related_entity_id     String?
+  metadata              Json?
+  status                String      @default("PENDING") // PENDING/DELIVERED/FAILED
+  read_at               DateTime?
+  delivered_at          DateTime?
+  delivery_details      Json?
+  created_at            DateTime    @default(now())
+
+  // Relations
+  workspace             Workspace   @relation(fields: [workspace_id], references: [id])
+  recipient             User        @relation(fields: [recipient_id], references: [id])
+
+  @@map("notifications")
 }
 
 // SUBLIMATION-SPECIFIC TABLES

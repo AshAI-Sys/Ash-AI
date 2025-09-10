@@ -6,8 +6,8 @@ export interface OrderWorkflowTransition {
   from: OrderStatus;
   to: OrderStatus;
   requiredRole: Role[];
-  validation?: (orderId: string, userId: string) => Promise<boolean>;
-  onTransition?: (orderId: string, userId: string) => Promise<void>;
+  validation?: (order_id: string, user_id: string) => Promise<boolean>;
+  onTransition?: (order_id: string, user_id: string) => Promise<void>;
 }
 
 // Order workflow state machine based on CLIENT_UPDATED_PLAN.md
@@ -17,84 +17,84 @@ export const ORDER_WORKFLOW: OrderWorkflowTransition[] = [
     from: 'INTAKE',
     to: 'DESIGN_PENDING',
     requiredRole: ['ADMIN', 'MANAGER'],
-    onTransition: async (orderId, userId) => {
-      await createOrderNotification(orderId, 'Order moved to design phase', 'DESIGN_TEAM');
+    onTransition: async (order_id, user_id) => {
+      await createOrderNotification(order_id, 'Order moved to design phase', 'DESIGN_TEAM');
     }
   },
   {
     from: 'DESIGN_PENDING',
     to: 'DESIGN_APPROVAL',
     requiredRole: ['ADMIN', 'MANAGER', 'DESIGNER'],
-    validation: async (orderId) => {
+    validation: async (order_id) => {
       const order = await db.order.findUnique({
-        where: { id: orderId },
-        include: { designAssets: true }
+        where: { id: order_id },
+        include: { design_assets: true }
       });
-      return !!order?.designAssets?.length;
+      return !!order?.design_assets?.length;
     }
   },
   {
     from: 'DESIGN_APPROVAL',
     to: 'CONFIRMED',
     requiredRole: ['ADMIN', 'MANAGER', 'CLIENT'],
-    onTransition: async (orderId, userId) => {
-      await createOrderNotification(orderId, 'Design approved, order confirmed', 'PRODUCTION_TEAM');
+    onTransition: async (order_id, user_id) => {
+      await createOrderNotification(order_id, 'Design approved, order confirmed', 'PRODUCTION_TEAM');
     }
   },
   {
     from: 'CONFIRMED',
     to: 'PRODUCTION_PLANNED',
     requiredRole: ['ADMIN', 'MANAGER', 'PRODUCTION_MANAGER'],
-    onTransition: async (orderId, userId) => {
-      await createProductionPlan(orderId, userId);
+    onTransition: async (order_id, user_id) => {
+      await createProductionPlan(order_id, user_id);
     }
   },
   {
     from: 'PRODUCTION_PLANNED',
     to: 'IN_PROGRESS',
     requiredRole: ['ADMIN', 'MANAGER', 'PRODUCTION_MANAGER'],
-    onTransition: async (orderId, userId) => {
-      await startProductionTracking(orderId);
+    onTransition: async (order_id, user_id) => {
+      await startProductionTracking(order_id);
     }
   },
   {
     from: 'IN_PROGRESS',
     to: 'QC',
     requiredRole: ['ADMIN', 'MANAGER', 'PRODUCTION_MANAGER'],
-    validation: async (orderId) => {
-      return await checkProductionCompletion(orderId);
+    validation: async (order_id) => {
+      return await checkProductionCompletion(order_id);
     }
   },
   {
     from: 'QC',
     to: 'PACKING',
     requiredRole: ['ADMIN', 'MANAGER', 'QC_INSPECTOR'],
-    validation: async (orderId) => {
-      return await checkQualityApproval(orderId);
+    validation: async (order_id) => {
+      return await checkQualityApproval(order_id);
     }
   },
   {
     from: 'PACKING',
     to: 'READY_FOR_DELIVERY',
     requiredRole: ['ADMIN', 'MANAGER', 'WAREHOUSE_MANAGER'],
-    onTransition: async (orderId, userId) => {
-      await createShipment(orderId, userId);
+    onTransition: async (order_id, user_id) => {
+      await createShipment(order_id, user_id);
     }
   },
   {
     from: 'READY_FOR_DELIVERY',
     to: 'DELIVERED',
     requiredRole: ['ADMIN', 'MANAGER', 'DELIVERY_DRIVER'],
-    onTransition: async (orderId, userId) => {
-      await completeDelivery(orderId, userId);
+    onTransition: async (order_id, user_id) => {
+      await completeDelivery(order_id, user_id);
     }
   },
   {
     from: 'DELIVERED',
     to: 'CLOSED',
     requiredRole: ['ADMIN', 'MANAGER', 'CLIENT'],
-    onTransition: async (orderId, userId) => {
-      await finalizeOrder(orderId, userId);
+    onTransition: async (order_id, user_id) => {
+      await finalizeOrder(order_id, user_id);
     }
   },
   // Emergency transitions
@@ -102,31 +102,31 @@ export const ORDER_WORKFLOW: OrderWorkflowTransition[] = [
     from: 'IN_PROGRESS',
     to: 'ON_HOLD',
     requiredRole: ['ADMIN', 'MANAGER'],
-    onTransition: async (orderId, userId) => {
-      await pauseProduction(orderId, userId);
+    onTransition: async (order_id, user_id) => {
+      await pauseProduction(order_id, user_id);
     }
   },
   {
     from: 'ON_HOLD',
     to: 'IN_PROGRESS',
     requiredRole: ['ADMIN', 'MANAGER'],
-    onTransition: async (orderId, userId) => {
-      await resumeProduction(orderId, userId);
+    onTransition: async (order_id, user_id) => {
+      await resumeProduction(order_id, user_id);
     }
   }
 ];
 
 export class OrderWorkflowEngine {
   static async transitionOrder(
-    orderId: string,
+    order_id: string,
     toStatus: OrderStatus,
-    userId: string,
+    user_id: string,
     userRole: Role,
     notes?: string
   ): Promise<void> {
     // Get current order
     const order = await db.order.findUnique({
-      where: { id: orderId }
+      where: { id: order_id }
     });
 
     if (!order) {
@@ -157,7 +157,7 @@ export class OrderWorkflowEngine {
 
     // Run validation if exists
     if (transition.validation) {
-      const isValid = await transition.validation(orderId, userId);
+      const isValid = await transition.validation(order_id, user_id);
       if (!isValid) {
         throw new AppError(
           'VALIDATION_FAILED',
@@ -171,11 +171,11 @@ export class OrderWorkflowEngine {
     await db.$transaction(async (tx) => {
       // Update order status
       await tx.order.update({
-        where: { id: orderId },
+        where: { id: order_id },
         data: {
           status: toStatus,
           updated_at: new Date(),
-          updated_by: userId
+          updated_by: user_id
         }
       });
 
@@ -183,9 +183,9 @@ export class OrderWorkflowEngine {
       await tx.auditLog.create({
         data: {
           workspace_id: order.workspace_id,
-          actor_id: userId,
+          actor_id: user_id,
           entity_type: 'ORDER',
-          entity_id: orderId,
+          entity_id: order_id,
           action: 'STATUS_CHANGE',
           before_data: JSON.stringify({ status: order.status }),
           after_data: JSON.stringify({ status: toStatus, notes })
@@ -195,9 +195,9 @@ export class OrderWorkflowEngine {
       // Create status history
       await tx.orderStatusHistory.create({
         data: {
-          order_id: orderId,
+          order_id: order_id,
           status: toStatus,
-          changed_by: userId,
+          changed_by: user_id,
           notes: notes || `Status changed from ${order.status} to ${toStatus}`,
           workspace_id: order.workspace_id
         }
@@ -206,16 +206,16 @@ export class OrderWorkflowEngine {
 
     // Run post-transition hook
     if (transition.onTransition) {
-      await transition.onTransition(orderId, userId);
+      await transition.onTransition(order_id, user_id);
     }
   }
 
   static async getAvailableTransitions(
-    orderId: string,
+    order_id: string,
     userRole: Role
   ): Promise<{ status: OrderStatus; label: string; description: string }[]> {
     const order = await db.order.findUnique({
-      where: { id: orderId }
+      where: { id: order_id }
     });
 
     if (!order) {
@@ -255,12 +255,12 @@ export class OrderWorkflowEngine {
 
 // Helper functions
 async function createOrderNotification(
-  orderId: string,
+  order_id: string,
   message: string,
   targetRole: string
 ): Promise<void> {
   const order = await db.order.findUnique({
-    where: { id: orderId },
+    where: { id: order_id },
     include: { client: true }
   });
 
@@ -273,16 +273,16 @@ async function createOrderNotification(
       title: `Order ${order.po_number}`,
       message,
       type: 'ORDER_UPDATE',
-      entity_id: orderId,
+      entity_id: order_id,
       entity_type: 'ORDER',
       target_role: targetRole as any
     }
   });
 }
 
-async function createProductionPlan(orderId: string, userId: string): Promise<void> {
+async function createProductionPlan(order_id: string, user_id: string): Promise<void> {
   const order = await db.order.findUnique({
-    where: { id: orderId },
+    where: { id: order_id },
     include: { orderItems: true }
   });
 
@@ -292,22 +292,22 @@ async function createProductionPlan(orderId: string, userId: string): Promise<vo
   for (const item of order.orderItems) {
     await db.sewingRun.create({
       data: {
-        order_id: orderId,
+        order_id: order_id,
         order_item_id: item.id,
         quantity: item.quantity,
         status: 'PLANNED',
         workspace_id: order.workspace_id,
-        created_by: userId
+        created_by: user_id
       }
     });
   }
 }
 
-async function startProductionTracking(orderId: string): Promise<void> {
+async function startProductionTracking(order_id: string): Promise<void> {
   // Initialize production tracking
   await db.productionTracking.create({
     data: {
-      order_id: orderId,
+      order_id: order_id,
       stage: 'CUTTING',
       status: 'IN_PROGRESS',
       started_at: new Date()
@@ -315,10 +315,10 @@ async function startProductionTracking(orderId: string): Promise<void> {
   });
 }
 
-async function checkProductionCompletion(orderId: string): Promise<boolean> {
+async function checkProductionCompletion(order_id: string): Promise<boolean> {
   const tracking = await db.productionTracking.findMany({
     where: { 
-      order_id: orderId,
+      order_id: order_id,
       status: { not: 'COMPLETED' }
     }
   });
@@ -326,10 +326,10 @@ async function checkProductionCompletion(orderId: string): Promise<boolean> {
   return tracking.length === 0;
 }
 
-async function checkQualityApproval(orderId: string): Promise<boolean> {
+async function checkQualityApproval(order_id: string): Promise<boolean> {
   const qcInspections = await db.qcInspection.findMany({
     where: { 
-      order_id: orderId,
+      order_id: order_id,
       status: 'APPROVED'
     }
   });
@@ -337,47 +337,47 @@ async function checkQualityApproval(orderId: string): Promise<boolean> {
   return qcInspections.length > 0;
 }
 
-async function createShipment(orderId: string, userId: string): Promise<void> {
+async function createShipment(order_id: string, user_id: string): Promise<void> {
   const order = await db.order.findUnique({
-    where: { id: orderId }
+    where: { id: order_id }
   });
 
   if (!order) return;
 
   await db.shipment.create({
     data: {
-      order_id: orderId,
+      order_id: order_id,
       status: 'PENDING',
       workspace_id: order.workspace_id,
-      created_by: userId
+      created_by: user_id
     }
   });
 }
 
-async function completeDelivery(orderId: string, userId: string): Promise<void> {
+async function completeDelivery(order_id: string, user_id: string): Promise<void> {
   await db.order.update({
-    where: { id: orderId },
+    where: { id: order_id },
     data: {
       delivered_at: new Date(),
-      updated_by: userId
+      updated_by: user_id
     }
   });
 }
 
-async function finalizeOrder(orderId: string, userId: string): Promise<void> {
+async function finalizeOrder(order_id: string, user_id: string): Promise<void> {
   await db.order.update({
-    where: { id: orderId },
+    where: { id: order_id },
     data: {
       closed_at: new Date(),
-      updated_by: userId
+      updated_by: user_id
     }
   });
 }
 
-async function pauseProduction(orderId: string, userId: string): Promise<void> {
+async function pauseProduction(order_id: string, user_id: string): Promise<void> {
   await db.productionTracking.updateMany({
     where: { 
-      order_id: orderId,
+      order_id: order_id,
       status: 'IN_PROGRESS'
     },
     data: { 
@@ -387,10 +387,10 @@ async function pauseProduction(orderId: string, userId: string): Promise<void> {
   });
 }
 
-async function resumeProduction(orderId: string, userId: string): Promise<void> {
+async function resumeProduction(order_id: string, user_id: string): Promise<void> {
   await db.productionTracking.updateMany({
     where: { 
-      order_id: orderId,
+      order_id: order_id,
       status: 'PAUSED'
     },
     data: { 

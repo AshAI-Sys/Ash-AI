@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     const pushSubscription = await prisma.pushSubscription.upsert({
       where: {
         userId_endpoint: {
-          userId: session.user.id,
+          user_id: session.user.id,
           endpoint: subscription.endpoint
         }
       },
@@ -35,16 +35,16 @@ export async function POST(request: NextRequest) {
         p256dhKey: subscription.keys.p256dh,
         authKey: subscription.keys.auth,
         userAgent,
-        isActive: true,
+        is_active: true,
         lastUsed: new Date()
       },
       create: {
-        userId: session.user.id,
+        user_id: session.user.id,
         endpoint: subscription.endpoint,
         p256dhKey: subscription.keys.p256dh,
         authKey: subscription.keys.auth,
         userAgent,
-        isActive: true,
+        is_active: true,
         lastUsed: new Date()
       }
     })
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
       subscriptionId: pushSubscription.id
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Failed to store push subscription:', error)
     return NextResponse.json(
       { error: 'Failed to store subscription' },
@@ -79,14 +79,14 @@ export async function GET(request: NextRequest) {
     // Get user's active push subscriptions
     const subscriptions = await prisma.pushSubscription.findMany({
       where: {
-        userId: session.user.id,
-        isActive: true
+        user_id: session.user.id,
+        is_active: true
       },
       select: {
         id: true,
         endpoint: true,
         userAgent: true,
-        createdAt: true,
+        created_at: true,
         lastUsed: true
       }
     })
@@ -96,7 +96,7 @@ export async function GET(request: NextRequest) {
       count: subscriptions.length
     })
 
-  } catch (error) {
+  } catch (_error) {
     console.error('Failed to get push subscriptions:', error)
     return NextResponse.json(
       { error: 'Failed to get subscriptions' },

@@ -17,19 +17,19 @@ export async function GET(request: NextRequest) {
     const priority = searchParams.get('priority')
     const ownerId = searchParams.get('ownerId')
     const assigneeId = searchParams.get('assigneeId')
-    const orderId = searchParams.get('orderId')
+    const order_id = searchParams.get('order_id')
     const overdue = searchParams.get('overdue') === 'true'
     const limit = parseInt(searchParams.get('limit') || '50')
     const offset = parseInt(searchParams.get('offset') || '0')
 
     const capaTasks = await prisma.cAPATask.findMany({
       where: {
-        workspaceId: 'default',
+        workspace_id: 'default',
         ...(status && { status: status as any }),
         ...(priority && { priority }),
         ...(ownerId && { ownerId }),
         ...(assigneeId && { assigneeId }),
-        ...(orderId && { orderId }),
+        ...(order_id && { order_id }),
         ...(overdue && {
           dueDate: { lt: new Date() },
           status: { notIn: ['DONE', 'VERIFIED', 'CANCELLED'] }
@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
     const {
-      orderId,
+      order_id,
       sourceInspectionId,
       title,
       description,
@@ -180,7 +180,7 @@ export async function POST(request: NextRequest) {
     if (sourceInspectionId) {
       const inspection = await prisma.qCInspection.findUnique({
         where: { id: sourceInspectionId },
-        select: { id: true, orderId: true }
+        select: { id: true, order_id: true }
       })
 
       if (!inspection) {
@@ -189,16 +189,16 @@ export async function POST(request: NextRequest) {
         }, { status: 404 })
       }
 
-      // If inspection has orderId, use it
-      if (!orderId && inspection.orderId) {
-        orderId = inspection.orderId
+      // If inspection has order_id, use it
+      if (!order_id && inspection.order_id) {
+        order_id = inspection.order_id
       }
     }
 
     const capaTask = await prisma.cAPATask.create({
       data: {
-        workspaceId: 'default',
-        orderId,
+        workspace_id: 'default',
+        order_id,
         sourceInspectionId,
         title,
         description,
@@ -227,13 +227,13 @@ export async function POST(request: NextRequest) {
     // Create audit log
     await prisma.auditLog.create({
       data: {
-        userId: session.user.id,
+        user_id: session.user.id,
         action: 'CREATE_CAPA_TASK',
         entityType: 'CAPATask',
         entityId: capaTask.id,
         details: `Created CAPA task: ${title}`,
         metadata: {
-          orderId,
+          order_id,
           sourceInspectionId,
           ownerId,
           assigneeId,
@@ -245,10 +245,10 @@ export async function POST(request: NextRequest) {
     })
 
     // Create task for tracking in main task system
-    if (orderId) {
+    if (order_id) {
       await prisma.task.create({
         data: {
-          orderId,
+          order_id,
           assignedTo: assigneeId || ownerId,
           taskType: 'CAPA',
           description: `CAPA: ${title}`,
@@ -275,7 +275,7 @@ export async function POST(request: NextRequest) {
           actionRequired: true,
           metadata: {
             capaId: capaTask.id,
-            orderId,
+            order_id,
             priority,
             dueDate,
             orderNumber: capaTask.order?.orderNumber

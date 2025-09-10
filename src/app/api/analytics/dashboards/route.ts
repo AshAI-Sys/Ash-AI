@@ -1,15 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth'
-import { Role } from '@prisma/client'
 import { prisma } from "@/lib/prisma"
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const visibility = searchParams.get("visibility")
-    const userId = searchParams.get("userId")
-    const userRole = searchParams.get("userRole")
+    const user_id = searchParams.get("user_id")
+    const _userRole = searchParams.get("userRole")
     
     const where: {
       visibility?: string
@@ -24,7 +21,7 @@ export async function GET(request: NextRequest) {
       // Default: get public dashboards and user's private dashboards
       where.OR = [
         { visibility: "PUBLIC" },
-        { visibility: "PRIVATE", created_by: userId },
+        { visibility: "PRIVATE", created_by: user_id || undefined },
         { 
           visibility: "ROLE_BASED"
         }
@@ -63,11 +60,11 @@ export async function POST(request: NextRequest) {
       description,
       layout,
       visibility = "PRIVATE",
-      allowedRoles = [],
-      createdBy
+      _allowedRoles = [],
+      _createdBy
     } = body
 
-    if (!name || !createdBy) {
+    if (!name || !_createdBy) {
       return NextResponse.json(
         { success: false, error: "Name and creator are required" },
         { status: 400 }

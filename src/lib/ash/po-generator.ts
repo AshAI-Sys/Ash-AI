@@ -8,7 +8,7 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 export interface POGenerationResult {
-  poNumber: string
+  po_number: string
   sequence: number
   brandCode: string
   year: number
@@ -17,17 +17,17 @@ export interface POGenerationResult {
 /**
  * Generate next PO number for a brand in the current year
  */
-export async function generatePONumber(brandId: string): Promise<POGenerationResult> {
+export async function generatePONumber(brand_id: string): Promise<POGenerationResult> {
   const currentYear = new Date().getFullYear()
   
   // Get brand information
   const brand = await prisma.brand.findUnique({
-    where: { id: brandId },
+    where: { id: brand_id },
     select: { code: true }
   })
 
   if (!brand?.code) {
-    throw new Error(`Brand not found or missing code: ${brandId}`)
+    throw new Error(`Brand not found or missing code: ${brand_id}`)
   }
 
   // Use transaction to ensure atomic sequence generation
@@ -36,7 +36,7 @@ export async function generatePONumber(brandId: string): Promise<POGenerationRes
     let sequenceRecord = await tx.pONumberSequence.findUnique({
       where: {
         brand_id_year: {
-          brand_id: brandId,
+          brand_id: brand_id,
           year: currentYear
         }
       }
@@ -46,7 +46,7 @@ export async function generatePONumber(brandId: string): Promise<POGenerationRes
       // Create new sequence for this brand/year
       sequenceRecord = await tx.pONumberSequence.create({
         data: {
-          brand_id: brandId,
+          brand_id: brand_id,
           year: currentYear,
           sequence: 1
         }
@@ -77,7 +77,7 @@ export async function generatePONumber(brandId: string): Promise<POGenerationRes
 /**
  * Validate PO number format
  */
-export function validatePONumber(poNumber: string): boolean {
+export function validatePONumber(po_number: string): boolean {
   const poRegex = /^[A-Z]+(-[0-9]{4}-[0-9]{6})$/
   return poRegex.test(poNumber)
 }
@@ -85,7 +85,7 @@ export function validatePONumber(poNumber: string): boolean {
 /**
  * Parse PO number components
  */
-export function parsePONumber(poNumber: string): {
+export function parsePONumber(po_number: string): {
   brandCode: string
   year: number
   sequence: number
@@ -109,7 +109,7 @@ export function parsePONumber(poNumber: string): {
 /**
  * Check if PO number already exists
  */
-export async function isUniquePoNumber(poNumber: string): Promise<boolean> {
+export async function isUniquePoNumber(po_number: string): Promise<boolean> {
   const existing = await prisma.order.findUnique({
     where: { po_number: poNumber },
     select: { id: true }

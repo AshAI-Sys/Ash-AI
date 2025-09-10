@@ -33,14 +33,14 @@ import {
 
 interface FinishingRun {
   id: string
-  orderId: string
+  order_id: string
   operationType: string
   operatorId: string
   startedAt: string | null
   endedAt: string | null
   materials: any[]
   notes: string | null
-  createdAt: string
+  created_at: string
   order: {
     id: string
     orderNumber: string
@@ -107,13 +107,13 @@ export default function FinishingPage() {
   const [filters, setFilters] = useState({
     operationType: "",
     operatorId: "",
-    orderId: "",
+    order_id: "",
     status: ""
   })
 
   // New operation form
   const [newOperation, setNewOperation] = useState({
-    orderId: "",
+    order_id: "",
     operationType: "",
     operatorId: "",
     materials: [],
@@ -159,7 +159,7 @@ export default function FinishingPage() {
       if (response.ok) {
         await fetchData()
         setNewOperation({
-          orderId: "",
+          order_id: "",
           operationType: "",
           operatorId: "",
           materials: [],
@@ -203,7 +203,7 @@ export default function FinishingPage() {
   const filteredRuns = finishingRuns.filter(run => {
     if (filters.operationType && run.operationType !== filters.operationType) return false
     if (filters.operatorId && run.operatorId !== filters.operatorId) return false
-    if (filters.orderId && run.orderId !== filters.orderId) return false
+    if (filters.order_id && run.order_id !== filters.order_id) return false
     return true
   })
 
@@ -258,7 +258,7 @@ export default function FinishingPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="order">Order</Label>
-                  <Select value={newOperation.orderId} onValueChange={(value) => setNewOperation(prev => ({ ...prev, orderId: value }))}>
+                  <Select value={newOperation.order_id} onValueChange={(value) => setNewOperation(prev => ({ ...prev, order_id: value }))}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select order" />
                     </SelectTrigger>
@@ -393,7 +393,7 @@ export default function FinishingPage() {
                   </SelectContent>
                 </Select>
 
-                <Select value={filters.orderId} onValueChange={(value) => setFilters(prev => ({ ...prev, orderId: value }))}>
+                <Select value={filters.order_id} onValueChange={(value) => setFilters(prev => ({ ...prev, order_id: value }))}>
                   <SelectTrigger>
                     <SelectValue placeholder="All Orders" />
                   </SelectTrigger>
@@ -415,7 +415,7 @@ export default function FinishingPage() {
 
                 <Button 
                   variant="outline" 
-                  onClick={() => setFilters({ operationType: "", operatorId: "", orderId: "", status: "" })}
+                  onClick={() => setFilters({ operationType: "", operatorId: "", order_id: "", status: "" })}
                   className="gap-2"
                 >
                   <Filter className="h-4 w-4" />

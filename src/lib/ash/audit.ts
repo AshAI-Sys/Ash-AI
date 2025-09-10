@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/db'
 
 export interface AuditLogEntry {
-  userId: string
+  user_id: string
   action: string
   entity: string
   entityId: string
@@ -20,7 +20,7 @@ export class AuditLogger {
     try {
       await prisma.auditLog.create({
         data: {
-          userId: entry.userId,
+          user_id: entry.user_id,
           action: entry.action,
           entity: entry.entity,
           entityId: entry.entityId,
@@ -122,9 +122,9 @@ export class AuditLogger {
         _count: { entity: true }
       }),
       prisma.auditLog.groupBy({
-        by: ['userId'],
+        by: ['user_id'],
         where,
-        _count: { userId: true }
+        _count: { user_id: true }
       })
     ])
 
@@ -139,8 +139,8 @@ export class AuditLogger {
         return acc
       }, {} as Record<string, number>),
       eventsByUser: userStats.reduce((acc, stat) => {
-        if (stat.userId) {
-          acc[stat.userId] = stat._count.userId
+        if (stat.user_id) {
+          acc[stat.user_id] = stat._count.user_id
         }
         return acc
       }, {} as Record<string, number>)
@@ -152,7 +152,7 @@ export class AuditLogger {
    */
   static async searchAuditLogs(
     query: {
-      userId?: string
+      user_id?: string
       action?: string
       entity?: string
       startDate?: Date
@@ -162,7 +162,7 @@ export class AuditLogger {
   ): Promise<any[]> {
     const where: any = {}
     
-    if (query.userId) where.userId = query.userId
+    if (query.user_id) where.user_id = query.user_id
     if (query.action) where.action = query.action
     if (query.entity) where.entity = query.entity
     

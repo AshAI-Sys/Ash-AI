@@ -120,8 +120,8 @@ export default function RoutingTemplatesPage() {
     setSelectedTemplate(null)
   }
 
-  const handleEditTemplate = (templateId: string) => {
-    setSelectedTemplate(templateId)
+  const handleEditTemplate = (template_id: string) => {
+    setSelectedTemplate(template_id)
     setActiveTab('builder')
   }
 
@@ -470,7 +470,7 @@ export default function RoutingTemplatesPage() {
           {/* Template Builder */}
           <TabsContent value="builder" className="space-y-6">
             <RoutingTemplateBuilder 
-              templateId={selectedTemplate}
+              template_id={selectedTemplate}
               onSave={() => {
                 fetchTemplates()
                 setActiveTab('browse')

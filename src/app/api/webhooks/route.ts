@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
     }
     
     if (active !== null) {
-      where.isActive = active === "true"
+      where.is_active = active === "true"
     }
     
     if (event) {
@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
         }
       },
       orderBy: [
-        { isActive: "desc" },
+        { is_active: "desc" },
         { updated_at: "desc" }
       ]
     })
@@ -98,8 +98,8 @@ export async function GET(request: NextRequest) {
         (successfulDeliveries.length / recentDeliveries.length) * 100 : 0
       
       const averageResponseTime = successfulDeliveries
-        .map(d => d.createdAt && d.deliveredAt ? 
-          new Date(d.deliveredAt).getTime() - new Date(d.createdAt).getTime() : 0)
+        .map(d => d.created_at && d.deliveredAt ? 
+          new Date(d.deliveredAt).getTime() - new Date(d.created_at).getTime() : 0)
         .filter(time => time > 0)
         .reduce((sum, time, _, arr) => sum + time / arr.length, 0)
 
@@ -110,7 +110,7 @@ export async function GET(request: NextRequest) {
           successRate: Math.round(successRate),
           averageResponseTime: Math.round(averageResponseTime),
           recentFailures: failedDeliveries.length,
-          lastDelivery: webhook.deliveries[0]?.createdAt || null,
+          lastDelivery: webhook.deliveries[0]?.created_at || null,
           isHealthy: successRate >= 95 && webhook.failureCount < 5
         }
       }

@@ -1,6 +1,6 @@
 export interface SyncData {
   timestamp: number;
-  userId: string;
+  user_id: string;
   entity: string;
   entityId: string;
   operation: 'CREATE' | 'UPDATE' | 'DELETE';

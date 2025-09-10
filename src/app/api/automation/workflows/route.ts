@@ -51,18 +51,18 @@ export async function GET(request: NextRequest) {
     }
 
     const url = new URL(request.url)
-    const workspaceId = url.searchParams.get('workspace_id')
+    const workspace_id = url.searchParams.get('workspace_id')
     const workflowId = url.searchParams.get('workflow_id')
     const status = url.searchParams.get('status')
 
-    if (!workspaceId) {
+    if (!workspace_id) {
       return NextResponse.json({ error: 'Workspace ID required' }, { status: 400 })
     }
 
     // Verify workspace access
-    const workspace = await secureDb.getPrisma().workspace.findFirst({
+    const _workspace = await secureDb.getPrisma().workspace.findFirst({
       where: {
-        id: workspaceId,
+        id: workspace_id,
         OR: [
           { owner_id: user.id },
           { members: { some: { user_id: user.id } } }
@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
       const workflow = await secureDb.getPrisma().automationWorkflow.findFirst({
         where: {
           id: workflowId,
-          workspace_id: workspaceId
+          workspace_id: workspace_id
         },
         include: {
           executions: {
@@ -111,7 +111,7 @@ export async function GET(request: NextRequest) {
 
     // Get all workflows for workspace
     const whereClause: any = {
-      workspace_id: workspaceId
+      workspace_id: workspace_id
     }
 
     if (status) {
@@ -184,7 +184,7 @@ export async function POST(request: NextRequest) {
     const workflowData = workflowSchema.parse(sanitizedBody)
 
     // Verify workspace access
-    const workspace = await secureDb.getPrisma().workspace.findFirst({
+    const _workspace = await secureDb.getPrisma().workspace.findFirst({
       where: {
         id: workflowData.workspace_id,
         OR: [
@@ -530,7 +530,7 @@ async function executeWorkflowAsync(workflow: any, execution: any, triggerData: 
 }
 
 // Condition evaluation
-async function evaluateConditions(conditions: any[], triggerData: any, workspaceId: string) {
+async function evaluateConditions(conditions: any[], triggerData: any, workspace_id: string) {
   if (!conditions || conditions.length === 0) {
     return { passed: true, details: 'No conditions to evaluate' }
   }
@@ -538,7 +538,7 @@ async function evaluateConditions(conditions: any[], triggerData: any, workspace
   const results = []
   
   for (const condition of conditions) {
-    const result = await evaluateCondition(condition, triggerData, workspaceId)
+    const result = await evaluateCondition(condition, triggerData, workspace_id)
     results.push(result)
   }
 
@@ -560,7 +560,7 @@ async function evaluateConditions(conditions: any[], triggerData: any, workspace
   }
 }
 
-async function evaluateCondition(condition: any, triggerData: any, workspaceId: string) {
+async function evaluateCondition(condition: any, triggerData: any, workspace_id: string) {
   const { field, operator, value } = condition
   
   // Get field value from trigger data or database
@@ -568,7 +568,7 @@ async function evaluateCondition(condition: any, triggerData: any, workspaceId: 
   
   // If not in trigger data, query database
   if (fieldValue === undefined) {
-    fieldValue = await getFieldValueFromDatabase(field, workspaceId)
+    fieldValue = await getFieldValueFromDatabase(field, workspace_id)
   }
 
   // Evaluate condition
@@ -591,20 +591,20 @@ async function evaluateCondition(condition: any, triggerData: any, workspaceId: 
 }
 
 // Action execution
-async function executeAction(action: any, triggerData: any, workspaceId: string) {
+async function executeAction(action: any, triggerData: any, workspace_id: string) {
   switch (action.type) {
     case 'EMAIL':
-      return await sendEmail(action.config, triggerData, workspaceId)
+      return await sendEmail(action.config, triggerData, workspace_id)
     case 'SMS':
-      return await sendSMS(action.config, triggerData, workspaceId)
+      return await sendSMS(action.config, triggerData, workspace_id)
     case 'WEBHOOK':
-      return await callWebhook(action.config, triggerData, workspaceId)
+      return await callWebhook(action.config, triggerData, workspace_id)
     case 'UPDATE_RECORD':
-      return await updateRecord(action.config, triggerData, workspaceId)
+      return await updateRecord(action.config, triggerData, workspace_id)
     case 'CREATE_TASK':
-      return await createTask(action.config, triggerData, workspaceId)
+      return await createTask(action.config, triggerData, workspace_id)
     case 'GENERATE_REPORT':
-      return await generateReport(action.config, triggerData, workspaceId)
+      return await generateReport(action.config, triggerData, workspace_id)
     default:
       throw new Error(`Unknown action type: ${action.type}`)
   }
@@ -645,37 +645,37 @@ function calculateAverageExecutionTime(executions: any[]) {
 }
 
 // Placeholder implementations for action executors
-async function sendEmail(config: any, triggerData: any, workspaceId: string) {
+async function sendEmail(config: any, triggerData: any, workspace_id: string) {
   // Implementation would send email using configured service
   return { sent: true, recipient: config.to }
 }
 
-async function sendSMS(config: any, triggerData: any, workspaceId: string) {
+async function sendSMS(config: any, triggerData: any, workspace_id: string) {
   // Implementation would send SMS using configured service
   return { sent: true, recipient: config.to }
 }
 
-async function callWebhook(config: any, triggerData: any, workspaceId: string) {
+async function callWebhook(config: any, triggerData: any, workspace_id: string) {
   // Implementation would make HTTP request to webhook URL
   return { called: true, url: config.url }
 }
 
-async function updateRecord(config: any, triggerData: any, workspaceId: string) {
+async function updateRecord(config: any, triggerData: any, workspace_id: string) {
   // Implementation would update database record
   return { updated: true, record_id: config.record_id }
 }
 
-async function createTask(config: any, triggerData: any, workspaceId: string) {
+async function createTask(config: any, triggerData: any, workspace_id: string) {
   // Implementation would create task in system
   return { created: true, task_id: 'generated-task-id' }
 }
 
-async function generateReport(config: any, triggerData: any, workspaceId: string) {
+async function generateReport(config: any, triggerData: any, workspace_id: string) {
   // Implementation would generate and save report
   return { generated: true, report_id: 'generated-report-id' }
 }
 
-async function getFieldValueFromDatabase(field: string, workspaceId: string) {
+async function getFieldValueFromDatabase(field: string, workspace_id: string) {
   // Implementation would query database for field value
   return null
 }

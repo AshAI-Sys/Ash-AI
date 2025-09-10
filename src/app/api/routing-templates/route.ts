@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     // Build where clause
     const where = method ? { method } : {}
 
-    const templates = await prisma.routingTemplate.findMany({
+    const templates = await prisma.routeTemplate.findMany({
       where,
       orderBy: [
         { method: 'asc' },
@@ -59,8 +59,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if templateKey already exists
-    const existingTemplate = await prisma.routingTemplate.findUnique({
-      where: { templateKey: body.key }
+    const existingTemplate = await prisma.routeTemplate.findUnique({
+      where: { id: body.key }
     })
 
     if (existingTemplate) {
@@ -70,13 +70,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Create template using the existing schema
-    const template = await prisma.routingTemplate.create({
+    const template = await prisma.routeTemplate.create({
       data: {
+        workspace_id: '1', // TODO: Get from session when workspace_id is available
         name: body.name,
-        templateKey: body.key,
-        method: body.method,
-        active: body.isActive !== false,
-        steps: body.steps // Store steps as JSON
+        category: body.method || 'CUSTOM',
+        description: body.description,
+        is_active: body.is_active !== false
       }
     })
 
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
     console.error('Error creating routing template:', _error)
     return NextResponse.json({ 
       error: 'Internal server error',
-      message: error instanceof Error ? error.message : 'Unknown error'
+      message: _error instanceof Error ? _error.message : 'Unknown error'
     }, { status: 500 })
   }
 }

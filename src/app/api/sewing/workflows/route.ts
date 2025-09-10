@@ -13,13 +13,13 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url)
-    const orderId = searchParams.get('orderId')
+    const order_id = searchParams.get('order_id')
     const status = searchParams.get('status')
 
     // Get routing steps with parallel workflow support
     const routingSteps = await prisma.routingStep.findMany({
       where: {
-        ...(orderId && { orderId }),
+        ...(order_id && { order_id }),
         ...(status && { status })
       },
       include: {
@@ -46,17 +46,17 @@ export async function GET(request: NextRequest) {
         }
       },
       orderBy: [
-        { orderId: 'asc' },
+        { order_id: 'asc' },
         { sequence: 'asc' }
       ]
     })
 
     // Group by order and analyze parallel workflows
     const workflowsByOrder = routingSteps.reduce((acc, step) => {
-      const orderId = step.orderId
+      const order_id = step.order_id
       
-      if (!acc[orderId]) {
-        acc[orderId] = {
+      if (!acc[order_id]) {
+        acc[order_id] = {
           order: step.order,
           steps: [],
           parallelGroups: {},
@@ -66,11 +66,11 @@ export async function GET(request: NextRequest) {
         }
       }
       
-      acc[orderId].steps.push(step)
+      acc[order_id].steps.push(step)
       
       // Analyze dependencies for parallel processing
       if (step.dependencies && step.dependencies.length > 0) {
-        acc[orderId].dependencies[step.stepName] = step.dependencies
+        acc[order_id].dependencies[step.stepName] = step.dependencies
       }
       
       return acc
@@ -107,9 +107,9 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { orderId, optimizationType = 'BALANCED' } = body
+    const { order_id, optimizationType = 'BALANCED' } = body
 
-    if (!orderId) {
+    if (!order_id) {
       return NextResponse.json({ 
         error: 'Order ID is required' 
       }, { status: 400 })
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
 
     // Get order routing steps and current sewing runs
     const routingSteps = await prisma.routingStep.findMany({
-      where: { orderId },
+      where: { order_id },
       include: {
         sewingRuns: {
           include: {
@@ -166,7 +166,7 @@ export async function POST(request: NextRequest) {
     // Create optimization record
     const optimizationRecord = await prisma.workflowOptimization.create({
       data: {
-        orderId,
+        order_id,
         type: optimizationType,
         recommendations: optimization.recommendations,
         estimatedSavings: optimization.estimatedSavings,
@@ -178,10 +178,10 @@ export async function POST(request: NextRequest) {
     // Create audit log
     await prisma.auditLog.create({
       data: {
-        userId: session.user.id,
+        user_id: session.user.id,
         action: 'OPTIMIZE_WORKFLOW',
         entityType: 'Order',
-        entityId: orderId,
+        entityId: order_id,
         details: `Generated ${optimizationType} workflow optimization`,
         metadata: {
           optimizationType,

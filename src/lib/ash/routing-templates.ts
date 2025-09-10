@@ -7,7 +7,7 @@ export interface RoutingStep {
   sequence: number
   dependsOn?: string[]
   joinType?: string
-  standardSpec?: Record<string, any>
+  standard_spec?: Record<string, any>
   expectedInputs?: Record<string, any>
   expectedOutputs?: Record<string, any>
   canRunParallel?: boolean
@@ -18,8 +18,8 @@ export class RoutingTemplateService {
   /**
    * Get default routing template for a method/brand combination
    */
-  static getDefaultTemplate(method: PrintMethod, brandId: string): string {
-    const brandPrefix = brandId.substring(0, 4).toUpperCase()
+  static getDefaultTemplate(method: PrintMethod, brand_id: string): string {
+    const brandPrefix = brand_id.substring(0, 4).toUpperCase()
     
     switch (method) {
       case PrintMethod.SILKSCREEN:
@@ -40,7 +40,7 @@ export class RoutingTemplateService {
    */
   static async createRoutingSteps(
     tx: Prisma.TransactionClient,
-    orderId: string,
+    order_id: string,
     template: any,
     targetDate?: Date
   ): Promise<any[]> {
@@ -68,14 +68,14 @@ export class RoutingTemplateService {
       
       const step = await tx.routingStep.create({
         data: {
-          orderId,
-          workspaceId: 'default',
+          order_id: order_id,
+          workspace_id: 'default',
           name: stepData.name,
           workcenter: stepData.workcenter,
           sequence: stepData.sequence,
           dependsOn: JSON.stringify(stepData.dependsOn || []),
           joinType: stepData.joinType,
-          standardSpec: stepData.standardSpec || {},
+          standard_spec: stepData.standard_spec || {},
           expectedInputs: stepData.expectedInputs || {},
           expectedOutputs: stepData.expectedOutputs || {},
           canRunParallel: stepData.canRunParallel || false,
@@ -126,7 +126,7 @@ export class RoutingTemplateService {
             dependsOn: ['Cutting', 'Screen Preparation'],
             joinType: 'AND',
             estimatedMinutes: 90,
-            standardSpec: { tempC: 160, curetime: 90 }
+            standard_spec: { tempC: 160, curetime: 90 }
           },
           {
             name: 'Sewing',
@@ -185,7 +185,7 @@ export class RoutingTemplateService {
             dependsOn: ['Sewing', 'Screen Preparation'],
             joinType: 'AND',
             estimatedMinutes: 120,
-            standardSpec: { tempC: 160, curetime: 90 }
+            standard_spec: { tempC: 160, curetime: 90 }
           },
           {
             name: 'QC',
@@ -228,7 +228,7 @@ export class RoutingTemplateService {
             sequence: 30,
             dependsOn: ['Print Transfer Paper'],
             estimatedMinutes: 120,
-            standardSpec: { tempC: 200, seconds: 60, pressure: 'medium' }
+            standard_spec: { tempC: 200, seconds: 60, pressure: 'medium' }
           },
           {
             name: 'Cutting',
@@ -286,7 +286,7 @@ export class RoutingTemplateService {
             sequence: 30,
             dependsOn: ['Print DTF Film'],
             estimatedMinutes: 45,
-            standardSpec: { tempC: 160, seconds: 120 }
+            standard_spec: { tempC: 160, seconds: 120 }
           },
           {
             name: 'Heat Press to Garment',
@@ -295,7 +295,7 @@ export class RoutingTemplateService {
             dependsOn: ['Receive Plain Garments', 'Powder & Cure DTF'],
             joinType: 'AND',
             estimatedMinutes: 90,
-            standardSpec: { tempC: 160, seconds: 15, pressure: 'firm' }
+            standard_spec: { tempC: 160, seconds: 15, pressure: 'firm' }
           },
           {
             name: 'QC',
@@ -331,7 +331,7 @@ export class RoutingTemplateService {
             sequence: 20,
             dependsOn: ['Cutting'],
             estimatedMinutes: 150,
-            standardSpec: { density: 'medium', stabilizer: 'cutaway' }
+            standard_spec: { density: 'medium', stabilizer: 'cutaway' }
           },
           {
             name: 'Sewing',
@@ -359,19 +359,16 @@ export class RoutingTemplateService {
     ]
 
     for (const templateData of templates) {
-      await prisma.routingTemplate.upsert({
-        where: { templateKey: templateData.templateKey },
+      await prisma.routeTemplate.upsert({
+        where: { id: templateData.templateKey },
         update: {
-          name: templateData.name,
-          steps: templateData.steps,
-          },
+          name: templateData.name
+        },
         create: {
-          workspaceId: 'default',
-          templateKey: templateData.templateKey,
+          workspace_id: 'default',
           name: templateData.name,
-          method: templateData.method,
-          steps: templateData.steps,
-          active: true
+          category: templateData.method,
+          is_active: true
         }
       })
     }
@@ -383,13 +380,12 @@ export class RoutingTemplateService {
    * Get available templates for a method
    */
   static async getTemplatesForMethod(method: PrintMethod): Promise<any[]> {
-    return await prisma.routingTemplate.findMany({
+    return await prisma.routeTemplate.findMany({
       where: {
-        method,
-        active: true
+        category: method,
+        is_active: true
       },
       orderBy: [
-        { },
         { name: 'asc' }
       ]
     })
@@ -399,8 +395,8 @@ export class RoutingTemplateService {
    * Get template by key
    */
   static async getTemplate(templateKey: string): Promise<any> {
-    return await prisma.routingTemplate.findUnique({
-      where: { templateKey }
+    return await prisma.routeTemplate.findUnique({
+      where: { id: templateKey }
     })
   }
 }

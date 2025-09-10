@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     }
     
     if (active !== null) {
-      where.isActive = active === "true"
+      where.is_active = active === "true"
     }
     
     if (search) {
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
         },
         automationRules: {
           where: {
-            isActive: true
+            is_active: true
           },
           select: {
             id: true,

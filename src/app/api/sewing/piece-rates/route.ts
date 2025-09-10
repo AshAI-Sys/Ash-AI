@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
         effectiveFrom: rate.effectiveFrom,
         effectiveTo: rate.effectiveTo,
         created_by: rate.creator?.name,
-        created_at: rate.createdAt
+        created_at: rate.created_at
       })
       
       return acc
@@ -219,7 +219,7 @@ export async function POST(request: NextRequest) {
     // Create audit log
     await prisma.auditLog.create({
       data: {
-        userId: session.user.id,
+        user_id: session.user.id,
         action: 'CREATE_PIECE_RATE',
         entityType: 'PieceRate',
         entityId: pieceRate.id,
@@ -343,7 +343,7 @@ export async function PUT(request: NextRequest) {
     // Create audit log for bulk update
     await prisma.auditLog.create({
       data: {
-        userId: session.user.id,
+        user_id: session.user.id,
         action: 'BULK_UPDATE_PIECE_RATES',
         entityType: 'PieceRate',
         entityId: 'bulk',

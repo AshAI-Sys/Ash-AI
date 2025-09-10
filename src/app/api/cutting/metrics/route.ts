@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth'
-import { Role } from '@prisma/client'
+
 import { db } from '@/lib/db'
 // Cutting Metrics API for Stage 3 Cutting System
 // Based on CLIENT_UPDATED_PLAN.md specifications

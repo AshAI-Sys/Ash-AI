@@ -25,7 +25,7 @@ const STATIC_ASSETS = [
 ];
 
 // API routes to cache for offline functionality
-const CACHE_API_ROUTES = [
+const _CACHE_API_ROUTES = [
   '/api/auth/session',
   '/api/orders',
   '/api/analytics',
@@ -224,7 +224,7 @@ async function networkFirstStrategy(request) {
     }
     
     return networkResponse;
-  } catch (error) {
+  } catch (_error) {
     console.log('[SW] Network failed, trying cache:', request.url);
     const cachedResponse = await caches.match(request);
     
@@ -248,7 +248,7 @@ async function networkFirstWithOfflineFallback(request) {
     }
     
     return networkResponse;
-  } catch (error) {
+  } catch (_error) {
     console.log('[SW] API network failed, checking cache:', request.url);
     
     // For GET requests, try cache
