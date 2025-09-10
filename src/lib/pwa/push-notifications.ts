@@ -8,7 +8,7 @@ interface NotificationPayload {
   badge?: string
   image?: string
   data?: any
-  actions?: NotificationAction[]
+  actions?: { action: string; title: string; icon?: string }[]
   tag?: string
   requireInteraction?: boolean
   silent?: boolean
@@ -76,7 +76,7 @@ class PushNotificationManager {
 
     try {
       // Convert VAPID key
-      const applicationServerKey = this.urlBase64ToUint8Array(this.vapidPublicKey)
+      const applicationServerKey = this.urlBase64ToUint8Array(this.vapidPublicKey) as BufferSource
 
       // Subscribe to push notifications
       this.subscription = await this.registration.pushManager.subscribe({
@@ -150,11 +150,10 @@ class PushNotificationManager {
       throw new Error('Notification permission denied')
     }
 
-    const options: NotificationOptions = {
+    const options: NotificationOptions & { actions?: any; vibrate?: number[] } = {
       body: payload.body,
       icon: payload.icon || '/icon-192.png',
       badge: payload.badge || '/icon-192.png',
-      image: payload.image,
       data: payload.data,
       actions: payload.actions,
       tag: payload.tag,
@@ -186,7 +185,7 @@ class PushNotificationManager {
   }
 
   // Predefined notification types for ASH AI
-  async notifyOrderUpdate(order_id: string, status: string, details?: string): Promise<void> {
+  async notifyOrderUpdate(order_id: string, status: string, _details?: string): Promise<void> {
     const payload: NotificationPayload = {
       title: 'Order Update',
       body: `Order ${order_id} status changed to ${status}`,
