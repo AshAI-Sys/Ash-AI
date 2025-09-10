@@ -88,7 +88,7 @@ RESPOND WITH HIGH INTELLIGENCE - analyze the user's question deeply and provide 
 
     // Call OpenAI API
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-latest", // Using GPT-4o latest for best intelligence
+      model: "gpt-4", // Using GPT-4 for best intelligence
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: message }
@@ -101,15 +101,15 @@ RESPOND WITH HIGH INTELLIGENCE - analyze the user's question deeply and provide 
 
     return NextResponse.json({ 
       response: aiResponse,
-      model: "gpt-4o-latest",
-      powered_by: "OpenAI GPT-4o Latest"
+      model: "gpt-4",
+      powered_by: "OpenAI GPT-4"
     })
 
-  } catch (_error) {
-    console.error('OpenAI API Error:', _error)
+  } catch (error) {
+    console.error('OpenAI API Error:', error)
     
     // Fallback to smart local response if OpenAI fails
-    const { message } = await request.json()
+    const fallbackResponse = generateFallbackResponse("AI assistant error")
     const fallbackResponse = generateFallbackResponse(message)
     
     return NextResponse.json({ 

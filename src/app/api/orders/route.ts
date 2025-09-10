@@ -109,7 +109,7 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
       }
     });
 
-  } catch (_error) {
+  } catch (error) {
     console.error('Orders API Error:', error);
     throw Errors.DATABASE_ERROR;
   }
@@ -156,7 +156,7 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
           quantity: item.quantity,
           unit_price: item.unit_price,
           total_price: item.quantity * item.unit_price,
-          specifications: item.specifications ? JSON.stringify(_item.specifications) : null,
+          specifications: item.specifications ? JSON.stringify(item.specifications) : null,
           workspace_id,
           created_by: user_id
         }))
@@ -211,7 +211,7 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
       201
     );
 
-  } catch (_error) {
+  } catch (error) {
     console.error('Order Creation Error:', error);
     throw error;
   }

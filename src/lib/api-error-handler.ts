@@ -116,8 +116,8 @@ export function withErrorHandler(
   return async (request: NextRequest): Promise<NextResponse> => {
     try {
       return await handler(request);
-    } catch (_error) {
-      console.error('API Error:', _error);
+    } catch (error) {
+      console.error('API Error:', error);
       
       // Log error for monitoring
       if (process.env.NODE_ENV === 'production') {
@@ -125,8 +125,8 @@ export function withErrorHandler(
         console.error('Production API Error:', {
           url: request.url,
           method: request.method,
-          error: _error instanceof Error ? _error.message : String(_error),
-          stack: _error instanceof Error ? _error.stack : undefined,
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
           timestamp: new Date().toISOString()
         });
       }
@@ -191,7 +191,7 @@ export async function checkSystemHealth() {
     const { db } = await import('./db');
     await db.$queryRaw`SELECT 1`;
     health.database = true;
-  } catch (_error) {
+  } catch (error) {
     console.error('Database health check failed:', error);
   }
 
