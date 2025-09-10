@@ -37,7 +37,7 @@ import AshleyAIChat from '@/components/ai/AshleyAIChat'
 import { CleanDashboard } from '@/components/CleanDashboard'
 import { ModernOrdersPage } from '@/components/ModernOrdersPage'
 import { EnterpriseDashboard } from '@/components/EnterpriseDashboard'
-import { TikTokStyleAnalytics } from '@/components/TikTokStyleAnalytics'
+import { ExactTikTokAnalytics } from '@/components/ExactTikTokAnalytics'
 
 export default function UnifiedDashboard() {
   const { data: session, status } = useSession()
@@ -232,7 +232,7 @@ export default function UnifiedDashboard() {
             </TabsContent>
             
             <TabsContent value="analytics" className="mt-0">
-              <TikTokStyleAnalytics />
+              <ExactTikTokAnalytics />
             </TabsContent>
 
             <TabsContent value="inventory" className="mt-0">
