@@ -34,7 +34,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { Role } from '@prisma/client'
-import { AshleyAIChat } from '@/components/ai/AshleyAIChat'
+import AshleyAIChat from '@/components/ai/AshleyAIChat'
 
 interface LayoutProps {
   children: React.ReactNode
