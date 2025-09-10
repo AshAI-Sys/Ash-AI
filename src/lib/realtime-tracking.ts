@@ -2,7 +2,7 @@
 // Live updates for production status, machine monitoring, and workflow progress
 
 import { prisma } from './prisma'
-import { logError, createSuccessResponse } from './error-handler'
+import { logError } from './error-handler'
 
 export interface ProductionUpdate {
   id: string
@@ -54,7 +54,7 @@ export interface ProductionStage {
 }
 
 export class RealTimeProductionTracker {
-  private subscribers: Map<string, Set<Function>> = new Map()
+  private subscribers: Map<string, Set<(update: ProductionUpdate) => void>> = new Map()
   private machineStatuses: Map<string, MachineStatus> = new Map()
   private productionMetrics: Map<string, ProductionMetrics> = new Map()
 
@@ -102,7 +102,7 @@ export class RealTimeProductionTracker {
   }
 
   // Subscribe to real-time updates for an order
-  subscribe(orderId: string, callback: Function): () => void {
+  subscribe(orderId: string, callback: (update: ProductionUpdate) => void): () => void {
     if (!this.subscribers.has(orderId)) {
       this.subscribers.set(orderId, new Set())
     }
@@ -357,7 +357,7 @@ export class RealTimeProductionTracker {
   private async updateMachineStatuses() {
     // In real implementation, this would poll machine APIs or IoT sensors
     // For now, we'll simulate some status updates
-    for (const [machineId, machine] of this.machineStatuses) {
+    for (const [_machineId, machine] of this.machineStatuses) {
       // Simulate efficiency updates
       const newEfficiency = Math.max(60, Math.min(100, 
         machine.efficiency + (Math.random() - 0.5) * 5
@@ -414,6 +414,6 @@ export async function getProductionMetrics(orderId: string) {
   return await productionTracker.getProductionMetrics(orderId)
 }
 
-export function subscribeToProductionUpdates(orderId: string, callback: Function) {
+export function subscribeToProductionUpdates(orderId: string, callback: (update: ProductionUpdate) => void) {
   return productionTracker.subscribe(orderId, callback)
 }

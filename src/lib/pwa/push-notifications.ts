@@ -15,13 +15,6 @@ interface NotificationPayload {
   vibrate?: number[]
 }
 
-interface NotificationSubscription {
-  endpoint: string
-  keys: {
-    p256dh: string
-    auth: string
-  }
-}
 
 class PushNotificationManager {
   private registration: ServiceWorkerRegistration | null = null
@@ -193,12 +186,12 @@ class PushNotificationManager {
   }
 
   // Predefined notification types for ASH AI
-  async notifyOrderUpdate(orderId: string, status: string, details?: string): Promise<void> {
+  async notifyOrderUpdate(order_id: string, status: string, details?: string): Promise<void> {
     const payload: NotificationPayload = {
       title: 'Order Update',
-      body: `Order ${orderId} status changed to ${status}`,
+      body: `Order ${order_id} status changed to ${status}`,
       icon: '/icon-192.png',
-      data: { type: 'order_update', orderId, status },
+      data: { type: 'order_update', order_id, status },
       actions: [
         {
           action: 'view',
@@ -211,7 +204,7 @@ class PushNotificationManager {
           icon: '/icons/dismiss.png'
         }
       ],
-      tag: `order_${orderId}`,
+      tag: `order_${order_id}`,
       vibrate: [200, 100, 200]
     }
 
@@ -222,12 +215,12 @@ class PushNotificationManager {
     }
   }
 
-  async notifyQualityAlert(orderId: string, issue: string): Promise<void> {
+  async notifyQualityAlert(order_id: string, issue: string): Promise<void> {
     const payload: NotificationPayload = {
       title: 'Quality Alert',
-      body: `Quality issue detected in order ${orderId}: ${issue}`,
+      body: `Quality issue detected in order ${order_id}: ${issue}`,
       icon: '/icon-192.png',
-      data: { type: 'quality_alert', orderId, issue },
+      data: { type: 'quality_alert', order_id, issue },
       actions: [
         {
           action: 'inspect',
@@ -240,7 +233,7 @@ class PushNotificationManager {
           icon: '/icons/dismiss.png'
         }
       ],
-      tag: `quality_${orderId}`,
+      tag: `quality_${order_id}`,
       requireInteraction: true,
       vibrate: [500, 200, 500, 200, 500]
     }
@@ -252,12 +245,12 @@ class PushNotificationManager {
     }
   }
 
-  async notifyProductionMilestone(orderId: string, milestone: string): Promise<void> {
+  async notifyProductionMilestone(order_id: string, milestone: string): Promise<void> {
     const payload: NotificationPayload = {
       title: 'Production Milestone',
-      body: `${milestone} completed for order ${orderId}`,
+      body: `${milestone} completed for order ${order_id}`,
       icon: '/icon-192.png',
-      data: { type: 'production_milestone', orderId, milestone },
+      data: { type: 'production_milestone', order_id, milestone },
       actions: [
         {
           action: 'view',
@@ -265,7 +258,7 @@ class PushNotificationManager {
           icon: '/icons/progress.png'
         }
       ],
-      tag: `milestone_${orderId}`,
+      tag: `milestone_${order_id}`,
       vibrate: [100, 50, 100]
     }
 
@@ -276,12 +269,12 @@ class PushNotificationManager {
     }
   }
 
-  async notifyInventoryAlert(item: string, level: number, threshold: number): Promise<void> {
+  async notifyInventoryAlert(_item: string, _level: number, _threshold: number): Promise<void> {
     const payload: NotificationPayload = {
       title: 'Inventory Alert',
-      body: `${item} is running low: ${level} remaining (threshold: ${threshold})`,
+      body: `${_item} is running low: ${_level} remaining (threshold: ${_threshold})`,
       icon: '/icon-192.png',
-      data: { type: 'inventory_alert', item, level, threshold },
+      data: { type: 'inventory_alert', item: _item, level: _level, threshold: _threshold },
       actions: [
         {
           action: 'reorder',
@@ -294,7 +287,7 @@ class PushNotificationManager {
           icon: '/icons/dismiss.png'
         }
       ],
-      tag: `inventory_${item}`,
+      tag: `inventory_${_item}`,
       requireInteraction: true,
       vibrate: [300, 100, 300]
     }
