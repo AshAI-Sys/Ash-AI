@@ -4,9 +4,11 @@ import { authOptions } from '@/lib/auth'
 import { db } from '@/lib/db'
 import OpenAI from 'openai'
 
-// Initialize OpenAI client with correct API key
+// Initialize OpenAI client with correct API key and timeout configuration
 const openai = new OpenAI({
   apiKey: process.env.ASH_OPENAI_API_KEY || process.env.OPENAI_API_KEY,
+  timeout: 45000, // 45 second timeout for all OpenAI requests
+  maxRetries: 2,  // Retry failed requests up to 2 times
 })
 
 export async function POST(request: NextRequest) {
@@ -115,9 +117,9 @@ Use this live data to provide accurate, current insights about orders, productio
         frequency_penalty: 0.1,
         stream: false // Ensure non-streaming for faster complete response
       }),
-      // 8-second timeout for OpenAI API
+      // 40-second timeout for OpenAI API (aligned with client timeout)
       new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('OpenAI API timeout')), 8000)
+        setTimeout(() => reject(new Error('OpenAI API timeout after 40 seconds')), 40000)
       )
     ]) as any
 
@@ -149,13 +151,25 @@ Use this live data to provide accurate, current insights about orders, productio
     const { message } = await request.json().catch(() => ({ message: 'system error' }));
     const fallbackResponse = generateEnhancedFallbackResponse(message, error)
     
+    // Determine error type for better user feedback
+    const errorMessage = (error as any)?.message || '';
+    const errorStatus = (error as any)?.status || 0;
+    const isTimeout = errorMessage.includes('timeout');
+    const isRateLimit = errorMessage.includes('rate') || errorStatus === 429;
+    const isAuthError = errorStatus === 401 || errorMessage.includes('auth');
+    
     return NextResponse.json({ 
       response: fallbackResponse,
       model: "fallback",
       powered_by: "Local AI Enhanced",
       response_time_ms: responseTime,
       error_handled: true,
-      timestamp: new Date().toISOString()
+      error_type: isTimeout ? 'timeout' : isRateLimit ? 'rate_limit' : isAuthError ? 'auth_error' : 'general_error',
+      timestamp: new Date().toISOString(),
+      suggestion: isTimeout ? 'Please try again - OpenAI response time exceeded 30 seconds' : 
+                 isRateLimit ? 'OpenAI API rate limit reached - please wait a moment' :
+                 isAuthError ? 'API authentication issue - please check configuration' : 
+                 'Temporary service issue - using local intelligence'
     })
   }
 }
@@ -208,7 +222,7 @@ async function getERPContext(userId: string) {
         },
         include: {
           client: { select: { name: true } },
-          _count: { select: { orderItems: true } }
+          _count: { select: { order_items: true } }
         },
         orderBy: { created_at: 'desc' },
         take: 10
@@ -256,14 +270,14 @@ async function getERPContext(userId: string) {
           where: { workspace_id },
           _count: { status: true }
         }),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 1000))
+        new Promise((_, reject) => setTimeout(() => reject(new Error('database timeout')), 5000))
       ]),
       Promise.race([
         db.routingStep.groupBy({
           by: ['workcenter', 'status'],
           _count: { workcenter: true }
         }),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 1000))
+        new Promise((_, reject) => setTimeout(() => reject(new Error('database timeout')), 5000))
       ])
     ]);
 
@@ -307,7 +321,7 @@ function formatContextData(contextData: any): string {
   if (contextData.orders?.active?.length > 0) {
     context += `📋 ACTIVE ORDERS (${contextData.orders.active.length}):\n`;
     contextData.orders.active.forEach((order: any) => {
-      context += `• PO: ${order.po_number} | Client: ${order.client?.name} | Status: ${order.status} | Items: ${order._count.orderItems}\n`;
+      context += `• PO: ${order.po_number} | Client: ${order.client?.name} | Status: ${order.status} | Items: ${order._count.order_items}\n`;
     });
     context += '\n';
   }
