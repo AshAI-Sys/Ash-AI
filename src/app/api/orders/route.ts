@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth'
 import { Role, OrderStatus } from '@prisma/client'
 import { db } from '@/lib/db'
 import { z } from 'zod'
-import { withErrorHandler, createSuccessResponse, createErrorResponse, Errors } from '@/lib/api-error-handler'
+import { withErrorHandler, createSuccessResponse, createErrorResponse, Errors, AppError } from '@/lib/api-error-handler'
 import { OrderWorkflowEngine } from '@/lib/order-workflow'
 
 // ASH AI Enhanced Order Management System - CLIENT_UPDATED_PLAN.md Implementation
@@ -275,3 +275,165 @@ async function getOrderStatusSummary(workspace_id: string) {
     return acc;
   }, {} as Record<string, number>);
 }
+
+// PUT /api/orders - Update order details (bulk update)
+export const PUT = withErrorHandler(async (request: NextRequest) => {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
+    throw Errors.UNAUTHORIZED;
+  }
+
+  const body = await request.json();
+  const { id, ...updateData } = body;
+  
+  if (!id) {
+    throw Errors.VALIDATION_ERROR;
+  }
+
+  const validatedData = OrderUpdateSchema.parse(updateData);
+
+  try {
+    const workspace_id = 'default';
+    const user_id = session.user.id;
+
+    // Get existing order
+    const existingOrder = await db.order.findUnique({
+      where: { id, workspace_id }
+    });
+
+    if (!existingOrder) {
+      throw Errors.NOT_FOUND;
+    }
+
+    // Update order in transaction
+    const updatedOrder = await db.$transaction(async (tx) => {
+      const order = await tx.order.update({
+        where: { id },
+        data: {
+          ...validatedData,
+          due_date: validatedData.due_date ? new Date(validatedData.due_date) : undefined,
+          updated_by: user_id,
+          updated_at: new Date()
+        },
+        include: {
+          client: { select: { id: true, name: true, emails: true } },
+          orderItems: true,
+          statusHistory: { orderBy: { changed_at: 'desc' }, take: 5 }
+        }
+      });
+
+      // Create audit log
+      await tx.auditLog.create({
+        data: {
+          workspace_id,
+          actor_id: user_id,
+          entity_type: 'ORDER',
+          entity_id: id,
+          action: 'UPDATE',
+          before_data: JSON.stringify(existingOrder),
+          after_data: JSON.stringify(validatedData)
+        }
+      });
+
+      return order;
+    });
+
+    return createSuccessResponse(
+      {
+        ...updatedOrder,
+        progress_percentage: OrderWorkflowEngine.getStatusProgress(updatedOrder.status),
+        available_transitions: await OrderWorkflowEngine.getAvailableTransitions(
+          id,
+          session.user.role as Role
+        )
+      },
+      'Order updated successfully'
+    );
+
+  } catch (error) {
+    console.error('Order Update Error:', error);
+    throw error;
+  }
+});
+
+// DELETE /api/orders - Cancel order (soft delete)
+export const DELETE = withErrorHandler(async (request: NextRequest) => {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
+    throw Errors.UNAUTHORIZED;
+  }
+
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get('id');
+  
+  if (!id) {
+    throw Errors.VALIDATION_ERROR;
+  }
+
+  try {
+    const workspace_id = 'default';
+    const user_id = session.user.id;
+
+    // Check if order can be cancelled
+    const order = await db.order.findUnique({
+      where: { id, workspace_id }
+    });
+
+    if (!order) {
+      throw Errors.NOT_FOUND;
+    }
+
+    // Only allow cancellation of orders that haven't started production
+    const cancellableStatuses: OrderStatus[] = ['INTAKE', 'DESIGN_PENDING', 'DESIGN_APPROVAL', 'CONFIRMED'];
+    if (!cancellableStatuses.includes(order.status)) {
+      throw new AppError(
+        'CANNOT_CANCEL',
+        'Orders in production cannot be cancelled. Use status transition to ON_HOLD instead.',
+        400
+      );
+    }
+
+    // Cancel order in transaction
+    await db.$transaction(async (tx) => {
+      await tx.order.update({
+        where: { id },
+        data: {
+          status: 'CANCELLED',
+          cancelled_at: new Date(),
+          updated_by: user_id,
+          updated_at: new Date()
+        }
+      });
+
+      // Create status history
+      await tx.orderStatusHistory.create({
+        data: {
+          order_id: id,
+          status: 'CANCELLED',
+          changed_by: user_id,
+          notes: 'Order cancelled',
+          workspace_id
+        }
+      });
+
+      // Create audit log
+      await tx.auditLog.create({
+        data: {
+          workspace_id,
+          actor_id: user_id,
+          entity_type: 'ORDER',
+          entity_id: id,
+          action: 'DELETE',
+          before_data: JSON.stringify({ status: order.status }),
+          after_data: JSON.stringify({ status: 'CANCELLED' })
+        }
+      });
+    });
+
+    return createSuccessResponse(null, 'Order cancelled successfully');
+
+  } catch (error) {
+    console.error('Order Cancellation Error:', error);
+    throw error;
+  }
+});

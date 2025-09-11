@@ -110,7 +110,6 @@ RESPOND WITH HIGH INTELLIGENCE - analyze the user's question deeply and provide 
     
     // Fallback to smart local response if OpenAI fails
     const fallbackResponse = generateFallbackResponse("AI assistant error")
-    const fallbackResponse = generateFallbackResponse(message)
     
     return NextResponse.json({ 
       response: fallbackResponse,

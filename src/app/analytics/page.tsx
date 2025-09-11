@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import EnhancedLayout from '@/components/EnhancedLayout'
+import TikTokLayout from '@/components/layout/TikTokLayout'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -303,336 +303,250 @@ export default function AnalyticsPage() {
 
   if (status === 'loading' || loading) {
     return (
-      <EnhancedLayout>
-        <div className="min-h-screen gradient-mesh relative overflow-hidden">
-          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-          </div>
+      <TikTokLayout>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-teal-600"></div>
         </div>
-      </EnhancedLayout>
+      </TikTokLayout>
     )
   }
 
   if (!session || !canViewAnalytics) {
     return (
-      <EnhancedLayout>
-        <div className="min-h-screen gradient-mesh relative overflow-hidden">
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-20 left-10 w-32 h-32 gradient-purple rounded-full opacity-20 float morph-shape"></div>
-            <div className="absolute top-40 right-16 w-24 h-24 gradient-pink rounded-full opacity-30 float" style={{animationDelay: '2s'}}></div>
-          </div>
-          <div className="relative z-10 p-6">
-            <div className="glass-card p-12 rounded-3xl text-center max-w-lg mx-auto mt-20">
-              <div className="gradient-red w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Shield className="w-10 h-10 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-3">Access Denied</h3>
-              <p className="text-white/70 text-lg">
-                You don&apos;t have permission to view analytics and reporting.
-              </p>
+      <TikTokLayout>
+        <div className="flex items-center justify-center h-64">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center max-w-lg">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Shield className="w-8 h-8 text-red-600" />
             </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Access Denied</h3>
+            <p className="text-gray-600">
+              You don&apos;t have permission to view analytics and reporting.
+            </p>
           </div>
         </div>
-      </EnhancedLayout>
+      </TikTokLayout>
     )
   }
 
   return (
-    <EnhancedLayout>
-      <div className="min-h-screen gradient-mesh relative overflow-hidden">
-        {/* Floating background shapes */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-10 w-32 h-32 gradient-purple rounded-full opacity-20 float morph-shape"></div>
-          <div className="absolute top-40 right-16 w-24 h-24 gradient-green rounded-full opacity-30 float" style={{animationDelay: '2s'}}></div>
-          <div className="absolute bottom-32 left-1/4 w-40 h-40 gradient-blue rounded-full opacity-15 float morph-shape" style={{animationDelay: '4s'}}></div>
-          <div className="absolute bottom-16 right-16 w-28 h-28 gradient-pink rounded-full opacity-25 float" style={{animationDelay: '1s'}}></div>
-        </div>
-
-        <div className="relative z-10 p-6 space-y-6">
-          {/* Header */}
-          <div className="glass-card p-8 rounded-3xl slide-in-up">
-            <div className="flex justify-between items-center">
-              <div>
-                <h1 className="text-4xl font-bold text-gradient mb-2">Stage 10: Advanced Analytics</h1>
-                <p className="text-white/80 text-lg">
-                  AI-powered insights, predictive analytics, and comprehensive reporting
-                </p>
-              </div>
-              <div className="flex gap-3">
-                <Button 
-                  onClick={handleRefresh}
-                  disabled={refreshing}
-                  className="glass-card border border-white/20 text-white hover:bg-white/10 px-6 py-3 rounded-2xl font-semibold hover-scale"
+    <TikTokLayout>
+      <div className="space-y-6">
+        {/* Business Data Cards - TikTok Style */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-4">
+              <h2 className="text-xl font-semibold text-gray-900">Business data</h2>
+              <div className="flex space-x-2">
+                <Button
+                  size="sm"
+                  className="bg-teal-600 hover:bg-teal-700 text-white rounded-full px-4"
                 >
-                  <RefreshCw className={`w-5 h-5 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-                  Refresh
+                  Sales
                 </Button>
-                <Button className="gradient-blue text-white px-6 py-3 rounded-2xl font-semibold hover-scale">
-                  <Download className="w-5 h-5 mr-2" />
-                  Export Report
+                <Button
+                  size="sm" 
+                  variant="outline"
+                  className="text-gray-700 border-gray-300 rounded-full px-4"
+                >
+                  Traffic
                 </Button>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2 text-sm text-gray-600">
+              <span>Last 7 days • Sep 02, 2025 - Sep 08, 2025</span>
+              <Button size="sm" variant="outline">📅</Button>
+              <Button size="sm" variant="outline">📊</Button>
+            </div>
+          </div>
+
+          {/* Metrics Grid - TikTok Style */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div className="bg-gray-50 rounded-lg p-4">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-medium text-gray-700">GMV 💰</h3>
+                <span className="text-xs text-gray-500">ℹ️</span>
+              </div>
+              <div className="text-2xl font-bold text-gray-900 mb-1">₱271,303.01</div>
+              <div className="text-sm text-gray-600">
+                vs last 7 days • <span className="text-green-600">+65.59%</span>
+              </div>
+              <Button size="sm" variant="link" className="text-teal-600 p-0 h-auto">
+                View breakdown &gt;
+              </Button>
+            </div>
+
+            <div className="bg-gray-50 rounded-lg p-4">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-medium text-gray-700">Gross revenue 💰</h3>
+                <span className="text-xs text-gray-500">ℹ️</span>
+              </div>
+              <div className="text-2xl font-bold text-gray-900 mb-1">₱284,728.01</div>
+              <div className="text-sm text-gray-600">
+                vs last 7 days • <span className="text-green-600">+66.54%</span>
+              </div>
+              <Button size="sm" variant="link" className="text-teal-600 p-0 h-auto">
+                View breakdown &gt;
+              </Button>
+            </div>
+
+            <div className="bg-gray-50 rounded-lg p-4">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-medium text-gray-700">Items sold 📦</h3>
+                <span className="text-xs text-gray-500">ℹ️</span>
+              </div>
+              <div className="text-2xl font-bold text-gray-900 mb-1">884</div>
+              <div className="text-sm text-gray-600">
+                vs last 7 days • <span className="text-green-600">+95.54%</span>
               </div>
             </div>
           </div>
 
-          {/* KPI Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 slide-in-left">
-            {kpis.map((kpi) => (
-              <div key={kpi.id} className={`glass-card p-6 rounded-3xl hover-scale ${getKPIBgColor(kpi)} border border-white/10`}>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    {getCategoryIcon(kpi.category)}
-                    <span className="text-sm font-medium text-white/60">{kpi.category}</span>
-                  </div>
-                  {kpi.activeAlerts > 0 && (
-                    <Badge variant="destructive" className="text-xs">
-                      {kpi.activeAlerts} Alert{kpi.activeAlerts > 1 ? 's' : ''}
-                    </Badge>
-                  )}
-                </div>
-                
-                <div className="space-y-2">
-                  <h3 className="font-semibold text-white text-sm">{kpi.name}</h3>
-                  <div className="flex items-end gap-2">
-                    <span className={`text-2xl font-bold ${getKPIColor(kpi)}`}>
-                      {kpi.currentValue}{kpi.unit}
-                    </span>
-                    {kpi.trend === "up" ? (
-                      <TrendingUp className="h-4 w-4 text-green-500" />
-                    ) : kpi.trend === "down" ? (
-                      <TrendingDown className="h-4 w-4 text-red-500" />
-                    ) : (
-                      <Activity className="h-4 w-4 text-gray-500" />
-                    )}
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <div className="flex justify-between text-xs text-white/60">
-                      <span>Target: {kpi.targetValue}{kpi.unit}</span>
-                      <span>{kpi.percentageChange > 0 ? '+' : ''}{kpi.percentageChange}%</span>
+          {/* Chart Area */}
+          <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center mb-6">
+            <div className="text-center">
+              <BarChart3 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-600">Analytics Chart Placeholder</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Today's Data - Right Sidebar Style */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">Today's data</h2>
+            <div className="flex items-center text-sm text-gray-600">
+              📈 Trends
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-sm font-medium text-gray-700 mb-2">GMV 💰</h3>
+              <div className="text-2xl font-bold text-gray-900">₱54,272.05</div>
+              <div className="text-sm text-gray-600">Yesterday ₱51,705.46</div>
+            </div>
+            
+            <div>
+              <h3 className="text-sm font-medium text-gray-700 mb-2">Items sold 📦</h3>
+              <div className="text-2xl font-bold text-gray-900">171</div>
+              <div className="text-sm text-gray-600">Yesterday 179</div>
+            </div>
+            
+            <div>
+              <h3 className="text-sm font-medium text-gray-700 mb-2">Visitors 👥</h3>
+              <div className="text-2xl font-bold text-gray-900">2,678</div>
+              <div className="text-sm text-gray-600">Yesterday 2,534</div>
+            </div>
+            
+            <div>
+              <h3 className="text-sm font-medium text-gray-700 mb-2">Customers 👤</h3>
+              <div className="text-2xl font-bold text-gray-900">111</div>
+              <div className="text-sm text-gray-600">Yesterday 114</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Sales Sources */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-semibold text-gray-900">Sales sources</h2>
+            <div className="flex space-x-2">
+              <Button size="sm" className="bg-teal-600 hover:bg-teal-700 text-white">
+                Highest GMV
+              </Button>
+              <Button size="sm" variant="outline">
+                Most views
+              </Button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* LIVE */}
+            <div className="border rounded-lg p-4">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-medium text-gray-900">📺 LIVE</h3>
+                <Button size="sm" variant="link" className="text-teal-600">
+                  View analysis &gt;
+                </Button>
+              </div>
+              <div className="text-lg font-bold text-gray-900 mb-2">₱42,934.08</div>
+              <p className="text-sm text-gray-600 mb-3">GMV from 1 self-operated accounts.</p>
+              
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-gray-700">Top 3 LIVE streams, ranked by GMV</h4>
+                <div className="bg-gray-50 rounded p-2">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-orange-200 rounded flex items-center justify-center">
+                      📺
                     </div>
-                    <Progress 
-                      value={Math.min(kpi.targetAchievement, 110)} 
-                      className="h-2 bg-white/20" 
-                    />
+                    <div>
+                      <div className="font-medium">₱17,164.69</div>
+                      <div className="text-sm text-gray-600">2025/09/08 18:01 • @teeferco</div>
+                    </div>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
 
-          {/* Main Content */}
-          <div className="glass-card p-6 rounded-3xl slide-in-right">
-            <Tabs defaultValue="insights" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-4 bg-white/10 rounded-2xl">
-                <TabsTrigger value="insights" className="data-[state=active]:bg-white/20 rounded-xl text-white">
-                  AI Insights
-                </TabsTrigger>
-                <TabsTrigger value="forecasts" className="data-[state=active]:bg-white/20 rounded-xl text-white">
-                  Forecasting
-                </TabsTrigger>
-                <TabsTrigger value="reports" className="data-[state=active]:bg-white/20 rounded-xl text-white">
-                  Reports
-                </TabsTrigger>
-                <TabsTrigger value="settings" className="data-[state=active]:bg-white/20 rounded-xl text-white">
-                  Settings
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="insights" className="space-y-6">
-                <Card className="glass-card border-0">
-                  <CardHeader>
-                    <CardTitle className="flex items-center text-white">
-                      <Brain className="h-5 w-5 mr-2" />
-                      AI-Powered Business Insights
-                    </CardTitle>
-                    <CardDescription className="text-white/60">
-                      Automated analysis and recommendations from Ashley AI
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {insights.map((insight) => (
-                        <div key={insight.id} className="p-6 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all">
-                          <div className="flex items-start justify-between mb-3">
-                            <div className="flex items-center gap-3">
-                              <div className="flex items-center gap-2">
-                                <Lightbulb className="h-5 w-5 text-yellow-400" />
-                                <Badge className={getInsightColor(insight.impact)}>
-                                  {insight.impact} Impact
-                                </Badge>
-                              </div>
-                              <div className="flex items-center gap-1 text-sm text-white/60">
-                                <Target className="h-4 w-4" />
-                                {Math.round(insight.confidence * 100)}% Confidence
-                              </div>
-                            </div>
-                            <Badge variant="outline" className="text-white border-white/20">
-                              {insight.category}
-                            </Badge>
-                          </div>
-                          
-                          <h3 className="font-semibold text-white mb-2">{insight.title}</h3>
-                          <p className="text-white/70 mb-4">{insight.description}</p>
-                          
-                          {insight.recommendation && (
-                            <div className="p-3 bg-blue-500/20 border border-blue-400/30 rounded-lg mb-3">
-                              <p className="text-sm text-blue-300 font-medium">Recommendation:</p>
-                              <p className="text-sm text-blue-200">{insight.recommendation}</p>
-                            </div>
-                          )}
-                          
-                          {insight.potentialImpact && (
-                            <div className="text-sm text-green-400">
-                              <span className="font-medium">Potential Impact: </span>
-                              {insight.potentialImpact}
-                            </div>
-                          )}
-                        </div>
-                      ))}
+            {/* Videos */}
+            <div className="border rounded-lg p-4">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-medium text-gray-900">🎥 Videos</h3>
+                <Button size="sm" variant="link" className="text-teal-600">
+                  View analysis &gt;
+                </Button>
+              </div>
+              <div className="text-lg font-bold text-gray-900 mb-2">₱259</div>
+              <p className="text-sm text-gray-600 mb-3">GMV from 1 linked accounts.</p>
+              
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-gray-700">Top 3 videos, ranked by GMV</h4>
+                <div className="bg-gray-50 rounded p-2">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-purple-200 rounded flex items-center justify-center">
+                      🎥
                     </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="forecasts" className="space-y-6">
-                <Card className="glass-card border-0">
-                  <CardHeader>
-                    <CardTitle className="flex items-center text-white">
-                      <BarChart3 className="h-5 w-5 mr-2" />
-                      Predictive Forecasting
-                    </CardTitle>
-                    <CardDescription className="text-white/60">
-                      Machine learning powered predictions for business planning
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      {forecasts.map((forecast) => (
-                        <div key={forecast.id} className="p-6 bg-white/5 border border-white/10 rounded-2xl">
-                          <div className="flex items-center justify-between mb-4">
-                            <h3 className="font-semibold text-white">{forecast.name}</h3>
-                            <div className="flex items-center gap-2">
-                              <CheckCircle className="h-4 w-4 text-green-400" />
-                              <span className="text-sm text-green-400">{Math.round(forecast.accuracy * 100)}% Accurate</span>
-                            </div>
-                          </div>
-                          
-                          <div className="space-y-3">
-                            <div className="flex justify-between items-center">
-                              <span className="text-white/60">Type:</span>
-                              <Badge variant="outline" className="text-white border-white/20">
-                                {forecast.type}
-                              </Badge>
-                            </div>
-                            
-                            <div className="flex justify-between items-center">
-                              <span className="text-white/60">Period:</span>
-                              <span className="text-white font-medium">{forecast.period}</span>
-                            </div>
-                            
-                            {forecast.type === "SALES" && (
-                              <div className="pt-3 border-t border-white/10">
-                                <div className="text-lg font-bold text-green-400 mb-1">
-                                  ₱{forecast.prediction.projectedRevenue?.toLocaleString() || '0'}
-                                </div>
-                                <div className="text-sm text-white/60">Projected Revenue</div>
-                              </div>
-                            )}
-                            
-                            {forecast.type === "INVENTORY" && (
-                              <div className="pt-3 border-t border-white/10">
-                                <div className="text-lg font-bold text-yellow-400 mb-1">
-                                  {forecast.prediction.materialsAtRisk?.length || 0} Materials at Risk
-                                </div>
-                                <div className="text-sm text-white/60">
-                                  {forecast.prediction.materialsAtRisk?.join(", ") || "None"}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
+                    <div>
+                      <div className="font-medium">₱259</div>
+                      <div className="text-sm text-gray-600">2024/10/13 17:44 • ₱99 Hoodied Limi...</div>
                     </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-              <TabsContent value="reports" className="space-y-6">
-                <Card className="glass-card border-0">
-                  <CardHeader>
-                    <CardTitle className="flex items-center text-white">
-                      <PieChart className="h-5 w-5 mr-2" />
-                      Executive Reports
-                    </CardTitle>
-                    <CardDescription className="text-white/60">
-                      Comprehensive business intelligence reports
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {[
-                        { name: "Executive Dashboard", icon: BarChart3, description: "High-level KPI overview" },
-                        { name: "Production Analytics", icon: Factory, description: "Manufacturing performance" },
-                        { name: "Financial Summary", icon: DollarSign, description: "Revenue and profitability" },
-                        { name: "Quality Metrics", icon: Shield, description: "Quality control analysis" },
-                        { name: "Customer Analytics", icon: Users, description: "Customer satisfaction trends" },
-                        { name: "Operational Efficiency", icon: Activity, description: "Process optimization insights" }
-                      ].map((report) => (
-                        <Button
-                          key={report.name}
-                          variant="outline"
-                          className="h-24 flex flex-col items-center justify-center glass-card border-white/20 text-white hover:bg-white/10"
-                        >
-                          <report.icon className="h-6 w-6 mb-2" />
-                          <span className="font-medium">{report.name}</span>
-                          <span className="text-xs text-white/60 text-center">{report.description}</span>
-                        </Button>
-                      ))}
+            {/* Product cards */}
+            <div className="border rounded-lg p-4">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-medium text-gray-900">🏷️ Product cards</h3>
+                <Button size="sm" variant="link" className="text-teal-600">
+                  View analysis &gt;
+                </Button>
+              </div>
+              <div className="text-lg font-bold text-gray-900 mb-2">₱6,602.38</div>
+              <p className="text-sm text-gray-600 mb-3">GMV from 18 product cards.</p>
+              
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-gray-700">Top 3 product cards by GMV</h4>
+                <div className="space-y-2">
+                  <div className="bg-gray-50 rounded p-2">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-8 h-8 bg-black rounded">
+                        <span className="text-white text-xs">👕</span>
+                      </div>
+                      <div>
+                        <div className="font-medium">₱2,310.90</div>
+                        <div className="text-sm text-gray-600">REFFEX CLOTHING - DARK DAYS [BLACK]</div>
+                      </div>
                     </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="settings" className="space-y-6">
-                <Card className="glass-card border-0">
-                  <CardHeader>
-                    <CardTitle className="flex items-center text-white">
-                      <Settings className="h-5 w-5 mr-2" />
-                      Analytics Configuration
-                    </CardTitle>
-                    <CardDescription className="text-white/60">
-                      Configure KPIs, alerts, and reporting parameters
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {[
-                        { name: "KPI Metrics", icon: Target, description: "Manage key performance indicators" },
-                        { name: "Alert Rules", icon: AlertTriangle, description: "Configure automated alerts" },
-                        { name: "Data Quality", icon: Shield, description: "Data validation and monitoring" },
-                        { name: "Report Templates", icon: PieChart, description: "Customize report formats" }
-                      ].map((setting) => (
-                        <Button
-                          key={setting.name}
-                          variant="outline"
-                          className="w-full justify-start glass-card border-white/20 text-white hover:bg-white/10 p-4"
-                        >
-                          <setting.icon className="h-5 w-5 mr-3" />
-                          <div className="text-left">
-                            <div className="font-medium">{setting.name}</div>
-                            <div className="text-sm text-white/60">{setting.description}</div>
-                          </div>
-                        </Button>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </EnhancedLayout>
+    </TikTokLayout>
   )
 }

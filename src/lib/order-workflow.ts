@@ -1,6 +1,7 @@
 import { db } from './db';
 import { OrderStatus, Role } from '@prisma/client';
 import { AppError } from './api-error-handler';
+import { routingEngine, OrderContext } from './routing-engine';
 
 export interface OrderWorkflowTransition {
   from: OrderStatus;
@@ -283,47 +284,175 @@ async function createOrderNotification(
 async function createProductionPlan(order_id: string, user_id: string): Promise<void> {
   const order = await db.order.findUnique({
     where: { id: order_id },
-    include: { orderItems: true }
+    include: { 
+      orderItems: true,
+      client: { select: { preferences: true } }
+    }
   });
 
   if (!order) return;
 
-  // Create production runs for each order item
+  // Create intelligent routing-based production plan
   for (const item of order.orderItems) {
-    await db.sewingRun.create({
+    const specs = item.specifications ? JSON.parse(item.specifications as string) : {};
+    const method = specs.printing_method || 'Silkscreen';
+    
+    // Create order context for routing engine
+    const orderContext: OrderContext = {
+      productType: item.product_type,
+      method: method,
+      quantity: item.quantity,
+      target_delivery_date: order.due_date || new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+      brand_id: order.client_id,
+      hasComplexDesign: specs.complexity === 'HIGH',
+      isPriority: specs.priority === 'HIGH'
+    };
+
+    // Get routing recommendation from Ashley AI
+    const recommendation = routingEngine.getAshleyRecommendation(orderContext);
+    
+    if (recommendation.recommendedTemplate) {
+      const template = recommendation.recommendedTemplate;
+      const criticalPath = routingEngine.calculateCriticalPath(
+        template, 
+        item.quantity, 
+        orderContext.target_delivery_date
+      );
+
+      // Create routing steps for this order item
+      for (let i = 0; i < template.steps.length; i++) {
+        const step = template.steps[i];
+        await db.routingStep.create({
+          data: {
+            order_id: order_id,
+            order_item_id: item.id,
+            step_name: step.name,
+            step_id: step.id,
+            department: step.department,
+            sequence: i + 1,
+            estimated_hours: step.estimatedHours,
+            required_skills: step.requiredSkills,
+            dependencies: step.dependencies,
+            status: 'PLANNED',
+            workspace_id: order.workspace_id,
+            created_by: user_id
+          }
+        });
+      }
+
+      // Create production run with routing intelligence
+      await db.sewingRun.create({
+        data: {
+          order_id: order_id,
+          order_item_id: item.id,
+          quantity: item.quantity,
+          status: 'PLANNED',
+          routing_template_id: template.id,
+          estimated_completion: criticalPath.estimatedDeliveryDate,
+          efficiency_target: 85.0,
+          workspace_id: order.workspace_id,
+          created_by: user_id
+        }
+      });
+
+      // Log Ashley's routing insights
+      if (recommendation.insights.length > 0 || recommendation.warnings.length > 0) {
+        await db.productionLog.create({
+          data: {
+            order_id: order_id,
+            update_type: 'ROUTING_ANALYSIS',
+            details: JSON.stringify({
+              template: template.name,
+              insights: recommendation.insights,
+              warnings: recommendation.warnings,
+              feasible: criticalPath.feasible,
+              bottlenecks: criticalPath.bottleneckSteps
+            }),
+            timestamp: new Date(),
+            workspace_id: order.workspace_id
+          }
+        });
+      }
+    } else {
+      // Fallback to basic production run
+      await db.sewingRun.create({
+        data: {
+          order_id: order_id,
+          order_item_id: item.id,
+          quantity: item.quantity,
+          status: 'PLANNED',
+          workspace_id: order.workspace_id,
+          created_by: user_id
+        }
+      });
+    }
+  }
+}
+
+async function startProductionTracking(order_id: string): Promise<void> {
+  // Get routing steps to initialize proper tracking
+  const routingSteps = await db.routingStep.findMany({
+    where: { order_id: order_id, status: 'PLANNED' },
+    orderBy: { sequence: 'asc' }
+  });
+
+  if (routingSteps.length > 0) {
+    // Start with first routing step
+    const firstStep = routingSteps[0];
+    
+    // Update first step to IN_PROGRESS
+    await db.routingStep.update({
+      where: { id: firstStep.id },
+      data: {
+        status: 'IN_PROGRESS',
+        started_at: new Date()
+      }
+    });
+
+    // Initialize production tracking with routing-aware stage
+    await db.productionTracking.create({
       data: {
         order_id: order_id,
-        order_item_id: item.id,
-        quantity: item.quantity,
-        status: 'PLANNED',
-        workspace_id: order.workspace_id,
-        created_by: user_id
+        routing_step_id: firstStep.id,
+        stage: firstStep.department,
+        status: 'IN_PROGRESS',
+        started_at: new Date()
+      }
+    });
+  } else {
+    // Fallback to basic tracking
+    await db.productionTracking.create({
+      data: {
+        order_id: order_id,
+        stage: 'CUTTING',
+        status: 'IN_PROGRESS',
+        started_at: new Date()
       }
     });
   }
 }
 
-async function startProductionTracking(order_id: string): Promise<void> {
-  // Initialize production tracking
-  await db.productionTracking.create({
-    data: {
-      order_id: order_id,
-      stage: 'CUTTING',
-      status: 'IN_PROGRESS',
-      started_at: new Date()
-    }
-  });
-}
-
 async function checkProductionCompletion(order_id: string): Promise<boolean> {
-  const tracking = await db.productionTracking.findMany({
+  // Check if all routing steps are completed
+  const incompleteSteps = await db.routingStep.findMany({
     where: { 
       order_id: order_id,
       status: { not: 'COMPLETED' }
     }
   });
   
-  return tracking.length === 0;
+  // If using routing steps, check those; otherwise fallback to production tracking
+  if (incompleteSteps.length === 0) {
+    const tracking = await db.productionTracking.findMany({
+      where: { 
+        order_id: order_id,
+        status: { not: 'COMPLETED' }
+      }
+    });
+    return tracking.length === 0;
+  }
+  
+  return false;
 }
 
 async function checkQualityApproval(order_id: string): Promise<boolean> {

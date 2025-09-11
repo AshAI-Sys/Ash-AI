@@ -211,12 +211,12 @@ export async function GET(request: NextRequest) {
       summary: summaryStats
     })
 
-  } catch (_error) {
+  } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {
       return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
     }
 
-    console.error('Client orders error:', _error)
+    console.error('Client orders error:', error)
     return NextResponse.json({ 
       success: false,
       error: 'Failed to load orders' 
@@ -226,7 +226,7 @@ export async function GET(request: NextRequest) {
 
 // Helper functions
 function calculateOrderProgress(routing_steps: any[]): number {
-  if (routingSteps.length === 0) return 0
+  if (routing_steps.length === 0) return 0
   
   const statusWeights = {
     'PLANNED': 0,
@@ -236,15 +236,15 @@ function calculateOrderProgress(routing_steps: any[]): number {
     'BLOCKED': 0
   }
 
-  const totalProgress = routingSteps.reduce((sum, step) => {
+  const totalProgress = routing_steps.reduce((sum, step) => {
     return sum + (statusWeights[step.status as keyof typeof statusWeights] || 0)
   }, 0)
 
-  return Math.round(totalProgress / routingSteps.length)
+  return Math.round(totalProgress / routing_steps.length)
 }
 
 function getCurrentStep(routing_steps: any[]): string {
-  const activeStep = routingSteps.find(step => 
+  const activeStep = routing_steps.find(step => 
     step.status === 'IN_PROGRESS' || step.status === 'READY'
   )
   
@@ -252,13 +252,13 @@ function getCurrentStep(routing_steps: any[]): string {
     return `${activeStep.name} (${activeStep.workcenter})`
   }
 
-  const nextStep = routingSteps.find(step => step.status === 'PLANNED')
+  const nextStep = routing_steps.find(step => step.status === 'PLANNED')
   if (nextStep) {
     return `Upcoming: ${nextStep.name}`
   }
 
-  const completedSteps = routingSteps.filter(step => step.status === 'DONE').length
-  if (completedSteps === routingSteps.length && routingSteps.length > 0) {
+  const completedSteps = routing_steps.filter(step => step.status === 'DONE').length
+  if (completedSteps === routing_steps.length && routing_steps.length > 0) {
     return 'Production Complete'
   }
 
@@ -266,14 +266,14 @@ function getCurrentStep(routing_steps: any[]): string {
 }
 
 function getDesignStatus(design_assets: any[]): { status: string; details: any } {
-  if (designAssets.length === 0) {
+  if (design_assets.length === 0) {
     return {
       status: 'No designs uploaded',
       details: { total: 0, pending: 0, approved: 0, rejected: 0 }
     }
   }
   
-  const statusCounts = designAssets.reduce((acc, asset) => {
+  const statusCounts = design_assets.reduce((acc, asset) => {
     acc[asset.approval_status] = (acc[asset.approval_status] || 0) + 1
     acc.total++
     return acc
@@ -409,7 +409,7 @@ function getQualitySummary(qcRecords: any[]): { status: string; details: any } {
 
 function calculateEstimatedCompletion(order: any, routing_steps: any[]): Date {
   // Simple estimation based on remaining steps
-  const remainingSteps = routingSteps.filter(step => 
+  const remainingSteps = routing_steps.filter(step => 
     step.status !== 'DONE'
   ).length
 
@@ -461,7 +461,7 @@ async function getOrderSummaryStats(client_id: string, workspace_id: string) {
     brand_distribution: brandCounts.map(item => ({
       brand_id: item.brand_id,
       order_count: item._count,
-      total_quantity: _item._sum.total_qty || 0
+      total_quantity: item._sum.total_qty || 0
     })),
     pending_design_approvals: pendingApprovals,
     total_orders: statusCounts.reduce((sum, item) => sum + item._count, 0)

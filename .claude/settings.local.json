@@ -35,7 +35,8 @@
       "mcp__ide__getDiagnostics",
       "Bash(find:*)",
       "Bash(python:*)",
-      "Bash(netstat:*)"
+      "Bash(netstat:*)",
+      "Bash(git restore:*)"
     ],
     "deny": [],
     "ask": []

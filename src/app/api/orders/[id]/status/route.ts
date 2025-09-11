@@ -79,7 +79,7 @@ export const PUT = withErrorHandler(async (
       workflow_complete: validatedData.status === 'CLOSED'
     }, 'Order status updated successfully');
 
-  } catch (_error) {
+  } catch (error) {
     console.error('Order Status Update Error:', error);
     throw error;
   }
@@ -149,7 +149,7 @@ export const GET = withErrorHandler(async (
       }
     });
 
-  } catch (_error) {
+  } catch (error) {
     console.error('Order Status Retrieval Error:', error);
     throw error;
   }
@@ -215,7 +215,7 @@ async function sendOrderStatusNotifications(
         });
       }
       // Email notifications would be handled by a background job
-    } catch (_error) {
+    } catch (error) {
       console.error('Notification send error:', error);
     }
   }

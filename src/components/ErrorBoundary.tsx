@@ -109,30 +109,30 @@ export class ErrorBoundary extends Component<Props, State> {
                 </div>
               )}
 
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              {/* Action Buttons - Mobile optimized */}
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-stretch sm:items-center">
                 <button
                   onClick={this.handleRefresh}
-                  className="group flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105"
+                  className="group flex items-center justify-center gap-3 px-4 sm:px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105 w-full sm:w-auto"
                 >
-                  <RefreshCcw size={20} className="group-hover:animate-spin" />
-                  Refresh Page
+                  <RefreshCcw size={18} className="group-hover:animate-spin" />
+                  <span className="text-sm sm:text-base">Refresh Page</span>
                 </button>
                 
                 <button
                   onClick={this.handleGoHome}
-                  className="group flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105"
+                  className="group flex items-center justify-center gap-3 px-4 sm:px-6 py-3 bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105 w-full sm:w-auto"
                 >
-                  <Home size={20} className="group-hover:animate-bounce" />
-                  Go to Dashboard
+                  <Home size={18} className="group-hover:animate-bounce" />
+                  <span className="text-sm sm:text-base">Go to Dashboard</span>
                 </button>
 
                 <button
                   onClick={this.handleReportError}
-                  className="group flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105"
+                  className="group flex items-center justify-center gap-3 px-4 sm:px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl font-semibold shadow-lg transition-all duration-300 transform hover:scale-105 w-full sm:w-auto"
                 >
-                  <MessageCircle size={20} className="group-hover:animate-pulse" />
-                  Report Error
+                  <MessageCircle size={18} className="group-hover:animate-pulse" />
+                  <span className="text-sm sm:text-base">Report Error</span>
                 </button>
               </div>
 

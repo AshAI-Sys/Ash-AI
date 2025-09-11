@@ -58,7 +58,7 @@ export const authOptions: NextAuthOptions = {
             };
           }
         } catch (_error) {
-          console.warn('Database auth failed, using mock auth:', error);
+          console.warn('Database auth failed, using mock auth:', _error);
         }
 
         // Fallback to mock users for demo/development
@@ -68,7 +68,8 @@ export const authOptions: NextAuthOptions = {
             email: 'admin@example.com',
             password: 'admin123',
             full_name: 'System Administrator',
-            role: 'ADMIN' as Role
+            role: 'ADMIN' as Role,
+            workspace_id: 'workspace-1'
           },
           {
             id: '2',
@@ -79,7 +80,7 @@ export const authOptions: NextAuthOptions = {
             workspace_id: 'workspace-1'
           },
           {
-            id: '2',
+            id: '3',
             email: 'sewing@example.com',
             password: 'sewing123',
             full_name: 'Maria Santos',
@@ -87,7 +88,7 @@ export const authOptions: NextAuthOptions = {
             workspace_id: 'workspace-1'
           },
           {
-            id: '3',
+            id: '4',
             email: 'manager@example.com',
             password: 'manager123',
             full_name: 'John Manager',
@@ -162,13 +163,36 @@ export async function verifyToken(request: NextRequest) {
       return null
     }
 
-    // Return session user data directly (bypass database)
-    return {
-      id: session.user.id,
-      email: session.user.email,
-      full_name: session.user.full_name,
-      role: session.user.role,
-      active: true
+    // Enhanced session validation - verify user exists and is active
+    try {
+      const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { id: true, email: true, name: true, role: true, active: true, workspace_id: true }
+      })
+      
+      if (!user || !user.active) {
+        return null
+      }
+      
+      return {
+        id: user.id,
+        email: user.email,
+        full_name: user.name,
+        role: user.role,
+        workspace_id: user.workspace_id,
+        active: user.active
+      }
+    } catch (dbError) {
+      console.warn('Database validation failed, using session data:', dbError)
+      // Fallback to session data if database is unavailable
+      return {
+        id: session.user.id,
+        email: session.user.email,
+        full_name: session.user.full_name,
+        role: session.user.role,
+        workspace_id: session.user.workspace_id,
+        active: true
+      }
     }
   } catch (_error) {
     console.error('Token verification error:', _error)

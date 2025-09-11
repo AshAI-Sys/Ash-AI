@@ -93,7 +93,7 @@ export async function createAuditLog(params: {
       },
     });
   } catch (_error) {
-    console.error('Failed to create audit log:', error);
+    console.error('Failed to create audit log:', _error);
     // Don't throw - audit logging shouldn't break the main operation
   }
 }
