@@ -122,8 +122,8 @@ export function restartServices() {
   }
 }
 
-// Auto-initialize in development
-if (process.env.NODE_ENV !== 'production') {
+// Auto-initialize in development - temporarily disabled for build fixes
+if (process.env.NODE_ENV !== 'production' && process.env.ENABLE_REALTIME === 'true') {
   // Only initialize once
   if (!isInitialized) {
     // Small delay to allow Next.js to fully start

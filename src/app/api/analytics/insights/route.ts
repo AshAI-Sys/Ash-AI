@@ -124,6 +124,7 @@ export async function POST(request: NextRequest) {
     const insight = await prisma.businessInsight.create({
       data: {
         type,
+        category: type, // Use type as category for now
         title,
         description,
         impact,

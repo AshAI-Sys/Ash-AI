@@ -158,13 +158,13 @@ async function generateProductionAlerts(): Promise<ProductionAlert[]> {
   // Check for quality issues
   const recentQCFailures = await prisma.qCRecord.findMany({
     where: {
-      passed: false,
-      created_at: { gte: new Date(new Date(now).getTime() - 7 * 24 * 60 * 60 * 1000) } // Last 7 days
+      status: 'FAILED',
+      inspection_date: { gte: new Date(new Date(now).getTime() - 7 * 24 * 60 * 60 * 1000) } // Last 7 days
     },
     include: {
       task: {
         include: {
-          assigned_user: { select: { full_name: true, role: true } }
+          assigned_user: { select: { name: true, role: true } }
         }
       }
     }
@@ -194,7 +194,7 @@ async function generateProductionAlerts(): Promise<ProductionAlert[]> {
           failures: recentQCFailures.map(f => ({
             order_id: f.order_id,
             task_id: f.task_id,
-            assigned_to: f.task?.assigned_user?.full_name
+            assigned_to: f.task?.assigned_user?.name
           }))
         }
       })
@@ -275,12 +275,12 @@ async function calculateQCFailureRate(): Promise<number> {
   
   const [totalQC, failedQC] = await Promise.all([
     prisma.qCRecord.count({
-      where: { created_at: { gte: last7Days } }
+      where: { inspection_date: { gte: last7Days } }
     }),
     prisma.qCRecord.count({
       where: { 
-        created_at: { gte: last7Days },
-        passed: false 
+        inspection_date: { gte: last7Days },
+        status: 'FAILED'
       }
     })
   ])

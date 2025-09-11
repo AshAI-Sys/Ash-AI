@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./ash_ai_dev.db"
 }
 
 // ==============================================
@@ -138,7 +138,7 @@ enum SecurityEventType {
 
 // Workspaces for multi-tenancy
 model Workspace {
-  id         String   @id @default(gen_random_uuid())
+  id         String   @id @default(uuid())
   name       String
   settings   Json?
   active     Boolean  @default(true)
@@ -193,13 +193,15 @@ model Workspace {
   wallets             Wallet[]
   sync_conflicts      SyncConflict[]
   time_records        TimeRecord[]
+  workflow_rules      WorkflowRule[]
+  task_assignment_rules TaskAssignmentRule[]
 
   @@map("workspaces")
 }
 
 // System users for authentication and staff access
 model User {
-  id               String   @id @default(gen_random_uuid())
+  id               String   @id @default(uuid())
   workspace_id     String
   email            String   @unique
   password         String
@@ -229,7 +231,7 @@ model User {
 
 // Inventory items for materials and supplies
 model InventoryItem {
-  id           String   @id @default(gen_random_uuid())
+  id           String   @id @default(uuid())
   workspace_id String
   brand_id     String?
   name         String
@@ -253,7 +255,7 @@ model InventoryItem {
 
 // AI insights from Ashley
 model AIInsight {
-  id           String   @id @default(gen_random_uuid())
+  id           String   @id @default(uuid())
   workspace_id String
   type         String   // CAPACITY/STOCK/ROUTE/QUALITY/COST
   priority     String   // HIGH/MEDIUM/LOW
@@ -271,7 +273,7 @@ model AIInsight {
 
 // Clients table from CLIENT_UPDATED_PLAN.md
 model Client {
-  id              String   @id @default(gen_random_uuid())
+  id              String   @id @default(uuid())
   workspace_id    String
   name            String
   company         String?
@@ -294,7 +296,7 @@ model Client {
 
 // Brands table from CLIENT_UPDATED_PLAN.md
 model Brand {
-  id           String   @id @default(gen_random_uuid())
+  id           String   @id @default(uuid())
   workspace_id String
   name         String
   code         String?
@@ -319,7 +321,7 @@ model Brand {
 
 // Orders (PO header) from CLIENT_UPDATED_PLAN.md
 model Order {
-  id                   String        @id @default(gen_random_uuid())
+  id                   String        @id @default(uuid())
   workspace_id         String
   brand_id             String
   client_id            String
@@ -372,7 +374,7 @@ model Order {
 
 // Order line items with size/color breakdown
 model OrderItem {
-  id         String   @id @default(gen_random_uuid())
+  id         String   @id @default(uuid())
   order_id   String
   sku        String   // e.g., "REEF-TEE-BLK-M"
   product_name String
@@ -392,7 +394,7 @@ model OrderItem {
 
 // Routing steps (per order) from CLIENT_UPDATED_PLAN.md
 model RoutingStep {
-  id               String            @id @default(gen_random_uuid())
+  id               String            @id @default(uuid())
   order_id         String
   name             String            // "Cutting", "Printing"...
   workcenter       WorkcenterType    // CUTTING/PRINTING/HEAT_PRESS/SEWING/EMB/QC/PACKING/DESIGN
@@ -421,7 +423,7 @@ model RoutingStep {
 
 // Attachments from CLIENT_UPDATED_PLAN.md
 model OrderAttachment {
-  id         String   @id @default(gen_random_uuid())
+  id         String   @id @default(uuid())
   order_id   String
   type       String   // mockup/separation/digitized/brief
   file_url   String
@@ -436,7 +438,7 @@ model OrderAttachment {
 
 // Audit (append-only) from CLIENT_UPDATED_PLAN.md
 model AuditLog {
-  id           String      @id @default(gen_random_uuid())
+  id           String      @id @default(uuid())
   workspace_id String
   actor_id     String?
   entity_type  String      // 'order','routing_step','client'
@@ -456,7 +458,7 @@ model AuditLog {
 
 // PO Number Generation Sequence (per brand per year)
 model PONumberSequence {
-  id         String   @id @default(gen_random_uuid())
+  id         String   @id @default(uuid())
   brand_id   String
   year       Int
   sequence   Int      @default(0)
@@ -473,7 +475,7 @@ model PONumberSequence {
 
 // Workflow automation rules
 model WorkflowRule {
-  id               String    @id @default(gen_random_uuid())
+  id               String    @id @default(uuid())
   workspace_id     String
   name             String
   description      String
@@ -493,7 +495,7 @@ model WorkflowRule {
 
 // Notification templates for automated notifications
 model NotificationTemplate {
-  id           String    @id @default(gen_random_uuid())
+  id           String    @id @default(uuid())
   name         String
   type         String    // EMAIL, SMS, IN_APP
   category     String    // ORDER_STATUS, TASK_ASSIGNMENT, REMINDER, ALERT
@@ -511,7 +513,7 @@ model NotificationTemplate {
 
 // Scheduled notifications
 model ScheduledNotification {
-  id             String    @id @default(gen_random_uuid())
+  id             String    @id @default(uuid())
   template_id    String
   recipient_id   String
   recipient_type String    // USER, CLIENT, ROLE
@@ -533,7 +535,7 @@ model ScheduledNotification {
 
 // Task templates for automated task creation
 model TaskTemplate {
-  id                 String    @id @default(gen_random_uuid())
+  id                 String    @id @default(uuid())
   name               String
   description        String
   type               String    // DESIGN, CUTTING, PRINTING, QC, etc.
@@ -557,7 +559,7 @@ model TaskTemplate {
 
 // Task assignment rules for different roles
 model TaskAssignmentRule {
-  id                   String    @id @default(gen_random_uuid())
+  id                   String    @id @default(uuid())
   workspace_id         String
   name                 String
   role                 String    // Role enum as string
@@ -582,7 +584,7 @@ model TaskAssignmentRule {
 
 // Design assets with versioning
 model DesignAsset {
-  id              String   @id @default(gen_random_uuid())
+  id              String   @id @default(uuid())
   order_id        String
   version         Int      @default(1)
   type            String   // MOCKUP/ARTWORK/SEPARATION/DIGITIZED
@@ -607,7 +609,7 @@ model DesignAsset {
 
 // Client design approval workflow
 model DesignApproval {
-  id              String      @id @default(gen_random_uuid())
+  id              String      @id @default(uuid())
   design_asset_id String
   client_id       String
   status          String      // PENDING/APPROVED/REJECTED
@@ -625,7 +627,7 @@ model DesignApproval {
 
 // Design revision history
 model DesignRevision {
-  id              String      @id @default(gen_random_uuid())
+  id              String      @id @default(uuid())
   design_asset_id String
   revision_notes  String
   changes_made    Json        // Detailed change log
@@ -645,7 +647,7 @@ model DesignRevision {
 
 // Cutting plan for optimized fabric layouts
 model CuttingPlan {
-  id                String   @id @default(gen_random_uuid())
+  id                String   @id @default(uuid())
   workspace_id      String
   order_id          String
   plan_name         String
@@ -674,7 +676,7 @@ model CuttingPlan {
 
 // Individual cutting sheet layouts
 model CuttingSheet {
-  id               String   @id @default(gen_random_uuid())
+  id               String   @id @default(uuid())
   cutting_plan_id  String
   sheet_number     Int
   sheet_width_cm   Float
@@ -697,7 +699,7 @@ model CuttingSheet {
 
 // Individual fabric cuts/rolls
 model FabricCut {
-  id               String   @id @default(gen_random_uuid())
+  id               String   @id @default(uuid())
   cutting_plan_id  String
   fabric_lot       String   // Fabric batch/lot number
   roll_number      String?
@@ -718,7 +720,7 @@ model FabricCut {
 
 // Individual cut pieces tracking
 model CutPiece {
-  id               String   @id @default(gen_random_uuid())
+  id               String   @id @default(uuid())
   cutting_sheet_id String
   order_item_id    String   // Links to specific order item
   piece_name       String   // e.g., "Front Panel Size M"
@@ -740,7 +742,7 @@ model CutPiece {
 
 // Cutting efficiency tracking
 model CuttingMetrics {
-  id                 String   @id @default(gen_random_uuid())
+  id                 String   @id @default(uuid())
   workspace_id       String
   cutting_plan_id    String
   operator_name      String
@@ -768,7 +770,7 @@ model CuttingMetrics {
 
 // Machine library for all production equipment
 model Machine {
-  id           String   @id @default(gen_random_uuid())
+  id           String   @id @default(uuid())
   workspace_id String
   workcenter   WorkcenterType
   name         String
@@ -787,7 +789,7 @@ model Machine {
 
 // Print run tracking for all methods
 model PrintRun {
-  id              String   @id @default(gen_random_uuid())
+  id              String   @id @default(uuid())
   order_id        String
   routing_step_id String
   method          ProductMethod // SILKSCREEN/SUBLIMATION/DTF/EMBROIDERY
@@ -820,7 +822,7 @@ model PrintRun {
 
 // Print run outputs per batch/bundle
 model PrintRunOutput {
-  id         String   @id @default(gen_random_uuid())
+  id         String   @id @default(uuid())
   run_id     String
   bundle_id  String?  // Link to cutting bundles
   qty_good   Int      @default(0)
@@ -836,7 +838,7 @@ model PrintRunOutput {
 
 // Material consumption tracking
 model PrintRunMaterial {
-  id               String   @id @default(gen_random_uuid())
+  id               String   @id @default(uuid())
   run_id           String
   item_id          String   // Reference to inventory item
   item_name        String   // For tracking purposes
@@ -855,7 +857,7 @@ model PrintRunMaterial {
 
 // Defect/reject tracking
 model PrintReject {
-  id               String   @id @default(gen_random_uuid())
+  id               String   @id @default(uuid())
   run_id           String
   bundle_id        String?
   reason_code      String   // MISALIGNMENT/PEEL/CRACK/GHOST/PUCKERING/etc
@@ -874,7 +876,7 @@ model PrintReject {
 
 // SILKSCREEN-SPECIFIC TABLES
 model SilkscreenPrep {
-  id                String   @id @default(gen_random_uuid())
+  id                String   @id @default(uuid())
   run_id            String
   screen_id         String
   mesh_count        Int
@@ -890,7 +892,7 @@ model SilkscreenPrep {
 }
 
 model SilkscreenSpec {
-  id                  String   @id @default(gen_random_uuid())
+  id                  String   @id @default(uuid())
   run_id              String
   ink_type            String   // PLASTISOL/WATER/PUFF/ANTI_MIGRATION
   coats               Int
@@ -907,7 +909,7 @@ model SilkscreenSpec {
 }
 
 model CuringLog {
-  id          String   @id @default(gen_random_uuid())
+  id          String   @id @default(uuid())
   run_id      String
   dryer_id    String?
   temp_c      Int
@@ -926,7 +928,7 @@ model CuringLog {
 
 // ROUTING TEMPLATES
 model RouteTemplate {
-  id            String   @id @default(gen_random_uuid())
+  id            String   @id @default(uuid())
   workspace_id  String
   name          String
   category      String   // APPAREL/PROMOTIONAL/CUSTOM
@@ -944,7 +946,7 @@ model RouteTemplate {
 }
 
 model RouteTemplateStep {
-  id                  String         @id @default(gen_random_uuid())
+  id                  String         @id @default(uuid())
   route_template_id   String
   name                String
   workcenter          WorkcenterType
@@ -964,7 +966,7 @@ model RouteTemplateStep {
 
 // PRODUCTION TRACKING
 model ProductionLog {
-  id                String      @id @default(gen_random_uuid())
+  id                String      @id @default(uuid())
   order_id          String
   routing_step_id   String?
   update_type       String      // STATUS_CHANGE/PROGRESS_UPDATE/QUALITY_CHECK/MACHINE_STATUS
@@ -984,7 +986,7 @@ model ProductionLog {
 
 // NOTIFICATION SYSTEM
 model Notification {
-  id                    String      @id @default(gen_random_uuid())
+  id                    String      @id @default(uuid())
   workspace_id          String
   recipient_id          String
   title                 String
@@ -1009,7 +1011,7 @@ model Notification {
 
 // SUBLIMATION-SPECIFIC TABLES
 model SublimationPrint {
-  id         String   @id @default(gen_random_uuid())
+  id         String   @id @default(uuid())
   run_id     String
   printer_id String?
   paper_m2   Float
@@ -1023,7 +1025,7 @@ model SublimationPrint {
 }
 
 model HeatPressLog {
-  id         String   @id @default(gen_random_uuid())
+  id         String   @id @default(uuid())
   run_id     String
   press_id   String?
   temp_c     Int
@@ -1040,7 +1042,7 @@ model HeatPressLog {
 
 // DTF-SPECIFIC TABLES
 model DTFPrint {
-  id         String   @id @default(gen_random_uuid())
+  id         String   @id @default(uuid())
   run_id     String
   film_m2    Float
   ink_g      Float?
@@ -1053,7 +1055,7 @@ model DTFPrint {
 }
 
 model DTFPowderCure {
-  id         String   @id @default(gen_random_uuid())
+  id         String   @id @default(uuid())
   run_id     String
   powder_g   Float
   temp_c     Int
@@ -1068,7 +1070,7 @@ model DTFPowderCure {
 
 // EMBROIDERY-SPECIFIC TABLES
 model EmbroideryRun {
-  id                String   @id @default(gen_random_uuid())
+  id                String   @id @default(uuid())
   run_id            String
   design_version_id String?
   stitch_count      Int
@@ -1092,7 +1094,7 @@ model EmbroideryRun {
 
 // Suppliers for AP
 model Supplier {
-  id           String   @id @default(gen_random_uuid())
+  id           String   @id @default(uuid())
   workspace_id String
   name         String
   tin          String?  // Tax Identification Number (BIR)
@@ -1111,7 +1113,7 @@ model Supplier {
 
 // Accounts Receivable - Invoices
 model Invoice {
-  id           String   @id @default(gen_random_uuid())
+  id           String   @id @default(uuid())
   workspace_id String
   brand_id     String
   client_id    String
@@ -1146,7 +1148,7 @@ model Invoice {
 
 // Invoice line items
 model InvoiceLine {
-  id          String  @id @default(gen_random_uuid())
+  id          String  @id @default(uuid())
   invoice_id  String
   description String
   qty         Float
@@ -1163,7 +1165,7 @@ model InvoiceLine {
 
 // Payments received
 model Payment {
-  id           String   @id @default(gen_random_uuid())
+  id           String   @id @default(uuid())
   workspace_id String
   payer_type   String   // CLIENT/PLATFORM
   client_id    String?
@@ -1185,7 +1187,7 @@ model Payment {
 
 // Payment allocations to invoices
 model PaymentAllocation {
-  id         String  @id @default(gen_random_uuid())
+  id         String  @id @default(uuid())
   payment_id String
   invoice_id String
   amount     Float
@@ -1200,7 +1202,7 @@ model PaymentAllocation {
 
 // Accounts Payable - Bills
 model Bill {
-  id            String   @id @default(gen_random_uuid())
+  id            String   @id @default(uuid())
   workspace_id  String
   brand_id      String?
   supplier_id   String
@@ -1228,7 +1230,7 @@ model Bill {
 
 // Bill line items
 model BillLine {
-  id          String  @id @default(gen_random_uuid())
+  id          String  @id @default(uuid())
   bill_id     String
   description String
   qty         Float
@@ -1244,7 +1246,7 @@ model BillLine {
 
 // Order costing and COGS
 model POCost {
-  id             String   @id @default(gen_random_uuid())
+  id             String   @id @default(uuid())
   order_id       String   @unique
   materials_cost Float    @default(0)
   labor_cost     Float    @default(0)
@@ -1261,7 +1263,7 @@ model POCost {
 
 // Channel settlements (e.g., Shopee/TikTok)
 model ChannelSettlement {
-  id             String    @id @default(gen_random_uuid())
+  id             String    @id @default(uuid())
   workspace_id   String
   brand_id       String?
   channel        String    // SHOPEE/TIKTOK/LAZADA
@@ -1286,7 +1288,7 @@ model ChannelSettlement {
 
 // BIR Sales Book entries for compliance
 model BIRSalesEntry {
-  id              String   @id @default(gen_random_uuid())
+  id              String   @id @default(uuid())
   workspace_id    String
   invoice_id      String   @unique
   date_of_sale    DateTime
@@ -1310,7 +1312,7 @@ model BIRSalesEntry {
 
 // BIR Purchase Book entries
 model BIRPurchaseEntry {
-  id               String   @id @default(gen_random_uuid())
+  id               String   @id @default(uuid())
   workspace_id     String
   bill_id          String   @unique
   date_of_purchase DateTime
@@ -1336,7 +1338,7 @@ model BIRPurchaseEntry {
 
 // Finishing runs for post-sewing operations
 model FinishingRun {
-  id               String    @id @default(gen_random_uuid())
+  id               String    @id @default(uuid())
   workspace_id     String
   order_id         String
   routing_step_id  String
@@ -1359,7 +1361,7 @@ model FinishingRun {
 
 // Finished goods units ready for packing
 model FinishedUnit {
-  id               String    @id @default(gen_random_uuid())
+  id               String    @id @default(uuid())
   workspace_id     String
   order_id         String
   bundle_id        String?   // Optional link to originating bundle
@@ -1384,7 +1386,7 @@ model FinishedUnit {
 
 // Cartons for shipping finished goods
 model FinishingCarton {
-  id                String    @id @default(gen_random_uuid())
+  id                String    @id @default(uuid())
   workspace_id      String
   order_id          String
   carton_no         Int       // Sequential number per order
@@ -1413,7 +1415,7 @@ model FinishingCarton {
 
 // Contents of each carton
 model CartonContent {
-  id                String        @id @default(gen_random_uuid())
+  id                String        @id @default(uuid())
   carton_id         String
   finished_unit_id  String
   qty               Int           @default(1)
@@ -1429,7 +1431,7 @@ model CartonContent {
 
 // Shipments linking cartons to delivery
 model FinishingShipment {
-  id                 String    @id @default(gen_random_uuid())
+  id                 String    @id @default(uuid())
   workspace_id       String
   order_id           String
   shipment_no        String    // Sequential shipment number
@@ -1460,7 +1462,7 @@ model FinishingShipment {
 
 // Junction table for shipments and cartons
 model ShipmentCarton {
-  id           String           @id @default(gen_random_uuid())
+  id           String           @id @default(uuid())
   shipment_id  String
   carton_id    String
   created_at   DateTime         @default(now())
@@ -1481,7 +1483,7 @@ model ShipmentCarton {
 
 // Vehicles for driver delivery method
 model Vehicle {
-  id           String   @id @default(gen_random_uuid())
+  id           String   @id @default(uuid())
   workspace_id String
   plate_no     String   @unique
   type         String?  // van/motorcycle/truck
@@ -1499,7 +1501,7 @@ model Vehicle {
 
 // Shipments from Stage 7
 model Shipment {
-  id                String   @id @default(gen_random_uuid())
+  id                String   @id @default(uuid())
   workspace_id      String
   order_id          String
   consignee_name    String
@@ -1526,7 +1528,7 @@ model Shipment {
 
 // Cartons from Stage 7
 model Carton {
-  id                String    @id @default(gen_random_uuid())
+  id                String    @id @default(uuid())
   shipment_id       String
   carton_no         String
   weight            Float?
@@ -1545,7 +1547,7 @@ model Carton {
 
 // Driver trips for in-house delivery
 model Trip {
-  id          String    @id @default(gen_random_uuid())
+  id          String    @id @default(uuid())
   shipment_id String
   driver_id   String    // Staff member ID
   vehicle_id  String
@@ -1569,7 +1571,7 @@ model Trip {
 
 // Trip stops for multi-drop deliveries
 model TripStop {
-  id             String    @id @default(gen_random_uuid())
+  id             String    @id @default(uuid())
   trip_id        String
   stop_no        Int
   consignee_name String?
@@ -1592,7 +1594,7 @@ model TripStop {
 
 // Link cartons to specific trip stops
 model StopCarton {
-  id              String    @id @default(gen_random_uuid())
+  id              String    @id @default(uuid())
   trip_stop_id    String
   carton_id       String
   scanned_out_at  DateTime?
@@ -1609,7 +1611,7 @@ model StopCarton {
 
 // Proof of delivery records
 model PODRecord {
-  id              String   @id @default(gen_random_uuid())
+  id              String   @id @default(uuid())
   shipment_id     String
   trip_stop_id    String?  // null for 3PL deliveries
   carton_id       String?
@@ -1628,7 +1630,7 @@ model PODRecord {
 
 // Driver trip expenses
 model TripExpense {
-  id          String   @id @default(gen_random_uuid())
+  id          String   @id @default(uuid())
   trip_id     String
   type        String   // FUEL/TOLL/PARKING/REPAIR/OTHER
   amount      Float
@@ -1644,7 +1646,7 @@ model TripExpense {
 
 // 3PL carrier bookings
 model CarrierBooking {
-  id              String   @id @default(gen_random_uuid())
+  id              String   @id @default(uuid())
   shipment_id     String
   provider        String   // LALAMOVE/GRAB/JNT/LBC/NINJA_VAN
   quote           Json?    // requested/returned rates
@@ -1664,7 +1666,7 @@ model CarrierBooking {
 
 // Optional GPS tracking for driver trips
 model GPSPing {
-  id          String   @id @default(gen_random_uuid())
+  id          String   @id @default(uuid())
   trip_id     String
   ts          DateTime
   lat         Float
@@ -1685,7 +1687,7 @@ model GPSPing {
 
 // Sewing operations library per product type
 model SewingOperation {
-  id               String   @id @default(gen_random_uuid())
+  id               String   @id @default(uuid())
   workspace_id     String
   product_type     String   // Tee/Hoodie/Jersey/etc
   name             String   // "Join shoulders", "Attach collar", etc
@@ -1706,7 +1708,7 @@ model SewingOperation {
 
 // Piece rates by brand/role (fallback rates)
 model PieceRate {
-  id             String    @id @default(gen_random_uuid())
+  id             String    @id @default(uuid())
   workspace_id   String
   brand_id       String?
   operation_name String
@@ -1725,7 +1727,7 @@ model PieceRate {
 
 // Sewing runs per bundle per operation
 model SewingRun {
-  id                String        @id @default(gen_random_uuid())
+  id                String        @id @default(uuid())
   workspace_id      String
   order_id          String
   routing_step_id   String
@@ -1763,7 +1765,7 @@ model SewingRun {
 
 // Bundle tracking and progress
 model Bundle {
-  id               String   @id @default(gen_random_uuid())
+  id               String   @id @default(uuid())
   workspace_id     String
   order_id         String
   bundle_no        String   // QR code reference
@@ -1787,7 +1789,7 @@ model Bundle {
 
 // Bundle progress per operation
 model BundleProgress {
-  id               String    @id @default(gen_random_uuid())
+  id               String    @id @default(uuid())
   bundle_id        String
   sewing_run_id    String
   operation_name   String
@@ -1805,7 +1807,7 @@ model BundleProgress {
 
 // Line efficiency and performance tracking
 model SewingLineMetrics {
-  id                    String   @id @default(gen_random_uuid())
+  id                    String   @id @default(uuid())
   workspace_id          String
   line_name             String
   shift_date            DateTime
@@ -1834,7 +1836,7 @@ model SewingLineMetrics {
 
 // QC inspections with AQL sampling
 model QCInspection {
-  id              String   @id @default(gen_random_uuid())
+  id              String   @id @default(uuid())
   order_id        String
   inspector_id    String   // Staff member who did inspection
   lot_size        Int      // Total pieces in lot
@@ -1861,7 +1863,7 @@ model QCInspection {
 
 // Individual defects found during QC
 model QCDefect {
-  id             String        @id @default(gen_random_uuid())
+  id             String        @id @default(uuid())
   inspection_id  String
   defect_type    String        // CRITICAL/MAJOR/MINOR
   defect_code    String        // e.g., "STAIN", "HOLE", "MISPRINT"
@@ -1880,7 +1882,7 @@ model QCDefect {
 
 // CAPA (Corrective and Preventive Action) tasks
 model CAPATask {
-  id               String        @id @default(gen_random_uuid())
+  id               String        @id @default(uuid())
   inspection_id    String
   title            String
   description      String
@@ -1907,7 +1909,7 @@ model CAPATask {
 
 // Employee master data with Philippine compliance fields
 model Employee {
-  id                    String    @id @default(gen_random_uuid())
+  id                    String    @id @default(uuid())
   workspace_id          String
   employee_no           String    // Company employee ID
   first_name            String
@@ -1997,7 +1999,7 @@ enum PayrollStatus {
 }
 
 model AttendanceRecord {
-  id                String            @id @default(gen_random_uuid())
+  id                String            @id @default(uuid())
   workspace_id      String
   employee_id       String
   date              DateTime
@@ -2024,7 +2026,7 @@ model AttendanceRecord {
 }
 
 model LeaveRequest {
-  id                String      @id @default(gen_random_uuid())
+  id                String      @id @default(uuid())
   workspace_id      String
   employee_id       String
   leave_type        LeaveType
@@ -2047,7 +2049,7 @@ model LeaveRequest {
 }
 
 model PayrollRecord {
-  id                  String        @id @default(gen_random_uuid())
+  id                  String        @id @default(uuid())
   workspace_id        String
   employee_id         String
   payroll_period_start DateTime
@@ -2099,7 +2101,7 @@ model PayrollRecord {
 }
 
 model PerformanceReview {
-  id                String    @id @default(gen_random_uuid())
+  id                String    @id @default(uuid())
   workspace_id      String
   employee_id       String
   reviewer_id       String    // Employee ID of reviewer
@@ -2136,7 +2138,7 @@ model PerformanceReview {
 }
 
 model DisciplinaryAction {
-  id                String    @id @default(gen_random_uuid())
+  id                String    @id @default(uuid())
   workspace_id      String
   employee_id       String
   issued_by         String    // Employee ID of person issuing action
@@ -2170,7 +2172,7 @@ model DisciplinaryAction {
 }
 
 model TrainingRecord {
-  id                String    @id @default(gen_random_uuid())
+  id                String    @id @default(uuid())
   workspace_id      String
   employee_id       String
   
@@ -2207,7 +2209,7 @@ model TrainingRecord {
 
 // AI Alert system for production monitoring
 model Alert {
-  id           String   @id @default(gen_random_uuid())
+  id           String   @id @default(uuid())
   workspace_id String
   title        String
   message      String
@@ -2230,7 +2232,7 @@ model Alert {
 
 // Alert audit trail
 model AlertAudit {
-  id         String   @id @default(gen_random_uuid())
+  id         String   @id @default(uuid())
   alert_id   String
   action     String   // CREATED/UPDATED/RESOLVED/DISMISSED
   user_id    String?
@@ -2246,7 +2248,7 @@ model AlertAudit {
 
 // Task management system
 model Task {
-  id            String     @id @default(gen_random_uuid())
+  id            String     @id @default(uuid())
   workspace_id  String
   title         String
   description   String?
@@ -2273,7 +2275,7 @@ model Task {
 
 // QC Records for quality control tracking
 model QCRecord {
-  id              String   @id @default(gen_random_uuid())
+  id              String   @id @default(uuid())
   workspace_id    String
   order_id        String?
   inspection_id   String?
@@ -2301,7 +2303,7 @@ model QCRecord {
 
 // Analytics Dashboard configurations
 model Dashboard {
-  id           String   @id @default(gen_random_uuid())
+  id           String   @id @default(uuid())
   workspace_id String
   name         String
   description  String?
@@ -2323,7 +2325,7 @@ model Dashboard {
 
 // Business forecasting data
 model Forecast {
-  id              String   @id @default(gen_random_uuid())
+  id              String   @id @default(uuid())
   workspace_id    String
   type            String   // DEMAND/REVENUE/PRODUCTION/INVENTORY
   period_type     String   // DAILY/WEEKLY/MONTHLY/QUARTERLY
@@ -2348,7 +2350,7 @@ model Forecast {
 
 // Business insights from AI analysis
 model BusinessInsight {
-  id            String   @id @default(gen_random_uuid())
+  id            String   @id @default(uuid())
   workspace_id  String
   title         String
   description   String
@@ -2375,7 +2377,7 @@ model BusinessInsight {
 
 // Key Performance Indicator metrics
 model KPIMetric {
-  id            String   @id @default(gen_random_uuid())
+  id            String   @id @default(uuid())
   workspace_id  String
   name          String
   description   String?
@@ -2401,7 +2403,7 @@ model KPIMetric {
 
 // Multi-currency wallet system
 model Wallet {
-  id            String   @id @default(gen_random_uuid())
+  id            String   @id @default(uuid())
   workspace_id  String
   owner_type    String   // WORKSPACE/CLIENT/SUPPLIER
   owner_id      String   // Reference to owner entity
@@ -2423,7 +2425,7 @@ model Wallet {
 
 // Sync conflict resolution for offline functionality
 model SyncConflict {
-  id               String   @id @default(gen_random_uuid())
+  id               String   @id @default(uuid())
   workspace_id     String
   entity_type      String   // Order, Task, etc.
   entity_id        String   // ID of conflicted entity
@@ -2448,7 +2450,7 @@ model SyncConflict {
 
 // Time tracking records
 model TimeRecord {
-  id           String    @id @default(gen_random_uuid())
+  id           String    @id @default(uuid())
   workspace_id String
   user_id      String    // Worker who recorded time
   task_id      String?   // Related task if any

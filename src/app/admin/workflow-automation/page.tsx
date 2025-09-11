@@ -399,7 +399,7 @@ export default function WorkflowAutomationPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge variant="outline">Skill Based</Badge>
-                      <Switch defaultChecked />
+                      <Switch defaultChecked={true} />
                     </div>
                   </div>
                 ))}

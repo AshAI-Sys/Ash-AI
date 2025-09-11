@@ -327,15 +327,15 @@ async function getQualityMetrics(startDate: Date) {
       }
     }),
     prisma.qCRecord.groupBy({
-      by: ['passed'],
-      where: { created_at: { gte: startDate } },
+      by: ['status'],
+      where: { inspection_date: { gte: startDate } },
       _count: { id: true }
     })
   ])
 
   const totalQC = qcRecords.length
-  const passedQC = qcStats.find(stat => stat.passed)?._count.id || 0
-  const failedQC = qcStats.find(stat => !stat.passed)?._count.id || 0
+  const passedQC = qcStats.find(stat => stat.status === 'PASSED')?._count.id || 0
+  const failedQC = qcStats.find(stat => stat.status === 'FAILED')?._count.id || 0
   const passRate = totalQC > 0 ? (passedQC / totalQC) * 100 : 0
 
   return {

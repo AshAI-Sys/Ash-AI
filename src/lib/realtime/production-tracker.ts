@@ -87,6 +87,12 @@ class ProductionTracker {
 
   private async trackProductionProgress() {
     try {
+      // Skip if database connection is not ready
+      if (!prisma) {
+        console.warn('Prisma client not ready, skipping production tracking')
+        return
+      }
+      
       // Get all active orders with their routing steps
       const activeOrders = await prisma.order.findMany({
         where: {
