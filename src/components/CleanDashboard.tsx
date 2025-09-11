@@ -346,7 +346,7 @@ export function CleanDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       {/* TikTok-Style Three-Column Layout */}
       <div className="flex flex-col lg:flex-row gap-4 p-4 tiktok-three-column">
         
