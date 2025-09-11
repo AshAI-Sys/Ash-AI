@@ -188,13 +188,11 @@ export default function OrdersPage() {
 
   if (status === 'loading') {
     return (
-      <div className="neural-bg min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="quantum-loader w-16 h-16 mx-auto mb-8">
-            <div></div><div></div><div></div>
-          </div>
-          <h1 className="text-3xl font-bold glitch-text text-white mb-4" data-text="ASH AI">ASH AI</h1>
-          <p className="text-cyan-300 font-medium">Loading Neural Orders System...</p>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Orders System</h1>
+          <p className="text-gray-600">Loading orders data...</p>
         </div>
       </div>
     )
@@ -208,15 +206,15 @@ export default function OrdersPage() {
   const allowedRoles = [Role.ADMIN, Role.MANAGER, Role.CSR, Role.SALES_STAFF, Role.LIVE_SELLER]
   if (!allowedRoles.includes(session.user.role)) {
     return (
-      <div className="simple-page-container">
-        <div className="simple-content-wrapper max-w-md mx-auto mt-20">
-          <div className="simple-card text-center p-8">
-            <Shield className="w-12 h-12 text-red-600 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold simple-text-primary mb-2">Access Denied</h3>
-            <p className="simple-text-secondary mb-4">You don't have permission to view this page.</p>
-            <p className="text-sm simple-text-muted">Contact your administrator for access.</p>
-          </div>
-        </div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card className="bg-white border border-gray-200 shadow-sm max-w-md mx-auto">
+          <CardContent className="text-center p-8">
+            <Shield className="w-12 h-12 text-red-500 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Access Denied</h3>
+            <p className="text-gray-600 mb-4">You don't have permission to view this page.</p>
+            <p className="text-sm text-gray-500">Contact your administrator for access.</p>
+          </CardContent>
+        </Card>
       </div>
     )
   }
@@ -253,116 +251,119 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="simple-page-container">
-      <div className="simple-content-wrapper">
-        <div className="simple-header">
-          <div className="simple-flex justify-between">
-            <div className="simple-flex">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-600 rounded-lg flex items-center justify-center">
-                <Package className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-6xl mx-auto p-6">
+        <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-6">
+          <div className="p-6">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Package className="w-6 h-6 text-blue-600" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900">Orders Management</h1>
+                  <p className="text-gray-600">Production order tracking system</p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-lg sm:text-xl font-semibold simple-text-primary">Orders Management</h1>
-                <p className="text-xs sm:text-sm simple-text-secondary">Production order tracking system</p>
+              <div className="flex items-center space-x-3">
+                <Button 
+                  onClick={() => fetchOrders()}
+                  disabled={loading}
+                  variant="outline"
+                  size="sm"
+                >
+                  <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                  Refresh
+                </Button>
+                <Button 
+                  onClick={() => router.push('/orders/new')}
+                  size="sm"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  New Order
+                </Button>
               </div>
-            </div>
-            <div className="simple-flex gap-2 sm:gap-4">
-              <button 
-                onClick={() => fetchOrders()}
-                disabled={loading}
-                className="simple-btn text-xs sm:text-sm px-3 py-1.5 sm:px-4 sm:py-2"
-              >
-                <RefreshCw className={`w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 ${loading ? 'animate-spin' : ''}`} />
-                Refresh
-              </button>
-              <button 
-                onClick={() => router.push('/orders/new')}
-                className="simple-btn text-xs sm:text-sm px-3 py-1.5 sm:px-4 sm:py-2"
-              >
-                <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                New Order
-              </button>
             </div>
           </div>
         </div>
 
-          {/* Neural Metrics Dashboard */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Card className="hologram-card hover:scale-105 transition-all duration-500">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-bold text-cyan-300 uppercase tracking-wider">Total Orders</p>
-                    <p className="text-3xl font-bold text-white">{orders.length}</p>
-                  </div>
-                  <div className="ai-orb w-12 h-12">
-                    <Package className="w-6 h-6 text-white" />
-                  </div>
+        {/* TikTok-Style Metrics Dashboard */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+          <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Total Orders</p>
+                  <p className="text-2xl font-bold text-gray-900">{orders.length}</p>
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card className="hologram-card hover:scale-105 transition-all duration-500">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-bold text-cyan-300 uppercase tracking-wider">In Production</p>
-                    <p className="text-3xl font-bold text-white">{orders.filter(o => o.status === 'IN_PRODUCTION').length}</p>
-                  </div>
-                  <div className="ai-orb w-12 h-12">
-                    <Clock className="w-6 h-6 text-white" />
-                  </div>
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Package className="w-5 h-5 text-blue-600" />
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </CardContent>
+          </Card>
 
-            <Card className="hologram-card hover:scale-105 transition-all duration-500">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-bold text-cyan-300 uppercase tracking-wider">Completed</p>
-                    <p className="text-3xl font-bold text-white">{orders.filter(o => o.status === 'DELIVERED').length}</p>
-                  </div>
-                  <div className="ai-orb w-12 h-12">
-                    <CheckCircle className="w-6 h-6 text-white" />
-                  </div>
+          <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">In Production</p>
+                  <p className="text-2xl font-bold text-gray-900">{orders.filter(o => o.status === 'IN_PRODUCTION').length}</p>
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card className="hologram-card hover:scale-105 transition-all duration-500">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-bold text-cyan-300 uppercase tracking-wider">Total Value</p>
-                    <p className="text-3xl font-bold text-white">{formatCurrency(orders.reduce((sum, order) => sum + order.totalAmount, 0))}</p>
-                  </div>
-                  <div className="ai-orb w-12 h-12">
-                    <Peso className="w-6 h-6 text-white" />
-                  </div>
+                <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-yellow-600" />
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </CardContent>
+          </Card>
 
-        {/* Neural Command Center */}
-        <Card className="quantum-card">
+          <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Completed</p>
+                  <p className="text-2xl font-bold text-gray-900">{orders.filter(o => o.status === 'DELIVERED').length}</p>
+                </div>
+                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Total Value</p>
+                  <p className="text-2xl font-bold text-gray-900">{formatCurrency(orders.reduce((sum, order) => sum + order.totalAmount, 0))}</p>
+                </div>
+                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <Peso className="w-5 h-5 text-purple-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* TikTok-Style Search and Filters */}
+        <Card className="bg-white border border-gray-200 shadow-sm mb-6">
           <CardContent className="p-6">
             <div className="flex flex-col lg:flex-row gap-4">
               <div className="flex-1">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-cyan-400" />
-                  <input
-                    placeholder="Neural search orders..."
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input
+                    placeholder="Search orders..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="cyber-input w-full pl-10"
+                    className="pl-10"
                   />
                 </div>
               </div>
               <div className="flex gap-3">
                 <select 
-                  className="cyber-select"
+                  className="px-3 py-2 border border-gray-200 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
                 >
@@ -373,9 +374,9 @@ export default function OrdersPage() {
                   <option value="QC_PASSED">QC Passed</option>
                   <option value="DELIVERED">Delivered</option>
                 </select>
-                <Button className="neon-btn">
+                <Button variant="outline" size="sm">
                   <Filter className="w-4 h-4 mr-2" />
-                  Neural Filter
+                  Filter
                 </Button>
                 <Button 
                   onClick={() => {
@@ -394,7 +395,8 @@ export default function OrdersPage() {
                     document.body.removeChild(link)
                     window.URL.revokeObjectURL(url)
                   }}
-                  className="neon-btn"
+                  variant="outline"
+                  size="sm"
                 >
                   <Download className="w-4 h-4 mr-2" />
                   Export Data
@@ -404,45 +406,45 @@ export default function OrdersPage() {
           </CardContent>
         </Card>
 
-        {/* Ashley AI Insights Panel */}
-        <Card className="quantum-card neon-glow">
+        {/* TikTok-Style AI Insights Panel */}
+        <Card className="bg-white border border-gray-200 shadow-sm mb-6">
           <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
-              <Brain className="w-5 h-5 text-cyan-400" />
+            <CardTitle className="text-gray-900 flex items-center gap-2">
+              <Brain className="w-5 h-5 text-blue-600" />
               Ashley AI Production Intelligence
             </CardTitle>
-            <CardDescription className="text-cyan-300">
+            <CardDescription className="text-gray-600">
               Real-time AI-powered insights for order optimization
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 rounded-lg bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/30">
+              <div className="p-4 rounded-lg bg-blue-50 border border-blue-200">
                 <div className="flex items-center gap-2 mb-2">
-                  <Clock className="w-4 h-4 text-blue-400" />
-                  <span className="text-sm font-medium text-blue-300">Production Flow</span>
+                  <Clock className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-medium text-blue-800">Production Flow</span>
                 </div>
-                <p className="text-xs text-white">
+                <p className="text-xs text-blue-700">
                   {orders.filter(o => o.status === 'IN_PRODUCTION').length} orders actively in production. Estimated completion rate: 94%
                 </p>
               </div>
               
-              <div className="p-4 rounded-lg bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30">
+              <div className="p-4 rounded-lg bg-yellow-50 border border-yellow-200">
                 <div className="flex items-center gap-2 mb-2">
-                  <AlertTriangle className="w-4 h-4 text-yellow-400" />
-                  <span className="text-sm font-medium text-yellow-300">Risk Assessment</span>
+                  <AlertTriangle className="w-4 h-4 text-yellow-600" />
+                  <span className="text-sm font-medium text-yellow-800">Risk Assessment</span>
                 </div>
-                <p className="text-xs text-white">
+                <p className="text-xs text-yellow-700">
                   {orders.filter(o => o.priority === 'HIGH').length} high-priority orders require attention. Monitor delivery schedules.
                 </p>
               </div>
               
-              <div className="p-4 rounded-lg bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/30">
+              <div className="p-4 rounded-lg bg-green-50 border border-green-200">
                 <div className="flex items-center gap-2 mb-2">
-                  <CheckCircle className="w-4 h-4 text-green-400" />
-                  <span className="text-sm font-medium text-green-300">Quality Insights</span>
+                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span className="text-sm font-medium text-green-800">Quality Insights</span>
                 </div>
-                <p className="text-xs text-white">
+                <p className="text-xs text-green-700">
                   Quality score trending up 15%. {orders.filter(o => o.status === 'QC_PASSED').length} orders passed QC this cycle.
                 </p>
               </div>
@@ -450,63 +452,64 @@ export default function OrdersPage() {
           </CardContent>
         </Card>
 
-        {/* Neural Orders Grid */}
+        {/* TikTok-Style Orders Grid */}
         <div className="space-y-4">
           {filteredOrders.map((order) => {
             return (
-              <Card key={order.id} className="quantum-card hover:scale-102 hover:border-cyan-400 transition-all duration-300">
+              <Card key={order.id} className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200">
                 <CardContent className="p-6">
                   <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-semibold text-white">{order.orderNumber}</h3>
-                        <div className={`px-3 py-1 rounded-full text-xs font-bold ${
-                          order.priority === 'HIGH' ? 'bg-red-500/20 text-red-300 border border-red-500/50' :
-                          order.priority === 'MEDIUM' ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/50' :
-                          'bg-green-500/20 text-green-300 border border-green-500/50'
+                        <h3 className="text-lg font-semibold text-gray-900">{order.orderNumber}</h3>
+                        <Badge className={`${
+                          order.priority === 'HIGH' ? 'bg-red-100 text-red-800 border-red-200' :
+                          order.priority === 'MEDIUM' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' :
+                          'bg-green-100 text-green-800 border-green-200'
                         }`}>
                           {order.priority}
-                        </div>
+                        </Badge>
                       </div>
-                      <p className="text-cyan-300 mb-3 font-medium">{order.clientName}</p>
+                      <p className="text-gray-700 mb-3 font-medium">{order.clientName}</p>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                         <div className="flex items-center gap-2">
-                          <Package className="w-4 h-4 text-cyan-400" />
-                          <span className="text-cyan-200">{order.items} items</span>
+                          <Package className="w-4 h-4 text-gray-500" />
+                          <span className="text-gray-600">{order.items} items</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4 text-cyan-400" />
-                          <span className="text-cyan-200">Due {formatDate(order.dueDate)}</span>
+                          <Calendar className="w-4 h-4 text-gray-500" />
+                          <span className="text-gray-600">Due {formatDate(order.dueDate)}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <User className="w-4 h-4 text-cyan-400" />
-                          <span className="text-cyan-200">Created {formatDate(order.created_at)}</span>
+                          <User className="w-4 h-4 text-gray-500" />
+                          <span className="text-gray-600">Created {formatDate(order.created_at)}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Peso className="w-4 h-4 text-cyan-400" />
-                          <span className="text-cyan-200 font-medium">{formatCurrency(order.totalAmount)}</span>
+                          <Peso className="w-4 h-4 text-gray-500" />
+                          <span className="text-gray-600 font-medium">{formatCurrency(order.totalAmount)}</span>
                         </div>
                       </div>
                     </div>
 
                     <div className="flex flex-col lg:flex-row lg:items-center gap-4">
-                      <div className={`px-3 py-1 rounded-full text-xs font-bold border ${
-                        order.status === 'DRAFT' ? 'bg-gray-500/20 text-gray-300 border-gray-500/50' :
-                        order.status === 'CONFIRMED' ? 'bg-blue-500/20 text-blue-300 border-blue-500/50' :
-                        order.status === 'IN_PRODUCTION' ? 'bg-yellow-500/20 text-yellow-300 border-yellow-500/50' :
-                        order.status === 'QC_PASSED' ? 'bg-green-500/20 text-green-300 border-green-500/50' :
-                        order.status === 'DELIVERED' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50' :
-                        'bg-red-500/20 text-red-300 border-red-500/50'
+                      <Badge className={`${
+                        order.status === 'DRAFT' ? 'bg-gray-100 text-gray-800 border-gray-200' :
+                        order.status === 'CONFIRMED' ? 'bg-blue-100 text-blue-800 border-blue-200' :
+                        order.status === 'IN_PRODUCTION' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' :
+                        order.status === 'QC_PASSED' ? 'bg-green-100 text-green-800 border-green-200' :
+                        order.status === 'DELIVERED' ? 'bg-emerald-100 text-emerald-800 border-emerald-200' :
+                        'bg-red-100 text-red-800 border-red-200'
                       }`}>
                         {order.status.replace(/_/g, ' ')}
-                      </div>
+                      </Badge>
 
                       <div className="flex gap-2">
                         <Button 
                           onClick={() => router.push(`/orders/${order.id}`)}
-                          className="neon-btn text-xs px-3 py-1"
+                          variant="outline"
+                          size="sm"
                         >
-                          <Eye className="w-4 h-4 mr-1" />
+                          <Eye className="w-4 h-4 mr-2" />
                           View
                         </Button>
                         <Button 
@@ -518,9 +521,10 @@ export default function OrdersPage() {
                               ))
                             }
                           }}
-                          className="neon-btn text-xs px-3 py-1"
+                          variant="outline"
+                          size="sm"
                         >
-                          <Edit className="w-4 h-4 mr-1" />
+                          <Edit className="w-4 h-4 mr-2" />
                           Edit
                         </Button>
                       </div>
@@ -532,19 +536,18 @@ export default function OrdersPage() {
           })}
 
           {filteredOrders.length === 0 && (
-            <Card className="quantum-card neon-glow">
+            <Card className="bg-white border border-gray-200 shadow-sm">
               <CardContent className="p-12 text-center">
-                <div className="ai-orb w-16 h-16 mx-auto mb-6">
-                  <Package className="w-8 h-8 text-white" />
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Package className="w-8 h-8 text-gray-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-2 glitch-text" data-text="No Neural Orders Found">No Neural Orders Found</h3>
-                <p className="text-cyan-300 mb-6">Initialize the system by creating your first order or adjust search parameters.</p>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">No Orders Found</h3>
+                <p className="text-gray-600 mb-6">Create your first order or adjust search parameters to see results.</p>
                 <Button 
                   onClick={() => router.push('/orders/new')}
-                  className="neon-btn hover:scale-105 transition-all duration-300"
                 >
                   <Plus className="w-4 h-4 mr-2" />
-                  Initialize First Order
+                  Create First Order
                 </Button>
               </CardContent>
             </Card>

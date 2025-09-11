@@ -90,13 +90,11 @@ export default function Home() {
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen neural-bg flex items-center justify-center">
-        <div className="text-center">
-          <div className="quantum-loader w-16 h-16 mx-auto mb-8">
-            <div></div><div></div><div></div>
-          </div>
-          <h1 className="text-3xl font-bold glitch-text text-white mb-4" data-text="ASH AI">ASH AI</h1>
-          <p className="text-cyan-300 font-medium">Initializing Neural Manufacturing System...</p>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">ASH AI</h1>
+          <p className="text-gray-600">Initializing Manufacturing System...</p>
         </div>
       </div>
     )
@@ -104,9 +102,10 @@ export default function Home() {
 
   if (!mounted) {
     return (
-      <div className="min-h-screen neural-bg flex items-center justify-center">
-        <div className="quantum-loader w-16 h-16">
-          <div></div><div></div><div></div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     )
