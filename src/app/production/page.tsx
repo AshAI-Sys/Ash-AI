@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-import EnhancedLayout from '@/components/EnhancedLayout'
+import TikTokLayout from '@/components/layout/TikTokLayout'
 import ProductionStages from '@/components/ProductionStages'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -50,22 +50,21 @@ export default function ProductionPage() {
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen neural-bg flex items-center justify-center">
-        <div className="text-center">
-          <div className="relative mb-8 mx-auto w-20 h-20">
-            <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/30 to-teal-400/30 rounded-full blur-xl animate-pulse"></div>
-            <div className="absolute inset-2 bg-gradient-to-br from-cyan-500/40 to-teal-400/40 rounded-full border border-cyan-400/50 animate-pulse"></div>
-            <div className="relative w-full h-full rounded-full bg-gradient-to-br from-slate-900 to-slate-800 border-2 border-cyan-500/60 flex items-center justify-center shadow-xl shadow-cyan-500/20 animate-pulse">
-              <img 
-                src="/Ash-AI.png" 
-                alt="ASH AI Logo" 
-                className="w-10 h-10 object-contain z-10 relative filter brightness-110 contrast-110" 
-              />
-              <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/20 to-teal-400/20 rounded-full animate-pulse"></div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+          <div className="text-center">
+            <div className="relative mb-6 mx-auto w-16 h-16">
+              <div className="w-full h-full rounded-full bg-gray-100 flex items-center justify-center animate-pulse">
+                <img 
+                  src="/Ash-AI.png" 
+                  alt="ASH AI Logo" 
+                  className="w-8 h-8 object-contain opacity-60" 
+                />
+              </div>
             </div>
+            <h1 className="text-2xl font-semibold text-gray-900 mb-2">ASH AI</h1>
+            <p className="text-gray-600">Loading Production System...</p>
           </div>
-          <h1 className="text-3xl font-bold glitch-text text-white mb-4 drop-shadow-lg" data-text="ASH AI">ASH AI</h1>
-          <p className="text-cyan-300 font-medium">Loading Production System...</p>
         </div>
       </div>
     )
@@ -76,151 +75,151 @@ export default function ProductionPage() {
   }
 
   return (
-    <EnhancedLayout>
-      <div className="neural-bg min-h-screen">
-      {/* Quantum Field Background */}
-      <div className="quantum-field">
-        {Array.from({ length: 12 }).map((_, i) => (
-          <div
-            key={i}
-            className="quantum-particle"
-            style={{
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 6}s`,
-            }}
-          />
-        ))}
-      </div>
-
-      <div className="relative z-10 p-6 max-w-7xl mx-auto">
+    <TikTokLayout>
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-4xl font-bold glitch-text text-white mb-2" data-text="Production Command">
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
                 Production Command
               </h1>
-              <p className="text-cyan-300 text-lg">
+              <p className="text-gray-600 text-lg">
                 Real-time production monitoring and optimization
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <div className="status-hologram status-active">
+              <div className="px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">
                 SYSTEM ONLINE
               </div>
-              <Button className="neon-btn">
+              <Button variant="outline" className="border-gray-300">
                 <Settings className="w-4 h-4 mr-2" />
                 Configure
               </Button>
             </div>
           </div>
+        </div>
 
-          {/* Quick Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
-            <Card className="hologram-card">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-cyan-400" />
-                  <div>
-                    <div className="text-sm text-cyan-300">Active Stations</div>
-                    <div className="text-xl font-bold text-white">{productionSummary.activeStations}/{productionSummary.totalStations}</div>
-                  </div>
+        {/* Quick Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+          <Card className="bg-white border border-gray-200 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <Activity className="w-4 h-4 text-blue-600" />
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card className="hologram-card">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-green-400" />
-                  <div>
-                    <div className="text-sm text-cyan-300">Efficiency</div>
-                    <div className="text-xl font-bold text-white">{productionSummary.efficiency}%</div>
-                  </div>
+                <div>
+                  <div className="text-sm text-gray-600">Active Stations</div>
+                  <div className="text-xl font-bold text-gray-900">{productionSummary.activeStations}/{productionSummary.totalStations}</div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </CardContent>
+          </Card>
 
-            <Card className="hologram-card">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <Package className="w-4 h-4 text-cyan-400" />
-                  <div>
-                    <div className="text-sm text-cyan-300">Daily Output</div>
-                    <div className="text-xl font-bold text-white">{productionSummary.dailyOutput.toLocaleString()}</div>
-                  </div>
+          <Card className="bg-white border border-gray-200 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <TrendingUp className="w-4 h-4 text-green-600" />
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card className="hologram-card">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-emerald-400" />
-                  <div>
-                    <div className="text-sm text-cyan-300">On-Time</div>
-                    <div className="text-xl font-bold text-white">{productionSummary.onTimeDelivery}%</div>
-                  </div>
+                <div>
+                  <div className="text-sm text-gray-600">Efficiency</div>
+                  <div className="text-xl font-bold text-gray-900">{productionSummary.efficiency}%</div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </CardContent>
+          </Card>
 
-            <Card className="hologram-card">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
+          <Card className="bg-white border border-gray-200 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <Package className="w-4 h-4 text-purple-600" />
+                </div>
+                <div>
+                  <div className="text-sm text-gray-600">Daily Output</div>
+                  <div className="text-xl font-bold text-gray-900">{productionSummary.dailyOutput.toLocaleString()}</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white border border-gray-200 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-emerald-100 rounded-lg">
+                  <Clock className="w-4 h-4 text-emerald-600" />
+                </div>
+                <div>
+                  <div className="text-sm text-gray-600">On-Time</div>
+                  <div className="text-xl font-bold text-gray-900">{productionSummary.onTimeDelivery}%</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white border border-gray-200 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-lg ${productionSummary.alertCount > 0 ? 'bg-red-100' : 'bg-green-100'}`}>
                   {productionSummary.alertCount > 0 ? (
-                    <AlertTriangle className="w-4 h-4 text-red-400" />
+                    <AlertTriangle className="w-4 h-4 text-red-600" />
                   ) : (
-                    <CheckCircle className="w-4 h-4 text-green-400" />
+                    <CheckCircle className="w-4 h-4 text-green-600" />
                   )}
-                  <div>
-                    <div className="text-sm text-cyan-300">Alerts</div>
-                    <div className={`text-xl font-bold ${productionSummary.alertCount > 0 ? 'text-red-400' : 'text-green-400'}`}>
-                      {productionSummary.alertCount}
-                    </div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-600">Alerts</div>
+                  <div className={`text-xl font-bold ${productionSummary.alertCount > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                    {productionSummary.alertCount}
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </CardContent>
+          </Card>
 
-            <Card className="hologram-card">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-yellow-400" />
-                  <div>
-                    <div className="text-sm text-cyan-300">AI Status</div>
-                    <div className="text-sm font-bold text-green-400">ACTIVE</div>
-                  </div>
+          <Card className="bg-white border border-gray-200 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-yellow-100 rounded-lg">
+                  <Zap className="w-4 h-4 text-yellow-600" />
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+                <div>
+                  <div className="text-sm text-gray-600">AI Status</div>
+                  <div className="text-sm font-bold text-green-600">ACTIVE</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-black/20 border border-cyan-500/30">
-            <TabsTrigger value="stages" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400">
-              <Settings className="w-4 h-4 mr-2" />
-              Production Stages
-            </TabsTrigger>
-            <TabsTrigger value="monitor" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400">
-              <Activity className="w-4 h-4 mr-2" />
-              Live Monitor
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400">
-              <BarChart3 className="w-4 h-4 mr-2" />
-              Analytics
-            </TabsTrigger>
-            <TabsTrigger value="schedule" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400">
-              <Clock className="w-4 h-4 mr-2" />
-              Schedule
-            </TabsTrigger>
-            <TabsTrigger value="team" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400">
-              <Users className="w-4 h-4 mr-2" />
-              Team
-            </TabsTrigger>
-          </TabsList>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-1">
+            <TabsList className="bg-gray-100">
+              <TabsTrigger value="stages" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm">
+                <Settings className="w-4 h-4 mr-2" />
+                Production Stages
+              </TabsTrigger>
+              <TabsTrigger value="monitor" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm">
+                <Activity className="w-4 h-4 mr-2" />
+                Live Monitor
+              </TabsTrigger>
+              <TabsTrigger value="analytics" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm">
+                <BarChart3 className="w-4 h-4 mr-2" />
+                Analytics
+              </TabsTrigger>
+              <TabsTrigger value="schedule" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm">
+                <Clock className="w-4 h-4 mr-2" />
+                Schedule
+              </TabsTrigger>
+              <TabsTrigger value="team" className="data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm">
+                <Users className="w-4 h-4 mr-2" />
+                Team
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="stages">
             <ProductionStages />
@@ -231,19 +230,21 @@ export default function ProductionPage() {
           </TabsContent>
 
           <TabsContent value="analytics">
-            <Card className="quantum-card">
+            <Card className="bg-white border border-gray-200 shadow-sm">
               <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <BarChart3 className="w-5 h-5 text-cyan-400" />
+                <CardTitle className="text-gray-900 flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-blue-600" />
                   Production Analytics
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-center py-12">
-                  <BarChart3 className="w-16 h-16 text-cyan-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-white mb-2">Advanced Analytics</h3>
-                  <p className="text-cyan-300 mb-6">Comprehensive production analytics dashboard coming soon</p>
-                  <Button className="neon-btn-primary">
+                  <div className="p-4 bg-blue-100 rounded-full w-fit mx-auto mb-4">
+                    <BarChart3 className="w-16 h-16 text-blue-600" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Advanced Analytics</h3>
+                  <p className="text-gray-600 mb-6">Comprehensive production analytics dashboard coming soon</p>
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white">
                     <Zap className="w-4 h-4 mr-2" />
                     Enable Analytics
                   </Button>
@@ -253,19 +254,21 @@ export default function ProductionPage() {
           </TabsContent>
 
           <TabsContent value="schedule">
-            <Card className="quantum-card">
+            <Card className="bg-white border border-gray-200 shadow-sm">
               <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-cyan-400" />
+                <CardTitle className="text-gray-900 flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-green-600" />
                   Production Schedule
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-center py-12">
-                  <Clock className="w-16 h-16 text-cyan-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-white mb-2">Smart Scheduling</h3>
-                  <p className="text-cyan-300 mb-6">AI-powered production scheduling system coming soon</p>
-                  <Button className="neon-btn-primary">
+                  <div className="p-4 bg-green-100 rounded-full w-fit mx-auto mb-4">
+                    <Clock className="w-16 h-16 text-green-600" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Smart Scheduling</h3>
+                  <p className="text-gray-600 mb-6">AI-powered production scheduling system coming soon</p>
+                  <Button className="bg-green-600 hover:bg-green-700 text-white">
                     <Zap className="w-4 h-4 mr-2" />
                     Generate Schedule
                   </Button>
@@ -275,19 +278,21 @@ export default function ProductionPage() {
           </TabsContent>
 
           <TabsContent value="team">
-            <Card className="quantum-card">
+            <Card className="bg-white border border-gray-200 shadow-sm">
               <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <Users className="w-5 h-5 text-cyan-400" />
+                <CardTitle className="text-gray-900 flex items-center gap-2">
+                  <Users className="w-5 h-5 text-purple-600" />
                   Team Management
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-center py-12">
-                  <Users className="w-16 h-16 text-cyan-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-white mb-2">Team Dashboard</h3>
-                  <p className="text-cyan-300 mb-6">Real-time team performance and assignment tracking coming soon</p>
-                  <Button className="neon-btn-primary">
+                  <div className="p-4 bg-purple-100 rounded-full w-fit mx-auto mb-4">
+                    <Users className="w-16 h-16 text-purple-600" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Team Dashboard</h3>
+                  <p className="text-gray-600 mb-6">Real-time team performance and assignment tracking coming soon</p>
+                  <Button className="bg-purple-600 hover:bg-purple-700 text-white">
                     <Zap className="w-4 h-4 mr-2" />
                     View Team
                   </Button>
@@ -298,6 +303,6 @@ export default function ProductionPage() {
         </Tabs>
         </div>
       </div>
-    </EnhancedLayout>
+    </TikTokLayout>
   )
 }
