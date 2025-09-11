@@ -32,6 +32,7 @@ import {
   ChevronRight,
   Brain,
   Sparkles,
+  Printer,
   Zap
 } from 'lucide-react'
 import { AIAnalyticsDashboard } from '@/components/ai/AIAnalyticsDashboard'

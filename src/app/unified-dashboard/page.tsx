@@ -217,8 +217,8 @@ export default function UnifiedDashboard() {
             </TabsList>
           </div>
 
-          {/* Tab Content */}
-          <div className="p-6">
+          {/* Tab Content - TikTok Style Centered */}
+          <div className="max-w-7xl mx-auto px-6 py-6">
             <TabsContent value="dashboard" className="mt-0">
               <CleanDashboard />
             </TabsContent>
