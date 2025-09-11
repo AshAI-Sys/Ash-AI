@@ -345,549 +345,283 @@ export function CleanDashboard() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-6 text-white">
-        <h1 className="text-2xl font-bold mb-2">
-          Welcome back, {session?.user?.name?.split(' ')[0] || 'System Admin'}!
-        </h1>
-        <p className="text-blue-100">Here's what's happening with your business today</p>
-      </div>
-
-      {/* Dashboard Toggle Buttons */}
-      <div className="flex space-x-4 mb-6">
-        <Button className="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50">
-          📊 My Queue
-        </Button>
-        <Button className="bg-blue-600 text-white hover:bg-blue-700">
-          📈 Business Overview
-        </Button>
-        <Button 
-          onClick={() => setShowAIDashboard(true)}
-          className="bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700"
-        >
-          <Brain className="mr-2 h-4 w-4" />
-          🧠 Ashley AI
-        </Button>
-      </div>
-
-      {/* Ashley AI Dashboard Section */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-sm">🤖</span>
-            </div>
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">Ashley AI Dashboard</h2>
-              <p className="text-sm text-gray-600">AI-powered business intelligence and insights</p>
-            </div>
-          </div>
-          <div className="flex space-x-2">
-            <Button size="sm" variant="outline">
-              Last 7 Days
-            </Button>
-            <Button size="sm" className="bg-blue-600 text-white">
-              📊 Viewing Period
-            </Button>
-            <Button size="sm" variant="outline">
-              🔄 Refresh
-            </Button>
-          </div>
-        </div>
-
-        {/* Modern Stats Cards Grid - Like Second Screenshot */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Total Orders - Blue */}
-          <Card className="bg-gradient-to-br from-blue-500 to-blue-600 border-0 text-white">
-            <CardContent className="p-6 relative overflow-hidden">
-              <div className="absolute top-2 right-2">
-                <Package className="w-8 h-8 text-white opacity-30" />
-              </div>
-              <div>
-                <p className="text-blue-100 text-sm font-medium">Total Orders</p>
-                <p className="text-4xl font-bold mt-2">{stats.orders.total}</p>
-                <p className="text-blue-100 text-xs mt-1">{stats.orders.pending} pending</p>
+    <div className="min-h-screen bg-gray-50">
+      {/* TikTok-Style Three-Column Layout */}
+      <div className="flex flex-col lg:flex-row gap-4 p-4 tiktok-three-column">
+        
+        {/* LEFT SECTION: Business Data Cards (300px) */}
+        <div className="w-full lg:w-80 space-y-4 tiktok-left-section">
+          {/* GMV Card */}
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">GMV</p>
+                  <p className="text-3xl font-bold text-gray-900">₱{stats.revenue.thisMonth.toLocaleString()}</p>
+                  <div className="flex items-center mt-2">
+                    <TrendingUp className="w-4 h-4 text-green-500 mr-1" />
+                    <span className="text-sm text-green-500">+8.2%</span>
+                  </div>
+                </div>
+                <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
+                  <DollarSign className="w-6 h-6 text-blue-600" />
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Revenue - Green */}
-          <Card className="bg-gradient-to-br from-green-500 to-green-600 border-0 text-white">
-            <CardContent className="p-6 relative overflow-hidden">
-              <div className="absolute top-2 right-2">
-                <DollarSign className="w-8 h-8 text-white opacity-30" />
-              </div>
-              <div>
-                <p className="text-green-100 text-sm font-medium">Monthly Revenue</p>
-                <p className="text-4xl font-bold mt-2">₱{(stats.revenue.thisMonth / 1000).toFixed(0)}K</p>
-                <p className="text-green-100 text-xs mt-1">+8.2% growth</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Performance - Purple */}
-          <Card className="bg-gradient-to-br from-purple-500 to-purple-600 border-0 text-white">
-            <CardContent className="p-6 relative overflow-hidden">
-              <div className="absolute top-2 right-2">
-                <BarChart3 className="w-8 h-8 text-white opacity-30" />
-              </div>
-              <div>
-                <p className="text-purple-100 text-sm font-medium">Completion Rate</p>
-                <p className="text-4xl font-bold mt-2">94%</p>
-                <p className="text-purple-100 text-xs mt-1">Quality Score</p>
+          {/* Gross Revenue Card */}
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Gross revenue</p>
+                  <p className="text-3xl font-bold text-gray-900">₱{stats.revenue.total.toLocaleString()}</p>
+                  <div className="flex items-center mt-2">
+                    <TrendingUp className="w-4 h-4 text-green-500 mr-1" />
+                    <span className="text-sm text-green-500">+12.5%</span>
+                  </div>
+                </div>
+                <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
+                  <BarChart3 className="w-6 h-6 text-green-600" />
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Alerts - Orange */}
-          <Card className="bg-gradient-to-br from-orange-500 to-orange-600 border-0 text-white">
-            <CardContent className="p-6 relative overflow-hidden">
-              <div className="absolute top-2 right-2">
-                <AlertCircle className="w-8 h-8 text-white opacity-30" />
-              </div>
-              <div>
-                <p className="text-orange-100 text-sm font-medium">Alerts</p>
-                <p className="text-4xl font-bold mt-2">{stats.inventory.lowStock}</p>
-                <p className="text-orange-100 text-xs mt-1">Low stock items</p>
+          {/* Items Sold Card */}
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Items sold</p>
+                  <p className="text-3xl font-bold text-gray-900">{stats.orders.total}</p>
+                  <div className="flex items-center mt-2">
+                    <TrendingUp className="w-4 h-4 text-green-500 mr-1" />
+                    <span className="text-sm text-green-500">+5.3%</span>
+                  </div>
+                </div>
+                <div className="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center">
+                  <Package className="w-6 h-6 text-purple-600" />
+                </div>
               </div>
             </CardContent>
           </Card>
         </div>
-      </div>
 
-      {/* Management Sections */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        
-        {/* User Management */}
-        <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
-          <CardHeader className="pb-4">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg font-bold text-purple-800 flex items-center">
-                <Users className="w-5 h-5 mr-2" />
-                User Management
-              </CardTitle>
-              <Button 
-                size="sm" 
-                onClick={() => setShowUserManagement(!showUserManagement)}
-                className="bg-purple-600 text-white hover:bg-purple-700">
-                <Eye className="w-4 h-4 mr-2" />
-                {showUserManagement ? 'Hide Details' : 'View All Users'}
-              </Button>
-            </div>
-            <p className="text-sm text-purple-600">Manage staff accounts, roles, and performance metrics</p>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {users.slice(0, showUserManagement ? users.length : 2).map((user) => (
-                <div key={user.id} className="flex items-center justify-between p-3 bg-white rounded-lg border border-purple-100">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-purple-200 rounded-full flex items-center justify-center">
-                      <Users className="w-5 h-5 text-purple-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900">{user.name}</p>
-                      <p className="text-sm text-gray-500">{user.email}</p>
-                      <p className="text-xs text-gray-400">{user.role}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Badge className="bg-green-100 text-green-800">{user.status}</Badge>
-                    {showUserManagement && (
-                      <>
-                        <Button size="sm" variant="ghost">
-                          <Edit3 className="w-4 h-4" />
-                        </Button>
-                        <Button size="sm" variant="ghost">
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                      </>
-                    )}
-                  </div>
+        {/* CENTER SECTION: Main Chart Area (flex-grow) */}
+        <div className="flex-1 lg:mr-4">
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200 h-96">
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg font-semibold text-gray-900">Production Pipeline Status</CardTitle>
+                <div className="flex space-x-2">
+                  <Button size="sm" variant="outline" className="text-sm">
+                    Last 7 Days
+                  </Button>
+                  <Button size="sm" className="bg-blue-600 text-white text-sm">
+                    View analysis
+                  </Button>
                 </div>
-              ))}
-              {showUserManagement && (
-                <div className="mt-4 p-4 bg-purple-50 rounded-lg border border-purple-200">
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-medium text-purple-800">User Management Actions</h4>
-                    <Button size="sm" className="bg-purple-600 text-white">
-                      <UserPlus className="w-4 h-4 mr-2" />
-                      Add New User
-                    </Button>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                    <div className="p-3 bg-white rounded border">
-                      <p className="text-sm font-medium text-gray-700">Active Users</p>
-                      <p className="text-xl font-bold text-green-600">{stats.users.active}</p>
-                    </div>
-                    <div className="p-3 bg-white rounded border">
-                      <p className="text-sm font-medium text-gray-700">Total Registered</p>
-                      <p className="text-xl font-bold text-blue-600">{stats.users.total}</p>
-                    </div>
-                    <div className="p-3 bg-white rounded border">
-                      <p className="text-sm font-medium text-gray-700">Roles Assigned</p>
-                      <p className="text-xl font-bold text-purple-600">8</p>
-                    </div>
-                  </div>
+              </div>
+            </CardHeader>
+            <CardContent className="h-80">
+              {/* Chart Placeholder - Main Visual Focal Point */}
+              <div className="w-full h-full bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-200">
+                <div className="text-center">
+                  <BarChart3 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <p className="text-lg font-medium text-gray-600">Production Analytics Chart</p>
+                  <p className="text-sm text-gray-500">Real-time manufacturing pipeline visualization</p>
                 </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
-        {/* Recent Orders */}
-        <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">
-          <CardHeader className="pb-4">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg font-bold text-blue-800 flex items-center">
-                <ShoppingCart className="w-5 h-5 mr-2" />
-                Recent Orders
-              </CardTitle>
-              <Button 
-                size="sm" 
-                onClick={() => setShowOrderManagement(!showOrderManagement)}
-                className="bg-blue-600 text-white hover:bg-blue-700">
-                <Eye className="w-4 h-4 mr-2" />
-                {showOrderManagement ? 'Hide Details' : 'View All Orders'}
-              </Button>
-            </div>
-            <p className="text-sm text-blue-600">Track and manage order workflow</p>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {(showOrderManagement ? allOrders : recentOrders).map((order) => (
-                <div key={order.id} className="flex items-center justify-between p-3 bg-white rounded-lg border border-blue-100">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center">
-                      <Package className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900">{order.id}</p>
-                      <p className="text-sm text-gray-500">{order.clientName} • {order.quantity} {order.apparelType}s</p>
-                      {showOrderManagement && <p className="text-xs text-gray-400">Total: ₱{order.total.toLocaleString()}</p>}
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Badge className={
-                      order.status === 'IN_PROGRESS' ? 'bg-yellow-100 text-yellow-800' : 
-                      order.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
-                      'bg-gray-100 text-gray-800'
-                    }>
-                      {order.status}
-                    </Badge>
-                    {showOrderManagement && (
-                      <>
-                        <Button size="sm" variant="ghost">
-                          <Edit3 className="w-4 h-4" />
-                        </Button>
-                        <Button size="sm" variant="ghost">
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                      </>
-                    )}
-                  </div>
+        {/* RIGHT SECTION: Today's Data & Info (300px) */}
+        <div className="w-full lg:w-80 space-y-4 tiktok-right-section">
+          {/* Today's Data Panel */}
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-semibold text-gray-900">Today</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Items sold</span>
+                <span className="text-sm font-semibold text-gray-900">23</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Visitors</span>
+                <span className="text-sm font-semibold text-gray-900">1,247</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Active Orders</span>
+                <span className="text-sm font-semibold text-gray-900">{stats.orders.pending}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Efficiency Rate</span>
+                <span className="text-sm font-semibold text-green-600">94%</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Business Accelerator Panel */}
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-semibold text-gray-900">Business accelerator</CardTitle>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="p-3 bg-blue-50 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-medium text-blue-600">PRODUCTION OPTIMIZATION</span>
+                  <span className="text-xs text-blue-600">New</span>
                 </div>
-              ))}
-              {showOrderManagement && (
-                <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-medium text-blue-800">Order Management Actions</h4>
-                    <Button size="sm" className="bg-blue-600 text-white">
-                      <Plus className="w-4 h-4 mr-2" />
-                      New Order
-                    </Button>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
-                    <div className="p-3 bg-white rounded border">
-                      <p className="text-sm font-medium text-gray-700">Pending</p>
-                      <p className="text-xl font-bold text-yellow-600">{stats.orders.pending}</p>
-                    </div>
-                    <div className="p-3 bg-white rounded border">
-                      <p className="text-sm font-medium text-gray-700">In Progress</p>
-                      <p className="text-xl font-bold text-blue-600">45</p>
-                    </div>
-                    <div className="p-3 bg-white rounded border">
-                      <p className="text-sm font-medium text-gray-700">Completed</p>
-                      <p className="text-xl font-bold text-green-600">{stats.orders.completed}</p>
-                    </div>
-                    <div className="p-3 bg-white rounded border">
-                      <p className="text-sm font-medium text-gray-700">Revenue</p>
-                      <p className="text-xl font-bold text-purple-600">₱{stats.revenue.thisMonth.toLocaleString()}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Secondary Management Sections */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        
-        {/* Inventory Overview */}
-        <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-bold text-green-800 flex items-center">
-              <Package className="w-5 h-5 mr-2" />
-              Inventory
-            </CardTitle>
-            <p className="text-sm text-green-600">Stock levels and alerts</p>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Total Items</span>
-                <span className="font-bold text-green-800">{stats.inventory.items}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Low Stock</span>
-                <Badge className="bg-orange-100 text-orange-800">{stats.inventory.lowStock}</Badge>
-              </div>
-              <Button 
-                className="w-full bg-green-600 text-white hover:bg-green-700 mt-4"
-                onClick={() => setShowInventoryManagement(!showInventoryManagement)}>
-                {showInventoryManagement ? 'Hide Inventory' : 'View Full Inventory'}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Performance */}
-        <Card className="bg-gradient-to-br from-orange-50 to-yellow-50 border-orange-200">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-bold text-orange-800 flex items-center">
-              <BarChart3 className="w-5 h-5 mr-2" />
-              Avg Performance
-            </CardTitle>
-            <p className="text-sm text-orange-600">Team productivity metrics</p>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Completion Rate</span>
-                <span className="font-bold text-orange-800">88%</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">On Time</span>
-                <Badge className="bg-green-100 text-green-800">92%</Badge>
-              </div>
-              <Button className="w-full bg-orange-600 text-white hover:bg-orange-700 mt-4">
-                View Reports
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Tasks Status */}
-        <Card className="bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-200">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-bold text-indigo-800 flex items-center">
-              <CheckCircle className="w-5 h-5 mr-2" />
-              Tasks Status
-            </CardTitle>
-            <p className="text-sm text-indigo-600">Production tasks overview</p>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Pending</span>
-                <Badge className="bg-yellow-100 text-yellow-800">{stats.tasks.pending}</Badge>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Completed Today</span>
-                <span className="font-bold text-indigo-800">138</span>
-              </div>
-              <Button className="w-full bg-indigo-600 text-white hover:bg-indigo-700 mt-4"
-                onClick={() => setShowTasksExpanded(true)}>
-                View All Tasks
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Expandable Inventory Management */}
-      {showInventoryManagement && (
-        <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 mb-8">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-xl font-bold text-green-800">
-                <Package className="w-6 h-6 mr-2 inline" />
-                Inventory Management
-              </CardTitle>
-              <Button 
-                variant="ghost" 
-                onClick={() => setShowInventoryManagement(false)}
-                className="text-green-600 hover:text-green-800"
-              >
-                Minimize
-              </Button>
-            </div>
-            <p className="text-green-600 mt-2">Complete inventory tracking and stock management</p>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4">
-              {inventory.map((item) => (
-                <div key={item.id} className="p-4 bg-white rounded-lg border border-green-200 flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                      <Package className="w-6 h-6 text-green-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900">{item.name}</p>
-                      <p className="text-sm text-gray-500">{item.category} • {item.supplier}</p>
-                      <p className="text-xs text-gray-400">Last restocked: {item.lastRestocked}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <div className="text-right">
-                      <p className="text-sm text-gray-600">Stock Level</p>
-                      <p className={`text-lg font-bold ${item.quantity <= item.lowStockThreshold ? 'text-red-600' : 'text-green-600'}`}>
-                        {item.quantity}
-                      </p>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      {item.quantity <= item.lowStockThreshold && (
-                        <Badge className="bg-red-100 text-red-800">Low Stock</Badge>
-                      )}
-                      <Button size="sm" variant="ghost">
-                        <Edit3 className="w-4 h-4" />
-                      </Button>
-                      <Button size="sm" variant="ghost">
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
-              <div className="flex items-center justify-between mb-4">
-                <h4 className="font-medium text-green-800">Inventory Summary</h4>
-                <Button size="sm" className="bg-green-600 text-white">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Item
+                <p className="text-sm text-gray-700 mb-2">Optimize cutting workflow</p>
+                <Button size="sm" className="bg-blue-600 text-white text-xs px-3 py-1 h-6">
+                  View details
                 </Button>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="p-3 bg-white rounded border">
-                  <p className="text-sm font-medium text-gray-700">Total Items</p>
-                  <p className="text-xl font-bold text-green-600">{stats.inventory.items}</p>
+              
+              <div className="p-3 bg-green-50 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-medium text-green-600">QUALITY INSIGHTS</span>
+                  <span className="text-xs text-green-600">Trending</span>
                 </div>
-                <div className="p-3 bg-white rounded border">
-                  <p className="text-sm font-medium text-gray-700">Low Stock Items</p>
-                  <p className="text-xl font-bold text-red-600">{stats.inventory.lowStock}</p>
-                </div>
-                <div className="p-3 bg-white rounded border">
-                  <p className="text-sm font-medium text-gray-700">Categories</p>
-                  <p className="text-xl font-bold text-blue-600">3</p>
-                </div>
-                <div className="p-3 bg-white rounded border">
-                  <p className="text-sm font-medium text-gray-700">Suppliers</p>
-                  <p className="text-xl font-bold text-purple-600">5</p>
-                </div>
+                <p className="text-sm text-gray-700 mb-2">QC metrics improved 12%</p>
+                <Button size="sm" className="bg-green-600 text-white text-xs px-3 py-1 h-6">
+                  Learn more
+                </Button>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
-      {/* Expandable Tasks Section */}
-      {showTasksExpanded && (
-        <Card className="bg-gradient-to-br from-slate-50 to-blue-50 border-slate-200 mb-8">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-xl font-bold text-slate-800">Production Tasks & Activities</CardTitle>
-              <Button 
-                variant="ghost" 
-                onClick={() => setShowTasksExpanded(false)}
-                className="text-slate-600 hover:text-slate-800"
-              >
-                Minimize
-              </Button>
-            </div>
-            <div className="flex items-center space-x-4 mt-4">
-              <Button
-                onClick={() => setTaskFilter('all')}
-                className={taskFilter === 'all' ? 'bg-slate-800 text-white' : 'bg-slate-200 text-slate-700'}
-                size="sm"
-              >
-                All Tasks
-              </Button>
-              <Button
-                onClick={() => setTaskFilter('pending')}
-                className={taskFilter === 'pending' ? 'bg-yellow-600 text-white' : 'bg-yellow-200 text-yellow-700'}
-                size="sm"
-              >
-                Pending
-              </Button>
-              <Button
-                onClick={() => setTaskFilter('in-progress')}
-                className={taskFilter === 'in-progress' ? 'bg-blue-600 text-white' : 'bg-blue-200 text-blue-700'}
-                size="sm"
-              >
-                In Progress
-              </Button>
-              <Button
-                onClick={() => setTaskFilter('completed')}
-                className={taskFilter === 'completed' ? 'bg-green-600 text-white' : 'bg-green-200 text-green-700'}
-                size="sm"
-              >
-                Completed
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {loadingStates.tasks ? (
-              <div className="text-center py-8">
-                <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
-                <p>Loading tasks...</p>
+              <div className="p-3 bg-purple-50 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-medium text-purple-600">AI ASSISTANT</span>
+                  <span className="text-xs text-purple-600">Available</span>
+                </div>
+                <p className="text-sm text-gray-700 mb-2">Ashley AI suggestions</p>
+                <Button 
+                  size="sm" 
+                  onClick={() => setShowAIDashboard(true)}
+                  className="bg-purple-600 text-white text-xs px-3 py-1 h-6"
+                >
+                  <Brain className="w-3 h-3 mr-1" />
+                  Open Ashley
+                </Button>
               </div>
-            ) : (
-              <div className="grid gap-4">
-                {tasks
-                  .filter(task => taskFilter === 'all' || task.status.toLowerCase().replace('_', '-') === taskFilter)
-                  .map((task) => (
-                    <div key={task.id} className="p-4 bg-white rounded-lg border border-slate-200 flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                          task.status === 'PENDING' ? 'bg-yellow-100' :
-                          task.status === 'IN_PROGRESS' ? 'bg-blue-100' : 'bg-green-100'
-                        }`}>
-                          {task.status === 'PENDING' ? <Clock className="w-5 h-5 text-yellow-600" /> :
-                           task.status === 'IN_PROGRESS' ? <Activity className="w-5 h-5 text-blue-600" /> :
-                           <CheckCircle className="w-5 h-5 text-green-600" />}
-                        </div>
-                        <div>
-                          <p className="font-medium">{task.description}</p>
-                          <p className="text-sm text-gray-500">{task.order.orderNumber} • {task.assignee.name}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Badge className={
-                          task.priority === 'HIGH' ? 'bg-red-100 text-red-800' :
-                          task.priority === 'MEDIUM' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-green-100 text-green-800'
-                        }>
-                          {task.priority}
-                        </Badge>
-                        <Badge className={
-                          task.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
-                          task.status === 'IN_PROGRESS' ? 'bg-blue-100 text-blue-800' :
-                          'bg-green-100 text-green-800'
-                        }>
-                          {task.status.replace('_', ' ')}
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* BOTTOM SECTIONS: Sales Sources Style Layout */}
+      <div className="p-4 pt-0">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          
+          {/* Production Status (LIVE equivalent) */}
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-semibold text-gray-900">Production Status</CardTitle>
+                <Button size="sm" variant="outline" className="text-xs px-2 py-1 h-6">
+                  View analysis
+                </Button>
               </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
-      
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <Activity className="w-4 h-4 text-yellow-600" />
+                  <span className="text-sm font-medium text-gray-900">Cutting Stage</span>
+                </div>
+                <Badge className="bg-yellow-100 text-yellow-800 text-xs">In Progress</Badge>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <Printer className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-medium text-gray-900">Printing Queue</span>
+                </div>
+                <Badge className="bg-blue-100 text-blue-800 text-xs">Active</Badge>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span className="text-sm font-medium text-gray-900">QC Completed</span>
+                </div>
+                <Badge className="bg-green-100 text-green-800 text-xs">94% Pass Rate</Badge>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Quality Reports (Videos equivalent) */}
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-semibold text-gray-900">Quality Reports</CardTitle>
+                <Button size="sm" variant="outline" className="text-xs px-2 py-1 h-6">
+                  View analysis
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Daily QC Score</p>
+                  <p className="text-xs text-gray-600">Batch #QC-001</p>
+                </div>
+                <span className="text-lg font-bold text-green-600">94%</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Pending Reviews</p>
+                  <p className="text-xs text-gray-600">Requires attention</p>
+                </div>
+                <span className="text-lg font-bold text-yellow-600">3</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Passed Items</p>
+                  <p className="text-xs text-gray-600">Today's production</p>
+                </div>
+                <span className="text-lg font-bold text-blue-600">{stats.orders.completed}</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Recent Orders (Product Cards equivalent) */}
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-semibold text-gray-900">Recent Orders</CardTitle>
+                <Button size="sm" variant="outline" className="text-xs px-2 py-1 h-6">
+                  View analysis
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {recentOrders.slice(0, 3).map((order) => (
+                <div key={order.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">{order.id}</p>
+                    <p className="text-xs text-gray-600">{order.clientName} • {order.quantity} pcs</p>
+                  </div>
+                  <Badge className={
+                    order.status === 'IN_PROGRESS' ? 'bg-yellow-100 text-yellow-800' : 
+                    order.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
+                    'bg-gray-100 text-gray-800'
+                  } size="sm">
+                    {order.status === 'IN_PROGRESS' ? 'Active' : 
+                     order.status === 'COMPLETED' ? 'Done' : 'Pending'}
+                  </Badge>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
       {/* AI Analytics Dashboard */}
       <AIAnalyticsDashboard 
         isOpen={showAIDashboard}

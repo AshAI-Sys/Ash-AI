@@ -41,6 +41,7 @@ import {
   Upload
 } from 'lucide-react'
 import { Role } from '@prisma/client'
+import { TikTokCenteredLayout, TikTokPageHeader, TikTokContentCard, TikTokMetricsGrid, TikTokMetricCard } from '@/components/TikTokCenteredLayout'
 
 interface WalletData {
   id: string

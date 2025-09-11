@@ -19,6 +19,7 @@ import {
   Calculator
 } from 'lucide-react'
 import Layout from '@/components/Layout'
+import { TikTokCenteredLayout, TikTokPageHeader, TikTokContentCard, TikTokMetricsGrid, TikTokMetricCard } from '@/components/TikTokCenteredLayout'
 
 export default function HRManagementPage() {
   const { data: session, status } = useSession()
