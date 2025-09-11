@@ -29,8 +29,9 @@ npx prisma db push
 npx prisma generate
 npx prisma studio
 
-# Scripts
+# Additional utilities
 npm run backup
+npm run postinstall  # Regenerates Prisma client after install
 ```
 
 ## Architecture Overview
@@ -190,10 +191,11 @@ The system uses a comprehensive Prisma schema organized by manufacturing stages:
 
 ### Development Notes
 - Uses `@` path alias for imports (`@/` = `./src/`)
-- TypeScript strict mode enabled
-- ESLint configuration with Next.js rules
+- TypeScript strict mode enabled with config in `config/tsconfig.json`
+- ESLint configuration with Next.js rules in `config/eslint.config.mjs`
 - Comprehensive audit logging system
 - Multi-tenant workspace architecture
+- Configuration files centralized in `config/` directory
 
 ## Philippine Business Compliance
 
@@ -222,3 +224,4 @@ The system uses a comprehensive Prisma schema organized by manufacturing stages:
 - Health monitoring and audit trail implementation
 
 When working on this codebase, always consider the comprehensive manufacturing workflow context and the multi-phase architecture. The system follows enterprise ERP patterns with proper separation of concerns, role-based security, and scalable multi-tenant architecture.
+- to memorize
