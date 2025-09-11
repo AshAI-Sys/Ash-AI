@@ -167,7 +167,7 @@ export default function UnifiedDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Fixed Header */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-xl border-b border-white/10">
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-b border-gray-200">
         <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3">
@@ -175,18 +175,18 @@ export default function UnifiedDashboard() {
                 <Brain className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-white">ASH AI Dashboard</h1>
-                <p className="text-xs text-gray-400">Apparel Smart Hub - All-in-One</p>
+                <h1 className="text-xl font-bold text-gray-900">ASH AI Dashboard</h1>
+                <p className="text-xs text-gray-600">Apparel Smart Hub - All-in-One</p>
               </div>
             </div>
           </div>
           
           <div className="flex items-center gap-4">
-            <Badge variant="secondary" className="bg-green-500/20 text-green-300 border-green-500/30">
+            <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-200">
               <Activity className="w-3 h-3 mr-1" />
               System Online
             </Badge>
-            <div className="text-sm text-gray-300">
+            <div className="text-sm text-gray-700">
               Welcome, {session?.user?.name || 'User'}
             </div>
           </div>
@@ -197,7 +197,7 @@ export default function UnifiedDashboard() {
       <div className="pt-20">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           {/* Tab Navigation */}
-          <div className="sticky top-20 z-40 bg-black/10 backdrop-blur-xl border-b border-white/10">
+          <div className="sticky top-20 z-40 bg-white/90 backdrop-blur-xl border-b border-gray-200">
             <TabsList className="w-full h-auto p-2 bg-transparent border-none rounded-none overflow-x-auto flex-nowrap">
               <div className="flex gap-1 min-w-max px-4">
                 {tabs.map((tab) => {
@@ -206,7 +206,7 @@ export default function UnifiedDashboard() {
                     <TabsTrigger
                       key={tab.id}
                       value={tab.id}
-                      className="flex items-center gap-2 px-4 py-3 text-gray-300 hover:text-white data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-300 data-[state=active]:border-cyan-500/50 rounded-xl whitespace-nowrap border border-transparent transition-all"
+                      className="flex items-center gap-2 px-4 py-3 text-gray-600 hover:text-gray-900 data-[state=active]:bg-blue-100 data-[state=active]:text-blue-700 data-[state=active]:border-blue-200 rounded-xl whitespace-nowrap border border-transparent transition-all"
                     >
                       <Icon className="w-4 h-4" />
                       <span className="hidden sm:inline">{tab.label}</span>
