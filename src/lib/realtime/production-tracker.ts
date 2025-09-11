@@ -95,7 +95,7 @@ class ProductionTracker {
           }
         },
         include: {
-          routingSteps: {
+          routing_steps: {
             orderBy: { sequence: 'asc' }
           },
           brand: true,
@@ -128,7 +128,7 @@ class ProductionTracker {
   }
 
   private async calculateOrderMetrics(order: any): Promise<ProductionMetrics> {
-    const routingSteps = order.routingSteps
+    const routingSteps = order.routing_steps
     const completedSteps = routingSteps.filter((step: any) => step.status === 'DONE').length
     const totalSteps = routingSteps.length
     const overallProgress = totalSteps > 0 ? (completedSteps / totalSteps) * 100 : 0
@@ -477,7 +477,7 @@ class ProductionTracker {
       const order = await prisma.order.findUnique({
         where: { id: orderId },
         include: {
-          routingSteps: {
+          routing_steps: {
             orderBy: { sequence: 'asc' }
           }
         }
