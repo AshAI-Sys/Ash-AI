@@ -168,6 +168,13 @@ model Workspace {
   cutting_plans       CuttingPlan[]
   cutting_metrics     CuttingMetrics[]
   sewing_operations   SewingOperation[]
+  employees           Employee[]
+  attendance_records  AttendanceRecord[]
+  leave_requests      LeaveRequest[]
+  payroll_records     PayrollRecord[]
+  performance_reviews PerformanceReview[]
+  disciplinary_actions DisciplinaryAction[]
+  training_records    TrainingRecord[]
   piece_rates         PieceRate[]
   sewing_runs         SewingRun[]
   bundles             Bundle[]
@@ -176,40 +183,6 @@ model Workspace {
   finished_units      FinishedUnit[]
   finishing_cartons   FinishingCarton[]
   finishing_shipments FinishingShipment[]
-  employees           Employee[]
-  attendance_records  AttendanceRecord[]
-  payroll_records     PayrollRecord[]
-  leave_requests      LeaveRequest[]
-  disciplinary_actions DisciplinaryAction[]
-  performance_reviews PerformanceReview[]
-  maintenance_schedules MaintenanceSchedule[]
-  maintenance_tasks   MaintenanceTask[]
-  equipment_downtime  EquipmentDowntime[]
-  maintenance_parts   MaintenancePart[]
-  maintenance_metrics MaintenanceMetrics[]
-  client_users        ClientUser[]
-  client_payments     ClientPayment[]
-  client_support_tickets ClientSupportTicket[]
-  client_portal_activities ClientPortalActivity[]
-  client_payment_methods ClientPaymentMethod[]
-  items               Item[]
-  operations          Operation[]
-  frames              Frame[]
-  alerts              Alert[]
-  ai_logs             AILog[]
-  tasks               Task[]
-  time_records        TimeRecord[]
-  qc_records          QCRecord[]
-  sync_conflicts      SyncConflict[]
-  wallets             Wallet[]
-  dashboards          Dashboard[]
-  forecasts           Forecast[]
-  insights            Insight[]
-  kpis                KPI[]
-  anomalies           Anomaly[]
-  reject_records      RejectRecord[]
-  business_insights   BusinessInsight[]
-  kpi_metrics         KPIMetric[]
 
   @@map("workspaces")
 }
@@ -237,9 +210,6 @@ model User {
   // Relations
   workspace        Workspace @relation(fields: [workspace_id], references: [id])
   audit_logs       AuditLog[]
-  assigned_tasks   Task[]    @relation("AssignedUser")
-  created_tasks    Task[]    @relation("CreatedUser")
-  pushSubscriptions PushSubscription[]
   production_logs  ProductionLog[] @relation("ProductionLogUser")
   notifications    Notification[]
   
@@ -294,8 +264,8 @@ model Client {
   workspace_id    String
   name            String
   company         String?
-  emails          Json     @default("[]")
-  phones          Json     @default("[]")
+  emails          Json?
+  phones          Json?
   billing_address Json?
   notes           String?
   created_at      DateTime @default(now())
@@ -307,9 +277,6 @@ model Client {
   design_approvals DesignApproval[]
   invoices         Invoice[]
   payments         Payment[]
-  client_users     ClientUser[]
-  client_payments  ClientPayment[]
-  client_payment_methods ClientPaymentMethod[]
 
   @@map("clients")
 }
@@ -384,7 +351,6 @@ model Order {
   finished_units    FinishedUnit[]
   finishing_cartons FinishingCarton[]
   finishing_shipments FinishingShipment[]
-  client_payments   ClientPayment[]
   production_logs   ProductionLog[]
 
   @@index([workspace_id, brand_id, status, created_at])
@@ -418,7 +384,7 @@ model RoutingStep {
   name             String            // "Cutting", "Printing"...
   workcenter       WorkcenterType    // CUTTING/PRINTING/HEAT_PRESS/SEWING/EMB/QC/PACKING/DESIGN
   sequence         Int
-  depends_on       Json              @default("[]")
+  depends_on       Json?
   join_type        String?           // null | AND | OR
   standard_spec    Json?             // e.g., {"tempC":200,"seconds":60}
   expected_inputs  Json?
@@ -862,10 +828,10 @@ model RouteTemplateStep {
   name                String
   workcenter          WorkcenterType
   sequence            Int
-  depends_on          Json           @default("[]") // Array of step names
-  standard_spec       Json           @default("{}") // Default specifications
-  expected_inputs     Json           @default("{}") // Input requirements
-  expected_outputs    Json           @default("{}") // Output specifications
+  depends_on          Json?           // Array of step names
+  standard_spec       Json?           // Default specifications
+  expected_inputs     Json?           // Input requirements
+  expected_outputs    Json?           // Output specifications
   estimated_minutes   Int?
   created_at          DateTime       @default(now())
 
@@ -903,7 +869,7 @@ model Notification {
   title                 String
   message               String
   priority              String      // LOW/NORMAL/HIGH/URGENT
-  channels              Json        @default("[]") // Array of channels
+  channels              Json?        // Array of channels
   related_entity_type   String?
   related_entity_id     String?
   metadata              Json?
@@ -1009,8 +975,8 @@ model Supplier {
   workspace_id String
   name         String
   tin          String?  // Tax Identification Number (BIR)
-  emails       Json     @default("[]")
-  phones       Json     @default("[]")
+  emails       Json?
+  phones       Json?
   address      Json?
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
@@ -1052,7 +1018,6 @@ model Invoice {
   lines             InvoiceLine[]
   allocations       PaymentAllocation[]
   bir_sales_entry   BIRSalesEntry?
-  client_payments   ClientPayment[]
 
   @@index([workspace_id, brand_id, client_id, status, date_issued])
   @@map("invoices")
@@ -1605,7 +1570,7 @@ model SewingOperation {
   name             String   // "Join shoulders", "Attach collar", etc
   standard_minutes Float    // SMV (Standard Minute Value)
   piece_rate       Float?   // Pay per piece for this operation
-  depends_on       Json     @default("[]") // Logical operation names
+  depends_on       Json?     // Logical operation names
   complexity       String   @default("MEDIUM") // LOW/MEDIUM/HIGH
   skill_level      String   @default("BASIC") // BASIC/INTERMEDIATE/ADVANCED
   quality_points   Json?    // Key quality checkpoints
@@ -1867,197 +1832,177 @@ model Employee {
   leave_requests        LeaveRequest[]
   disciplinary_actions  DisciplinaryAction[]
   performance_reviews   PerformanceReview[]
+  training_records      TrainingRecord[]
   
   @@unique([workspace_id, employee_no])
   @@map("employees")
 }
 
-// Daily attendance tracking with biometric integration
+// ==============================================
+// HR MANAGEMENT MODELS - PHASE 5
+// ==============================================
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  HALF_DAY
+  ON_LEAVE
+}
+
+enum LeaveType {
+  VACATION
+  SICK
+  MATERNITY
+  PATERNITY
+  EMERGENCY
+  BEREAVEMENT
+  UNPAID
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum PayrollStatus {
+  DRAFT
+  PROCESSING
+  COMPLETED
+  PAID
+  CANCELLED
+}
+
 model AttendanceRecord {
-  id                String    @id @default(uuid())
+  id                String            @id @default(uuid())
   workspace_id      String
   employee_id       String
-  attendance_date   DateTime  // Date only
+  date              DateTime
   time_in           DateTime?
   time_out          DateTime?
   break_start       DateTime?
   break_end         DateTime?
-  regular_hours     Float     @default(0)
-  overtime_hours    Float     @default(0)
-  night_diff_hours  Float     @default(0)
-  holiday_hours     Float     @default(0)
-  status            String    @default("PRESENT") // PRESENT/ABSENT/LATE/UNDERTIME/SICK/VACATION
-  
-  // Deductions and adjustments
-  late_minutes      Int       @default(0)
-  undertime_minutes Int       @default(0)
-  
-  // Device/method of record
-  time_in_method    String?   // BIOMETRIC/MANUAL/SYSTEM
-  time_out_method   String?
-  approved_by       String?   // For manual entries
+  overtime_start    DateTime?
+  overtime_end      DateTime?
+  status            AttendanceStatus  @default(PRESENT)
+  hours_worked      Float?            // Calculated hours
+  overtime_hours    Float?            // Overtime hours
   notes             String?
-  
-  created_at        DateTime  @default(now())
-  updated_at        DateTime  @updatedAt
+  location          String?           // GPS coordinates or location name
+  created_at        DateTime          @default(now())
+  updated_at        DateTime          @updatedAt
   
   // Relations
-  workspace         Workspace @relation(fields: [workspace_id], references: [id])
-  employee          Employee  @relation(fields: [employee_id], references: [id])
+  workspace         Workspace         @relation(fields: [workspace_id], references: [id])
+  employee          Employee          @relation(fields: [employee_id], references: [id])
   
-  @@unique([workspace_id, employee_id, attendance_date])
+  @@unique([workspace_id, employee_id, date])
   @@map("attendance_records")
 }
 
-// Payroll processing with Philippine tax compliance
-model PayrollRecord {
-  id                        String    @id @default(uuid())
-  workspace_id              String
-  employee_id               String
-  pay_period_start          DateTime
-  pay_period_end            DateTime
-  pay_date                  DateTime?
-  
-  // Earnings breakdown
-  basic_pay                 Float     @default(0)
-  overtime_pay              Float     @default(0)
-  night_differential        Float     @default(0)
-  holiday_pay               Float     @default(0)
-  allowances                Float     @default(0)
-  commission                Float     @default(0)
-  bonus                     Float     @default(0)
-  other_earnings            Float     @default(0)
-  gross_pay                 Float     @default(0)
-  
-  // Government deductions
-  sss_employee              Float     @default(0)
-  sss_employer              Float     @default(0)
-  philhealth_employee       Float     @default(0)
-  philhealth_employer       Float     @default(0)
-  pagibig_employee          Float     @default(0)
-  pagibig_employer          Float     @default(0)
-  withholding_tax           Float     @default(0)
-  
-  // Other deductions
-  loan_deductions           Float     @default(0)
-  other_deductions          Float     @default(0)
-  total_deductions          Float     @default(0)
-  
-  // Final amounts
-  net_pay                   Float     @default(0)
-  employer_cost             Float     @default(0) // Total cost including employer contributions
-  
-  // Status and processing
-  status                    String    @default("DRAFT") // DRAFT/APPROVED/PAID/CANCELLED
-  processed_by              String?
-  approved_by               String?
-  payment_method            String?   // CASH/BANK_TRANSFER/CHECK
-  bank_reference            String?
-  
-  // BIR compliance fields
-  bir_form_number          String?   // For BIR 2316, etc.
-  bir_filing_status        String?   // Filed/Pending
-  
-  created_at               DateTime  @default(now())
-  updated_at               DateTime  @updatedAt
-  
-  // Relations
-  workspace                Workspace @relation(fields: [workspace_id], references: [id])
-  employee                 Employee  @relation(fields: [employee_id], references: [id])
-  
-  @@map("payroll_records")
-}
-
-// Leave management system
 model LeaveRequest {
-  id                String    @id @default(uuid())
+  id                String      @id @default(uuid())
   workspace_id      String
   employee_id       String
-  leave_type        String    // SICK/VACATION/EMERGENCY/MATERNITY/PATERNITY/BEREAVEMENT
+  leave_type        LeaveType
   start_date        DateTime
   end_date          DateTime
-  days_requested    Float     // Can be partial days
-  reason            String?
-  
-  // Approval workflow
-  status            String    @default("PENDING") // PENDING/APPROVED/REJECTED/CANCELLED
-  requested_at      DateTime  @default(now())
-  reviewed_by       String?
-  reviewed_at       DateTime?
-  review_comments   String?
-  
-  // Leave balance impact
-  days_deducted     Float?    // Actual days deducted from balance
-  
-  created_at        DateTime  @default(now())
-  updated_at        DateTime  @updatedAt
+  days_requested    Float       // Can be fractional for half days
+  reason            String
+  status            LeaveStatus @default(PENDING)
+  approved_by       String?     // Employee ID of approver
+  approved_date     DateTime?
+  rejection_reason  String?
+  created_at        DateTime    @default(now())
+  updated_at        DateTime    @updatedAt
   
   // Relations
-  workspace         Workspace @relation(fields: [workspace_id], references: [id])
-  employee          Employee  @relation(fields: [employee_id], references: [id])
+  workspace         Workspace   @relation(fields: [workspace_id], references: [id])
+  employee          Employee    @relation(fields: [employee_id], references: [id])
   
   @@map("leave_requests")
 }
 
-// Employee disciplinary actions tracking
-model DisciplinaryAction {
-  id                String    @id @default(uuid())
-  workspace_id      String
-  employee_id       String
-  incident_date     DateTime
-  type              String    // VERBAL_WARNING/WRITTEN_WARNING/SUSPENSION/TERMINATION
-  severity          String    // MINOR/MAJOR/GRAVE
-  description       String
-  investigation_notes String?
-  corrective_measures String?
+model PayrollRecord {
+  id                  String        @id @default(uuid())
+  workspace_id        String
+  employee_id         String
+  payroll_period_start DateTime
+  payroll_period_end   DateTime
   
-  // Workflow
-  reported_by       String
-  investigated_by   String?
-  approved_by       String?
-  status            String    @default("PENDING") // PENDING/APPROVED/DISMISSED
+  // Basic pay calculations
+  basic_salary        Float         // Monthly basic or computed from daily/hourly
+  days_worked         Float
+  hours_worked        Float
+  overtime_hours      Float         @default(0)
+  overtime_rate       Float         @default(1.25) // 125% rate for overtime
   
-  // Impact
-  suspension_days   Int?
-  salary_deduction  Float?
+  // Allowances and benefits
+  allowances          Json?         // {rice: 1500, transportation: 500, etc}
+  bonuses             Json?         // {performance: 5000, attendance: 1000, etc}
   
-  created_at        DateTime  @default(now())
-  updated_at        DateTime  @updatedAt
+  // Deductions
+  sss_contribution    Float         @default(0)
+  philhealth_contribution Float     @default(0)
+  pagibig_contribution Float        @default(0)
+  withholding_tax     Float         @default(0)
+  other_deductions    Json?         // {loans: 2000, uniform: 500, etc}
+  
+  // Computed totals
+  gross_pay           Float
+  total_deductions    Float
+  net_pay             Float
+  
+  // 13th month pay tracking
+  thirteenth_month_accrual Float    @default(0)
+  
+  // Status and processing
+  status              PayrollStatus @default(DRAFT)
+  processed_date      DateTime?
+  paid_date           DateTime?
+  payment_method      String?       // CASH/BANK_TRANSFER/CHECK
+  bank_reference      String?
+  notes               String?
+  
+  created_at          DateTime      @default(now())
+  updated_at          DateTime      @updatedAt
   
   // Relations
-  workspace         Workspace @relation(fields: [workspace_id], references: [id])
-  employee          Employee  @relation(fields: [employee_id], references: [id])
+  workspace           Workspace     @relation(fields: [workspace_id], references: [id])
+  employee            Employee      @relation(fields: [employee_id], references: [id])
   
-  @@map("disciplinary_actions")
+  @@unique([workspace_id, employee_id, payroll_period_start])
+  @@map("payroll_records")
 }
 
-// Performance review system
 model PerformanceReview {
   id                String    @id @default(uuid())
   workspace_id      String
   employee_id       String
-  review_period     String    // Q1_2024, ANNUAL_2024, etc.
-  review_date       DateTime
   reviewer_id       String    // Employee ID of reviewer
+  review_period_start DateTime
+  review_period_end   DateTime
   
-  // Core metrics (1-5 scale)
-  work_quality      Float?
-  productivity      Float?
-  punctuality       Float?
-  teamwork          Float?
-  initiative        Float?
-  overall_rating    Float?
-  
-  // Qualitative feedback
+  // Performance metrics
+  overall_rating    Float     // 1-5 scale
+  goals_met         Json?     // Array of goals and achievement status
   strengths         String?
-  areas_improvement String?
-  goals_next_period String?
-  training_needs    String?
+  areas_for_improvement String?
+  training_recommendations String?
   
-  // Status
+  // Ratings by category
+  quality_of_work   Float?    // 1-5
+  productivity      Float?    // 1-5
+  teamwork          Float?    // 1-5
+  communication     Float?    // 1-5
+  initiative        Float?    // 1-5
+  
   status            String    @default("DRAFT") // DRAFT/SUBMITTED/ACKNOWLEDGED
   employee_comments String?
-  acknowledged_at   DateTime?
+  action_plan       String?
+  next_review_date  DateTime?
   
   created_at        DateTime  @default(now())
   updated_at        DateTime  @updatedAt
@@ -2069,797 +2014,68 @@ model PerformanceReview {
   @@map("performance_reviews")
 }
 
-// ==============================================
-// STAGE 11: MAINTENANCE SYSTEM - Equipment & Facility Management
-// Based on CLIENT_UPDATED_PLAN.md specifications
-// ==============================================
-
-// Maintenance schedules for equipment and facilities
-model MaintenanceSchedule {
-  id                  String    @id @default(uuid())
-  workspace_id        String
-  equipment_type      String    // SEWING_MACHINE/EMBROIDERY/HEAT_PRESS/CUTTING/FACILITY
-  equipment_id        String?   // Link to machine table if applicable
-  schedule_name       String    // e.g., "Monthly Oil Change", "Quarterly Calibration"
-  description         String?
-  frequency_type      String    // DAILY/WEEKLY/MONTHLY/QUARTERLY/YEARLY/USAGE_BASED
-  frequency_value     Int       // e.g., 1 for monthly, 500 for every 500 hours
-  estimated_duration  Int?      // Minutes
-  assigned_to         String?   // Employee ID of technician
-  next_due_date       DateTime
-  priority            String    @default("MEDIUM") // LOW/MEDIUM/HIGH/CRITICAL
-  active              Boolean   @default(true)
-  created_at          DateTime  @default(now())
-  updated_at          DateTime  @updatedAt
-
-  // Relations
-  workspace           Workspace           @relation(fields: [workspace_id], references: [id])
-  maintenance_tasks   MaintenanceTask[]
-  
-  @@map("maintenance_schedules")
-}
-
-// Individual maintenance work orders/tasks
-model MaintenanceTask {
-  id                    String    @id @default(uuid())
-  workspace_id          String
-  schedule_id           String?   // Link to schedule if this is scheduled maintenance
-  task_no               String    // Auto-generated task number
-  equipment_type        String    // SEWING_MACHINE/EMBROIDERY/HEAT_PRESS/CUTTING/FACILITY
-  equipment_id          String?   // Link to machine if applicable
-  task_type             String    // SCHEDULED/BREAKDOWN/INSPECTION/UPGRADE
-  priority              String    @default("MEDIUM") // LOW/MEDIUM/HIGH/CRITICAL
-  title                 String
-  description           String?
-  
-  // Assignment and scheduling
-  assigned_to           String?   // Employee ID of technician
-  requested_by          String?   // Employee ID who reported the issue
-  scheduled_date        DateTime?
-  estimated_duration    Int?      // Minutes
-  
-  // Execution tracking
-  started_at            DateTime?
-  completed_at          DateTime?
-  actual_duration       Int?      // Actual minutes spent
-  
-  // Status and resolution
-  status                String    @default("OPEN") // OPEN/IN_PROGRESS/WAITING_PARTS/COMPLETED/CANCELLED
-  resolution_notes      String?
-  parts_used            Json?     // [{part_id, part_name, quantity, cost}]
-  labor_cost            Float?
-  parts_cost            Float?
-  total_cost            Float?
-  
-  // Quality and follow-up
-  quality_check_passed  Boolean?
-  follow_up_required    Boolean   @default(false)
-  next_inspection_date  DateTime?
-  
-  created_at            DateTime  @default(now())
-  updated_at            DateTime  @updatedAt
-
-  // Relations
-  workspace             Workspace           @relation(fields: [workspace_id], references: [id])
-  schedule              MaintenanceSchedule? @relation(fields: [schedule_id], references: [id])
-  
-  @@map("maintenance_tasks")
-}
-
-// Equipment downtime tracking for efficiency analysis
-model EquipmentDowntime {
+model DisciplinaryAction {
   id                String    @id @default(uuid())
   workspace_id      String
-  equipment_type    String    // SEWING_MACHINE/EMBROIDERY/HEAT_PRESS/CUTTING
-  equipment_id      String?   // Machine ID if applicable
-  downtime_start    DateTime
-  downtime_end      DateTime?
-  duration_minutes  Int?      // Calculated when downtime ends
-  reason_category   String    // BREAKDOWN/MAINTENANCE/SETUP/NO_OPERATOR/NO_MATERIAL
-  reason_details    String?
-  impact_level      String    @default("MEDIUM") // LOW/MEDIUM/HIGH/CRITICAL
+  employee_id       String
+  issued_by         String    // Employee ID of person issuing action
   
-  // Production impact
-  production_loss   Float?    // Estimated pieces/value lost
-  orders_affected   Json?     // Array of order IDs impacted
+  action_type       String    // VERBAL_WARNING/WRITTEN_WARNING/SUSPENSION/TERMINATION
+  violation         String    // Description of violation
+  description       String    // Detailed description
+  action_taken      String    // What action was taken
   
-  // Resolution
-  maintenance_task_id String? // Link to maintenance task if applicable
-  resolved_by         String? // Employee ID
-  resolution_notes    String?
+  incident_date     DateTime
+  action_date       DateTime  @default(now())
+  
+  // Follow-up
+  follow_up_required Boolean  @default(false)
+  follow_up_date    DateTime?
+  follow_up_notes   String?
+  
+  // Employee response
+  employee_acknowledged Boolean @default(false)
+  employee_signature    String?
+  employee_comments     String?
   
   created_at        DateTime  @default(now())
   updated_at        DateTime  @updatedAt
-
+  
   // Relations
   workspace         Workspace @relation(fields: [workspace_id], references: [id])
+  employee          Employee  @relation(fields: [employee_id], references: [id])
   
-  @@map("equipment_downtime")
+  @@map("disciplinary_actions")
 }
 
-// Maintenance inventory - spare parts and consumables
-model MaintenancePart {
+model TrainingRecord {
   id                String    @id @default(uuid())
   workspace_id      String
-  part_number       String    // Manufacturer part number
-  part_name         String
+  employee_id       String
+  
+  training_name     String
+  training_type     String    // ORIENTATION/SKILL_DEVELOPMENT/SAFETY/COMPLIANCE
+  provider          String?   // Internal/External provider
   description       String?
-  category          String    // ELECTRICAL/MECHANICAL/CONSUMABLE/TOOL
-  compatible_equipment Json?  // Array of equipment types this part works with
   
-  // Inventory tracking
-  current_stock     Int       @default(0)
-  min_stock_level   Int       @default(1)
-  max_stock_level   Int?
-  unit_cost         Float?
-  supplier_info     Json?     // {name, contact, lead_time}
+  start_date        DateTime
+  end_date          DateTime?
+  duration_hours    Float?
   
-  // Usage tracking
-  avg_monthly_usage Float     @default(0)
-  last_used_date    DateTime?
-  total_used_ytd    Int       @default(0)
+  status            String    @default("SCHEDULED") // SCHEDULED/IN_PROGRESS/COMPLETED/CANCELLED
+  completion_date   DateTime?
+  certificate_number String?
+  expiry_date       DateTime? // For certifications that expire
   
-  status            String    @default("ACTIVE") // ACTIVE/DISCONTINUED/OBSOLETE
-  created_at        DateTime  @default(now())
-  updated_at        DateTime  @updatedAt
-
-  // Relations
-  workspace         Workspace @relation(fields: [workspace_id], references: [id])
+  cost              Float?
+  notes             String?
   
-  @@unique([workspace_id, part_number])
-  @@map("maintenance_parts")
-}
-
-// Maintenance metrics and KPIs tracking
-model MaintenanceMetrics {
-  id                    String    @id @default(uuid())
-  workspace_id          String
-  metric_date           DateTime  // Daily/weekly/monthly snapshot date
-  period_type           String    // DAY/WEEK/MONTH/QUARTER
-  
-  // Task completion metrics
-  total_tasks           Int       @default(0)
-  completed_tasks       Int       @default(0)
-  overdue_tasks         Int       @default(0)
-  avg_completion_time   Float?    // Hours
-  
-  // Downtime metrics
-  total_downtime_hours  Float     @default(0)
-  planned_downtime      Float     @default(0)
-  unplanned_downtime    Float     @default(0)
-  equipment_availability Float?   // Percentage
-  
-  // Cost metrics
-  total_maintenance_cost Float    @default(0)
-  labor_cost            Float     @default(0)
-  parts_cost            Float     @default(0)
-  external_service_cost Float     @default(0)
-  
-  // Efficiency metrics
-  preventive_vs_reactive Float?   // Ratio of preventive to breakdown maintenance
-  first_time_fix_rate   Float?    // Percentage of tasks completed without rework
-  
-  created_at            DateTime  @default(now())
-
-  // Relations
-  workspace             Workspace @relation(fields: [workspace_id], references: [id])
-  
-  @@unique([workspace_id, metric_date, period_type])
-  @@map("maintenance_metrics")
-}
-
-// ==============================================
-// STAGE 12: CLIENT PORTAL - Enhanced Client Self-Service
-// Based on CLIENT_UPDATED_PLAN.md specifications
-// ==============================================
-
-// Client portal user accounts (separate from main client records)
-model ClientUser {
-  id                String    @id @default(uuid())
-  workspace_id      String
-  client_id         String    // Link to main Client record
-  email             String    @unique
-  password_hash     String
-  first_name        String
-  last_name         String
-  role              String    @default("CLIENT_USER") // CLIENT_USER/CLIENT_ADMIN
-  permissions       Json?     // {orders: "view", invoices: "view_pay", etc}
-  
-  // Account management
-  email_verified    Boolean   @default(false)
-  verification_token String?
-  reset_token       String?
-  reset_token_expires DateTime?
-  last_login        DateTime?
-  login_attempts    Int       @default(0)
-  locked_until      DateTime?
-  
-  // Preferences
-  notification_preferences Json? // {email: true, sms: false, etc}
-  language          String    @default("en")
-  timezone          String    @default("Asia/Manila")
-  
-  status            String    @default("ACTIVE") // ACTIVE/INACTIVE/SUSPENDED
   created_at        DateTime  @default(now())
   updated_at        DateTime  @updatedAt
   
   // Relations
   workspace         Workspace @relation(fields: [workspace_id], references: [id])
-  client            Client    @relation(fields: [client_id], references: [id])
-  portal_sessions   ClientPortalSession[]
-  support_tickets   ClientSupportTicket[]
+  employee          Employee  @relation(fields: [employee_id], references: [id])
   
-  @@map("client_users")
+  @@map("training_records")
 }
-
-// Client portal login sessions
-model ClientPortalSession {
-  id                String      @id @default(uuid())
-  client_user_id    String
-  session_token     String      @unique
-  ip_address        String?
-  user_agent        String?
-  expires_at        DateTime
-  created_at        DateTime    @default(now())
-  
-  // Relations
-  client_user       ClientUser  @relation(fields: [client_user_id], references: [id])
-  
-  @@map("client_portal_sessions")
-}
-
-// Enhanced payment processing
-model ClientPayment {
-  id                    String    @id @default(uuid())
-  workspace_id          String
-  client_id             String
-  invoice_id            String?   // Link to invoice if paying invoice
-  order_id              String?   // Direct order payment
-  payment_no            String    // Auto-generated payment reference
-  
-  // Payment details
-  amount                Float
-  currency              String    @default("PHP")
-  payment_method        String    // GCASH/PAYMAYA/BANK_TRANSFER/CREDIT_CARD/CASH
-  payment_gateway       String?   // STRIPE/PAYMONGO/GCASH_API/etc
-  gateway_reference     String?   // Gateway transaction ID
-  
-  // Status tracking
-  status                String    @default("PENDING") // PENDING/PROCESSING/COMPLETED/FAILED/REFUNDED
-  paid_at               DateTime?
-  confirmed_at          DateTime?
-  
-  // Gateway response data
-  gateway_response      Json?     // Full response from payment gateway
-  gateway_fees          Float?    // Gateway processing fees
-  net_amount            Float?    // Amount after gateway fees
-  
-  // Reconciliation
-  bank_reference        String?   // Bank confirmation number
-  reconciled_at         DateTime?
-  reconciled_by         String?   // Employee who reconciled
-  
-  // Refund handling
-  refund_amount         Float?
-  refund_reason         String?
-  refunded_at           DateTime?
-  refund_reference      String?
-  
-  created_at            DateTime  @default(now())
-  updated_at            DateTime  @updatedAt
-  
-  // Relations
-  workspace             Workspace @relation(fields: [workspace_id], references: [id])
-  client                Client    @relation(fields: [client_id], references: [id])
-  invoice               Invoice?  @relation(fields: [invoice_id], references: [id])
-  order                 Order?    @relation(fields: [order_id], references: [id])
-  
-  @@map("client_payments")
-}
-
-// Client support ticket system
-model ClientSupportTicket {
-  id                String      @id @default(uuid())
-  workspace_id      String
-  client_user_id    String
-  ticket_no         String      // Auto-generated ticket number
-  
-  // Ticket details
-  subject           String
-  description       String
-  category          String      // ORDER_INQUIRY/PAYMENT_ISSUE/TECHNICAL/COMPLAINT/FEEDBACK
-  priority          String      @default("MEDIUM") // LOW/MEDIUM/HIGH/URGENT
-  
-  // Assignment and handling
-  assigned_to       String?     // Employee ID
-  status            String      @default("OPEN") // OPEN/IN_PROGRESS/WAITING_CLIENT/RESOLVED/CLOSED
-  
-  // Related entities
-  related_order_id  String?
-  related_invoice_id String?
-  
-  // Resolution tracking
-  first_response_at DateTime?
-  resolved_at       DateTime?
-  closed_at         DateTime?
-  resolution_notes  String?
-  client_rating     Int?        // 1-5 rating of support quality
-  
-  created_at        DateTime    @default(now())
-  updated_at        DateTime    @updatedAt
-  
-  // Relations
-  workspace         Workspace   @relation(fields: [workspace_id], references: [id])
-  client_user       ClientUser  @relation(fields: [client_user_id], references: [id])
-  messages          ClientSupportMessage[]
-  
-  @@map("client_support_tickets")
-}
-
-// Support ticket messages/conversation
-model ClientSupportMessage {
-  id                String                @id @default(uuid())
-  ticket_id         String
-  sender_type       String                // CLIENT/EMPLOYEE
-  sender_id         String                // ClientUser ID or Employee ID
-  message           String
-  attachments       Json?                 // Array of file URLs
-  is_internal       Boolean               @default(false) // Internal notes not visible to client
-  created_at        DateTime              @default(now())
-  
-  // Relations
-  ticket            ClientSupportTicket   @relation(fields: [ticket_id], references: [id])
-  
-  @@map("client_support_messages")
-}
-
-// Client portal activity/audit log
-model ClientPortalActivity {
-  id                String      @id @default(uuid())
-  workspace_id      String
-  client_user_id    String?     // Null for system activities
-  activity_type     String      // LOGIN/ORDER_VIEW/PAYMENT/SUPPORT_TICKET/etc
-  description       String
-  ip_address        String?
-  user_agent        String?
-  related_entity_type String?   // order/invoice/payment/ticket
-  related_entity_id String?
-  metadata          Json?       // Additional activity data
-  created_at        DateTime    @default(now())
-  
-  // Relations
-  workspace         Workspace   @relation(fields: [workspace_id], references: [id])
-  
-  @@map("client_portal_activities")
-}
-
-// Client payment methods and preferences
-model ClientPaymentMethod {
-  id                String    @id @default(uuid())
-  workspace_id      String
-  client_id         String
-  method_type       String    // GCASH/PAYMAYA/BANK_ACCOUNT/CREDIT_CARD
-  display_name      String    // e.g., "GCash ending in 1234"
-  
-  // Encrypted payment details
-  encrypted_details Json      // Encrypted payment method details
-  
-  // Gateway tokens (for saved payment methods)
-  gateway_token     String?   // Token from payment gateway
-  gateway_customer_id String? // Customer ID in gateway
-  
-  // Status and verification
-  is_verified       Boolean   @default(false)
-  is_default        Boolean   @default(false)
-  expires_at        DateTime? // For credit cards
-  
-  status            String    @default("ACTIVE") // ACTIVE/INACTIVE/EXPIRED
-  created_at        DateTime  @default(now())
-  updated_at        DateTime  @updatedAt
-  
-  // Relations
-  workspace         Workspace @relation(fields: [workspace_id], references: [id])
-  client            Client    @relation(fields: [client_id], references: [id])
-  
-  @@map("client_payment_methods")
-}
-
-// ==============================================
-// ADDITIONAL MODELS - Missing models referenced in seed files
-// ==============================================
-
-// Item model for generic items
-model Item {
-  id           String   @id @default(uuid())
-  workspace_id String
-  name         String
-  description  String?
-  category     String?
-  unit         String?
-  sku          String?  @unique
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-
-  // Relations
-  workspace    Workspace @relation(fields: [workspace_id], references: [id])
-
-  @@map("items")
-}
-
-// Operation model for manufacturing operations  
-model Operation {
-  id           String   @id @default(uuid())
-  workspace_id String
-  name         String
-  code         String?  @unique
-  description  String?
-  type         ProcessType
-  standard_time Float?
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-
-  // Relations
-  workspace    Workspace @relation(fields: [workspace_id], references: [id])
-
-  @@map("operations")
-}
-
-// Frame model for production frames
-model Frame {
-  id           String   @id @default(uuid())
-  workspace_id String
-  name         String
-  code         String?  @unique
-  size         String?
-  material     String?
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-
-  // Relations
-  workspace    Workspace @relation(fields: [workspace_id], references: [id])
-
-  @@map("frames")
-}
-
-// Alert model for system alerts
-model Alert {
-  id           String   @id @default(uuid())
-  workspace_id String
-  type         String
-  message      String
-  severity     String   @default("INFO") // INFO/WARNING/ERROR/CRITICAL
-  status       String   @default("ACTIVE") // ACTIVE/ACKNOWLEDGED/RESOLVED
-  resolved     Boolean  @default(false)
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-  resolved_at  DateTime?
-
-  // Relations
-  workspace    Workspace     @relation(fields: [workspace_id], references: [id])
-  audits       AlertAudit[]
-
-  @@map("alerts")
-}
-
-// Alert audit model for tracking alert actions
-model AlertAudit {
-  id         String   @id @default(uuid())
-  alert_id   String
-  action     String   // ACK, RESOLVE, CREATE, etc.
-  actor_id   String
-  note       String?
-  created_at DateTime @default(now())
-
-  // Relations
-  alert      Alert    @relation(fields: [alert_id], references: [id])
-
-  @@map("alert_audits")
-}
-
-// AI Log model for AI interactions
-model AILog {
-  id           String   @id @default(uuid())
-  workspace_id String
-  type         String
-  input        Json?
-  output       Json?
-  metadata     Json?
-  created_at   DateTime @default(now())
-
-  // Relations
-  workspace    Workspace @relation(fields: [workspace_id], references: [id])
-
-  @@map("ai_logs")
-}
-
-// Task model for general tasks
-model Task {
-  id           String   @id @default(uuid())
-  workspace_id String
-  title        String
-  description  String?
-  status       TaskStatus @default(OPEN)
-  assigned_to  String?
-  priority     String   @default("MEDIUM") // LOW/MEDIUM/HIGH/URGENT
-  due_date     DateTime?
-  created_by   String?
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-
-  // Relations
-  workspace    Workspace @relation(fields: [workspace_id], references: [id])
-  assigned_user User?    @relation("AssignedUser", fields: [assigned_to], references: [id])
-  creator      User?     @relation("CreatedUser", fields: [created_by], references: [id])
-  time_records TimeRecord[]
-  qc_records   QCRecord[]
-
-  @@map("tasks")
-}
-
-// Time Record model for time tracking
-model TimeRecord {
-  id           String   @id @default(uuid())
-  workspace_id String
-  task_id      String?
-  employee_id  String?
-  start_time   DateTime
-  end_time     DateTime?
-  duration     Int?     // Duration in minutes
-  notes        String?
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-
-  // Relations
-  workspace    Workspace @relation(fields: [workspace_id], references: [id])
-  task         Task?     @relation(fields: [task_id], references: [id])
-
-  @@map("time_records")
-}
-
-// QC Record model for quality control records
-model QCRecord {
-  id           String   @id @default(uuid())
-  workspace_id String
-  order_id     String?
-  inspector_id String?
-  batch_id     String?
-  status       String   @default("PENDING") // PENDING/PASS/FAIL
-  passed       Boolean  @default(false)
-  defects      Json?
-  notes        String?
-  task_id      String?
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-
-  // Relations
-  workspace    Workspace @relation(fields: [workspace_id], references: [id])
-  task         Task?     @relation(fields: [task_id], references: [id])
-
-  @@map("qc_records")
-}
-
-// Sync Conflict model for data synchronization conflicts
-model SyncConflict {
-  id           String   @id @default(uuid())
-  workspace_id String
-  entity_type  String
-  entity_id    String
-  conflict_data Json
-  local_value  Json?
-  server_value Json?
-  resolved     Boolean  @default(false)
-  resolved_by  String?
-  resolved_at  DateTime?
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-
-  // Relations
-  workspace    Workspace @relation(fields: [workspace_id], references: [id])
-
-  @@map("sync_conflicts")
-}
-
-// Wallet model for employee wallets/accounts
-model Wallet {
-  id           String   @id @default(uuid())
-  workspace_id String
-  employee_id  String?
-  balance      Float    @default(0)
-  currency     String   @default("PHP")
-  status       String   @default("ACTIVE") // ACTIVE/INACTIVE/SUSPENDED
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-
-  // Relations
-  workspace    Workspace @relation(fields: [workspace_id], references: [id])
-
-  @@map("wallets")
-}
-
-// Dashboard model for analytics dashboards
-model Dashboard {
-  id           String   @id @default(uuid())
-  workspace_id String
-  name         String
-  description  String?
-  config       Json?
-  visibility   String   @default("PRIVATE") // PRIVATE/PUBLIC/SHARED
-  created_by   String?
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-
-  // Relations
-  workspace    Workspace @relation(fields: [workspace_id], references: [id])
-
-  @@map("dashboards")
-}
-
-// Forecast model for AI-generated forecasts
-model Forecast {
-  id           String   @id @default(uuid())
-  workspace_id String
-  type         String   // REVENUE/INVENTORY/PRODUCTION/CASHFLOW/DEMAND
-  period       String   // MONTHLY/QUARTERLY/YEARLY
-  data         Json
-  algorithm    String?
-  accuracy     Float?
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-
-  // Relations
-  workspace    Workspace @relation(fields: [workspace_id], references: [id])
-
-  @@map("forecasts")
-}
-
-// Insight model for analytics insights
-model Insight {
-  id           String   @id @default(uuid())
-  workspace_id String
-  type         String
-  title        String
-  description  String
-  data         Json?
-  priority     String   @default("MEDIUM") // LOW/MEDIUM/HIGH/CRITICAL
-  status       String   @default("ACTIVE") // ACTIVE/ACKNOWLEDGED/DISMISSED
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-
-  // Relations
-  workspace    Workspace @relation(fields: [workspace_id], references: [id])
-
-  @@map("insights")
-}
-
-// KPI model for key performance indicators
-model KPI {
-  id           String   @id @default(uuid())
-  workspace_id String
-  name         String
-  metric_type  String
-  current_value Float?
-  target_value Float?
-  unit         String?
-  period       String   @default("MONTHLY") // DAILY/WEEKLY/MONTHLY/QUARTERLY/YEARLY
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-
-  // Relations
-  workspace    Workspace @relation(fields: [workspace_id], references: [id])
-
-  @@map("kpis")
-}
-
-// Anomaly model for anomaly detection
-model Anomaly {
-  id           String   @id @default(uuid())
-  workspace_id String
-  type         String
-  entity_type  String?
-  entity_id    String?
-  description  String
-  severity     String   @default("MEDIUM") // LOW/MEDIUM/HIGH/CRITICAL
-  data         Json?
-  status       String   @default("DETECTED") // DETECTED/INVESTIGATING/RESOLVED/DISMISSED
-  detected_at  DateTime @default(now())
-  resolved_at  DateTime?
-
-  // Relations
-  workspace    Workspace @relation(fields: [workspace_id], references: [id])
-
-  @@map("anomalies")
-}
-
-// Reject Record model for reject tracking
-model RejectRecord {
-  id           String   @id @default(uuid())
-  workspace_id String
-  order_id     String?
-  reject_type  String
-  quantity     Int
-  reason       String?
-  cost_impact  Float?
-  responsible_stage String?
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-
-  // Relations
-  workspace    Workspace @relation(fields: [workspace_id], references: [id])
-
-  @@map("reject_records")
-}
-
-// Security Event model for security monitoring
-model SecurityEvent {
-  id           String            @id @default(uuid())
-  workspace_id String?
-  event_type   SecurityEventType
-  user_id      String?
-  ip_address   String?
-  user_agent   String?
-  details      Json?
-  severity     String            @default("INFO") // INFO/WARNING/ERROR/CRITICAL
-  created_at   DateTime          @default(now())
-
-  @@map("security_events")
-}
-
-// Business Insight model for analytics insights
-model BusinessInsight {
-  id           String   @id @default(uuid())
-  workspace_id String
-  category     String?
-  type         String
-  title        String
-  description  String
-  impact       String?
-  status       String   @default("ACTIVE") // ACTIVE/ACKNOWLEDGED/DISMISSED
-  assigned_to  String?
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-
-  // Relations
-  workspace    Workspace @relation(fields: [workspace_id], references: [id])
-
-  @@map("business_insights")
-}
-
-// KPI Metric model for key performance indicators
-model KPIMetric {
-  id           String   @id @default(uuid())
-  workspace_id String
-  name         String
-  metric_type  String
-  current_value Float?
-  target_value Float?
-  unit         String?
-  period       String   @default("MONTHLY") // DAILY/WEEKLY/MONTHLY/QUARTERLY/YEARLY
-  isActive     Boolean  @default(true)
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-
-  // Relations
-  workspace    Workspace @relation(fields: [workspace_id], references: [id])
-
-  @@map("kpi_metrics")
-}
-
-// Push Subscription model for PWA notifications
-model PushSubscription {
-  id         String   @id @default(uuid())
-  userId     String
-  endpoint   String
-  p256dhKey  String
-  authKey    String
-  userAgent  String?
-  isActive   Boolean  @default(true)
-  createdAt  DateTime @default(now())
-  lastUsed   DateTime @default(now())
-
-  // Relations
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, endpoint])
-  @@map("push_subscriptions")
-}
-

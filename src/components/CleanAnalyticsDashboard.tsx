@@ -25,8 +25,8 @@ import {
 } from 'lucide-react'
 
 // Lazy load heavy components
-const ChartComponent = lazy(() => import('./ChartComponent').catch(() => ({ default: () => <div>Chart unavailable</div> })))
-const AdvancedMetrics = lazy(() => import('./AdvancedMetrics').catch(() => ({ default: () => <div>Advanced metrics unavailable</div> })))
+const ChartComponent = lazy(() => import('@/components/ChartComponent').catch(() => ({ default: () => <div>Chart unavailable</div> })))
+const AdvancedMetrics = lazy(() => import('@/components/AdvancedMetrics').catch(() => ({ default: () => <div>Advanced metrics unavailable</div> })))
 
 interface AnalyticsData {
   systemPerformance: {

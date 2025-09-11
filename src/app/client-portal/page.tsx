@@ -7,6 +7,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -30,7 +31,11 @@ import {
   Settings,
   LogOut,
   Brain,
-  Palette
+  Palette,
+  Wifi,
+  WifiOff,
+  RefreshCw,
+  Circle
 } from 'lucide-react'
 
 interface ClientDashboard {
@@ -100,10 +105,36 @@ export default function ClientPortalPage() {
   const [dashboard, setDashboard] = useState<ClientDashboard | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  
+  // Real-time notifications integration
+  const { 
+    notifications, 
+    connectionStatus, 
+    unreadCount, 
+    markAsRead, 
+    markAllAsRead,
+    requestNotificationPermission 
+  } = useRealtimeNotifications('client-portal')
 
   useEffect(() => {
     loadDashboard()
+    // Request notification permission on first load
+    requestNotificationPermission()
   }, [])
+
+  // Auto-refresh dashboard when relevant notifications arrive
+  useEffect(() => {
+    const relevantNotifications = notifications.filter(notif => 
+      notif.type === 'order_status_change' || 
+      notif.type === 'design_approval_needed' ||
+      notif.type === 'production_update'
+    )
+    
+    if (relevantNotifications.length > 0) {
+      // Refresh dashboard data automatically
+      loadDashboard()
+    }
+  }, [notifications])
 
   const loadDashboard = async () => {
     try {
@@ -195,9 +226,39 @@ export default function ClientPortalPage() {
             </div>
             
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm">
+              {/* Real-time connection status */}
+              <div className="hidden md:flex items-center space-x-2 text-xs">
+                {connectionStatus.connected ? (
+                  <>
+                    <Wifi className="w-3 h-3 text-green-500" />
+                    <span className="text-green-600">Live</span>
+                  </>
+                ) : connectionStatus.reconnecting ? (
+                  <>
+                    <RefreshCw className="w-3 h-3 text-yellow-500 animate-spin" />
+                    <span className="text-yellow-600">Connecting...</span>
+                  </>
+                ) : (
+                  <>
+                    <WifiOff className="w-3 h-3 text-red-500" />
+                    <span className="text-red-600">Offline</span>
+                  </>
+                )}
+              </div>
+
+              {/* Notifications button */}
+              <Button variant="ghost" size="sm" className="relative" onClick={markAllAsRead}>
                 <Bell className="w-4 h-4" />
+                {unreadCount > 0 && (
+                  <Badge 
+                    variant="destructive" 
+                    className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
+                  >
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </Badge>
+                )}
               </Button>
+
               <Button variant="ghost" size="sm">
                 <Settings className="w-4 h-4" />
               </Button>
@@ -210,6 +271,56 @@ export default function ClientPortalPage() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Real-time Notifications Banner */}
+        {notifications.length > 0 && (
+          <div className="mb-6">
+            <Card className="border-blue-200 bg-blue-50">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-medium text-blue-900">
+                    Real-time Updates
+                  </CardTitle>
+                  <Button variant="ghost" size="sm" onClick={markAllAsRead}>
+                    Mark all read
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2 max-h-32 overflow-y-auto">
+                  {notifications.slice(0, 3).map((notification) => (
+                    <div 
+                      key={notification.id}
+                      className={`flex items-start space-x-3 p-2 rounded cursor-pointer transition-colors ${
+                        notification.read ? 'bg-white/50' : 'bg-white'
+                      }`}
+                      onClick={() => markAsRead(notification.id)}
+                    >
+                      <Circle 
+                        className={`w-2 h-2 mt-1.5 flex-shrink-0 ${
+                          notification.priority === 'high' ? 'text-red-500 fill-current' :
+                          notification.priority === 'normal' ? 'text-blue-500 fill-current' :
+                          'text-gray-400 fill-current'
+                        }`} 
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-gray-900">{notification.message}</p>
+                        <p className="text-xs text-gray-500">
+                          {new Date(notification.timestamp).toLocaleTimeString()}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                  {notifications.length > 3 && (
+                    <p className="text-xs text-gray-500 text-center pt-2">
+                      {notifications.length - 3} more notifications...
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         {/* Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card>

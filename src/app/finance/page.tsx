@@ -231,7 +231,7 @@ const mockBills: Bill[] = [
 
 export default function FinancePage() {
   const { data: session } = useSession()
-  const [activeTab, setActiveTab] = useState<'overview' | 'wallets' | 'transactions' | 'bills'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'wallets' | 'transactions' | 'bills' | 'ar-ap' | 'reports'>('overview')
   const [wallets] = useState<WalletData[]>(mockWallets)
   const [transactions] = useState<Transaction[]>(mockTransactions)
   const [bills] = useState<Bill[]>(mockBills)
@@ -381,20 +381,24 @@ export default function FinancePage() {
                   { key: 'overview', label: 'OVERVIEW', icon: TrendingUp, color: 'cyan' },
                   { key: 'wallets', label: 'NEURAL WALLETS', icon: Wallet, color: 'green' },
                   { key: 'transactions', label: 'TRANSACTIONS', icon: Activity, color: 'purple' },
-                  { key: 'bills', label: 'BILLS & BIR', icon: Building, color: 'orange' }
+                  { key: 'bills', label: 'BILLS & BIR', icon: Building, color: 'orange' },
+                  { key: 'ar-ap', label: 'AR/AP AGING', icon: Calculator, color: 'blue' },
+                  { key: 'reports', label: 'FINANCIAL REPORTS', icon: BarChart3, color: 'pink' }
                 ].map(({ key, label, icon: Icon, color }) => {
                   const isActive = activeTab === key
                   const colorClasses = {
                     cyan: isActive ? 'neon-btn-primary' : 'neon-btn-outline border-cyan-500/50 text-cyan-400',
                     green: isActive ? 'neon-btn-primary bg-green-500' : 'neon-btn-outline border-green-500/50 text-green-400',
                     purple: isActive ? 'neon-btn-primary bg-purple-500' : 'neon-btn-outline border-purple-500/50 text-purple-400',
-                    orange: isActive ? 'neon-btn-primary bg-orange-500' : 'neon-btn-outline border-orange-500/50 text-orange-400'
+                    orange: isActive ? 'neon-btn-primary bg-orange-500' : 'neon-btn-outline border-orange-500/50 text-orange-400',
+                    blue: isActive ? 'neon-btn-primary bg-blue-500' : 'neon-btn-outline border-blue-500/50 text-blue-400',
+                    pink: isActive ? 'neon-btn-primary bg-pink-500' : 'neon-btn-outline border-pink-500/50 text-pink-400'
                   }[color]
                   
                   return (
                     <button
                       key={key}
-                      onClick={() => setActiveTab(key as 'overview' | 'wallets' | 'transactions' | 'bills')}
+                      onClick={() => setActiveTab(key as any)}
                       className={`${colorClasses} px-4 py-2 text-xs font-mono`}
                     >
                       <Icon className="w-4 h-4 mr-2" />
@@ -814,6 +818,330 @@ export default function FinancePage() {
                   </Card>
                 )
               })}
+            </div>
+          )}
+
+          {/* AR/AP Aging Tab */}
+          {activeTab === 'ar-ap' && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Accounts Receivable */}
+                <Card className="quantum-card border-green-500/30">
+                  <CardHeader>
+                    <CardTitle className="flex items-center text-white">
+                      <ArrowDownLeft className="w-5 h-5 mr-2 text-green-400" />
+                      ACCOUNTS RECEIVABLE AGING
+                    </CardTitle>
+                    <CardDescription className="text-green-300 font-mono">
+                      Outstanding customer invoices
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-5 gap-2 text-xs font-mono">
+                      <div className="bg-slate-800/40 p-3 rounded border border-green-500/20 text-center">
+                        <p className="text-green-400 mb-1">CURRENT</p>
+                        <p className="text-white font-bold">₱125,400</p>
+                      </div>
+                      <div className="bg-slate-800/40 p-3 rounded border border-yellow-500/20 text-center">
+                        <p className="text-yellow-400 mb-1">1-30 DAYS</p>
+                        <p className="text-white font-bold">₱65,200</p>
+                      </div>
+                      <div className="bg-slate-800/40 p-3 rounded border border-orange-500/20 text-center">
+                        <p className="text-orange-400 mb-1">31-60 DAYS</p>
+                        <p className="text-white font-bold">₱32,100</p>
+                      </div>
+                      <div className="bg-slate-800/40 p-3 rounded border border-red-500/20 text-center">
+                        <p className="text-red-400 mb-1">61-90 DAYS</p>
+                        <p className="text-white font-bold">₱18,500</p>
+                      </div>
+                      <div className="bg-slate-800/40 p-3 rounded border border-red-600/20 text-center">
+                        <p className="text-red-600 mb-1">90+ DAYS</p>
+                        <p className="text-white font-bold">₱8,900</p>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      {[
+                        { client: 'ABC Manufacturing Corp.', invoice: 'INV-2024-001', amount: 45200, days: 15, status: 'current' },
+                        { client: 'XYZ Fashion Inc.', invoice: 'INV-2024-008', amount: 32500, days: 45, status: 'overdue' },
+                        { client: 'Fashion Forward Ltd.', invoice: 'INV-2024-012', amount: 18900, days: 75, status: 'critical' }
+                      ].map((item, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 bg-slate-800/40 border border-green-500/20 rounded-lg">
+                          <div>
+                            <p className="font-medium text-white font-mono text-sm">{item.client}</p>
+                            <p className="text-xs text-green-400 font-mono">{item.invoice} • {item.days} days</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-bold text-white font-mono">₱{item.amount.toLocaleString()}</p>
+                            <Badge className={
+                              item.status === 'current' ? 'bg-green-500/20 text-green-400 border-green-500/50' :
+                              item.status === 'overdue' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50' :
+                              'bg-red-500/20 text-red-400 border-red-500/50'
+                            }>
+                              {item.status.toUpperCase()}
+                            </Badge>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Accounts Payable */}
+                <Card className="quantum-card border-red-500/30">
+                  <CardHeader>
+                    <CardTitle className="flex items-center text-white">
+                      <ArrowUpRight className="w-5 h-5 mr-2 text-red-400" />
+                      ACCOUNTS PAYABLE AGING
+                    </CardTitle>
+                    <CardDescription className="text-red-300 font-mono">
+                      Outstanding vendor bills
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-5 gap-2 text-xs font-mono">
+                      <div className="bg-slate-800/40 p-3 rounded border border-green-500/20 text-center">
+                        <p className="text-green-400 mb-1">CURRENT</p>
+                        <p className="text-white font-bold">₱85,300</p>
+                      </div>
+                      <div className="bg-slate-800/40 p-3 rounded border border-yellow-500/20 text-center">
+                        <p className="text-yellow-400 mb-1">1-30 DAYS</p>
+                        <p className="text-white font-bold">₱42,800</p>
+                      </div>
+                      <div className="bg-slate-800/40 p-3 rounded border border-orange-500/20 text-center">
+                        <p className="text-orange-400 mb-1">31-60 DAYS</p>
+                        <p className="text-white font-bold">₱15,600</p>
+                      </div>
+                      <div className="bg-slate-800/40 p-3 rounded border border-red-500/20 text-center">
+                        <p className="text-red-400 mb-1">61-90 DAYS</p>
+                        <p className="text-white font-bold">₱8,500</p>
+                      </div>
+                      <div className="bg-slate-800/40 p-3 rounded border border-red-600/20 text-center">
+                        <p className="text-red-600 mb-1">90+ DAYS</p>
+                        <p className="text-white font-bold">₱3,200</p>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      {[
+                        { vendor: 'Textile Suppliers Inc.', bill: 'BILL-001', amount: 25000, days: 5, status: 'current' },
+                        { vendor: 'Ink & Chemicals Co.', bill: 'BILL-007', amount: 15600, days: 35, status: 'overdue' },
+                        { vendor: 'Utilities Provider', bill: 'BILL-015', amount: 8500, days: 65, status: 'critical' }
+                      ].map((item, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 bg-slate-800/40 border border-red-500/20 rounded-lg">
+                          <div>
+                            <p className="font-medium text-white font-mono text-sm">{item.vendor}</p>
+                            <p className="text-xs text-red-400 font-mono">{item.bill} • {item.days} days</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-bold text-white font-mono">₱{item.amount.toLocaleString()}</p>
+                            <Badge className={
+                              item.status === 'current' ? 'bg-green-500/20 text-green-400 border-green-500/50' :
+                              item.status === 'overdue' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50' :
+                              'bg-red-500/20 text-red-400 border-red-500/50'
+                            }>
+                              {item.status.toUpperCase()}
+                            </Badge>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Cash Flow Forecast */}
+              <Card className="quantum-card border-purple-500/30">
+                <CardHeader>
+                  <CardTitle className="flex items-center text-white">
+                    <TrendingUp className="w-5 h-5 mr-2 text-purple-400" />
+                    CASH FLOW FORECAST (30 DAYS)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-slate-800/40 p-4 rounded-lg border border-purple-500/20">
+                      <h4 className="font-semibold text-purple-400 font-mono mb-3">EXPECTED INFLOWS</h4>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Collections from AR:</span>
+                          <span className="text-green-400 font-mono">₱190,600</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">New orders expected:</span>
+                          <span className="text-green-400 font-mono">₱85,000</span>
+                        </div>
+                        <div className="flex justify-between font-bold border-t border-purple-500/20 pt-2">
+                          <span className="text-purple-400">Total Inflows:</span>
+                          <span className="text-green-400 font-mono">₱275,600</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-slate-800/40 p-4 rounded-lg border border-purple-500/20">
+                      <h4 className="font-semibold text-purple-400 font-mono mb-3">EXPECTED OUTFLOWS</h4>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">AP payments due:</span>
+                          <span className="text-red-400 font-mono">₱128,100</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Payroll & benefits:</span>
+                          <span className="text-red-400 font-mono">₱95,000</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Operating expenses:</span>
+                          <span className="text-red-400 font-mono">₱45,000</span>
+                        </div>
+                        <div className="flex justify-between font-bold border-t border-purple-500/20 pt-2">
+                          <span className="text-purple-400">Total Outflows:</span>
+                          <span className="text-red-400 font-mono">₱268,100</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-slate-800/40 p-4 rounded-lg border border-purple-500/20">
+                      <h4 className="font-semibold text-purple-400 font-mono mb-3">NET POSITION</h4>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Opening balance:</span>
+                          <span className="text-cyan-400 font-mono">₱153,900</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Net cash flow:</span>
+                          <span className="text-green-400 font-mono">₱7,500</span>
+                        </div>
+                        <div className="flex justify-between font-bold border-t border-purple-500/20 pt-2">
+                          <span className="text-purple-400">Projected balance:</span>
+                          <span className="text-cyan-400 font-mono text-lg">₱161,400</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* Financial Reports Tab */}
+          {activeTab === 'reports' && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[
+                  {
+                    title: 'Profit & Loss Statement',
+                    description: 'Monthly P&L with cost analysis',
+                    icon: TrendingUp,
+                    color: 'green',
+                    data: 'Current Month: ₱125,400 profit'
+                  },
+                  {
+                    title: 'Balance Sheet',
+                    description: 'Assets, liabilities, and equity',
+                    icon: PieChart,
+                    color: 'blue',
+                    data: 'Total Assets: ₱2,456,780'
+                  },
+                  {
+                    title: 'Cash Flow Statement',
+                    description: 'Operating, investing, financing activities',
+                    icon: Activity,
+                    color: 'purple',
+                    data: 'Operating CF: ₱98,200'
+                  },
+                  {
+                    title: 'BIR VAT Report',
+                    description: 'VAT returns and compliance',
+                    icon: Building,
+                    color: 'orange',
+                    data: 'Q4 VAT: ₱45,600 due Nov 25'
+                  },
+                  {
+                    title: 'Aging Reports',
+                    description: 'AR/AP aging analysis',
+                    icon: Calculator,
+                    color: 'cyan',
+                    data: 'AR Total: ₱250,100'
+                  },
+                  {
+                    title: 'Cost Analysis',
+                    description: 'Manufacturing cost breakdown',
+                    icon: BarChart3,
+                    color: 'pink',
+                    data: 'Material: 45%, Labor: 30%, Overhead: 25%'
+                  }
+                ].map((report, index) => {
+                  const colorClasses = {
+                    green: { border: 'border-green-500/30', icon: 'text-green-400', text: 'text-green-400' },
+                    blue: { border: 'border-blue-500/30', icon: 'text-blue-400', text: 'text-blue-400' },
+                    purple: { border: 'border-purple-500/30', icon: 'text-purple-400', text: 'text-purple-400' },
+                    orange: { border: 'border-orange-500/30', icon: 'text-orange-400', text: 'text-orange-400' },
+                    cyan: { border: 'border-cyan-500/30', icon: 'text-cyan-400', text: 'text-cyan-400' },
+                    pink: { border: 'border-pink-500/30', icon: 'text-pink-400', text: 'text-pink-400' }
+                  }[report.color]
+                  
+                  return (
+                    <Card key={index} className={`quantum-card ${colorClasses.border} hover:border-opacity-60 cursor-pointer transition-all duration-300`}>
+                      <CardContent className="p-6">
+                        <div className="flex items-start gap-4">
+                          <div className="ai-orb">
+                            <report.icon className={`w-6 h-6 ${colorClasses.icon}`} />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-lg font-bold text-white mb-2">{report.title}</h3>
+                            <p className="text-sm text-gray-400 mb-3">{report.description}</p>
+                            <p className={`text-sm font-mono ${colorClasses.text}`}>{report.data}</p>
+                            <div className="flex gap-2 mt-4">
+                              <button className="neon-btn-outline text-xs px-3 py-1">
+                                <Eye className="w-3 h-3 mr-1" />
+                                VIEW
+                              </button>
+                              <button className="neon-btn-outline text-xs px-3 py-1">
+                                <Download className="w-3 h-3 mr-1" />
+                                EXPORT
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )
+                })}
+              </div>
+
+              {/* BIR Compliance Summary */}
+              <Card className="quantum-card border-yellow-500/30">
+                <CardHeader>
+                  <CardTitle className="flex items-center text-white">
+                    <Building className="w-5 h-5 mr-2 text-yellow-400" />
+                    BIR COMPLIANCE STATUS
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="bg-slate-800/40 p-4 rounded-lg border border-yellow-500/20">
+                      <h4 className="font-semibold text-yellow-400 font-mono mb-2">VAT REGISTRATION</h4>
+                      <p className="text-green-400 text-sm mb-1">✓ Active</p>
+                      <p className="text-gray-400 text-xs">TIN: 123-456-789-000</p>
+                    </div>
+                    <div className="bg-slate-800/40 p-4 rounded-lg border border-yellow-500/20">
+                      <h4 className="font-semibold text-yellow-400 font-mono mb-2">BOOKS OF ACCOUNTS</h4>
+                      <p className="text-green-400 text-sm mb-1">✓ Updated</p>
+                      <p className="text-gray-400 text-xs">Last: Oct 2024</p>
+                    </div>
+                    <div className="bg-slate-800/40 p-4 rounded-lg border border-yellow-500/20">
+                      <h4 className="font-semibold text-yellow-400 font-mono mb-2">QUARTERLY RETURNS</h4>
+                      <p className="text-yellow-400 text-sm mb-1">⚠ Due Soon</p>
+                      <p className="text-gray-400 text-xs">Q4 Due: Nov 25</p>
+                    </div>
+                    <div className="bg-slate-800/40 p-4 rounded-lg border border-yellow-500/20">
+                      <h4 className="font-semibold text-yellow-400 font-mono mb-2">ANNUAL ITR</h4>
+                      <p className="text-blue-400 text-sm mb-1">➤ Preparing</p>
+                      <p className="text-gray-400 text-xs">2024 Due: Apr 15</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           )}
         </div>
