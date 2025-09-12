@@ -2,27 +2,85 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { Role, OrderStatus } from '@prisma/client'
+import { Role, OrderStatus, ProductMethod } from '@prisma/client'
 import { db } from '@/lib/db'
 import { z } from 'zod'
 import { withErrorHandler, createSuccessResponse, createErrorResponse, Errors, AppError } from '@/lib/api-error-handler'
+import type { ProductMethod, OrderStatus as PrismaOrderStatus } from '@prisma/client'
 import { OrderWorkflowEngine } from '@/lib/order-workflow'
 
 // ASH AI Enhanced Order Management System - CLIENT_UPDATED_PLAN.md Implementation
 // Complete order lifecycle management with workflow automation
 
+// Enhanced Order Schema for ASH AI TikTok-style form
 const OrderCreateSchema = z.object({
-  client_id: z.string().uuid(),
+  // Core order info
+  client_id: z.string().uuid().optional(),
+  brand_id: z.string().uuid(),
   po_number: z.string().optional(),
-  total_amount: z.number().positive(),
-  due_date: z.string().datetime().optional(),
+  
+  // Enhanced Company/Client Information
+  company_name: z.string().min(1, "Company name is required"),
+  requested_deadline: z.string().datetime(),
+  
+  // Product Details
+  product_name: z.string().min(1, "Product name is required"),
+  product_type: z.string(),
+  service_type: z.string(), // "Sew and Print / Embro", "Sew Only", "Print / Embro Only"
+  garment_type: z.string().optional(),
+  fabric_type: z.string().optional(),
+  fabric_colors: z.array(z.string()).optional(),
+  method: z.nativeEnum(ProductMethod),
+  
+  // Options (20 checkboxes as JSON)
+  options: z.record(z.boolean()).optional(),
+  
+  // Design Info
+  screen_printed: z.boolean().default(false),
+  embroidered_sublim: z.boolean().default(false),
+  size_label: z.enum(["Sew", "Print", "None"]).optional(),
+  
+  // Quantity & Specifications
+  estimated_quantity: z.number().positive().optional(),
+  total_qty: z.number().positive(),
+  size_curve: z.record(z.number()).default({}),
+  variants: z.array(z.object({
+    color: z.string(),
+    qty: z.number().positive()
+  })).optional(),
+  
+  // Files
+  images: z.array(z.object({
+    url: z.string().url(),
+    name: z.string(),
+    size: z.number().optional(),
+    type: z.string().optional()
+  })).max(10, "Maximum 10 images allowed").optional(),
+  attachments: z.array(z.object({
+    url: z.string().url(),
+    name: z.string(),
+    size: z.number().optional(),
+    type: z.enum(["pdf", "ai", "psd", "zip"])
+  })).optional(),
+  
+  // Legacy fields for compatibility
+  target_delivery_date: z.string().datetime(),
+  commercials: z.object({
+    unit_price: z.number().positive().optional(),
+    deposit_pct: z.number().min(0).max(100).optional(),
+    terms: z.string().optional(),
+    tax_mode: z.enum(["VAT_INCLUSIVE", "VAT_EXCLUSIVE", "NON_VAT"]).optional(),
+    currency: z.string().default("PHP")
+  }).optional(),
+  
+  clothing_type: z.string().optional(),
+  order_type: z.string().optional(),
   notes: z.string().optional(),
-  items: z.array(z.object({
-    product_type: z.string(),
-    quantity: z.number().positive(),
-    unit_price: z.number().positive(),
-    specifications: z.record(z.any()).optional()
-  }))
+  addons: z.array(z.object({
+    name: z.string(),
+    price: z.number(),
+    quantity: z.number().optional()
+  })).optional()
 });
 
 const OrderUpdateSchema = z.object({
@@ -130,85 +188,243 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
     const workspace_id = 'default';
     const user_id = session.user.id;
 
-    // Generate PO number if not provided
-    const po_number = validatedData.po_number || await generatePONumber(workspace_id);
+    // Generate ASH AI PO number using brand-specific format
+    const { generatePONumber } = await import('@/lib/po-generator');
+    const po_result = validatedData.po_number 
+      ? { po_number: validatedData.po_number, sequence: 0 }
+      : await generatePONumber(validatedData.brand_id);
+    const po_number = po_result.po_number;
 
-    // Create order with items in transaction
+    // Handle client creation or retrieval
+    let client_id = validatedData.client_id;
+    if (!client_id && validatedData.company_name) {
+      // Create new client if company name provided but no client_id
+      const newClient = await db.client.create({
+        data: {
+          workspace_id,
+          name: validatedData.company_name,
+          company: validatedData.company_name,
+          created_at: new Date(),
+          updated_at: new Date()
+        }
+      });
+      client_id = newClient.id;
+    }
+
+    if (!client_id) {
+      throw new AppError('CLIENT_REQUIRED', 'Client ID or company name is required', 400);
+    }
+
+    // Create enhanced order with all new fields
     const order = await db.$transaction(async (tx) => {
-      // Create the order
+      // Create the order with enhanced fields
       const newOrder = await tx.order.create({
         data: {
+          // Core identification
+          workspace_id,
+          brand_id: validatedData.brand_id,
+          client_id,
           po_number,
-          client_id: validatedData.client_id,
-          status: 'INTAKE',
-          total_amount: validatedData.total_amount,
-          due_date: validatedData.due_date ? new Date(validatedData.due_date) : null,
+          created_by: user_id,
+          
+          // Enhanced Company/Client Information
+          company_name: validatedData.company_name,
+          requested_deadline: new Date(validatedData.requested_deadline),
+          
+          // Product Details
+          product_name: validatedData.product_name,
+          product_type: validatedData.product_type,
+          service_type: validatedData.service_type,
+          garment_type: validatedData.garment_type,
+          fabric_type: validatedData.fabric_type,
+          fabric_colors: validatedData.fabric_colors || [],
+          method: validatedData.method,
+          
+          // Options (checkboxes)
+          options: validatedData.options || {},
+          
+          // Design Info
+          screen_printed: validatedData.screen_printed,
+          embroidered_sublim: validatedData.embroidered_sublim,
+          size_label: validatedData.size_label,
+          
+          // Quantity & Files
+          estimated_quantity: validatedData.estimated_quantity,
+          total_qty: validatedData.total_qty,
+          size_curve: validatedData.size_curve,
+          variants: validatedData.variants || [],
+          images: validatedData.images || [],
+          attachments: validatedData.attachments || [],
+          
+          // Core order fields
+          target_delivery_date: new Date(validatedData.target_delivery_date),
+          commercials: validatedData.commercials || {},
+          clothing_type: validatedData.clothing_type,
+          order_type: validatedData.order_type,
           notes: validatedData.notes,
-          workspace_id,
-          created_by: user_id
+          addons: validatedData.addons || [],
+          
+          // Status and timestamps
+          status: OrderStatus.INTAKE,
+          created_at: new Date(),
+          updated_at: new Date()
         }
       });
 
-      // Create order items
-      await tx.orderItem.createMany({
-        data: validatedData.items.map(item => ({
-          order_id: newOrder.id,
-          product_type: item.product_type,
-          quantity: item.quantity,
-          unit_price: item.unit_price,
-          total_price: item.quantity * item.unit_price,
-          specifications: item.specifications ? JSON.stringify(item.specifications) : null,
-          workspace_id,
-          created_by: user_id
-        }))
-      });
-
-      // Create initial status history
-      await tx.orderStatusHistory.create({
-        data: {
-          order_id: newOrder.id,
-          status: 'INTAKE',
-          changed_by: user_id,
-          notes: 'Order created',
-          workspace_id
+      // Create order items from variants or default item
+      const orderItems = [];
+      
+      if (validatedData.variants && validatedData.variants.length > 0) {
+        // Create items from variants (color/qty breakdown)
+        for (const variant of validatedData.variants) {
+          // Generate SKU for this variant
+          const sku = `${validatedData.product_name?.replace(/\s+/g, '-').toUpperCase()}-${variant.color.replace(/\s+/g, '-').toUpperCase()}`;
+          
+          orderItems.push({
+            order_id: newOrder.id,
+            sku,
+            product_name: validatedData.product_name,
+            size: 'MIXED', // Will be broken down by size_curve
+            color: variant.color,
+            quantity: variant.qty,
+            unit_price: validatedData.commercials?.unit_price || 0,
+            total_price: variant.qty * (validatedData.commercials?.unit_price || 0),
+            created_at: new Date()
+          });
         }
-      });
+      } else {
+        // Create single item
+        const sku = `${validatedData.product_name?.replace(/\s+/g, '-').toUpperCase()}-DEFAULT`;
+        orderItems.push({
+          order_id: newOrder.id,
+          sku,
+          product_name: validatedData.product_name,
+          size: 'MIXED',
+          color: 'DEFAULT',
+          quantity: validatedData.total_qty,
+          unit_price: validatedData.commercials?.unit_price || 0,
+          total_price: validatedData.total_qty * (validatedData.commercials?.unit_price || 0),
+          created_at: new Date()
+        });
+      }
+      
+      if (orderItems.length > 0) {
+        await tx.orderItem.createMany({
+          data: orderItems
+        });
+      }
 
-      // Create audit log
+      // Create order attachments if images provided
+      if (validatedData.images && validatedData.images.length > 0) {
+        await tx.orderAttachment.createMany({
+          data: validatedData.images.map((image, index) => ({
+            order_id: newOrder.id,
+            type: 'image',
+            file_url: image.url,
+            meta: {
+              name: image.name,
+              size: image.size,
+              type: image.type,
+              order: index + 1
+            },
+            created_at: new Date()
+          }))
+        });
+      }
+      
+      // Create attachment records for file attachments
+      if (validatedData.attachments && validatedData.attachments.length > 0) {
+        await tx.orderAttachment.createMany({
+          data: validatedData.attachments.map((attachment, index) => ({
+            order_id: newOrder.id,
+            type: 'attachment',
+            file_url: attachment.url,
+            meta: {
+              name: attachment.name,
+              size: attachment.size,
+              type: attachment.type,
+              order: index + 1
+            },
+            created_at: new Date()
+          }))
+        });
+      }
+
+      // Create audit log with enhanced data
       await tx.auditLog.create({
         data: {
           workspace_id,
           actor_id: user_id,
-          entity_type: 'ORDER',
+          entity_type: 'order',
           entity_id: newOrder.id,
           action: 'CREATE',
-          after_data: JSON.stringify(validatedData)
+          after_data: {
+            po_number,
+            company_name: validatedData.company_name,
+            product_name: validatedData.product_name,
+            service_type: validatedData.service_type,
+            method: validatedData.method,
+            total_qty: validatedData.total_qty,
+            estimated_quantity: validatedData.estimated_quantity,
+            requested_deadline: validatedData.requested_deadline,
+            images_count: validatedData.images?.length || 0,
+            attachments_count: validatedData.attachments?.length || 0,
+            options_selected: Object.keys(validatedData.options || {}).filter(key => validatedData.options?.[key]).length
+          },
+          created_at: new Date()
         }
       });
 
       return newOrder;
     });
 
-    // Get complete order with relations
+    // Get complete order with enhanced relations
     const completeOrder = await db.order.findUnique({
       where: { id: order.id },
       include: {
-        client: { select: { id: true, name: true, emails: true } },
-        orderItems: true,
-        statusHistory: { orderBy: { changed_at: 'desc' } }
+        workspace: { select: { id: true, name: true } },
+        brand: { select: { id: true, name: true, code: true } },
+        client: { select: { id: true, name: true, company: true, emails: true } },
+        items: true,
+        order_attachments: {
+          select: {
+            id: true,
+            type: true,
+            file_url: true,
+            meta: true,
+            created_at: true
+          }
+        }
       }
     });
 
     return createSuccessResponse(
       {
-        ...completeOrder,
+        id: completeOrder?.id,
+        po_number,
+        status: completeOrder?.status,
+        company_name: completeOrder?.company_name,
+        product_name: completeOrder?.product_name,
+        service_type: completeOrder?.service_type,
+        method: completeOrder?.method,
+        total_qty: completeOrder?.total_qty,
+        estimated_quantity: completeOrder?.estimated_quantity,
+        requested_deadline: completeOrder?.requested_deadline,
+        target_delivery_date: completeOrder?.target_delivery_date,
+        images: completeOrder?.images,
+        attachments: completeOrder?.attachments,
+        options: completeOrder?.options,
+        brand: completeOrder?.brand,
+        client: completeOrder?.client,
+        workspace: completeOrder?.workspace,
+        items: completeOrder?.items,
+        order_attachments: completeOrder?.order_attachments,
         progress_percentage: 0,
-        available_transitions: await OrderWorkflowEngine.getAvailableTransitions(
-          order.id,
-          session.user.role as Role
-        )
+        available_transitions: [], // Will be populated by workflow engine
+        created_at: completeOrder?.created_at,
+        updated_at: completeOrder?.updated_at
       },
-      'Order created successfully',
+      `ASH AI Order ${po_number} created successfully! 🎯`,
       201
     );
 
@@ -219,7 +435,8 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
 });
 
 // Helper Functions
-async function generatePONumber(workspace_id: string): Promise<string> {
+// Legacy fallback PO number generator
+async function generateLegacyPONumber(workspace_id: string): Promise<string> {
   const year = new Date().getFullYear();
   const count = await db.order.count({
     where: {

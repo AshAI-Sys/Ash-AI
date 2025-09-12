@@ -41,6 +41,19 @@ interface Order {
   created_at: string
   items: number
   priority: 'HIGH' | 'MEDIUM' | 'LOW'
+  
+  // Enhanced fields for search/filtering
+  company_name?: string
+  product_name?: string
+  service_type?: string
+  garment_type?: string
+  fabric_type?: string
+  fabric_colors?: string[]
+  method: string
+  screen_printed: boolean
+  embroidered_sublim: boolean
+  size_label?: string
+  estimated_quantity: number
 }
 
 const sampleOrders: Order[] = [
@@ -48,6 +61,17 @@ const sampleOrders: Order[] = [
     id: '1',
     orderNumber: 'ASH-2025-001234',
     clientName: 'Premium Apparel Co.',
+    company_name: 'Premium Sports Inc.',
+    product_name: 'Team Jersey',
+    service_type: 'Sew and Print / Embro',
+    garment_type: 'Jersey',
+    fabric_type: 'Dri-Fit',
+    fabric_colors: ['Navy Blue', 'White'],
+    method: 'SILKSCREEN',
+    screen_printed: true,
+    embroidered_sublim: false,
+    size_label: 'Print',
+    estimated_quantity: 100,
     status: 'IN_PRODUCTION',
     totalAmount: 45000,
     dueDate: '2025-09-15',
@@ -59,6 +83,17 @@ const sampleOrders: Order[] = [
     id: '2',
     orderNumber: 'ASH-2025-001235',
     clientName: 'Fashion Forward Ltd.',
+    company_name: 'Fashion Forward',
+    product_name: 'Corporate Polo',
+    service_type: 'Sew Only',
+    garment_type: 'Polo Shirt',
+    fabric_type: 'Cotton Blend',
+    fabric_colors: ['Black', 'Gray'],
+    method: 'EMBROIDERY',
+    screen_printed: false,
+    embroidered_sublim: true,
+    size_label: 'Sew',
+    estimated_quantity: 75,
     status: 'QC_PASSED',
     totalAmount: 32500,
     dueDate: '2025-09-10',
@@ -70,6 +105,17 @@ const sampleOrders: Order[] = [
     id: '3',
     orderNumber: 'ASH-2025-001236',
     clientName: 'Urban Style Boutique',
+    company_name: 'Urban Style Co.',
+    product_name: 'Casual Hoodie',
+    service_type: 'Print / Embro Only',
+    garment_type: 'Hoodie',
+    fabric_type: 'French Terry',
+    fabric_colors: ['White', 'Red'],
+    method: 'DTF',
+    screen_printed: true,
+    embroidered_sublim: false,
+    size_label: 'Print',
+    estimated_quantity: 60,
     status: 'DELIVERED',
     totalAmount: 28000,
     dueDate: '2025-09-01',
@@ -81,6 +127,17 @@ const sampleOrders: Order[] = [
     id: '4',
     orderNumber: 'ASH-2025-001237',
     clientName: 'Corporate Uniforms Inc.',
+    company_name: 'Corporate Solutions Ltd.',
+    product_name: 'Security Uniform',
+    service_type: 'Sew and Print / Embro',
+    garment_type: 'Uniform',
+    fabric_type: 'Cotton 100%',
+    fabric_colors: ['Navy Blue', 'Black'],
+    method: 'SILKSCREEN',
+    screen_printed: true,
+    embroidered_sublim: true,
+    size_label: 'Sew',
+    estimated_quantity: 200,
     status: 'CONFIRMED',
     totalAmount: 85000,
     dueDate: '2025-09-20',
@@ -92,6 +149,17 @@ const sampleOrders: Order[] = [
     id: '5',
     orderNumber: 'ASH-2025-001238',
     clientName: 'TechStart Solutions',
+    company_name: 'TechStart Inc.',
+    product_name: 'Company Tee',
+    service_type: 'Print / Embro Only',
+    garment_type: 'Tee',
+    fabric_type: 'Cotton Blend',
+    fabric_colors: ['White'],
+    method: 'SUBLIMATION',
+    screen_printed: false,
+    embroidered_sublim: true,
+    size_label: 'Print',
+    estimated_quantity: 30,
     status: 'DRAFT',
     totalAmount: 15000,
     dueDate: '2025-09-12',
@@ -220,9 +288,19 @@ export default function OrdersPage() {
     )
   }
 
+  // Enhanced filtering with all new fields
   const filteredOrders = orders.filter(order => {
-    const matchesSearch = order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         order.clientName.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesSearch = searchTerm === '' || 
+                         order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         order.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         order.company_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         order.product_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         order.service_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         order.garment_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         order.fabric_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         order.fabric_colors?.some(color => color.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                         order.method?.toLowerCase().includes(searchTerm.toLowerCase())
+    
     const matchesStatus = !statusFilter || order.status === statusFilter
     return matchesSearch && matchesStatus
   })
@@ -347,22 +425,33 @@ export default function OrdersPage() {
           </Card>
         </div>
 
-        {/* TikTok-Style Search and Filters */}
+        {/* Enhanced TikTok-Style Search and Filters */}
         <Card className="bg-white border border-gray-200 shadow-sm mb-6">
           <CardContent className="p-6">
-            <div className="flex flex-col lg:flex-row gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <Input
-                    placeholder="Search orders..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
+            <div className="space-y-4">
+              {/* Main Search Bar */}
+              <div className="flex flex-col lg:flex-row gap-4">
+                <div className="flex-1">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Input
+                      placeholder="Search by order number, client, company, product name, garment type, fabric, colors..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <Button variant="outline" size="sm">
+                    <Filter className="w-4 h-4 mr-2" />
+                    Advanced Filters
+                  </Button>
                 </div>
               </div>
-              <div className="flex gap-3">
+              
+              {/* Quick Filters Row */}
+              <div className="flex flex-wrap gap-3">
                 <select 
                   className="px-3 py-2 border border-gray-200 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   value={statusFilter}
@@ -375,37 +464,109 @@ export default function OrdersPage() {
                   <option value="QC_PASSED">QC Passed</option>
                   <option value="DELIVERED">Delivered</option>
                 </select>
-                <Button variant="outline" size="sm">
-                  <Filter className="w-4 h-4 mr-2" />
-                  Filter
-                </Button>
-                <Button 
-                  onClick={() => {
-                    const csvContent = 'Order Number,Client Name,Status,Amount,Due Date\n' + 
-                      filteredOrders.map(order => 
-                        `${order.orderNumber},${order.clientName},${order.status},${order.totalAmount},${order.dueDate}`
-                      ).join('\n')
-                    
-                    const blob = new Blob([csvContent], { type: 'text/csv' })
-                    const url = window.URL.createObjectURL(blob)
-                    const link = document.createElement('a')
-                    link.href = url
-                    link.download = 'ash-ai-orders-export.csv'
-                    document.body.appendChild(link)
-                    link.click()
-                    document.body.removeChild(link)
-                    window.URL.revokeObjectURL(url)
-                  }}
-                  variant="outline"
-                  size="sm"
+                
+                <select 
+                  className="px-3 py-2 border border-gray-200 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  onChange={(e) => setSearchTerm(e.target.value)}
                 >
-                  <Download className="w-4 h-4 mr-2" />
-                  Export Data
+                  <option value="">All Service Types</option>
+                  <option value="Sew and Print / Embro">Sew and Print / Embro</option>
+                  <option value="Sew Only">Sew Only</option>
+                  <option value="Print / Embro Only">Print / Embro Only</option>
+                </select>
+                
+                <select 
+                  className="px-3 py-2 border border-gray-200 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                >
+                  <option value="">All Garment Types</option>
+                  <option value="Jersey">Jersey</option>
+                  <option value="Polo Shirt">Polo Shirt</option>
+                  <option value="Tee">Tee</option>
+                  <option value="Hoodie">Hoodie</option>
+                  <option value="Uniform">Uniform</option>
+                </select>
+                
+                <select 
+                  className="px-3 py-2 border border-gray-200 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                >
+                  <option value="">All Methods</option>
+                  <option value="SILKSCREEN">Silkscreen</option>
+                  <option value="SUBLIMATION">Sublimation</option>
+                  <option value="DTF">DTF</option>
+                  <option value="EMBROIDERY">Embroidery</option>
+                </select>
+                
+                <Button 
+                  onClick={() => setSearchTerm('')}
+                  variant="ghost" 
+                  size="sm"
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  Clear All
                 </Button>
               </div>
             </div>
           </CardContent>
         </Card>
+        
+        {/* Quick Filter Tags */}
+        {searchTerm && (
+          <Card className="bg-blue-50 border border-blue-200 shadow-sm mb-6">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-blue-800">Active filter:</span>
+                <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                  "{searchTerm}"
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="ml-2 h-4 w-4 p-0 hover:bg-blue-200"
+                    onClick={() => setSearchTerm('')}
+                  >
+                    ×
+                  </Button>
+                </Badge>
+                <span className="text-sm text-blue-600">
+                  {filteredOrders.length} of {orders.length} orders shown
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+        
+        {/* Enhanced Export and Actions */}
+        <div className="flex justify-between items-center mb-6">
+          <div className="text-sm text-gray-600">
+            Showing {filteredOrders.length} of {orders.length} orders
+          </div>
+          <div className="flex gap-3">
+            <Button 
+              onClick={() => {
+                const csvContent = 'Order Number,Client Name,Status,Amount,Due Date\n' + 
+                  filteredOrders.map(order => 
+                    `${order.orderNumber},${order.clientName},${order.status},${order.totalAmount},${order.dueDate}`
+                  ).join('\n')
+                
+                const blob = new Blob([csvContent], { type: 'text/csv' })
+                const url = window.URL.createObjectURL(blob)
+                const link = document.createElement('a')
+                link.href = url
+                link.download = 'ash-ai-orders-export.csv'
+                document.body.appendChild(link)
+                link.click()
+                document.body.removeChild(link)
+                window.URL.revokeObjectURL(url)
+              }}
+              variant="outline"
+              size="sm"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Export Data
+            </Button>
+          </div>
+        </div>
 
         {/* TikTok-Style AI Insights Panel */}
         <Card className="bg-white border border-gray-200 shadow-sm mb-6">

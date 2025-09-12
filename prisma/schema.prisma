@@ -327,16 +327,45 @@ model Order {
   client_id            String
   po_number            String        @unique // e.g., REEF-2025-000123
   channel              String?       // Direct / Shopee / etc.
+  
+  // Enhanced Order Information
+  company_name         String?       // Clothing/Company field
+  requested_deadline   DateTime?     // Requested Deadline
+  
+  // Product Details
+  product_name         String?       // Product Name
   product_type         String
+  service_type         String?       // "Sew and Print / Embro", "Sew Only", "Print / Embro Only"
+  garment_type         String?       // Garment Type dropdown + optional text
+  fabric_type          String?       // Fabric Type
+  fabric_colors        Json?         // Multi-select fabric colors array
   method               ProductMethod // SILKSCREEN/SUBLIMATION/DTF/EMBROIDERY
+  
+  // Options (checkboxes)
+  options              Json?         // All checkbox options as JSON object
+  
+  // Design Info
+  screen_printed       Boolean       @default(false)
+  embroidered_sublim   Boolean       @default(false)
+  size_label           String?       // "Sew", "Print", "None"
+  
+  // Quantity & Files
+  estimated_quantity   Int?          // Estimated Quantity
   total_qty            Int
   size_curve           Json          // {"S":50,"M":120,...}
   variants             Json?         // [{"color":"Black","qty":300}, ...]
   addons               Json?
+  
+  // Files
+  images               Json?         // Array of uploaded images (max 10)
+  attachments          Json?         // PDF, AI, PSD, ZIP files
+  
   target_delivery_date DateTime
   commercials          Json?         // {unit_price, deposit_pct, terms, tax_mode, currency}
   clothing_type        String?       // Additional clothing type field
   order_type           String?       // Type of order
+  notes                String?       // Notes, remarks, or other options
+  
   status               OrderStatus   @default(INTAKE)
   route_template_id    String?       // Optional routing template
   created_by           String        // user id

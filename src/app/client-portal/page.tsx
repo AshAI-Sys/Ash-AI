@@ -15,6 +15,11 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import {
   Package,
   Eye,
@@ -36,7 +41,22 @@ import {
   Wifi,
   WifiOff,
   RefreshCw,
-  Circle
+  Circle,
+  Plus,
+  Upload,
+  Save,
+  Send,
+  Info,
+  Building2,
+  User,
+  Sparkles,
+  Zap,
+  Shirt,
+  Palette as PaletteIcon,
+  Hash,
+  FileText,
+  Image as ImageIcon,
+  X
 } from 'lucide-react'
 
 interface ClientDashboard {
@@ -101,11 +121,102 @@ interface ClientDashboard {
   }>
 }
 
+interface OrderFormData {
+  company_name: string
+  requested_deadline: string
+  product_name: string
+  service_type: string
+  garment_type: string
+  fabric_type: string
+  fabric_colors: string[]
+  method: string
+  options: {
+    with_collar: boolean
+    with_cuffs: boolean
+    with_combi: boolean
+    with_bias_tape: boolean
+    with_side_slit: boolean
+    with_flatbed: boolean
+    with_buttons: boolean
+    with_zipper: boolean
+    with_linings: boolean
+    with_pangiti: boolean
+    sleeveless: boolean
+    longsleeves: boolean
+    three_quarter_sleeves: boolean
+    pocket: boolean
+    reversible: boolean
+    raglan: boolean
+    hooded: boolean
+    long_tee: boolean
+    kangaroo_pocket: boolean
+    with_batok: boolean
+  }
+  screen_printed: boolean
+  embroidered_sublim: boolean
+  size_label: string
+  estimated_quantity: number
+  images: File[]
+  attachments: File[]
+  notes: string
+  brand_id: string
+  product_type: string
+  total_qty: number
+  target_delivery_date: string
+}
+
 export default function ClientPortalPage() {
   const router = useRouter()
   const [dashboard, setDashboard] = useState<ClientDashboard | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  
+  // Order form state
+  const [orderFormData, setOrderFormData] = useState<OrderFormData>({
+    company_name: '',
+    requested_deadline: '',
+    product_name: '',
+    service_type: '',
+    garment_type: '',
+    fabric_type: '',
+    fabric_colors: [],
+    method: 'SILKSCREEN',
+    options: {
+      with_collar: false,
+      with_cuffs: false,
+      with_combi: false,
+      with_bias_tape: false,
+      with_side_slit: false,
+      with_flatbed: false,
+      with_buttons: false,
+      with_zipper: false,
+      with_linings: false,
+      with_pangiti: false,
+      sleeveless: false,
+      longsleeves: false,
+      three_quarter_sleeves: false,
+      pocket: false,
+      reversible: false,
+      raglan: false,
+      hooded: false,
+      long_tee: false,
+      kangaroo_pocket: false,
+      with_batok: false
+    },
+    screen_printed: false,
+    embroidered_sublim: false,
+    size_label: '',
+    estimated_quantity: 0,
+    images: [],
+    attachments: [],
+    notes: '',
+    brand_id: '1',
+    product_type: '',
+    total_qty: 0,
+    target_delivery_date: ''
+  })
+  const [orderFormLoading, setOrderFormLoading] = useState(false)
+  const [orderFormErrors, setOrderFormErrors] = useState<string[]>([])
   
   // Real-time notifications integration
   const { 
@@ -122,6 +233,16 @@ export default function ClientPortalPage() {
     // Request notification permission on first load
     requestNotificationPermission()
   }, [])
+
+  // Auto-populate company name when dashboard loads
+  useEffect(() => {
+    if (dashboard?.client && !orderFormData.company_name) {
+      setOrderFormData(prev => ({
+        ...prev,
+        company_name: dashboard.client.company || dashboard.client.name
+      }))
+    }
+  }, [dashboard])
 
   // Auto-refresh dashboard when relevant notifications arrive
   useEffect(() => {
@@ -164,6 +285,207 @@ export default function ClientPortalPage() {
       router.push('/client-portal/login')
     } catch (error) {
       console.error('Logout error:', error)
+    }
+  }
+
+  // Order form constants
+  const garmentTypes = [
+    'Tee', 'Polo Shirt', 'Hoodie', 'Jersey', 'Uniform', 'Tank Top', 'Long Sleeve', 'Jacket', 'Dress', 'Custom'
+  ]
+  
+  const fabricTypes = [
+    'Cotton 100%', 'Cotton Blend', 'Polyester', 'Cotton-Polyester', 'Bamboo', 'Linen', 'Dri-Fit', 'Jersey Knit', 'French Terry', 'Custom'
+  ]
+  
+  const colorOptions = [
+    'White', 'Black', 'Navy Blue', 'Royal Blue', 'Red', 'Maroon', 'Green', 'Gray', 'Yellow', 'Orange', 'Purple', 'Pink', 'Brown', 'Beige'
+  ]
+
+  // Order form handlers
+  const handleOrderFormChange = (field: keyof OrderFormData, value: any) => {
+    setOrderFormData(prev => ({
+      ...prev,
+      [field]: value
+    }))
+  }
+
+  const handleColorToggle = (color: string) => {
+    setOrderFormData(prev => ({
+      ...prev,
+      fabric_colors: prev.fabric_colors.includes(color)
+        ? prev.fabric_colors.filter(c => c !== color)
+        : [...prev.fabric_colors, color]
+    }))
+  }
+
+  const handleOptionToggle = (option: keyof OrderFormData['options']) => {
+    setOrderFormData(prev => ({
+      ...prev,
+      options: {
+        ...prev.options,
+        [option]: !prev.options[option]
+      }
+    }))
+  }
+
+  const handleFileUpload = (field: 'images' | 'attachments', files: FileList | null) => {
+    if (files) {
+      const fileArray = Array.from(files)
+      setOrderFormData(prev => ({
+        ...prev,
+        [field]: [...prev[field], ...fileArray]
+      }))
+    }
+  }
+
+  const removeFile = (field: 'images' | 'attachments', index: number) => {
+    setOrderFormData(prev => ({
+      ...prev,
+      [field]: prev[field].filter((_, i) => i !== index)
+    }))
+  }
+
+  const validateOrderForm = (): boolean => {
+    const errors: string[] = []
+    
+    if (!orderFormData.company_name.trim()) errors.push('Company name is required')
+    if (!orderFormData.product_name.trim()) errors.push('Product name is required')
+    if (!orderFormData.service_type) errors.push('Service type is required')
+    if (!orderFormData.requested_deadline) errors.push('Requested deadline is required')
+    if (orderFormData.estimated_quantity <= 0) errors.push('Estimated quantity must be greater than 0')
+    if (orderFormData.fabric_colors.length === 0) errors.push('At least one fabric color must be selected')
+    
+    setOrderFormErrors(errors)
+    return errors.length === 0
+  }
+
+  const handleOrderSubmit = async () => {
+    if (!validateOrderForm()) return
+
+    setOrderFormLoading(true)
+    try {
+      // Auto-populate client information from session
+      const submissionData = {
+        ...orderFormData,
+        total_qty: orderFormData.estimated_quantity,
+        target_delivery_date: orderFormData.requested_deadline,
+        product_type: orderFormData.garment_type,
+        // Convert images and attachments to URLs (in real implementation, upload files first)
+        images: orderFormData.images.map((file, index) => ({
+          url: URL.createObjectURL(file),
+          name: file.name,
+          size: file.size,
+          type: file.type
+        })),
+        attachments: orderFormData.attachments.map((file, index) => ({
+          url: URL.createObjectURL(file),
+          name: file.name,
+          size: file.size,
+          type: file.name.split('.').pop()?.toLowerCase() || 'unknown'
+        }))
+      }
+
+      const response = await fetch('/api/client-portal/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(submissionData)
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        
+        // Show success message with TikTok-style notification
+        if (result.message) {
+          // Create a temporary success banner
+          const successBanner = document.createElement('div')
+          successBanner.innerHTML = `
+            <div class="fixed top-20 left-1/2 transform -translate-x-1/2 z-[9999] bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-8 py-4 rounded-2xl shadow-2xl animate-bounce">
+              <div class="flex items-center space-x-3">
+                <div class="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                </div>
+                <span class="font-bold text-lg">${result.message}</span>
+              </div>
+            </div>
+          `
+          document.body.appendChild(successBanner)
+          
+          // Remove banner after 5 seconds
+          setTimeout(() => {
+            if (successBanner.parentNode) {
+              successBanner.parentNode.removeChild(successBanner)
+            }
+          }, 5000)
+        }
+        
+        // Reset form to initial state
+        setOrderFormData({
+          company_name: dashboard?.client?.company || '',
+          requested_deadline: '',
+          product_name: '',
+          service_type: '',
+          garment_type: '',
+          fabric_type: '',
+          fabric_colors: [],
+          method: 'SILKSCREEN',
+          options: {
+            with_collar: false,
+            with_cuffs: false,
+            with_combi: false,
+            with_bias_tape: false,
+            with_side_slit: false,
+            with_flatbed: false,
+            with_buttons: false,
+            with_zipper: false,
+            with_linings: false,
+            with_pangiti: false,
+            sleeveless: false,
+            longsleeves: false,
+            three_quarter_sleeves: false,
+            pocket: false,
+            reversible: false,
+            raglan: false,
+            hooded: false,
+            long_tee: false,
+            kangaroo_pocket: false,
+            with_batok: false
+          },
+          screen_printed: false,
+          embroidered_sublim: false,
+          size_label: '',
+          estimated_quantity: 0,
+          images: [],
+          attachments: [],
+          notes: '',
+          brand_id: '1',
+          product_type: '',
+          total_qty: 0,
+          target_delivery_date: ''
+        })
+        
+        // Clear any existing errors
+        setOrderFormErrors([])
+        
+        // Refresh dashboard to show new order
+        loadDashboard()
+      } else {
+        const errorData = await response.json()
+        if (errorData.details && Array.isArray(errorData.details)) {
+          // Handle Zod validation errors
+          setOrderFormErrors(errorData.details.map((err: any) => err.message))
+        } else {
+          setOrderFormErrors([errorData.error || 'Failed to create order'])
+        }
+      }
+    } catch (error) {
+      console.error('Order submission error:', error)
+      setOrderFormErrors(['Network error. Please try again.'])
+    } finally {
+      setOrderFormLoading(false)
     }
   }
 
@@ -429,13 +751,20 @@ export default function ClientPortalPage() {
         {/* TikTok-Style Tabs Navigation */}
         <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-200/50 shadow-xl shadow-gray-100/50 p-2 mb-8">
           <Tabs defaultValue="orders" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3 bg-transparent gap-2 p-0">
+            <TabsList className="grid w-full grid-cols-4 bg-transparent gap-2 p-0">
               <TabsTrigger 
                 value="orders" 
                 className="flex items-center gap-2 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 font-medium"
               >
                 <Package className="w-4 h-4" />
                 My Orders
+              </TabsTrigger>
+              <TabsTrigger 
+                value="create-order" 
+                className="flex items-center gap-2 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-500 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 font-medium"
+              >
+                <Plus className="w-4 h-4" />
+                New Order
               </TabsTrigger>
               <TabsTrigger 
                 value="approvals" 
@@ -451,7 +780,7 @@ export default function ClientPortalPage() {
               </TabsTrigger>
               <TabsTrigger 
                 value="insights" 
-                className="flex items-center gap-2 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-emerald-500 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 font-medium"
+                className="flex items-center gap-2 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-indigo-500 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 font-medium"
               >
                 <TrendingUp className="w-4 h-4" />
                 Insights
@@ -540,6 +869,422 @@ export default function ClientPortalPage() {
                   <p>No orders found</p>
                 </div>
               )}
+            </div>
+          </TabsContent>
+
+          {/* Create New Order Tab */}
+          <TabsContent value="create-order" className="space-y-6">
+            <div className="bg-white/90 backdrop-blur-xl rounded-2xl border border-emerald-200/50 shadow-xl shadow-emerald-100/50 p-8">
+              {/* Header */}
+              <div className="flex items-center space-x-4 mb-8">
+                <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg">
+                  <Plus className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                    Create New Order
+                  </h2>
+                  <p className="text-gray-600 font-medium">Submit your next apparel manufacturing request</p>
+                </div>
+              </div>
+
+              {/* Error Display */}
+              {orderFormErrors.length > 0 && (
+                <Alert variant="destructive" className="mb-6">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>
+                    <ul className="list-disc list-inside">
+                      {orderFormErrors.map((error, index) => (
+                        <li key={index}>{error}</li>
+                      ))}
+                    </ul>
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              <form className="space-y-8">
+                {/* Company Information */}
+                <Card className="border-emerald-100 bg-emerald-50/50">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-emerald-700">
+                      <Building2 className="w-5 h-5" />
+                      Company Information
+                    </CardTitle>
+                    <CardDescription>Basic details about your order</CardDescription>
+                  </CardHeader>
+                  <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="company_name" className="text-sm font-semibold text-gray-700">
+                        Company/Organization Name *
+                      </Label>
+                      <Input
+                        id="company_name"
+                        value={orderFormData.company_name}
+                        onChange={(e) => handleOrderFormChange('company_name', e.target.value)}
+                        placeholder="e.g., Premium Sports Inc."
+                        className="bg-white/80 border-emerald-200 focus:border-emerald-400"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="requested_deadline" className="text-sm font-semibold text-gray-700">
+                        Requested Deadline *
+                      </Label>
+                      <Input
+                        id="requested_deadline"
+                        type="datetime-local"
+                        value={orderFormData.requested_deadline}
+                        onChange={(e) => handleOrderFormChange('requested_deadline', e.target.value)}
+                        className="bg-white/80 border-emerald-200 focus:border-emerald-400"
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Product Details */}
+                <Card className="border-blue-100 bg-blue-50/50">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-blue-700">
+                      <Shirt className="w-5 h-5" />
+                      Product Details
+                    </CardTitle>
+                    <CardDescription>Specify your garment requirements</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <Label htmlFor="product_name" className="text-sm font-semibold text-gray-700">
+                          Product Name *
+                        </Label>
+                        <Input
+                          id="product_name"
+                          value={orderFormData.product_name}
+                          onChange={(e) => handleOrderFormChange('product_name', e.target.value)}
+                          placeholder="e.g., Team Jersey, Corporate Polo"
+                          className="bg-white/80 border-blue-200 focus:border-blue-400"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="service_type" className="text-sm font-semibold text-gray-700">
+                          Service Type *
+                        </Label>
+                        <Select value={orderFormData.service_type} onValueChange={(value) => handleOrderFormChange('service_type', value)}>
+                          <SelectTrigger className="bg-white/80 border-blue-200 focus:border-blue-400">
+                            <SelectValue placeholder="Select service type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Sew and Print / Embro">Sew and Print / Embroidery</SelectItem>
+                            <SelectItem value="Sew Only">Sew Only</SelectItem>
+                            <SelectItem value="Print / Embro Only">Print / Embroidery Only</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="space-y-2">
+                        <Label htmlFor="garment_type" className="text-sm font-semibold text-gray-700">
+                          Garment Type
+                        </Label>
+                        <Select value={orderFormData.garment_type} onValueChange={(value) => handleOrderFormChange('garment_type', value)}>
+                          <SelectTrigger className="bg-white/80 border-blue-200 focus:border-blue-400">
+                            <SelectValue placeholder="Select garment" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {garmentTypes.map(type => (
+                              <SelectItem key={type} value={type}>{type}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="fabric_type" className="text-sm font-semibold text-gray-700">
+                          Fabric Type
+                        </Label>
+                        <Select value={orderFormData.fabric_type} onValueChange={(value) => handleOrderFormChange('fabric_type', value)}>
+                          <SelectTrigger className="bg-white/80 border-blue-200 focus:border-blue-400">
+                            <SelectValue placeholder="Select fabric" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {fabricTypes.map(type => (
+                              <SelectItem key={type} value={type}>{type}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="method" className="text-sm font-semibold text-gray-700">
+                          Print Method
+                        </Label>
+                        <Select value={orderFormData.method} onValueChange={(value) => handleOrderFormChange('method', value)}>
+                          <SelectTrigger className="bg-white/80 border-blue-200 focus:border-blue-400">
+                            <SelectValue placeholder="Select method" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="SILKSCREEN">Silkscreen</SelectItem>
+                            <SelectItem value="SUBLIMATION">Sublimation</SelectItem>
+                            <SelectItem value="DTF">DTF (Direct to Film)</SelectItem>
+                            <SelectItem value="EMBROIDERY">Embroidery</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm font-semibold text-gray-700">Fabric Colors *</Label>
+                      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+                        {colorOptions.map(color => (
+                          <div key={color} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`color-${color}`}
+                              checked={orderFormData.fabric_colors.includes(color)}
+                              onCheckedChange={() => handleColorToggle(color)}
+                              className="border-blue-300"
+                            />
+                            <Label htmlFor={`color-${color}`} className="text-sm font-medium">{color}</Label>
+                          </div>
+                        ))}
+                      </div>
+                      {orderFormData.fabric_colors.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-3">
+                          {orderFormData.fabric_colors.map(color => (
+                            <Badge key={color} variant="secondary" className="bg-blue-100 text-blue-700">
+                              {color}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Options & Features */}
+                <Card className="border-purple-100 bg-purple-50/50">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-purple-700">
+                      <Settings className="w-5 h-5" />
+                      Options & Features
+                    </CardTitle>
+                    <CardDescription>Select additional features for your garments</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                      {Object.entries(orderFormData.options).map(([key, value]) => (
+                        <div key={key} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={key}
+                            checked={value}
+                            onCheckedChange={() => handleOptionToggle(key as keyof OrderFormData['options'])}
+                            className="border-purple-300"
+                          />
+                          <Label htmlFor={key} className="text-sm font-medium capitalize">
+                            {key.replace(/_/g, ' ')}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Design Information */}
+                <Card className="border-yellow-100 bg-yellow-50/50">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-yellow-700">
+                      <PaletteIcon className="w-5 h-5" />
+                      Design Information
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="screen_printed"
+                          checked={orderFormData.screen_printed}
+                          onCheckedChange={(checked) => handleOrderFormChange('screen_printed', checked)}
+                          className="border-yellow-300"
+                        />
+                        <Label htmlFor="screen_printed" className="text-sm font-medium">Screen Printed</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="embroidered_sublim"
+                          checked={orderFormData.embroidered_sublim}
+                          onCheckedChange={(checked) => handleOrderFormChange('embroidered_sublim', checked)}
+                          className="border-yellow-300"
+                        />
+                        <Label htmlFor="embroidered_sublim" className="text-sm font-medium">Embroidered/Sublim</Label>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="size_label" className="text-sm font-semibold text-gray-700">Size Label</Label>
+                        <Select value={orderFormData.size_label} onValueChange={(value) => handleOrderFormChange('size_label', value)}>
+                          <SelectTrigger className="bg-white/80 border-yellow-200 focus:border-yellow-400">
+                            <SelectValue placeholder="Select option" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Sew">Sew</SelectItem>
+                            <SelectItem value="Print">Print</SelectItem>
+                            <SelectItem value="None">None</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Quantity & Files */}
+                <Card className="border-teal-100 bg-teal-50/50">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-teal-700">
+                      <Hash className="w-5 h-5" />
+                      Quantity & Files
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="estimated_quantity" className="text-sm font-semibold text-gray-700">
+                        Estimated Quantity *
+                      </Label>
+                      <Input
+                        id="estimated_quantity"
+                        type="number"
+                        min="1"
+                        value={orderFormData.estimated_quantity}
+                        onChange={(e) => handleOrderFormChange('estimated_quantity', parseInt(e.target.value) || 0)}
+                        placeholder="e.g., 100"
+                        className="bg-white/80 border-teal-200 focus:border-teal-400 max-w-xs"
+                      />
+                    </div>
+
+                    {/* Image Upload */}
+                    <div className="space-y-3">
+                      <Label className="text-sm font-semibold text-gray-700">Design Images (Max 10)</Label>
+                      <div className="border-2 border-dashed border-teal-300 rounded-xl p-6 text-center bg-white/50">
+                        <input
+                          type="file"
+                          multiple
+                          accept="image/*"
+                          onChange={(e) => handleFileUpload('images', e.target.files)}
+                          className="hidden"
+                          id="image-upload"
+                        />
+                        <label htmlFor="image-upload" className="cursor-pointer">
+                          <div className="flex flex-col items-center space-y-2">
+                            <ImageIcon className="w-8 h-8 text-teal-500" />
+                            <span className="text-sm font-medium text-teal-600">Click to upload images</span>
+                            <span className="text-xs text-gray-500">PNG, JPG up to 10MB each</span>
+                          </div>
+                        </label>
+                      </div>
+                      {orderFormData.images.length > 0 && (
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                          {orderFormData.images.map((file, index) => (
+                            <div key={index} className="relative group">
+                              <div className="bg-white p-2 rounded-lg shadow border">
+                                <div className="text-xs font-medium truncate">{file.name}</div>
+                                <div className="text-xs text-gray-500">{Math.round(file.size / 1024)}KB</div>
+                              </div>
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="destructive"
+                                className="absolute -top-2 -right-2 w-5 h-5 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={() => removeFile('images', index)}
+                              >
+                                ×
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Attachments Upload */}
+                    <div className="space-y-3">
+                      <Label className="text-sm font-semibold text-gray-700">Design Files (PDF, AI, PSD, ZIP)</Label>
+                      <div className="border-2 border-dashed border-teal-300 rounded-xl p-6 text-center bg-white/50">
+                        <input
+                          type="file"
+                          multiple
+                          accept=".pdf,.ai,.psd,.zip"
+                          onChange={(e) => handleFileUpload('attachments', e.target.files)}
+                          className="hidden"
+                          id="attachment-upload"
+                        />
+                        <label htmlFor="attachment-upload" className="cursor-pointer">
+                          <div className="flex flex-col items-center space-y-2">
+                            <FileText className="w-8 h-8 text-teal-500" />
+                            <span className="text-sm font-medium text-teal-600">Click to upload files</span>
+                            <span className="text-xs text-gray-500">PDF, AI, PSD, ZIP up to 50MB each</span>
+                          </div>
+                        </label>
+                      </div>
+                      {orderFormData.attachments.length > 0 && (
+                        <div className="space-y-2">
+                          {orderFormData.attachments.map((file, index) => (
+                            <div key={index} className="flex items-center justify-between bg-white p-3 rounded-lg shadow border">
+                              <div className="flex items-center space-x-3">
+                                <FileText className="w-4 h-4 text-teal-500" />
+                                <div>
+                                  <div className="text-sm font-medium">{file.name}</div>
+                                  <div className="text-xs text-gray-500">{Math.round(file.size / 1024)}KB</div>
+                                </div>
+                              </div>
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => removeFile('attachments', index)}
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Notes */}
+                <Card className="border-gray-100 bg-gray-50/50">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-gray-700">
+                      <FileText className="w-5 h-5" />
+                      Additional Notes
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Textarea
+                      value={orderFormData.notes}
+                      onChange={(e) => handleOrderFormChange('notes', e.target.value)}
+                      placeholder="Any special requirements, deadlines, or additional information..."
+                      rows={4}
+                      className="bg-white/80 border-gray-200 focus:border-gray-400 resize-none"
+                    />
+                  </CardContent>
+                </Card>
+
+                {/* Submit Button */}
+                <div className="flex justify-center pt-6">
+                  <Button
+                    type="button"
+                    onClick={handleOrderSubmit}
+                    disabled={orderFormLoading}
+                    className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-12 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-lg font-semibold"
+                  >
+                    {orderFormLoading ? (
+                      <>
+                        <RefreshCw className="w-5 h-5 mr-3 animate-spin" />
+                        Submitting Order...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-5 h-5 mr-3" />
+                        Submit Order Request
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </form>
             </div>
           </TabsContent>
 

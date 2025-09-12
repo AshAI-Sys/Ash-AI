@@ -54,13 +54,27 @@ interface WorkOrder {
   id: string
   po_number: string
   client: string
+  company_name?: string
+  product_name: string
   product_type: string
+  service_type: string
+  garment_type: string
   method: string
   quantity: number
   target_date: string
+  fabric_type?: string
+  fabric_colors?: string
+  fabric_gsm?: number
+  design_concept?: string
+  special_instructions?: string
+  design_files?: string[]
+  additional_files?: string[]
   stages: ProductionStage[]
   overall_progress: number
   status: string
+  priority_level?: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'
+  budget_range?: string
+  estimated_completion?: string
 }
 
 export default function ProductionStages() {
@@ -70,12 +84,26 @@ export default function ProductionStages() {
       id: '1',
       po_number: 'ASH-2025-001234',
       client: 'Premium Apparel Corp',
+      company_name: 'Premium Apparel Corporation Ltd.',
+      product_name: 'Elite Performance Hoodie Collection',
       product_type: 'Hoodie',
+      service_type: 'FULL_PRODUCTION',
+      garment_type: 'HOODIE',
       method: 'SILKSCREEN',
       quantity: 450,
       target_date: '2025-01-25',
+      fabric_type: 'Premium Cotton Blend',
+      fabric_colors: 'Navy Blue, Heather Gray, Black',
+      fabric_gsm: 320,
+      design_concept: 'Modern streetwear with minimalist logo placement and premium finish',
+      special_instructions: 'Use eco-friendly inks only. Double-stitch all seams for durability.',
+      design_files: ['logo-design.ai', 'placement-guide.pdf', 'color-specs.png'],
+      additional_files: ['size-chart.xlsx', 'brand-guidelines.pdf'],
       overall_progress: 45,
       status: 'IN_PROGRESS',
+      priority_level: 'HIGH',
+      budget_range: '₱45,000 - ₱55,000',
+      estimated_completion: '2025-01-25',
       stages: [
         {
           id: 1,
@@ -135,7 +163,9 @@ export default function ProductionStages() {
             method: 'SILKSCREEN',
             colors: 3,
             curing_temp: '160°C',
-            curing_time: '2 minutes'
+            curing_time: '2 minutes',
+            fabric_colors: 'Navy Blue, Heather Gray, Black',
+            special_notes: 'Use eco-friendly inks only'
           }
         },
         {
@@ -148,7 +178,13 @@ export default function ProductionStages() {
           category: 'PRODUCTION',
           estimatedTime: '8 hours',
           dependencies: [4],
-          workers: ['SEW-001', 'SEW-002', 'SEW-003']
+          workers: ['SEW-001', 'SEW-002', 'SEW-003'],
+          specifications: {
+            garment_type: 'HOODIE',
+            seam_type: 'Double-stitch',
+            quality_standard: 'Premium finish',
+            special_instructions: 'Double-stitch all seams for durability'
+          }
         },
         {
           id: 6,
@@ -314,8 +350,26 @@ export default function ProductionStages() {
                 <Package className="w-6 h-6 text-blue-500" />
                 Production Workflow - {currentOrder.po_number}
               </CardTitle>
-              <CardDescription className="text-base">
-                {currentOrder.client} • {currentOrder.product_type} • {currentOrder.method} • {currentOrder.quantity} units
+              <CardDescription className="text-base space-y-2">
+                <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                  <span className="font-medium">{currentOrder.client}</span>
+                  {currentOrder.company_name && <span>• {currentOrder.company_name}</span>}
+                  <span>• {currentOrder.product_name}</span>
+                  <span>• {currentOrder.service_type.replace('_', ' ')}</span>
+                  <span>• {currentOrder.quantity} units</span>
+                </div>
+                <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+                  <span>Method: {currentOrder.method}</span>
+                  {currentOrder.fabric_type && <span>• Fabric: {currentOrder.fabric_type}</span>}
+                  {currentOrder.fabric_gsm && <span>• {currentOrder.fabric_gsm}GSM</span>}
+                  {currentOrder.priority_level && (
+                    <Badge variant={currentOrder.priority_level === 'URGENT' ? 'destructive' : 
+                           currentOrder.priority_level === 'HIGH' ? 'default' : 'secondary'} 
+                           className="text-xs">
+                      {currentOrder.priority_level}
+                    </Badge>
+                  )}
+                </div>
               </CardDescription>
             </div>
             <Badge className={`status-badge ${currentOrder.status.toLowerCase()}`}>
@@ -323,13 +377,69 @@ export default function ProductionStages() {
             </Badge>
           </div>
           
-          {/* Overall Progress */}
-          <div className="mt-4">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium">Overall Progress</span>
-              <span className="text-sm text-muted-foreground">{currentOrder.overall_progress}% Complete</span>
+          {/* Overall Progress & Key Details */}
+          <div className="mt-4 space-y-4">
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-medium">Overall Progress</span>
+                <span className="text-sm text-muted-foreground">{currentOrder.overall_progress}% Complete</span>
+              </div>
+              <Progress value={currentOrder.overall_progress} className="h-3" />
             </div>
-            <Progress value={currentOrder.overall_progress} className="h-3" />
+            
+            {/* Enhanced Order Details */}
+            {(currentOrder.design_concept || currentOrder.fabric_colors || currentOrder.budget_range) && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
+                {currentOrder.design_concept && (
+                  <div>
+                    <span className="text-xs font-medium text-gray-600">Design Concept:</span>
+                    <p className="text-sm text-gray-800 mt-1">{currentOrder.design_concept}</p>
+                  </div>
+                )}
+                {currentOrder.fabric_colors && (
+                  <div>
+                    <span className="text-xs font-medium text-gray-600">Colors:</span>
+                    <p className="text-sm text-gray-800 mt-1">{currentOrder.fabric_colors}</p>
+                  </div>
+                )}
+                {currentOrder.budget_range && (
+                  <div>
+                    <span className="text-xs font-medium text-gray-600">Budget:</span>
+                    <p className="text-sm text-gray-800 mt-1 font-medium">{currentOrder.budget_range}</p>
+                  </div>
+                )}
+              </div>
+            )}
+            
+            {/* Special Instructions Alert */}
+            {currentOrder.special_instructions && (
+              <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <span className="text-xs font-medium text-amber-700">Special Instructions:</span>
+                    <p className="text-sm text-amber-800 mt-1">{currentOrder.special_instructions}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Design Files */}
+            {(currentOrder.design_files?.length || currentOrder.additional_files?.length) && (
+              <div className="flex flex-wrap gap-2">
+                <span className="text-xs font-medium text-gray-600">Files:</span>
+                {currentOrder.design_files?.map((file, index) => (
+                  <Badge key={`design-${index}`} variant="outline" className="text-xs">
+                    📎 {file}
+                  </Badge>
+                ))}
+                {currentOrder.additional_files?.map((file, index) => (
+                  <Badge key={`additional-${index}`} variant="secondary" className="text-xs">
+                    📄 {file}
+                  </Badge>
+                ))}
+              </div>
+            )}
           </div>
         </CardHeader>
       </div>

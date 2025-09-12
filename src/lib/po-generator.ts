@@ -73,7 +73,7 @@ export async function generatePONumber(brand_id: string): Promise<PONumberResult
 export function validatePONumber(po_number: string): boolean {
   // Pattern: BRANDCODE-YYYY-NNNNNN
   const pattern = /^[A-Z]{2,6}-\d{4}-\d{6}$/;
-  return pattern.test(poNumber);
+  return pattern.test(po_number);
 }
 
 /**
@@ -84,11 +84,11 @@ export function parsePONumber(po_number: string): {
   year: number;
   sequence: number;
 } | null {
-  if (!validatePONumber(poNumber)) {
+  if (!validatePONumber(po_number)) {
     return null;
   }
   
-  const parts = poNumber.split('-');
+  const parts = po_number.split('-');
   return {
     brandCode: parts[0],
     year: parseInt(parts[1]),
@@ -102,7 +102,7 @@ export function parsePONumber(po_number: string): {
 export async function isPONumberExists(po_number: string): Promise<boolean> {
   const count = await db.order.count({
     where: {
-      po_number: poNumber
+      po_number: po_number
     }
   });
   

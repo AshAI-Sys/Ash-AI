@@ -7,9 +7,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
-import { Role } from '@prisma/client'
+import { Role, OrderStatus, ProductMethod } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
+import { generatePONumber } from '@/lib/po-generator'
 import jwt from 'jsonwebtoken'
+import { z } from 'zod'
 
 const JWT_SECRET = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET
 if (!JWT_SECRET) {
@@ -466,5 +468,270 @@ async function getOrderSummaryStats(client_id: string, workspace_id: string) {
     })),
     pending_design_approvals: pendingApprovals,
     total_orders: statusCounts.reduce((sum, item) => sum + item._count, 0)
+  }
+}
+
+// Order creation validation schema for client portal
+const ClientOrderCreateSchema = z.object({
+  // Company Information
+  company_name: z.string().min(1, "Company name is required"),
+  requested_deadline: z.string().datetime(),
+  
+  // Product Details
+  product_name: z.string().min(1, "Product name is required"),
+  service_type: z.string().min(1, "Service type is required"),
+  garment_type: z.string().optional(),
+  fabric_type: z.string().optional(),
+  fabric_colors: z.array(z.string()).min(1, "At least one fabric color is required"),
+  method: z.nativeEnum(ProductMethod),
+  
+  // Options (20 checkboxes as JSON)
+  options: z.record(z.boolean()).default({}),
+  
+  // Design Info
+  screen_printed: z.boolean().default(false),
+  embroidered_sublim: z.boolean().default(false),
+  size_label: z.string().optional(),
+  
+  // Quantity & Files
+  estimated_quantity: z.number().positive("Estimated quantity must be greater than 0"),
+  images: z.array(z.object({
+    url: z.string().url(),
+    name: z.string(),
+    size: z.number().optional(),
+    type: z.string().optional()
+  })).max(10, "Maximum 10 images allowed").optional(),
+  attachments: z.array(z.object({
+    url: z.string().url(),
+    name: z.string(),
+    size: z.number().optional(),
+    type: z.string()
+  })).optional(),
+  
+  // Notes
+  notes: z.string().optional(),
+  
+  // Legacy compatibility fields
+  brand_id: z.string().uuid().optional(),
+  product_type: z.string().optional(),
+  total_qty: z.number().positive(),
+  target_delivery_date: z.string().datetime()
+})
+
+/**
+ * POST /api/client-portal/orders - Create new order from client portal
+ */
+export async function POST(request: NextRequest) {
+  try {
+    // Verify client session
+    const token = request.cookies.get('client-portal-token')?.value
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET) as any
+    const client_id = decoded.client_id
+    const clientUserId = decoded.clientUserId
+    const workspace_id = decoded.workspace_id
+
+    // Verify client user still exists and has portal access
+    const clientUser = await prisma.clientUser.findFirst({
+      where: {
+        id: clientUserId,
+        client_id: client_id,
+        workspace_id: workspace_id,
+        status: 'ACTIVE'
+      },
+      include: {
+        client: {
+          include: {
+            brands: true
+          }
+        }
+      }
+    })
+
+    if (!clientUser) {
+      return NextResponse.json({ error: 'Client access revoked' }, { status: 401 })
+    }
+
+    // Parse and validate request body
+    const body = await request.json()
+    const validatedData = ClientOrderCreateSchema.parse(body)
+
+    // Use client's first brand or default brand
+    const brand_id = validatedData.brand_id || clientUser.client.brands[0]?.id || 'default-brand'
+
+    // Generate ASH AI PO number
+    const po_result = await generatePONumber(brand_id)
+    const po_number = po_result.po_number
+
+    // Create order with enhanced fields in transaction
+    const order = await prisma.$transaction(async (tx) => {
+      // Create the order with enhanced fields
+      const newOrder = await tx.order.create({
+        data: {
+          // Core identification
+          workspace_id,
+          brand_id,
+          client_id,
+          po_number,
+          
+          // Enhanced Company/Client Information
+          company_name: validatedData.company_name,
+          requested_deadline: new Date(validatedData.requested_deadline),
+          
+          // Product Details
+          product_name: validatedData.product_name,
+          product_type: validatedData.product_type || validatedData.garment_type || 'Custom',
+          service_type: validatedData.service_type,
+          garment_type: validatedData.garment_type,
+          fabric_type: validatedData.fabric_type,
+          fabric_colors: validatedData.fabric_colors,
+          method: validatedData.method,
+          
+          // Options (checkboxes)
+          options: validatedData.options,
+          
+          // Design Info
+          screen_printed: validatedData.screen_printed,
+          embroidered_sublim: validatedData.embroidered_sublim,
+          size_label: validatedData.size_label,
+          
+          // Quantity & Files
+          estimated_quantity: validatedData.estimated_quantity,
+          total_qty: validatedData.total_qty,
+          images: validatedData.images || [],
+          attachments: validatedData.attachments || [],
+          
+          // Core order fields
+          target_delivery_date: new Date(validatedData.target_delivery_date),
+          notes: validatedData.notes,
+          
+          // Status and timestamps
+          status: OrderStatus.INTAKE,
+          created_at: new Date(),
+          updated_at: new Date()
+        }
+      })
+
+      // Create order items from estimated quantity
+      if (validatedData.estimated_quantity > 0) {
+        await tx.orderItem.create({
+          data: {
+            order_id: newOrder.id,
+            sku: `${validatedData.product_name?.replace(/\s+/g, '-').toUpperCase()}-DEFAULT`,
+            product_name: validatedData.product_name,
+            size: 'MIXED',
+            color: validatedData.fabric_colors[0] || 'DEFAULT',
+            quantity: validatedData.estimated_quantity,
+            unit_price: 0, // Will be updated during quotation
+            total_price: 0,
+            created_at: new Date()
+          }
+        })
+      }
+
+      // Create order attachments for images
+      if (validatedData.images && validatedData.images.length > 0) {
+        const imageAttachments = validatedData.images.map((image, index) => ({
+          order_id: newOrder.id,
+          type: 'image' as const,
+          file_url: image.url,
+          meta: {
+            name: image.name,
+            size: image.size,
+            type: image.type,
+            order: index + 1
+          },
+          created_at: new Date()
+        }))
+
+        await tx.orderAttachment.createMany({
+          data: imageAttachments
+        })
+      }
+
+      // Create attachment records for files
+      if (validatedData.attachments && validatedData.attachments.length > 0) {
+        const fileAttachments = validatedData.attachments.map((attachment, index) => ({
+          order_id: newOrder.id,
+          type: 'attachment' as const,
+          file_url: attachment.url,
+          meta: {
+            name: attachment.name,
+            size: attachment.size,
+            type: attachment.type,
+            order: index + 1
+          },
+          created_at: new Date()
+        }))
+
+        await tx.orderAttachment.createMany({
+          data: fileAttachments
+        })
+      }
+
+      // Create audit log
+      await tx.auditLog.create({
+        data: {
+          workspace_id,
+          actor_id: clientUserId,
+          entity_type: 'order',
+          entity_id: newOrder.id,
+          action: 'CREATE',
+          after_data: {
+            po_number,
+            company_name: validatedData.company_name,
+            product_name: validatedData.product_name,
+            service_type: validatedData.service_type,
+            method: validatedData.method,
+            estimated_quantity: validatedData.estimated_quantity,
+            requested_deadline: validatedData.requested_deadline,
+            images_count: validatedData.images?.length || 0,
+            attachments_count: validatedData.attachments?.length || 0,
+            submitted_via: 'client_portal'
+          },
+          created_at: new Date()
+        }
+      })
+
+      return newOrder
+    })
+
+    return NextResponse.json({
+      success: true,
+      message: `Order ${po_number} submitted successfully! 🎯`,
+      order: {
+        id: order.id,
+        po_number,
+        status: order.status,
+        company_name: order.company_name,
+        product_name: order.product_name,
+        service_type: order.service_type,
+        method: order.method,
+        estimated_quantity: order.estimated_quantity,
+        requested_deadline: order.requested_deadline,
+        created_at: order.created_at
+      }
+    }, { status: 201 })
+
+  } catch (error) {
+    if (error instanceof jwt.JsonWebTokenError) {
+      return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
+    }
+
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({
+        error: 'Validation failed',
+        details: error.errors
+      }, { status: 400 })
+    }
+
+    console.error('Client portal order creation error:', error)
+    return NextResponse.json({
+      success: false,
+      error: 'Failed to create order. Please try again.'
+    }, { status: 500 })
   }
 }

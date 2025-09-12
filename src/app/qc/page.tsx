@@ -46,6 +46,14 @@ interface QCInspection {
     orderNumber: string
     clientName: string
     productType: string
+    productName?: string
+    companyName?: string
+    serviceType?: string
+    garmentType?: string
+    fabricType?: string
+    fabricColors?: string
+    designConcept?: string
+    specialInstructions?: string
   }
   inspector: {
     name: string
@@ -261,13 +269,14 @@ export default function QCPage() {
         )}
 
         <Card>
-          <Tabs defaultValue="active-inspections" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="active-inspections">Active</TabsTrigger>
-              <TabsTrigger value="completed">Completed</TabsTrigger>
-              <TabsTrigger value="defect-codes">Defect Codes</TabsTrigger>
-              <TabsTrigger value="analytics">Reports</TabsTrigger>
-            </TabsList>
+          <CardContent className="p-6">
+            <Tabs defaultValue="active-inspections" className="w-full">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="active-inspections">Active</TabsTrigger>
+                <TabsTrigger value="completed">Completed</TabsTrigger>
+                <TabsTrigger value="defect-codes">Defect Codes</TabsTrigger>
+                <TabsTrigger value="analytics">Reports</TabsTrigger>
+              </TabsList>
 
         {/* Filters */}
         <div className="flex gap-4 mb-6">
@@ -535,8 +544,9 @@ export default function QCPage() {
               </CardContent>
             </Card>
           </div>
-          </TabsContent>
-          </Tabs>
+        </TabsContent>
+            </Tabs>
+          </CardContent>
         </Card>
       </div>
     </TikTokLayout>

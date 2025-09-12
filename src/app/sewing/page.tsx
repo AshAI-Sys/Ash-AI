@@ -36,6 +36,14 @@ interface SewingRun {
   order: {
     orderNumber: string
     productType: string
+    productName?: string
+    companyName?: string
+    serviceType?: string
+    garmentType?: string
+    fabricType?: string
+    fabricColors?: string
+    designConcept?: string
+    specialInstructions?: string
   }
   operation: {
     standardMinutes: number
@@ -286,8 +294,15 @@ export default function SewingPage() {
                         {getStatusBadge(run.status)}
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        Order: {run.order.orderNumber} • Bundle: {run.bundle.bundleNumber}
+                        {run.order.productName || run.order.productType} • Order: {run.order.orderNumber} • Bundle: {run.bundle.bundleNumber}
                       </p>
+                      {(run.order.companyName || run.order.serviceType) && (
+                        <p className="text-xs text-muted-foreground">
+                          {run.order.companyName && `${run.order.companyName}`}
+                          {run.order.companyName && run.order.serviceType && " • "}
+                          {run.order.serviceType && run.order.serviceType.replace('_', ' ')}
+                        </p>
+                      )}
                     </div>
                     <div className="text-right text-sm">
                       <p className="font-medium">{run.operator.name}</p>
@@ -313,6 +328,44 @@ export default function SewingPage() {
                       <p className="text-xs text-muted-foreground">Rejects</p>
                     </div>
                   </div>
+
+                  {/* Enhanced Order Details for Sewing */}
+                  {(run.order.fabricType || run.order.fabricColors || run.order.garmentType || run.order.specialInstructions) && (
+                    <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                        {run.order.garmentType && (
+                          <div>
+                            <span className="font-medium text-blue-700">Garment:</span>
+                            <p className="text-blue-800">{run.order.garmentType}</p>
+                          </div>
+                        )}
+                        {run.order.fabricType && (
+                          <div>
+                            <span className="font-medium text-blue-700">Fabric:</span>
+                            <p className="text-blue-800">{run.order.fabricType}</p>
+                          </div>
+                        )}
+                        {run.order.fabricColors && (
+                          <div>
+                            <span className="font-medium text-blue-700">Colors:</span>
+                            <p className="text-blue-800">{run.order.fabricColors}</p>
+                          </div>
+                        )}
+                        {run.order.designConcept && (
+                          <div>
+                            <span className="font-medium text-blue-700">Design:</span>
+                            <p className="text-blue-800 truncate" title={run.order.designConcept}>{run.order.designConcept}</p>
+                          </div>
+                        )}
+                      </div>
+                      {run.order.specialInstructions && (
+                        <div className="mt-2 pt-2 border-t border-blue-300">
+                          <span className="text-xs font-medium text-blue-700">Special Instructions:</span>
+                          <p className="text-xs text-blue-800 mt-1">{run.order.specialInstructions}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -494,7 +547,7 @@ export default function SewingPage() {
                         {getStatusBadge(run.status)}
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        {run.operator.name} • {run.order.orderNumber} • Bundle {run.bundle.bundleNumber}
+                        {run.operator.name} • {run.order.productName || run.order.productType} • Bundle {run.bundle.bundleNumber}
                       </p>
                     </div>
                     <div className="text-right text-sm">
