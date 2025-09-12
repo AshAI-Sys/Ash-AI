@@ -30,7 +30,9 @@ import {
   Target,
   Layers,
   GitBranch,
-  Wrench
+  Wrench,
+  Menu,
+  X
 } from 'lucide-react'
 import AshleyAIChat from '@/components/ai/AshleyAIChat'
 
@@ -45,6 +47,7 @@ export default function UnifiedDashboard() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('dashboard')
   const [mounted, setMounted] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     if (status === 'loading') return
@@ -166,60 +169,68 @@ export default function UnifiedDashboard() {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Fixed Header */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-b border-gray-200">
-        <div className="flex items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center">
-                <Brain className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">ASH AI Dashboard</h1>
-                <p className="text-xs text-gray-600">Apparel Smart Hub - All-in-One</p>
-              </div>
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* TikTok-style Left Sidebar */}
+      <div className="fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-gray-200 z-50 flex flex-col hidden lg:flex">
+        {/* Sidebar Header */}
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-black to-gray-800 rounded-lg flex items-center justify-center">
+              <Brain className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-gray-900">ASH AI</h1>
+              <p className="text-xs text-gray-600">Smart Hub</p>
             </div>
           </div>
-          
-          <div className="flex items-center gap-4">
-            <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-200">
-              <Activity className="w-3 h-3 mr-1" />
-              System Online
-            </Badge>
-            <div className="text-sm text-gray-700">
-              Welcome, {session?.user?.name || 'User'}
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 px-3 py-4 overflow-y-auto">
+          <div className="space-y-1">
+            {tabs.map((tab) => {
+              const Icon = tab.icon
+              const isActive = activeTab === tab.id
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`w-full flex items-center gap-3 px-3 py-3 text-left text-sm font-medium rounded-lg transition-colors group ${
+                    isActive
+                      ? 'bg-black text-white'
+                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                  }`}
+                >
+                  <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-gray-500 group-hover:text-gray-700'}`} />
+                  <span className="truncate">{tab.label}</span>
+                </button>
+              )
+            })}
+          </div>
+        </nav>
+
+        {/* Sidebar Footer */}
+        <div className="p-4 border-t border-gray-200">
+          <div className="flex items-center gap-3">
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-medium text-gray-900 truncate">
+                {session?.user?.name || 'User'}
+              </div>
+              <div className="flex items-center gap-2 text-xs text-gray-600">
+                <Activity className="w-3 h-3 text-green-500" />
+                System Online
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="pt-20">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          {/* Tab Navigation */}
-          <div className="sticky top-20 z-40 bg-white/90 backdrop-blur-xl border-b border-gray-200">
-            <TabsList className="w-full h-auto p-2 bg-transparent border-none rounded-none overflow-x-auto flex-nowrap">
-              <div className="flex gap-1 min-w-max px-4">
-                {tabs.map((tab) => {
-                  const Icon = tab.icon
-                  return (
-                    <TabsTrigger
-                      key={tab.id}
-                      value={tab.id}
-                      className="flex items-center gap-2 px-4 py-3 text-gray-600 hover:text-gray-900 data-[state=active]:bg-blue-100 data-[state=active]:text-blue-700 data-[state=active]:border-blue-200 rounded-xl whitespace-nowrap border border-transparent transition-all"
-                    >
-                      <Icon className="w-4 h-4" />
-                      <span className="hidden sm:inline">{tab.label}</span>
-                    </TabsTrigger>
-                  )
-                })}
-              </div>
-            </TabsList>
-          </div>
+      <div className="lg:ml-64 flex-1 pt-16 lg:pt-0">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full">
 
-          {/* Tab Content - TikTok Style Centered */}
-          <div className="max-w-7xl mx-auto px-6 py-6">
+          {/* Content Area */}
+          <div className="p-6">
             <TabsContent value="dashboard" className="mt-0">
               {/* TikTok-style Dashboard Content */}
               <div className="max-w-6xl mx-auto space-y-6">
@@ -506,6 +517,105 @@ export default function UnifiedDashboard() {
             </TabsContent>
           </div>
         </Tabs>
+      </div>
+
+      {/* Mobile Navigation */}
+      <div className="lg:hidden">
+        {/* Mobile Top Bar */}
+        <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200">
+          <div className="flex items-center justify-between px-4 py-3">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+              <div className="w-8 h-8 bg-gradient-to-br from-black to-gray-800 rounded-lg flex items-center justify-center">
+                <Brain className="w-5 h-5 text-white" />
+              </div>
+              <h1 className="text-sm font-bold text-gray-900">ASH AI</h1>
+            </div>
+            <div className="text-xs text-gray-600">
+              {session?.user?.name || 'User'}
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Sidebar */}
+        {mobileMenuOpen && (
+          <>
+            {/* Backdrop */}
+            <div 
+              className="fixed inset-0 bg-gray-600 bg-opacity-50 z-40"
+              onClick={() => setMobileMenuOpen(false)}
+            ></div>
+            
+            {/* Sidebar */}
+            <div className="fixed left-0 top-0 bottom-0 w-64 bg-white z-50 flex flex-col">
+              {/* Mobile Sidebar Header */}
+              <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-gradient-to-br from-black to-gray-800 rounded-lg flex items-center justify-center">
+                    <Brain className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h1 className="text-lg font-bold text-gray-900">ASH AI</h1>
+                    <p className="text-xs text-gray-600">Smart Hub</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Mobile Navigation */}
+              <nav className="flex-1 px-3 py-4 overflow-y-auto">
+                <div className="space-y-1">
+                  {tabs.map((tab) => {
+                    const Icon = tab.icon
+                    const isActive = activeTab === tab.id
+                    return (
+                      <button
+                        key={tab.id}
+                        onClick={() => {
+                          setActiveTab(tab.id)
+                          setMobileMenuOpen(false)
+                        }}
+                        className={`w-full flex items-center gap-3 px-3 py-3 text-left text-sm font-medium rounded-lg transition-colors group ${
+                          isActive
+                            ? 'bg-black text-white'
+                            : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                        }`}
+                      >
+                        <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-gray-500 group-hover:text-gray-700'}`} />
+                        <span className="truncate">{tab.label}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </nav>
+
+              {/* Mobile Sidebar Footer */}
+              <div className="p-4 border-t border-gray-200">
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-gray-900 truncate">
+                      {session?.user?.name || 'User'}
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-gray-600">
+                      <Activity className="w-3 h-3 text-green-500" />
+                      System Online
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Ashley AI Chat - Always Available */}
