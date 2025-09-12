@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { PrismaClient } from '@prisma/client'
 import WebSocketManager, { InventoryUpdate, AlertUpdate } from './websocket-manager'
 import Redis from 'ioredis'

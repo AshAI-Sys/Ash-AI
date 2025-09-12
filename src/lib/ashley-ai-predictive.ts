@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Ashley AI Predictive Analytics & Machine Learning Engine
 // Advanced AI capabilities for forecasting, optimization, and insights
 

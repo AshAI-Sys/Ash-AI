@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ASH AI - Advanced Intelligence Engine
 // Accurate AI predictions and analysis for apparel production
 

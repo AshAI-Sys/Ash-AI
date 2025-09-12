@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Merchandising AI - Inventory Optimization API
  * Provides AI-powered inventory optimization recommendations

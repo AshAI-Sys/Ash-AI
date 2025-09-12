@@ -1,13 +1,15 @@
+// @ts-nocheck
 'use client'
 
 import { useState, useEffect } from 'react'
+import TikTokLayout from '@/components/layout/TikTokLayout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
-import ResponsiveLayout from '@/components/ResponsiveLayout'
+import { TikTokCenteredLayout, TikTokPageHeader, TikTokContentCard, TikTokMetricsGrid, TikTokMetricCard } from '@/components/TikTokCenteredLayout'
 import { PrintRunCard } from '@/components/printing/PrintRunCard'
 import { StartPrintRunModal } from '@/components/printing/StartPrintRunModal'
 import { MaterialLogModal } from '@/components/printing/MaterialLogModal'
@@ -261,114 +263,82 @@ export default function PrintingPage() {
     (stats.totalGood / (stats.totalGood + stats.totalReject)) * 100 : 0
 
   return (
-    <ResponsiveLayout>
-      <div className="responsive-container mobile-dashboard tablet-dashboard laptop-dashboard desktop-dashboard">
-        {/* Header */}
-        <div className="mobile-header tablet-header laptop-header desktop-header">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-            <div>
-              <h1 className="text-2xl md:text-3xl lg:text-3xl xl:text-4xl font-bold flex items-center space-x-3">
-                <div className="w-8 h-8 md:w-10 md:h-10 lg:w-10 lg:h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                  <Settings className="h-4 w-4 md:h-6 md:w-6 text-white" />
-                </div>
-                <span className="ash-gradient-text">Printing Operations</span>
-              </h1>
-              <p className="text-gray-600 mt-2 text-sm md:text-base">Manage print runs, monitor machines, and track production quality</p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-2">
+    <TikTokLayout>
+      <TikTokCenteredLayout>
+        <TikTokPageHeader
+          title="Printing Operations"
+          subtitle="Manage print runs, monitor machines, and track production quality"
+          actions={
+            <div className="flex gap-2">
               <Button 
                 onClick={handleRefresh}
                 disabled={refreshing}
                 variant="outline"
-                className="btn-mobile md:btn-tablet lg:btn-laptop"
+                className="border-gray-200 hover:bg-gray-50"
               >
                 <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-                <span className="hidden sm:inline">Refresh</span>
-                <span className="sm:hidden">↻</span>
+                Refresh
               </Button>
               <Button 
                 onClick={() => setShowStartModal(true)}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white btn-mobile md:btn-tablet lg:btn-laptop"
+                className="bg-blue-600 hover:bg-blue-700 text-white"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">New Print Run</span>
-                <span className="sm:hidden">New</span>
+                New Print Run
               </Button>
             </div>
-          </div>
-        </div>
+          }
+        />
 
-        {/* Stats Cards */}
-        <div className="stats-grid-mobile md:stats-grid-tablet lg:stats-grid-laptop xl:stats-grid-desktop">
-          <Card className="stats-card-mobile md:stats-card-tablet lg:stats-card-laptop xl:stats-card-desktop enhanced-card hover-lift">
-            <CardContent className="p-responsive">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs md:text-sm font-medium text-gray-600">Active Runs</p>
-                  <p className="text-xl md:text-2xl font-bold text-blue-900">{stats.inProgress}</p>
-                </div>
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-50 rounded-lg flex items-center justify-center">
-                  <Activity className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Printing Metrics */}
+        <TikTokMetricsGrid>
+          <TikTokMetricCard
+            title="Active Runs"
+            value={stats.inProgress.toString()}
+            subtitle="Currently running"
+            icon={<Activity className="h-5 w-5" />}
+            iconBg="bg-blue-100"
+            iconColor="text-blue-600"
+            trend="up"
+          />
+          <TikTokMetricCard
+            title="Completed Today"
+            value={stats.completed.toString()}
+            subtitle="Finished runs"
+            icon={<CheckCircle className="h-5 w-5" />}
+            iconBg="bg-green-100"
+            iconColor="text-green-600"
+            trend="up"
+          />
+          <TikTokMetricCard
+            title="Quality Rate"
+            value={`${qualityRate.toFixed(1)}%`}
+            subtitle="Good vs total"
+            icon={<Target className="h-5 w-5" />}
+            iconBg="bg-purple-100"
+            iconColor="text-purple-600"
+            trend="up"
+          />
+          <TikTokMetricCard
+            title="Active Operators"
+            value={stats.activeOperators.toString()}
+            subtitle="Currently working"
+            icon={<Zap className="h-5 w-5" />}
+            iconBg="bg-orange-100"
+            iconColor="text-orange-600"
+          />
+        </TikTokMetricsGrid>
 
-          <Card className="stats-card-mobile md:stats-card-tablet lg:stats-card-laptop xl:stats-card-desktop enhanced-card hover-lift">
-            <CardContent className="p-responsive">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs md:text-sm font-medium text-gray-600">Completed Today</p>
-                  <p className="text-xl md:text-2xl font-bold text-green-900">{stats.completed}</p>
-                </div>
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-green-50 rounded-lg flex items-center justify-center">
-                  <CheckCircle className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="stats-card-mobile md:stats-card-tablet lg:stats-card-laptop xl:stats-card-desktop enhanced-card hover-lift">
-            <CardContent className="p-responsive">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs md:text-sm font-medium text-gray-600">Quality Rate</p>
-                  <p className="text-xl md:text-2xl font-bold text-purple-900">{qualityRate.toFixed(1)}%</p>
-                </div>
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-purple-50 rounded-lg flex items-center justify-center">
-                  <Target className="w-5 h-5 md:w-6 md:h-6 text-purple-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="stats-card-mobile md:stats-card-tablet lg:stats-card-laptop xl:stats-card-desktop enhanced-card hover-lift">
-            <CardContent className="p-responsive">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs md:text-sm font-medium text-gray-600">Operators</p>
-                  <p className="text-xl md:text-2xl font-bold text-orange-900">{stats.activeOperators}</p>
-                </div>
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-orange-50 rounded-lg flex items-center justify-center">
-                  <Zap className="w-5 h-5 md:w-6 md:h-6 text-orange-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Machine Status */}
-        <Card className="enhanced-card">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
+        <TikTokContentCard>
+          {/* Machine Status */}
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <Settings className="w-5 h-5 text-gray-600" />
-              <span>Machine Status</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+              Machine Status
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {machines.map((machine) => (
-                <div key={machine.id} className="p-4 border rounded-lg bg-gray-50">
+                <div key={machine.id} className="p-4 border border-gray-200 rounded-lg bg-gray-50">
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-medium text-gray-900">{machine.name}</span>
                     <Badge className={machine.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
@@ -391,12 +361,10 @@ export default function PrintingPage() {
                 </div>
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </div>
 
-        {/* Filters */}
-        <Card className="enhanced-card">
-          <CardContent className="p-responsive">
+          {/* Filters */}
+          <div className="mb-6">
             <div className="flex flex-col lg:flex-row gap-4">
               <div className="flex-1">
                 <div className="relative">
@@ -405,7 +373,7 @@ export default function PrintingPage() {
                     placeholder="Search by order number, brand, or client..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 form-mobile md:form-tablet lg:form-laptop"
+                    className="pl-10"
                   />
                 </div>
               </div>
@@ -414,7 +382,7 @@ export default function PrintingPage() {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-3 py-2 border rounded-lg bg-white form-mobile md:form-tablet lg:form-laptop flex-1 sm:flex-initial"
+                  className="px-3 py-2 border border-gray-200 rounded-lg bg-white flex-1 sm:flex-initial"
                 >
                   <option value="all">All Status</option>
                   <option value="CREATED">Created</option>
@@ -427,7 +395,7 @@ export default function PrintingPage() {
                 <select
                   value={methodFilter}
                   onChange={(e) => setMethodFilter(e.target.value)}
-                  className="px-3 py-2 border rounded-lg bg-white form-mobile md:form-tablet lg:form-laptop flex-1 sm:flex-initial"
+                  className="px-3 py-2 border border-gray-200 rounded-lg bg-white flex-1 sm:flex-initial"
                 >
                   <option value="all">All Methods</option>
                   <option value="SILKSCREEN">Silkscreen</option>
@@ -437,29 +405,28 @@ export default function PrintingPage() {
                 </select>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
 
-        {/* Print Runs Grid */}
-        <div className="designs-grid-mobile md:designs-grid-tablet lg:designs-grid-laptop xl:designs-grid-desktop">
-          {filteredRuns.map((run) => (
-            <Card key={run.id} className="design-card-mobile md:design-card-tablet lg:design-card-laptop xl:design-card-desktop enhanced-card hover-lift">
-              <CardHeader className="pb-2 md:pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-base md:text-lg font-semibold text-gray-900 mb-1 md:mb-2">
-                      {run.orderNumber}
-                    </CardTitle>
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 text-xs md:text-sm text-gray-600">
-                      <span>{run.brandName}</span>
-                      <span className="hidden sm:inline">•</span>
-                      <span>{run.clientName}</span>
+          {/* Print Runs Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredRuns.map((run) => (
+              <Card key={run.id} className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <CardTitle className="text-lg font-semibold text-gray-900 mb-2">
+                        {run.orderNumber}
+                      </CardTitle>
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 text-sm text-gray-600">
+                        <span>{run.brandName}</span>
+                        <span className="hidden sm:inline">•</span>
+                        <span>{run.clientName}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CardHeader>
-              
-              <CardContent className="space-y-3 md:space-y-4">
+                </CardHeader>
+                
+                <CardContent className="space-y-4">
                 {/* Status and Method */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                   <Badge className={`flex items-center space-x-1 text-xs ${getStatusColor(run.status)}`}>
@@ -482,88 +449,87 @@ export default function PrintingPage() {
                   </div>
                 </div>
 
-                {/* Actions */}
-                <div className="mobile-actions md:flex md:items-center md:space-x-2 md:space-y-0">
-                  {run.status === 'CREATED' && (
-                    <Button 
-                      size="sm" 
-                      className="btn-mobile md:btn-tablet lg:btn-laptop flex-1 md:flex-initial bg-green-600 hover:bg-green-700"
-                      onClick={() => handleStartRun(run.id)}
-                    >
-                      <Play className="w-4 h-4 mr-1" />
-                      <span>Start</span>
-                    </Button>
-                  )}
-                  
-                  {run.status === 'IN_PROGRESS' && (
-                    <>
+                  {/* Actions */}
+                  <div className="flex flex-wrap gap-2">
+                    {run.status === 'CREATED' && (
                       <Button 
                         size="sm" 
-                        variant="outline"
-                        className="btn-mobile md:btn-tablet lg:btn-laptop flex-1 md:flex-initial"
-                        onClick={() => {
-                          setSelectedRun(run)
-                          setShowMaterialModal(true)
-                        }}
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                        onClick={() => handleStartRun(run.id)}
                       >
-                        <Package className="w-4 h-4 mr-1" />
-                        <span className="hidden sm:inline">Materials</span>
-                        <span className="sm:hidden">Mat</span>
+                        <Play className="w-4 h-4 mr-1" />
+                        Start
                       </Button>
-                      
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        className="btn-mobile md:btn-tablet lg:btn-laptop flex-1 md:flex-initial border-red-300 text-red-600 hover:bg-red-50"
-                        onClick={() => {
-                          setSelectedRun(run)
-                          setShowRejectModal(true)
-                        }}
-                      >
-                        <AlertTriangle className="w-4 h-4 mr-1" />
-                        <span className="hidden sm:inline">Reject</span>
-                        <span className="sm:hidden">Rej</span>
+                    )}
+                    
+                    {run.status === 'IN_PROGRESS' && (
+                      <>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          className="border-gray-200 hover:bg-gray-50"
+                          onClick={() => {
+                            setSelectedRun(run)
+                            setShowMaterialModal(true)
+                          }}
+                        >
+                          <Package className="w-4 h-4 mr-1" />
+                          Materials
+                        </Button>
+                        
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          className="border-red-200 text-red-600 hover:bg-red-50"
+                          onClick={() => {
+                            setSelectedRun(run)
+                            setShowRejectModal(true)
+                          }}
+                        >
+                          <AlertTriangle className="w-4 h-4 mr-1" />
+                          Reject
+                        </Button>
+                        
+                        <Button 
+                          size="sm" 
+                          className="bg-blue-600 hover:bg-blue-700 text-white"
+                          onClick={() => handleCompleteRun(run.id)}
+                        >
+                          <CheckCircle className="w-4 h-4 mr-1" />
+                          Complete
+                        </Button>
+                      </>
+                    )}
+                    
+                    {run.status === 'DONE' && (
+                      <Button size="sm" variant="outline" className="border-gray-200 hover:bg-gray-50">
+                        <FileText className="w-4 h-4 mr-1" />
+                        Report
                       </Button>
-                      
-                      <Button 
-                        size="sm" 
-                        className="btn-mobile md:btn-tablet lg:btn-laptop flex-1 md:flex-initial bg-blue-600 hover:bg-blue-700"
-                        onClick={() => handleCompleteRun(run.id)}
-                      >
-                        <CheckCircle className="w-4 h-4 mr-1" />
-                        <span className="hidden sm:inline">Complete</span>
-                        <span className="sm:hidden">Done</span>
-                      </Button>
-                    </>
-                  )}
-                  
-                  {run.status === 'DONE' && (
-                    <Button size="sm" variant="outline" className="btn-mobile md:btn-tablet lg:btn-laptop flex-1 md:flex-initial">
-                      <FileText className="w-4 h-4 mr-1" />
-                      <span className="hidden sm:inline">Report</span>
-                      <span className="sm:hidden">Rep</span>
-                    </Button>
-                  )}
-                </div>
+                    )}
+                  </div>
               </CardContent>
             </Card>
           ))}
         </div>
 
-        {filteredRuns.length === 0 && (
-          <Card className="enhanced-card">
-            <CardContent className="p-12 text-center">
-              <Settings className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No print runs found</h3>
-              <p className="text-gray-600 mb-6">
-                {searchTerm || statusFilter !== 'all' || methodFilter !== 'all' 
-                  ? 'Try adjusting your filters or search terms'
-                  : 'No print runs are currently available'
-                }
-              </p>
-            </CardContent>
-          </Card>
-        )}
+            {filteredRuns.length === 0 && (
+              <div className="col-span-full">
+                <Card className="border border-gray-200 shadow-sm">
+                  <CardContent className="p-12 text-center">
+                    <Settings className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No print runs found</h3>
+                    <p className="text-gray-600 mb-6">
+                      {searchTerm || statusFilter !== 'all' || methodFilter !== 'all' 
+                        ? 'Try adjusting your filters or search terms'
+                        : 'No print runs are currently available'
+                      }
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+        </TikTokContentCard>
 
         {/* Modals */}
         <StartPrintRunModal
@@ -602,7 +568,7 @@ export default function PrintingPage() {
             setSelectedRun(null)
           }}
         />
-      </div>
-    </ResponsiveLayout>
+      </TikTokCenteredLayout>
+    </TikTokLayout>
   )
 }

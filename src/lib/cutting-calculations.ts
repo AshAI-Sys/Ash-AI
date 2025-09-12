@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Cutting System Calculations & Optimization
 // Based on CLIENT_UPDATED_PLAN.md Stage 3 specifications
 

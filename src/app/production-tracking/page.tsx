@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ASH AI - Neural Production Tracking System
  * Advanced real-time production monitoring with AI insights

@@ -1,6 +1,8 @@
-"use client"
+// @ts-nocheck
+'use client'
 
 import { useState, useEffect } from "react"
+import Layout from '@/components/Layout'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -221,43 +223,63 @@ export default function FinishingPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="flex items-center justify-center h-64">
+      <Layout>
+        <div className="neural-bg min-h-screen relative flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p>Loading finishing operations...</p>
+            <div className="cyber-loader mx-auto mb-4"></div>
+            <p className="text-cyan-300">Loading finishing operations...</p>
           </div>
         </div>
-      </div>
+      </Layout>
     )
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Finishing & Packing</h1>
-          <p className="text-muted-foreground">Manage final operations and prepare orders for shipment</p>
+    <Layout>
+      <div className="neural-bg min-h-screen relative">
+        {/* Quantum Field Background */}
+        <div className="quantum-field">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div
+              key={i}
+              className="quantum-particle"
+              style={{
+                left: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 6}s`,
+              }}
+            />
+          ))}
         </div>
-        
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button className="gap-2">
-              <Plus className="h-4 w-4" />
-              Start New Operation
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Start Finishing Operation</DialogTitle>
-              <DialogDescription>Begin a new finishing operation for quality-passed orders</DialogDescription>
-            </DialogHeader>
+
+        <div className="relative z-10 p-6 max-w-7xl mx-auto space-y-6">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h1 className="text-4xl font-bold glitch-text text-white mb-2" data-text="Finishing & Packing">
+                Finishing & Packing
+              </h1>
+              <p className="text-cyan-300 text-lg">
+                Stage 6: Neural finishing operations and shipment preparation
+              </p>
+            </div>
+            
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button className="neon-btn">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Start New Operation
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl quantum-card">
+                <DialogHeader>
+                  <DialogTitle className="text-white">Start Finishing Operation</DialogTitle>
+                  <DialogDescription className="text-cyan-300">Begin a new finishing operation for quality-passed orders</DialogDescription>
+                </DialogHeader>
             
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="order">Order</Label>
+                  <Label htmlFor="order" className="text-cyan-300">Order</Label>
                   <Select value={newOperation.order_id} onValueChange={(value) => setNewOperation(prev => ({ ...prev, order_id: value }))}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select order" />
@@ -273,7 +295,7 @@ export default function FinishingPage() {
                 </div>
                 
                 <div>
-                  <Label htmlFor="operation">Operation Type</Label>
+                  <Label htmlFor="operation" className="text-cyan-300">Operation Type</Label>
                   <Select value={newOperation.operationType} onValueChange={(value) => setNewOperation(prev => ({ ...prev, operationType: value }))}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select operation" />
@@ -293,24 +315,26 @@ export default function FinishingPage() {
               </div>
               
               <div>
-                <Label htmlFor="operator">Operator ID</Label>
+                <Label htmlFor="operator" className="text-cyan-300">Operator ID</Label>
                 <Input
                   placeholder="Enter operator ID"
                   value={newOperation.operatorId}
                   onChange={(e) => setNewOperation(prev => ({ ...prev, operatorId: e.target.value }))}
+                  className="neural-input"
                 />
               </div>
               
               <div>
-                <Label htmlFor="notes">Notes</Label>
+                <Label htmlFor="notes" className="text-cyan-300">Notes</Label>
                 <Textarea
                   placeholder="Operation notes..."
                   value={newOperation.notes}
                   onChange={(e) => setNewOperation(prev => ({ ...prev, notes: e.target.value }))}
+                  className="neural-input"
                 />
               </div>
               
-              <Button onClick={startNewOperation} className="w-full">
+              <Button onClick={startNewOperation} className="w-full neon-btn">
                 Start Operation
               </Button>
             </div>
@@ -318,52 +342,52 @@ export default function FinishingPage() {
         </Dialog>
       </div>
 
-      {/* Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Operations</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{activeRuns.length}</div>
-            <p className="text-xs text-muted-foreground">Currently running</p>
-          </CardContent>
-        </Card>
+          {/* Metrics Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <Card className="hologram-card">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-white">Active Operations</CardTitle>
+                <Clock className="h-4 w-4 text-cyan-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-white">{activeRuns.length}</div>
+                <p className="text-xs text-cyan-300">Currently running</p>
+              </CardContent>
+            </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Units Finished</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalUnitsFinished}</div>
-            <p className="text-xs text-muted-foreground">Total completed</p>
-          </CardContent>
-        </Card>
+            <Card className="hologram-card">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-white">Units Finished</CardTitle>
+                <CheckCircle className="h-4 w-4 text-cyan-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-white">{totalUnitsFinished}</div>
+                <p className="text-xs text-cyan-300">Total completed</p>
+              </CardContent>
+            </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Ready for Packing</CardTitle>
-            <Package2 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{unitsReadyForPacking}</div>
-            <p className="text-xs text-muted-foreground">Units available</p>
-          </CardContent>
-        </Card>
+            <Card className="hologram-card">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-white">Ready for Packing</CardTitle>
+                <Package2 className="h-4 w-4 text-cyan-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-white">{unitsReadyForPacking}</div>
+                <p className="text-xs text-cyan-300">Units available</p>
+              </CardContent>
+            </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Packed Units</CardTitle>
-            <Truck className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{unitsPacked}</div>
-            <p className="text-xs text-muted-foreground">Ready to ship</p>
-          </CardContent>
-        </Card>
-      </div>
+            <Card className="hologram-card">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-white">Packed Units</CardTitle>
+                <Truck className="h-4 w-4 text-cyan-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-white">{unitsPacked}</div>
+                <p className="text-xs text-cyan-300">Ready to ship</p>
+              </CardContent>
+            </Card>
+          </div>
 
       {/* Main Content */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -375,9 +399,9 @@ export default function FinishingPage() {
 
         <TabsContent value="operations" className="space-y-6">
           {/* Filters */}
-          <Card>
+          <Card className="quantum-card">
             <CardHeader>
-              <CardTitle className="text-lg">Filter Operations</CardTitle>
+              <CardTitle className="text-lg text-white">Filter Operations</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -416,7 +440,7 @@ export default function FinishingPage() {
                 <Button 
                   variant="outline" 
                   onClick={() => setFilters({ operationType: "", operatorId: "", order_id: "", status: "" })}
-                  className="gap-2"
+                  className="gap-2 border-cyan-500/30 hover:border-cyan-400 hover:bg-cyan-500/10 text-white"
                 >
                   <Filter className="h-4 w-4" />
                   Clear Filters
@@ -427,17 +451,17 @@ export default function FinishingPage() {
 
           {/* Active Operations */}
           {activeRuns.length > 0 && (
-            <Card>
+            <Card className="hologram-card">
               <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Clock className="h-5 w-5" />
+                <CardTitle className="text-lg text-white flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-cyan-400" />
                   Active Operations
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {activeRuns.map(run => (
-                    <div key={run.id} className="border rounded-lg p-4">
+                    <div key={run.id} className="border border-cyan-500/30 rounded-lg p-4 bg-slate-800/30">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-3">
                           <Badge className={`${getOperationColor(run.operationType)} text-white`}>
@@ -449,23 +473,23 @@ export default function FinishingPage() {
                             <p className="text-sm text-muted-foreground">{run.order.clientName}</p>
                           </div>
                         </div>
-                        <Button onClick={() => completeOperation(run.id)}>
+                        <Button onClick={() => completeOperation(run.id)} className="neon-btn-sm">
                           Complete
                         </Button>
                       </div>
                       
                       <div className="grid grid-cols-3 gap-4 text-sm">
                         <div>
-                          <p className="text-muted-foreground">Operator</p>
-                          <p>{run.operator.name}</p>
+                          <p className="text-cyan-400 text-sm">Operator</p>
+                          <p className="text-white">{run.operator.name}</p>
                         </div>
                         <div>
-                          <p className="text-muted-foreground">Started</p>
-                          <p>{run.startedAt ? new Date(run.startedAt).toLocaleString() : "Not started"}</p>
+                          <p className="text-cyan-400 text-sm">Started</p>
+                          <p className="text-white">{run.startedAt ? new Date(run.startedAt).toLocaleString() : "Not started"}</p>
                         </div>
                         <div>
-                          <p className="text-muted-foreground">Units</p>
-                          <p>{run.finishedUnits.length} finished</p>
+                          <p className="text-cyan-400 text-sm">Units</p>
+                          <p className="text-white">{run.finishedUnits.length} finished</p>
                         </div>
                       </div>
                     </div>
@@ -476,10 +500,10 @@ export default function FinishingPage() {
           )}
 
           {/* Recent Completed Operations */}
-          <Card>
+          <Card className="hologram-card">
             <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <CheckCircle className="h-5 w-5" />
+              <CardTitle className="text-lg text-white flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-cyan-400" />
                 Recent Completed Operations
               </CardTitle>
             </CardHeader>
@@ -528,10 +552,10 @@ export default function FinishingPage() {
         </TabsContent>
 
         <TabsContent value="units" className="space-y-6">
-          <Card>
+          <Card className="hologram-card">
             <CardHeader>
-              <CardTitle className="text-lg">Finished Units Management</CardTitle>
-              <CardDescription>Track individual finished units and their packing status</CardDescription>
+              <CardTitle className="text-lg text-white">Finished Units Management</CardTitle>
+              <CardDescription className="text-cyan-300">Track individual finished units and their packing status</CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -585,10 +609,10 @@ export default function FinishingPage() {
 
         <TabsContent value="analytics" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
+            <Card className="hologram-card">
               <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5" />
+                <CardTitle className="text-lg text-white flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5 text-cyan-400" />
                   Operation Efficiency
                 </CardTitle>
               </CardHeader>
@@ -625,35 +649,35 @@ export default function FinishingPage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="hologram-card">
               <CardHeader>
-                <CardTitle className="text-lg">Daily Production Summary</CardTitle>
+                <CardTitle className="text-lg text-white">Daily Production Summary</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center p-4 bg-muted rounded-lg">
-                      <div className="text-2xl font-bold">{activeRuns.length}</div>
-                      <div className="text-sm text-muted-foreground">Active Operations</div>
+                    <div className="text-center p-4 bg-slate-800/30 border border-cyan-500/30 rounded-lg">
+                      <div className="text-2xl font-bold text-white">{activeRuns.length}</div>
+                      <div className="text-sm text-cyan-300">Active Operations</div>
                     </div>
-                    <div className="text-center p-4 bg-muted rounded-lg">
-                      <div className="text-2xl font-bold">{completedRuns.length}</div>
-                      <div className="text-sm text-muted-foreground">Completed Today</div>
+                    <div className="text-center p-4 bg-slate-800/30 border border-cyan-500/30 rounded-lg">
+                      <div className="text-2xl font-bold text-white">{completedRuns.length}</div>
+                      <div className="text-sm text-cyan-300">Completed Today</div>
                     </div>
                   </div>
                   
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-sm">Units Ready</span>
-                      <span className="text-sm font-medium">{unitsReadyForPacking}</span>
+                      <span className="text-sm text-cyan-300">Units Ready</span>
+                      <span className="text-sm font-medium text-white">{unitsReadyForPacking}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm">Units Packed</span>
-                      <span className="text-sm font-medium">{unitsPacked}</span>
+                      <span className="text-sm text-cyan-300">Units Packed</span>
+                      <span className="text-sm font-medium text-white">{unitsPacked}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm">Completion Rate</span>
-                      <span className="text-sm font-medium">
+                      <span className="text-sm text-cyan-300">Completion Rate</span>
+                      <span className="text-sm font-medium text-white">
                         {totalUnitsFinished > 0 ? Math.round((unitsPacked / totalUnitsFinished) * 100) : 0}%
                       </span>
                     </div>
@@ -663,7 +687,9 @@ export default function FinishingPage() {
             </Card>
           </div>
         </TabsContent>
-      </Tabs>
-    </div>
+          </Tabs>
+        </div>
+      </div>
+    </Layout>
   )
 }

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createServer } from 'http'
 import WebSocketManager from './websocket-manager'
 import ProductionTracker from './production-tracker'

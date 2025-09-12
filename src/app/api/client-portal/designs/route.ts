@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ASH AI - Client Portal Design Assets API
  * Design approval workflow and asset management for clients

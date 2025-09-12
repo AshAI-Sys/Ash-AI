@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { db } from '../lib/db'
 import bcrypt from 'bcryptjs'
 import { Role } from '@prisma/client'

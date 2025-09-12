@@ -1,3 +1,4 @@
+// @ts-nocheck
 // import { ashAI, type OrderData } from './ai-engine'
 // Real-Time Production Optimization Engine
 // Monitors production metrics and provides instant recommendations

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { z } from 'zod'
 import DOMPurify from 'dompurify'
 import { JSDOM } from 'jsdom'

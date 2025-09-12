@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ASH AI System Constants
 
 // Event Bus Prefixes

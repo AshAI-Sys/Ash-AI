@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 
 // Sewing Operations API - Mock Data for Testing

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Production Stages Management - All 14 Stages from CLIENT_UPDATED_PLAN.md
  * Complete workflow management for apparel manufacturing

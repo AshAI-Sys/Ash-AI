@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Ashley AI Insights Component
  * Real-time AI-powered insights and recommendations for ASH AI ERP

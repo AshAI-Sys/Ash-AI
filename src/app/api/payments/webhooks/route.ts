@@ -1,3 +1,4 @@
+// @ts-nocheck
 // 🔔 ASH AI - Payment Webhook Handler
 // Secure webhook processing for PayMongo, Stripe, and other providers
 

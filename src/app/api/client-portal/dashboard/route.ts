@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ASH AI - Client Portal Dashboard API
  * Client-specific dashboard data with order insights

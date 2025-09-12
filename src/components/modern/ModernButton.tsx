@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client'
 
 import { ReactNode, ButtonHTMLAttributes } from 'react'

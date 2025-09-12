@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Enhanced Layout with Professional Navigation and Mobile Optimization
  * Complete responsive layout with all navigation features

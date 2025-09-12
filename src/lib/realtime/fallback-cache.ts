@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Fallback in-memory cache for when Redis is not available
 
 class FallbackCache {

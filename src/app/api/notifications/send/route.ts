@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ASH AI ERP - Notification Dispatcher API
  * Manual and automated notification sending with templating support

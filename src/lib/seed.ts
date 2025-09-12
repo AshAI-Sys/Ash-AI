@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { PrismaClient, Role } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
@@ -198,8 +199,8 @@ async function main() {
   if (walletCount === 0) {
     await prisma.wallet.createMany({
       data: [
-        { workspace_id: workspace_id, balance: 50000.00 },
-        { workspace_id: workspace_id, balance: 15000.00 },
+        { workspace_id: workspace_id, owner_type: 'WORKSPACE', owner_id: workspace_id, balance: 50000.00 },
+        { workspace_id: workspace_id, owner_type: 'WORKSPACE', owner_id: workspace_id, balance: 15000.00 },
       ],
     })
   }

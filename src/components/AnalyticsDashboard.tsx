@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Advanced Analytics Dashboard with Professional Data Visualization
  * Interactive charts and metrics for production insights

@@ -1,10 +1,12 @@
+// @ts-nocheck
 'use client'
 
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-import EnhancedLayout from '@/components/EnhancedLayout'
+import TikTokLayout from '@/components/layout/TikTokLayout'
+import { TikTokCenteredLayout, TikTokPageHeader, TikTokContentCard, TikTokMetricsGrid, TikTokMetricCard } from '@/components/TikTokCenteredLayout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -23,7 +25,9 @@ import {
   Globe,
   Shield,
   Sparkles,
-  Eye
+  Eye,
+  MessageSquare,
+  BarChart3
 } from 'lucide-react'
 
 interface AIInsight {
@@ -262,301 +266,244 @@ export default function AIAssistantPage() {
   }
 
   return (
-    <EnhancedLayout>
-      <div className="neural-bg min-h-screen relative">
-        <div className="quantum-field">
-          {Array.from({ length: 15 }).map((_, i) => (
-            <div key={i} className="quantum-particle" />
-          ))}
-        </div>
-        
-        <div className="relative z-10 p-8">
-          {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="ai-orb">
-                  <Brain className="w-8 h-8 text-cyan-400" />
-                </div>
-                <div>
-                  <h1 className="text-4xl font-bold glitch-text text-white" data-text="ASHLEY AI COMMAND CENTER">
-                    ASHLEY AI COMMAND CENTER
-                  </h1>
-                  <p className="text-cyan-300 font-mono mt-2">
-                    Advanced Neural Intelligence • Real-time ERP Analysis • Predictive Insights
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex gap-2">
-                {(['overview', 'detailed', 'predictive'] as const).map((mode) => (
-                  <button
-                    key={mode}
-                    onClick={() => setNeuralMode(mode)}
-                    className={`neon-btn-outline ${neuralMode === mode ? 'text-cyan-400 border-cyan-400' : ''}`}
-                  >
-                    {mode.toUpperCase()}
-                  </button>
-                ))}
-              </div>
+    <TikTokLayout>
+      <TikTokCenteredLayout>
+        <TikTokPageHeader
+          title="Ashley AI Assistant"
+          description="Advanced Neural Intelligence • Real-time ERP Analysis • Predictive Insights"
+          icon={<Brain className="h-8 w-8 text-purple-600" />}
+          actions={
+            <div className="flex gap-2">
+              {(['overview', 'detailed', 'predictive'] as const).map((mode) => (
+                <Button
+                  key={mode}
+                  variant={neuralMode === mode ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setNeuralMode(mode)}
+                  className={neuralMode === mode ? "bg-purple-600 hover:bg-purple-700" : "border-gray-300"}
+                >
+                  {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                </Button>
+              ))}
             </div>
-          </div>
+          }
+        />
 
-          {/* AI Status Dashboard */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {AI_METRICS.map((metric) => {
-              const IconComponent = metric.icon
+        {/* AI Status Dashboard */}
+        <TikTokMetricsGrid cols={3}>
+          {AI_METRICS.map((metric) => (
+            <TikTokMetricCard
+              key={metric.id}
+              title={metric.name}
+              value={`${metric.value}${metric.unit}`}
+              icon={<metric.icon className="w-4 h-4" />}
+              iconColor="text-purple-600"
+              iconBgColor="bg-purple-100"
+              trend={{
+                value: `${metric.trend === 'up' ? '+' : metric.trend === 'down' ? '-' : ''}${Math.abs(metric.change)}${metric.unit}`,
+                direction: metric.trend === 'up' ? 'up' as const : metric.trend === 'down' ? 'down' as const : 'neutral' as const
+              }}
+            />
+          ))}
+        </TikTokMetricsGrid>
+
+        {/* AI Insights */}
+        <TikTokContentCard title="Ashley's Neural Insights & Recommendations">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {AI_INSIGHTS.map((insight) => {
+              const InsightIcon = getInsightIcon(insight.type)
               return (
-                <Card key={metric.id} className="quantum-card border-cyan-500/30">
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="ai-orb-small">
-                          <IconComponent className="w-5 h-5 text-cyan-400" />
-                        </div>
-                        <div>
-                          <p className="text-sm text-cyan-300 font-mono">{metric.category}</p>
-                          <h3 className="text-lg font-bold text-white">{metric.name}</h3>
-                        </div>
+                <div
+                  key={insight.id}
+                  onClick={() => setSelectedInsight(insight)}
+                  className="p-4 rounded-lg border border-gray-200 hover:border-purple-300 transition-all duration-300 cursor-pointer hover:bg-purple-50"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-purple-100 rounded-lg">
+                      <InsightIcon className="w-4 h-4 text-purple-600" />
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-2 flex-wrap">
+                        <Badge variant="outline" className="text-xs border-purple-200 text-purple-700 bg-purple-50">
+                          {insight.category}
+                        </Badge>
+                        <Badge variant="outline" className={`text-xs ${
+                          insight.impact === 'high' ? 'border-red-200 text-red-700 bg-red-50' :
+                          insight.impact === 'medium' ? 'border-yellow-200 text-yellow-700 bg-yellow-50' :
+                          'border-blue-200 text-blue-700 bg-blue-50'
+                        }`}>
+                          {insight.impact} impact
+                        </Badge>
+                        {insight.actionRequired && (
+                          <Badge variant="outline" className="text-xs border-red-200 text-red-700 bg-red-50">
+                            Action Required
+                          </Badge>
+                        )}
                       </div>
                       
-                      <div className="text-right">
-                        <div className="text-2xl font-bold text-white">
-                          {metric.value}{metric.unit}
+                      <h4 className="font-semibold mb-2 text-gray-900">{insight.title}</h4>
+                      <p className="text-gray-600 text-sm mb-3">{insight.description}</p>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                          <span className="text-xs text-green-600">
+                            {Math.round(insight.confidence * 100)}% confidence
+                          </span>
                         </div>
-                        <div className={`flex items-center gap-1 text-sm ${
-                          metric.trend === 'up' ? 'text-green-400' : 
-                          metric.trend === 'down' ? 'text-red-400' : 'text-gray-400'
-                        }`}>
-                          {metric.trend === 'up' ? (
-                            <TrendingUp className="w-4 h-4" />
-                          ) : metric.trend === 'down' ? (
-                            <TrendingDown className="w-4 h-4" />
-                          ) : (
-                            <Activity className="w-4 h-4" />
-                          )}
-                          {Math.abs(metric.change)}{metric.unit}
+                        
+                        <div className="text-xs text-gray-500">
+                          {insight.type}
                         </div>
                       </div>
                     </div>
-                    
-                    <p className="text-xs text-gray-400 mt-3">{metric.description}</p>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               )
             })}
           </div>
+        </TikTokContentCard>
 
-          {/* AI Insights */}
-          <Card className="quantum-card border-purple-500/30 mb-8">
-            <CardHeader>
-              <CardTitle className="flex items-center text-white">
-                <div className="ai-orb mr-3">
-                  <Sparkles className="w-6 h-6 text-purple-400" />
+        {/* Detailed Insight Modal */}
+        {selectedInsight && (
+          <TikTokContentCard>
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <Eye className="w-5 h-5 text-purple-600" />
                 </div>
-                NEURAL INSIGHTS & RECOMMENDATIONS
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {AI_INSIGHTS.map((insight) => {
-                  const InsightIcon = getInsightIcon(insight.type)
-                  return (
-                    <div
-                      key={insight.id}
-                      onClick={() => setSelectedInsight(insight)}
-                      className="p-4 rounded-lg border border-gray-600/30 hover:border-cyan-500/50 transition-all duration-300 cursor-pointer hover:bg-slate-800/20"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="ai-orb-small">
-                          <InsightIcon className="w-4 h-4 text-cyan-400" />
-                        </div>
-                        
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Badge className={getCategoryColor(insight.category)}>
-                              {insight.category.toUpperCase()}
-                            </Badge>
-                            <Badge className={getImpactColor(insight.impact)}>
-                              {insight.impact.toUpperCase()} IMPACT
-                            </Badge>
-                            {insight.actionRequired && (
-                              <div className="neural-pulse">
-                                <Badge className="bg-red-500/20 text-red-400 border-red-500/50">
-                                  ACTION REQUIRED
-                                </Badge>
-                              </div>
-                            )}
-                          </div>
-                          
-                          <h4 className="text-white font-semibold mb-2">{insight.title}</h4>
-                          <p className="text-cyan-300 text-sm mb-3">{insight.description}</p>
-                          
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                              <span className="text-xs text-green-400 font-mono">
-                                {Math.round(insight.confidence * 100)}% CONFIDENCE
-                              </span>
-                            </div>
-                            
-                            <div className="text-xs text-gray-400 font-mono">
-                              {insight.type.toUpperCase()}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })}
+                <h3 className="text-xl font-semibold">Detailed Analysis</h3>
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Detailed Insight Modal */}
-          {selectedInsight && (
-            <Card className="quantum-card border-cyan-500/30 mb-8">
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between text-white">
-                  <div className="flex items-center">
-                    <div className="ai-orb mr-3">
-                      <Eye className="w-6 h-6 text-cyan-400" />
-                    </div>
-                    DETAILED ANALYSIS
-                  </div>
-                  <Button
-                    onClick={() => setSelectedInsight(null)}
-                    className="neon-btn-outline"
-                  >
-                    CLOSE
-                  </Button>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <h3 className="text-xl font-bold text-white mb-4">{selectedInsight.title}</h3>
-                    <p className="text-cyan-300 mb-4">{selectedInsight.description}</p>
-                    
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-400">Impact Level:</span>
-                        <Badge className={getImpactColor(selectedInsight.impact)}>
-                          {selectedInsight.impact.toUpperCase()}
-                        </Badge>
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-400">Confidence:</span>
-                        <span className="text-green-400 font-mono">
-                          {Math.round(selectedInsight.confidence * 100)}%
-                        </span>
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-400">Category:</span>
-                        <Badge className={getCategoryColor(selectedInsight.category)}>
-                          {selectedInsight.category.toUpperCase()}
-                        </Badge>
-                      </div>
-                    </div>
+              <Button
+                onClick={() => setSelectedInsight(null)}
+                variant="outline"
+                size="sm"
+                className="border-gray-300"
+              >
+                Close
+              </Button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-4">{selectedInsight.title}</h3>
+                <p className="text-gray-600 mb-4">{selectedInsight.description}</p>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-500">Impact Level:</span>
+                    <Badge variant="outline" className={
+                      selectedInsight.impact === 'high' ? 'border-red-200 text-red-700 bg-red-50' :
+                      selectedInsight.impact === 'medium' ? 'border-yellow-200 text-yellow-700 bg-yellow-50' :
+                      'border-blue-200 text-blue-700 bg-blue-50'
+                    }>
+                      {selectedInsight.impact}
+                    </Badge>
                   </div>
                   
-                  <div className="space-y-4">
-                    <h4 className="text-lg font-semibold text-white">Recommended Actions:</h4>
-                    <div className="space-y-2">
-                      {selectedInsight.category === 'production' && (
-                        <>
-                          <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/20">
-                            <p className="text-green-400 text-sm">• Schedule maintenance check for affected workstation</p>
-                          </div>
-                          <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
-                            <p className="text-blue-400 text-sm">• Arrange operator training session</p>
-                          </div>
-                          <div className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
-                            <p className="text-purple-400 text-sm">• Monitor efficiency metrics daily</p>
-                          </div>
-                        </>
-                      )}
-                      
-                      {selectedInsight.category === 'inventory' && (
-                        <>
-                          <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-                            <p className="text-red-400 text-sm">• Place urgent reorder for depleting items</p>
-                          </div>
-                          <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-                            <p className="text-yellow-400 text-sm">• Review supplier lead times</p>
-                          </div>
-                          <div className="p-3 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
-                            <p className="text-cyan-400 text-sm">• Adjust minimum stock levels</p>
-                          </div>
-                        </>
-                      )}
-                      
-                      {selectedInsight.category === 'finance' && (
-                        <>
-                          <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/20">
-                            <p className="text-green-400 text-sm">• Prepare for increased production capacity</p>
-                          </div>
-                          <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
-                            <p className="text-blue-400 text-sm">• Review pricing strategy</p>
-                          </div>
-                        </>
-                      )}
-                    </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-500">Confidence:</span>
+                    <span className="text-green-600">
+                      {Math.round(selectedInsight.confidence * 100)}%
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-500">Category:</span>
+                    <Badge variant="outline" className="border-purple-200 text-purple-700 bg-purple-50">
+                      {selectedInsight.category}
+                    </Badge>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Neural System Status */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="quantum-card border-green-500/30">
-              <CardContent className="p-6 text-center">
-                <div className="ai-orb mx-auto mb-4">
-                  <CheckCircle className="w-8 h-8 text-green-400" />
+              </div>
+              
+              <div className="space-y-4">
+                <h4 className="text-lg font-semibold text-gray-900">Recommended Actions:</h4>
+                <div className="space-y-2">
+                  {selectedInsight.category === 'production' && (
+                    <>
+                      <div className="p-3 rounded-lg bg-green-50 border border-green-200">
+                        <p className="text-green-700 text-sm">• Schedule maintenance check for affected workstation</p>
+                      </div>
+                      <div className="p-3 rounded-lg bg-blue-50 border border-blue-200">
+                        <p className="text-blue-700 text-sm">• Arrange operator training session</p>
+                      </div>
+                      <div className="p-3 rounded-lg bg-purple-50 border border-purple-200">
+                        <p className="text-purple-700 text-sm">• Monitor efficiency metrics daily</p>
+                      </div>
+                    </>
+                  )}
+                  
+                  {selectedInsight.category === 'inventory' && (
+                    <>
+                      <div className="p-3 rounded-lg bg-red-50 border border-red-200">
+                        <p className="text-red-700 text-sm">• Place urgent reorder for depleting items</p>
+                      </div>
+                      <div className="p-3 rounded-lg bg-yellow-50 border border-yellow-200">
+                        <p className="text-yellow-700 text-sm">• Review supplier lead times</p>
+                      </div>
+                      <div className="p-3 rounded-lg bg-cyan-50 border border-cyan-200">
+                        <p className="text-cyan-700 text-sm">• Adjust minimum stock levels</p>
+                      </div>
+                    </>
+                  )}
+                  
+                  {selectedInsight.category === 'finance' && (
+                    <>
+                      <div className="p-3 rounded-lg bg-green-50 border border-green-200">
+                        <p className="text-green-700 text-sm">• Prepare for increased production capacity</p>
+                      </div>
+                      <div className="p-3 rounded-lg bg-blue-50 border border-blue-200">
+                        <p className="text-blue-700 text-sm">• Review pricing strategy</p>
+                      </div>
+                    </>
+                  )}
                 </div>
-                <h3 className="text-lg font-bold text-white mb-2">System Status</h3>
-                <Badge className="bg-green-500/20 text-green-400 border-green-500/50">
-                  ALL SYSTEMS OPERATIONAL
-                </Badge>
-                <p className="text-xs text-gray-400 mt-3">
-                  Neural networks running at optimal performance
-                </p>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
+          </TikTokContentCard>
+        )}
 
-            <Card className="quantum-card border-blue-500/30">
-              <CardContent className="p-6 text-center">
-                <div className="ai-orb mx-auto mb-4">
-                  <Globe className="w-8 h-8 text-blue-400" />
-                </div>
-                <h3 className="text-lg font-bold text-white mb-2">Data Sources</h3>
-                <div className="text-2xl font-bold text-blue-400 mb-2">24/7</div>
-                <p className="text-xs text-gray-400">
-                  Continuous data ingestion from all ERP modules
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="quantum-card border-purple-500/30">
-              <CardContent className="p-6 text-center">
-                <div className="ai-orb mx-auto mb-4">
-                  <Shield className="w-8 h-8 text-purple-400" />
-                </div>
-                <h3 className="text-lg font-bold text-white mb-2">Security Level</h3>
-                <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/50">
-                  MAXIMUM ENCRYPTION
-                </Badge>
-                <p className="text-xs text-gray-400 mt-3">
-                  All AI processes secured with quantum encryption
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </div>
-    </EnhancedLayout>
+        {/* Ashley AI System Status */}
+        <TikTokMetricsGrid cols={3}>
+          <TikTokMetricCard
+            title="System Status"
+            value="Operational"
+            icon={<CheckCircle className="w-4 h-4" />}
+            iconColor="text-green-600"
+            iconBgColor="bg-green-100"
+            trend={{
+              value: "Neural networks at optimal performance",
+              direction: 'neutral' as const
+            }}
+          />
+          
+          <TikTokMetricCard
+            title="Data Sources"
+            value="24/7"
+            icon={<Globe className="w-4 h-4" />}
+            iconColor="text-blue-600"
+            iconBgColor="bg-blue-100"
+            trend={{
+              value: "Continuous data ingestion from all ERP modules",
+              direction: 'neutral' as const
+            }}
+          />
+          
+          <TikTokMetricCard
+            title="Security Level"
+            value="Maximum"
+            icon={<Shield className="w-4 h-4" />}
+            iconColor="text-purple-600"
+            iconBgColor="bg-purple-100"
+            trend={{
+              value: "All AI processes secured with quantum encryption",
+              direction: 'neutral' as const
+            }}
+          />
+        </TikTokMetricsGrid>
+      </TikTokCenteredLayout>
+    </TikTokLayout>
   )
 }

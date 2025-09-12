@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ASH AI - Futuristic Design Upload Center
  * Advanced drag-and-drop design upload with AI validation

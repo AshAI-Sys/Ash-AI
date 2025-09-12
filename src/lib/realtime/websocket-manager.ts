@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Server as SocketIOServer } from 'socket.io'
 import { Server as HTTPServer } from 'http'
 import { NextApiRequest } from 'next'

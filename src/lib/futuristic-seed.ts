@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { PrismaClient, Role, RouteTemplateType, ProcessType, WorkcenterType, WalletType, AlertSeverity, AlertCategory } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 

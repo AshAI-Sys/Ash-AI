@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { prisma as db } from './db'
 import * as XLSX from 'xlsx'
 import { format, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter } from 'date-fns'

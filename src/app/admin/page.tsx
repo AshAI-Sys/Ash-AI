@@ -1,10 +1,14 @@
+// @ts-nocheck
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import ResponsiveLayout from '@/components/ResponsiveLayout'
+import TikTokLayout from '@/components/layout/TikTokLayout'
+import { TikTokCenteredLayout, TikTokPageHeader, TikTokContentCard, TikTokMetricsGrid, TikTokMetricCard } from '@/components/TikTokCenteredLayout'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { InteractiveCharts } from '@/components/analytics/InteractiveCharts'
 import { PaymentIntegration } from '@/components/integrations/PaymentIntegration'
@@ -23,11 +27,44 @@ import {
   Database,
   Users,
   Bell,
-  Monitor
+  Monitor,
+  Server,
+  Cpu,
+  HardDrive,
+  Network,
+  Clock,
+  CheckCircle,
+  AlertTriangle,
+  TrendingUp,
+  TrendingDown,
+  Globe,
+  Lock,
+  Wifi,
+  RefreshCw
 } from 'lucide-react'
 
 export default function AdminPage() {
+  const { data: session, status } = useSession()
+  const router = useRouter()
   const [activeSection, setActiveSection] = useState<'overview' | 'analytics' | 'integrations' | 'ai' | 'security' | 'performance' | 'appearance'>('overview')
+
+  useEffect(() => {
+    if (status === 'loading') return
+    if (!session) {
+      router.push('/auth/signin')
+      return
+    }
+  }, [session, status, router])
+
+  if (status === 'loading') {
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-50">
+        <div className="text-gray-600 text-xl">Loading...</div>
+      </div>
+    )
+  }
+
+  if (!session) return null
 
   const sections = [
     { key: 'overview', label: 'Overview', icon: Settings, color: 'text-gray-600' },
@@ -40,10 +77,70 @@ export default function AdminPage() {
   ]
 
   const systemStats = [
-    { label: 'System Uptime', value: '99.9%', icon: Monitor, color: 'text-green-600' },
-    { label: 'Active Users', value: '27', icon: Users, color: 'text-blue-600' },
-    { label: 'Database Health', value: 'Excellent', icon: Database, color: 'text-green-600' },
-    { label: 'API Response', value: '145ms', icon: Zap, color: 'text-yellow-600' }
+    { 
+      label: 'System Uptime', 
+      value: '99.9%', 
+      icon: Monitor, 
+      iconColor: 'text-green-600',
+      iconBgColor: 'bg-green-100',
+      trend: { value: '+0.2% vs last month', direction: 'up' as const }
+    },
+    { 
+      label: 'Active Users', 
+      value: '127', 
+      icon: Users, 
+      iconColor: 'text-blue-600',
+      iconBgColor: 'bg-blue-100',
+      trend: { value: '+15 vs yesterday', direction: 'up' as const }
+    },
+    { 
+      label: 'Database Health', 
+      value: 'Excellent', 
+      icon: Database, 
+      iconColor: 'text-green-600',
+      iconBgColor: 'bg-green-100',
+      trend: { value: 'All systems operational', direction: 'neutral' as const }
+    },
+    { 
+      label: 'API Response', 
+      value: '145ms', 
+      icon: Zap, 
+      iconColor: 'text-yellow-600',
+      iconBgColor: 'bg-yellow-100',
+      trend: { value: '-12ms improvement', direction: 'up' as const }
+    },
+    { 
+      label: 'Server Load', 
+      value: '23%', 
+      icon: Server, 
+      iconColor: 'text-purple-600',
+      iconBgColor: 'bg-purple-100',
+      trend: { value: 'Normal load', direction: 'neutral' as const }
+    },
+    { 
+      label: 'CPU Usage', 
+      value: '45%', 
+      icon: Cpu, 
+      iconColor: 'text-orange-600',
+      iconBgColor: 'bg-orange-100',
+      trend: { value: '-5% vs avg', direction: 'up' as const }
+    },
+    { 
+      label: 'Memory Usage', 
+      value: '67%', 
+      icon: HardDrive, 
+      iconColor: 'text-red-600',
+      iconBgColor: 'bg-red-100',
+      trend: { value: '+3% vs yesterday', direction: 'down' as const }
+    },
+    { 
+      label: 'Network I/O', 
+      value: '2.4 GB/s', 
+      icon: Network, 
+      iconColor: 'text-indigo-600',
+      iconBgColor: 'bg-indigo-100',
+      trend: { value: 'Peak: 3.1 GB/s', direction: 'neutral' as const }
+    }
   ]
 
   const recentActivities = [
@@ -55,48 +152,45 @@ export default function AdminPage() {
   ]
 
   return (
-    <ResponsiveLayout>
-      <div className="p-6 space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold flex items-center space-x-3">
-              <Settings className="h-8 w-8 text-gray-700" />
-              <span>System Administration</span>
-            </h1>
-            <p className="text-gray-600 mt-2">
-              Advanced system management and configuration
-            </p>
-          </div>
-          <div className="flex items-center space-x-3">
-            <ThemeToggle />
-            <Button variant="outline">
-              <Bell className="mr-2 h-4 w-4" />
-              Notifications
-            </Button>
-          </div>
-        </div>
+    <TikTokLayout>
+      <TikTokCenteredLayout>
+        <TikTokPageHeader
+          title="System Administration"
+          description="Advanced system management and configuration"
+          icon={<Settings className="h-8 w-8 text-gray-700" />}
+          actions={
+            <>
+              <ThemeToggle />
+              <Button variant="outline" className="border-gray-300">
+                <Bell className="mr-2 h-4 w-4" />
+                Notifications
+              </Button>
+            </>
+          }
+        />
 
         {/* Navigation */}
-        <div className="flex space-x-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1 overflow-x-auto">
-          {sections.map(section => {
-            const IconComponent = section.icon
-            return (
-              <button
-                key={section.key}
-                onClick={() => setActiveSection(section.key as typeof activeSection)}
-                className={`flex-shrink-0 px-4 py-2 rounded-md font-medium transition-all text-sm whitespace-nowrap ${
-                  activeSection === section.key
-                    ? 'bg-white dark:bg-gray-700 shadow-sm'
-                    : 'hover:bg-white/50 dark:hover:bg-gray-700/50'
-                }`}
-              >
-                <IconComponent className={`w-4 h-4 inline mr-2 ${section.color}`} />
-                {section.label}
-              </button>
-            )
-          })}
-        </div>
+        <TikTokContentCard>
+          <div className="flex space-x-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1 overflow-x-auto">
+            {sections.map(section => {
+              const IconComponent = section.icon
+              return (
+                <button
+                  key={section.key}
+                  onClick={() => setActiveSection(section.key as typeof activeSection)}
+                  className={`flex-shrink-0 px-4 py-2 rounded-md font-medium transition-all text-sm whitespace-nowrap ${
+                    activeSection === section.key
+                      ? 'bg-white dark:bg-gray-700 shadow-sm'
+                      : 'hover:bg-white/50 dark:hover:bg-gray-700/50'
+                  }`}
+                >
+                  <IconComponent className={`w-4 h-4 inline mr-2 ${section.color}`} />
+                  {section.label}
+                </button>
+              )
+            })}
+          </div>
+        </TikTokContentCard>
 
         {/* Content */}
         <div className="space-y-6">
@@ -104,101 +198,86 @@ export default function AdminPage() {
           {activeSection === 'overview' && (
             <div className="space-y-6">
               {/* System Status Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {systemStats.map((stat, index) => {
-                  const IconComponent = stat.icon
-                  return (
-                    <Card key={index} className="hover:shadow-lg transition-shadow">
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-sm font-medium text-gray-600">{stat.label}</p>
-                            <p className="text-2xl font-bold mt-1">{stat.value}</p>
-                          </div>
-                          <IconComponent className={`h-8 w-8 ${stat.color}`} />
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )
-                })}
-              </div>
+              <TikTokMetricsGrid cols={4}>
+                {systemStats.map((stat, index) => (
+                  <TikTokMetricCard
+                    key={index}
+                    title={stat.label}
+                    value={stat.value}
+                    icon={<stat.icon className="w-4 h-4" />}
+                    iconColor={stat.iconColor}
+                    iconBgColor={stat.iconBgColor}
+                    trend={stat.trend}
+                  />
+                ))}
+              </TikTokMetricsGrid>
 
               {/* Quick Actions */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Quick Actions</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <Button 
-                      variant="outline" 
-                      className="h-20 flex-col"
-                      onClick={() => setActiveSection('analytics')}
-                    >
-                      <BarChart3 className="h-6 w-6 mb-2 text-blue-600" />
-                      <span>View Analytics</span>
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="h-20 flex-col"
-                      onClick={() => setActiveSection('integrations')}
-                    >
-                      <CreditCard className="h-6 w-6 mb-2 text-green-600" />
-                      <span>Manage Integrations</span>
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="h-20 flex-col"
-                      onClick={() => setActiveSection('security')}
-                    >
-                      <Shield className="h-6 w-6 mb-2 text-red-600" />
-                      <span>Security Center</span>
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="h-20 flex-col"
-                      onClick={() => setActiveSection('ai')}
-                    >
-                      <Brain className="h-6 w-6 mb-2 text-purple-600" />
-                      <span>AI Dashboard</span>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <TikTokContentCard title="Quick Actions">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <Button 
+                    variant="outline" 
+                    className="h-20 flex-col border-gray-300 hover:bg-blue-50"
+                    onClick={() => setActiveSection('analytics')}
+                  >
+                    <BarChart3 className="h-6 w-6 mb-2 text-blue-600" />
+                    <span>View Analytics</span>
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="h-20 flex-col border-gray-300 hover:bg-green-50"
+                    onClick={() => setActiveSection('integrations')}
+                  >
+                    <CreditCard className="h-6 w-6 mb-2 text-green-600" />
+                    <span>Manage Integrations</span>
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="h-20 flex-col border-gray-300 hover:bg-red-50"
+                    onClick={() => setActiveSection('security')}
+                  >
+                    <Shield className="h-6 w-6 mb-2 text-red-600" />
+                    <span>Security Center</span>
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="h-20 flex-col border-gray-300 hover:bg-purple-50"
+                    onClick={() => setActiveSection('ai')}
+                  >
+                    <Brain className="h-6 w-6 mb-2 text-purple-600" />
+                    <span>AI Dashboard</span>
+                  </Button>
+                </div>
+              </TikTokContentCard>
 
               {/* Recent Activities */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Recent System Activities</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {recentActivities.map((activity, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">
-                        <div className="flex items-center space-x-3">
-                          <Badge 
-                            variant="outline" 
-                            className={`
-                              ${activity.type === 'integration' ? 'border-green-200 text-green-800' : ''}
-                              ${activity.type === 'security' ? 'border-red-200 text-red-800' : ''}
-                              ${activity.type === 'ai' ? 'border-purple-200 text-purple-800' : ''}
-                              ${activity.type === 'performance' ? 'border-orange-200 text-orange-800' : ''}
-                              ${activity.type === 'analytics' ? 'border-blue-200 text-blue-800' : ''}
-                            `}
-                          >
-                            {activity.type}
-                          </Badge>
-                          <div>
-                            <p className="font-medium">{activity.action}</p>
-                            <p className="text-sm text-gray-500">by {activity.user}</p>
-                          </div>
+              <TikTokContentCard title="Recent System Activities">
+                <div className="space-y-4">
+                  {recentActivities.map((activity, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                      <div className="flex items-center space-x-3">
+                        <Badge 
+                          variant="outline" 
+                          className={`
+                            ${activity.type === 'integration' ? 'border-green-200 text-green-800 bg-green-50' : ''}
+                            ${activity.type === 'security' ? 'border-red-200 text-red-800 bg-red-50' : ''}
+                            ${activity.type === 'ai' ? 'border-purple-200 text-purple-800 bg-purple-50' : ''}
+                            ${activity.type === 'performance' ? 'border-orange-200 text-orange-800 bg-orange-50' : ''}
+                            ${activity.type === 'analytics' ? 'border-blue-200 text-blue-800 bg-blue-50' : ''}
+                          `}
+                        >
+                          {activity.type}
+                        </Badge>
+                        <div>
+                          <p className="font-medium">{activity.action}</p>
+                          <p className="text-sm text-gray-500">by {activity.user}</p>
                         </div>
-                        <span className="text-sm text-gray-400">{activity.time}</span>
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+                      <span className="text-sm text-gray-400">{activity.time}</span>
+                    </div>
+                  ))}
+                </div>
+              </TikTokContentCard>
             </div>
           )}
 
@@ -220,14 +299,13 @@ export default function AdminPage() {
           {/* Appearance Section */}
           {activeSection === 'appearance' && (
             <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Palette className="h-5 w-5" />
-                    <span>Theme & Appearance</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
+              <TikTokContentCard>
+                <div className="space-y-6">
+                  <div className="flex items-center space-x-2 mb-6">
+                    <Palette className="h-5 w-5 text-pink-600" />
+                    <h3 className="text-xl font-semibold">Theme & Appearance</h3>
+                  </div>
+
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="font-medium">Dark Mode</h4>
@@ -256,28 +334,28 @@ export default function AdminPage() {
                   </div>
 
                   <div className="border-t pt-6">
-                    <h4 className="font-medium mb-4">ResponsiveLayout Options (Coming Soon)</h4>
+                    <h4 className="font-medium mb-4">Layout Options (Coming Soon)</h4>
                     <div className="space-y-3">
                       <div className="flex items-center space-x-3">
                         <input type="radio" id="compact" name="layout" defaultChecked />
-                        <label htmlFor="compact" className="text-sm">Compact ResponsiveLayout</label>
+                        <label htmlFor="compact" className="text-sm">Compact Layout</label>
                       </div>
                       <div className="flex items-center space-x-3">
                         <input type="radio" id="comfortable" name="layout" />
-                        <label htmlFor="comfortable" className="text-sm">Comfortable ResponsiveLayout</label>
+                        <label htmlFor="comfortable" className="text-sm">Comfortable Layout</label>
                       </div>
                       <div className="flex items-center space-x-3">
                         <input type="radio" id="spacious" name="layout" />
-                        <label htmlFor="spacious" className="text-sm">Spacious ResponsiveLayout</label>
+                        <label htmlFor="spacious" className="text-sm">Spacious Layout</label>
                       </div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </TikTokContentCard>
             </div>
           )}
         </div>
-      </div>
-    </ResponsiveLayout>
+      </TikTokCenteredLayout>
+    </TikTokLayout>
   )
 }

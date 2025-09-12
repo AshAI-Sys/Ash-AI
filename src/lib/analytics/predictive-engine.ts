@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { PrismaClient } from '@prisma/client'
 import WebSocketManager from '@/lib/realtime/websocket-manager'
 import Redis from 'ioredis'

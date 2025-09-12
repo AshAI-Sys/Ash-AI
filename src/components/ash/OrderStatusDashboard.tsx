@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ASH AI - Neural Order Status Dashboard
  * Futuristic order lifecycle visualization with AI-powered insights

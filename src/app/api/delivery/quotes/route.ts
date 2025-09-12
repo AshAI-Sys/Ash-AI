@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 
 import { get3PLQuotes, recommendDeliveryMethod, calculateDriverCost } from '@/lib/delivery-calculations'

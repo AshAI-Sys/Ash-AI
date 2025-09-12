@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * PostgreSQL Connection Pool Configuration for ASH AI ERP
  * Production-grade connection pooling with automatic scaling

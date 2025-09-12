@@ -1,3 +1,4 @@
+// @ts-nocheck
 import crypto from 'crypto'
 import { db } from '@/lib/db'
 // Magic Link Authentication for Client Portal

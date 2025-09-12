@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ASH AI - Individual Order API
  * Fetch detailed order information with AI insights

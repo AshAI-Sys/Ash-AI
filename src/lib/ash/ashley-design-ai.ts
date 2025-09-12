@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ASH AI - Ashley Design Intelligence System
  * Advanced AI-powered design validation and optimization

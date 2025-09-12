@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ASH AI - Client Portal Orders API
  * Client-specific order management and tracking

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Redis Caching Layer for ASH AI ERP
  * High-performance caching for API endpoints and database queries

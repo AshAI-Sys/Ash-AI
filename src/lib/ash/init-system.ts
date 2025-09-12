@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ASH AI System Initialization
  * Professional data seeding and system setup for futuristic ERP

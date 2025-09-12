@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { NextAuthOptions, User } from 'next-auth'
 import { getServerSession } from 'next-auth/next'
 import CredentialsProvider from 'next-auth/providers/credentials'

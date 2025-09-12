@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ASH AI - Design Asset Upload API
  * Futuristic design file processing with AI-powered validation

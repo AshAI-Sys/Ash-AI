@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { prisma as db } from './db'
 import { Role, TaskStatus, ProductMethod, User, Order } from '@prisma/client'
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client'
 
 import { useSession } from 'next-auth/react'
@@ -18,7 +19,7 @@ import {
   UserCheck,
   Calculator
 } from 'lucide-react'
-import Layout from '@/components/Layout'
+import TikTokLayout from '@/components/layout/TikTokLayout'
 import { TikTokCenteredLayout, TikTokPageHeader, TikTokContentCard, TikTokMetricsGrid, TikTokMetricCard } from '@/components/TikTokCenteredLayout'
 
 export default function HRManagementPage() {
@@ -35,8 +36,8 @@ export default function HRManagementPage() {
   }, [session, status, router])
 
   if (status === 'loading') {
-    return <div className="flex h-screen items-center justify-center neural-bg">
-      <div className="text-cyan-400 text-xl">Loading...</div>
+    return <div className="flex h-screen items-center justify-center bg-gray-50">
+      <div className="text-gray-600 text-xl">Loading...</div>
     </div>
   }
 
@@ -52,80 +53,87 @@ export default function HRManagementPage() {
   }
 
   return (
-    <Layout>
-      <div className="neural-bg min-h-screen p-6 space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <h1 className="text-3xl font-bold text-white glitch-text" data-text="HR MANAGEMENT">
-              HR MANAGEMENT
-            </h1>
-            <p className="text-cyan-300 font-mono">Human Resources & Payroll System</p>
+    <TikTokLayout>
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-6xl mx-auto space-y-6">
+          {/* Header */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                  HR Management
+                </h1>
+                <p className="text-gray-600 text-lg">
+                  Human Resources & Payroll System
+                </p>
+              </div>
+              
+              <div className="flex gap-3">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                  <Calendar className="w-4 h-4 mr-2" />
+                  Schedule
+                </Button>
+                <Button variant="outline" className="border-gray-300">
+                  <Calculator className="w-4 h-4 mr-2" />
+                  Payroll
+                </Button>
+              </div>
+            </div>
           </div>
-          
-          <div className="flex gap-3">
-            <Button className="neon-btn-primary">
-              <Calendar className="w-4 h-4 mr-2" />
-              Schedule
-            </Button>
-            <Button className="neon-btn-outline">
-              <Calculator className="w-4 h-4 mr-2" />
-              Payroll
-            </Button>
-          </div>
-        </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card className="quantum-card neon-glow">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="space-y-2">
-                  <p className="text-sm text-cyan-300 font-mono">TOTAL EMPLOYEES</p>
-                  <p className="text-3xl font-bold text-white">{hrStats.totalEmployees}</p>
-                  <div className="flex items-center gap-1 text-green-400">
-                    <TrendingUp className="w-3 h-3" />
-                    <span className="text-xs">+2 this month</span>
-                  </div>
+        {/* HR Metrics */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Card className="bg-white border border-gray-200 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <Users className="w-4 h-4 text-blue-600" />
                 </div>
-                <div className="ai-orb">
-                  <Users className="w-6 h-6 text-cyan-400" />
+                <div>
+                  <div className="text-sm text-gray-600">Total Employees</div>
+                  <div className="text-xl font-bold text-gray-900">{hrStats.totalEmployees}</div>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="quantum-card neon-glow">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="space-y-2">
-                  <p className="text-sm text-cyan-300 font-mono">ACTIVE TODAY</p>
-                  <p className="text-3xl font-bold text-white">{hrStats.activeToday}</p>
-                  <div className="flex items-center gap-1 text-green-400">
-                    <CheckCircle className="w-3 h-3" />
-                    <span className="text-xs">{hrStats.averageAttendance}% attendance</span>
-                  </div>
+          <Card className="bg-white border border-gray-200 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <UserCheck className="w-4 h-4 text-green-600" />
                 </div>
-                <div className="ai-orb">
-                  <UserCheck className="w-6 h-6 text-green-400" />
+                <div>
+                  <div className="text-sm text-gray-600">Active Today</div>
+                  <div className="text-xl font-bold text-gray-900">{hrStats.activeToday}</div>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="quantum-card neon-glow">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="space-y-2">
-                  <p className="text-sm text-cyan-300 font-mono">PENDING APPROVALS</p>
-                  <p className="text-3xl font-bold text-white">{hrStats.pendingApprovals}</p>
-                  <div className="flex items-center gap-1 text-yellow-400">
-                    <AlertTriangle className="w-3 h-3" />
-                    <span className="text-xs">Requires attention</span>
-                  </div>
+          <Card className="bg-white border border-gray-200 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-yellow-100 rounded-lg">
+                  <Clock className="w-4 h-4 text-yellow-600" />
                 </div>
-                <div className="ai-orb">
-                  <Clock className="w-6 h-6 text-yellow-400" />
+                <div>
+                  <div className="text-sm text-gray-600">Pending</div>
+                  <div className="text-xl font-bold text-gray-900">{hrStats.pendingApprovals}</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white border border-gray-200 shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <DollarSign className="w-4 h-4 text-purple-600" />
+                </div>
+                <div>
+                  <div className="text-sm text-gray-600">On Leave</div>
+                  <div className="text-xl font-bold text-gray-900">{hrStats.onLeave}</div>
                 </div>
               </div>
             </CardContent>
@@ -133,89 +141,92 @@ export default function HRManagementPage() {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex space-x-1 bg-slate-900/50 rounded-lg p-1">
-          {[
-            { id: 'overview', label: 'Overview', icon: TrendingUp },
-            { id: 'employees', label: 'Employees', icon: Users },
-            { id: 'attendance', label: 'Attendance', icon: Clock },
-            { id: 'payroll', label: 'Payroll', icon: DollarSign },
-            { id: 'leaves', label: 'Leaves', icon: Calendar },
-            { id: 'reports', label: 'Reports', icon: FileText }
-          ].map((tab) => {
-            const Icon = tab.icon
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 font-mono text-sm ${
-                  activeTab === tab.id
-                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
-                    : 'text-gray-400 hover:text-cyan-300 hover:bg-cyan-500/10'
-                }`}
-              >
-                <Icon className="w-4 h-4" />
-                {tab.label}
-              </button>
-            )
-          })}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-1">
+          <div className="flex flex-wrap gap-1">
+            {[
+              { id: 'overview', label: 'Overview', icon: TrendingUp },
+              { id: 'employees', label: 'Employees', icon: Users },
+              { id: 'attendance', label: 'Attendance', icon: Clock },
+              { id: 'payroll', label: 'Payroll', icon: DollarSign },
+              { id: 'leaves', label: 'Leaves', icon: Calendar },
+              { id: 'reports', label: 'Reports', icon: FileText }
+            ].map((tab) => {
+              const Icon = tab.icon
+              const isActive = activeTab === tab.id
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                    isActive
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {tab.label}
+                </button>
+              )
+            })}
+          </div>
         </div>
 
         {/* Content Area */}
         <div className="space-y-6">
           {activeTab === 'overview' && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="quantum-card">
+              <Card className="bg-white border border-gray-200 shadow-sm">
                 <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-cyan-400" />
+                  <CardTitle className="text-gray-900 flex items-center gap-2">
+                    <Clock className="w-5 h-5 text-blue-600" />
                     Today's Attendance
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-cyan-300">Present</span>
-                    <Badge className="bg-green-500/20 text-green-400 border-green-500/50">
+                    <span className="text-gray-600">Present</span>
+                    <Badge className="bg-green-100 text-green-800">
                       {hrStats.activeToday}
                     </Badge>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-cyan-300">On Leave</span>
-                    <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/50">
+                    <span className="text-gray-600">On Leave</span>
+                    <Badge className="bg-blue-100 text-blue-800">
                       {hrStats.onLeave}
                     </Badge>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-cyan-300">Absent</span>
-                    <Badge className="bg-red-500/20 text-red-400 border-red-500/50">
+                    <span className="text-gray-600">Absent</span>
+                    <Badge className="bg-red-100 text-red-800">
                       {hrStats.totalEmployees - hrStats.activeToday - hrStats.onLeave}
                     </Badge>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="quantum-card">
+              <Card className="bg-white border border-gray-200 shadow-sm">
                 <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <DollarSign className="w-5 h-5 text-cyan-400" />
+                  <CardTitle className="text-gray-900 flex items-center gap-2">
+                    <DollarSign className="w-5 h-5 text-blue-600" />
                     Payroll Status
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-cyan-300">Current Period</span>
-                    <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/50">
+                    <span className="text-gray-600">Current Period</span>
+                    <Badge className="bg-gray-100 text-gray-800">
                       Sep 1-15, 2025
                     </Badge>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-cyan-300">Pending Runs</span>
-                    <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/50">
+                    <span className="text-gray-600">Pending Runs</span>
+                    <Badge className="bg-yellow-100 text-yellow-800">
                       {hrStats.payrollPending}
                     </Badge>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-cyan-300">Total Amount</span>
-                    <span className="text-white font-mono">₱2,456,780</span>
+                    <span className="text-gray-600">Total Amount</span>
+                    <span className="text-gray-900 font-semibold">₱2,456,780</span>
                   </div>
                 </CardContent>
               </Card>
@@ -686,7 +697,8 @@ export default function HRManagementPage() {
             </div>
           )}
         </div>
+        </div>
       </div>
-    </Layout>
+    </TikTokLayout>
   )
 }

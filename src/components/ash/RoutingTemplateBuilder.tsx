@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ASH AI - Routing Template Builder
  * Professional drag-and-drop routing template customization

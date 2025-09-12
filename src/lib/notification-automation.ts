@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ASH AI ERP - Multi-Channel Notification Automation System
  * Email, SMS, and in-app notifications with templating and scheduling

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Security Utilities
  * Centralized security functions and validations

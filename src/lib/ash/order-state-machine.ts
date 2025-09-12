@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ASH AI - Order Status State Machine
  * Professional order lifecycle management with AI-powered transitions

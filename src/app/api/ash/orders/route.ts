@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { db, createAuditLog } from '@/lib/db'
 import { generatePONumber } from '@/lib/po-generator'

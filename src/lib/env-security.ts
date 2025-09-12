@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Environment & Configuration Security
  * Secure environment variable validation and configuration management

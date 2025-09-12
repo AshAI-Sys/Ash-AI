@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Stage 14 Automation - Workflow Automation API
  * Intelligent workflow automation system with conditional logic

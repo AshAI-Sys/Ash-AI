@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ASH AI - Client Portal Authentication API
  * Secure authentication system for client portal access

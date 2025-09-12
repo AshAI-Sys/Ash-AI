@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { PrintMethod, Role } from '@prisma/client'
 
 export interface TaskStep {

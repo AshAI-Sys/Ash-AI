@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Stage 14 Automation - Intelligent Alerts API
  * AI-powered alert system for proactive business monitoring

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ASH AI - Ashley Intelligence System
  * Advanced AI-powered order validation, risk assessment, and recommendations

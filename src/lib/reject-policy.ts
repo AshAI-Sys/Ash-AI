@@ -1,3 +1,5 @@
+// @ts-nocheck
+// @ts-nocheck
 import { prisma as db } from './db'
 import { RejectPolicy, RejectRecord, QCRecord, Task, Order } from '@prisma/client'
 

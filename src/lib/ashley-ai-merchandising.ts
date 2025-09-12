@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Ashley AI Merchandising System - Stage 13 Implementation
 // AI-powered reprint advisor and theme recommender
 

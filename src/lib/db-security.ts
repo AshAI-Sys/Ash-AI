@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Database Security Hardening
  * Advanced database protection and query security

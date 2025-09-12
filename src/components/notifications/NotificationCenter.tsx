@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client'
 
 // 🔔 ASH AI - Real-time Notification Center

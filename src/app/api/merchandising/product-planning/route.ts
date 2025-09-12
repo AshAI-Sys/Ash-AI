@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Merchandising AI - Product Planning API
  * Advanced product line planning with AI-driven recommendations

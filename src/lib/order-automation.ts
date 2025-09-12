@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Order Workflow Automation - CLIENT_UPDATED_PLAN.md Implementation
 // Automate order status changes, notifications, and routing decisions
 

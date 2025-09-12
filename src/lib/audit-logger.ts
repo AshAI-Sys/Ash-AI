@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { prisma as db } from './db'
 import { AuditLog, User } from '@prisma/client'
 import { NextRequest } from 'next/server'

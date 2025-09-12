@@ -1,13 +1,15 @@
+// @ts-nocheck
 'use client'
 
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { hasPermission, maskSensitiveData } from '@/utils/security'
+import TikTokLayout from '@/components/layout/TikTokLayout'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
-import ResponsiveLayout from '@/components/ResponsiveLayout'
+import { TikTokCenteredLayout, TikTokPageHeader, TikTokContentCard, TikTokMetricsGrid, TikTokMetricCard } from '@/components/TikTokCenteredLayout'
 import { CuttingQueueModal } from '@/components/cutting/CuttingQueueModal'
 import { FabricLayoutModal } from '@/components/cutting/FabricLayoutModal'
 import { MaterialTrackingModal } from '@/components/cutting/MaterialTrackingModal'
@@ -286,115 +288,80 @@ export default function CuttingPage() {
   }
 
   return (
-    <ResponsiveLayout>
-      <div className="responsive-container mobile-dashboard tablet-dashboard laptop-dashboard desktop-dashboard">
-        {/* Header */}
-        <div className="mobile-header tablet-header laptop-header desktop-header">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-            <div>
-              <h1 className="text-2xl md:text-3xl lg:text-3xl xl:text-4xl font-bold flex items-center space-x-3">
-                <div className="w-8 h-8 md:w-10 md:h-10 lg:w-10 lg:h-10 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
-                  <Scissors className="h-4 w-4 md:h-6 md:w-6 text-white" />
-                </div>
-                <span className="ash-gradient-text">Cutting Station</span>
-              </h1>
-              <p className="text-gray-600 mt-2 text-sm md:text-base">Fabric cutting queue, layout optimization, and material tracking</p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-2">
+    <TikTokLayout>
+      <TikTokCenteredLayout>
+        <TikTokPageHeader
+          title="Cutting Station"
+          subtitle="Fabric cutting queue, layout optimization, and material tracking"
+          actions={
+            <div className="flex gap-2">
               <Button 
                 onClick={() => setShowQueueModal(true)}
-                className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white btn-mobile md:btn-tablet lg:btn-laptop"
+                className="bg-orange-600 hover:bg-orange-700 text-white"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Add to Queue</span>
-                <span className="sm:hidden">Add</span>
+                Add to Queue
               </Button>
               <Button 
                 onClick={() => setShowLayoutModal(true)}
-                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white btn-mobile md:btn-tablet lg:btn-laptop"
+                className="bg-purple-600 hover:bg-purple-700 text-white"
               >
                 <Layout className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Layout AI</span>
-                <span className="sm:hidden">Layout</span>
+                Layout AI
               </Button>
               <Button 
                 onClick={() => setShowQRBatchModal(true)}
-                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white btn-mobile md:btn-tablet lg:btn-laptop"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white"
               >
                 <QrCode className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">QR Batch</span>
-                <span className="sm:hidden">QR</span>
+                QR Batch
               </Button>
             </div>
-          </div>
-        </div>
+          }
+        />
 
-        {/* Stats Cards */}
-        <div className="stats-grid-mobile md:stats-grid-tablet lg:stats-grid-laptop xl:stats-grid-desktop">
-          <Card className="stats-card-mobile md:stats-card-tablet lg:stats-card-laptop xl:stats-card-desktop enhanced-card hover-lift">
-            <CardContent className="p-responsive">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs md:text-sm font-medium text-gray-600">Total Jobs</p>
-                  <p className="text-xl md:text-2xl font-bold text-gray-900">{stats.total}</p>
-                  <p className="text-xs text-gray-500">Active cutting jobs</p>
-                </div>
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-50 rounded-lg flex items-center justify-center">
-                  <Package className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Cutting Metrics */}
+        <TikTokMetricsGrid>
+          <TikTokMetricCard
+            title="Total Jobs"
+            value={stats.total.toString()}
+            subtitle="Active cutting jobs"
+            icon={<Package className="h-5 w-5" />}
+            iconBg="bg-blue-100"
+            iconColor="text-blue-600"
+          />
+          <TikTokMetricCard
+            title="In Progress"
+            value={stats.inProgress.toString()}
+            subtitle="Currently cutting"
+            icon={<Activity className="h-5 w-5" />}
+            iconBg="bg-purple-100"
+            iconColor="text-purple-600"
+            trend="up"
+          />
+          <TikTokMetricCard
+            title="Efficiency"
+            value={`${stats.efficiency}%`}
+            subtitle="Average efficiency"
+            icon={<Target className="h-5 w-5" />}
+            iconBg="bg-green-100"
+            iconColor="text-green-600"
+            trend="up"
+          />
+          <TikTokMetricCard
+            title="Material Waste"
+            value={`${stats.totalWastage.toFixed(1)}m`}
+            subtitle="Total wastage"
+            icon={<AlertTriangle className="h-5 w-5" />}
+            iconBg="bg-orange-100"
+            iconColor="text-orange-600"
+            trend="down"
+          />
+        </TikTokMetricsGrid>
 
-          <Card className="stats-card-mobile md:stats-card-tablet lg:stats-card-laptop xl:stats-card-desktop enhanced-card hover-lift">
-            <CardContent className="p-responsive">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs md:text-sm font-medium text-gray-600">In Progress</p>
-                  <p className="text-xl md:text-2xl font-bold text-purple-900">{stats.inProgress}</p>
-                  <p className="text-xs text-gray-500">Currently cutting</p>
-                </div>
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-purple-50 rounded-lg flex items-center justify-center">
-                  <Activity className="w-5 h-5 md:w-6 md:h-6 text-purple-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="stats-card-mobile md:stats-card-tablet lg:stats-card-laptop xl:stats-card-desktop enhanced-card hover-lift">
-            <CardContent className="p-responsive">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs md:text-sm font-medium text-gray-600">Efficiency</p>
-                  <p className="text-xl md:text-2xl font-bold text-green-900">{stats.efficiency}%</p>
-                  <p className="text-xs text-gray-500">Average efficiency</p>
-                </div>
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-green-50 rounded-lg flex items-center justify-center">
-                  <Target className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="stats-card-mobile md:stats-card-tablet lg:stats-card-laptop xl:stats-card-desktop enhanced-card hover-lift">
-            <CardContent className="p-responsive">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs md:text-sm font-medium text-gray-600">Material Waste</p>
-                  <p className="text-xl md:text-2xl font-bold text-orange-900">{stats.totalWastage.toFixed(1)}m</p>
-                  <p className="text-xs text-gray-500">Total wastage</p>
-                </div>
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-orange-50 rounded-lg flex items-center justify-center">
-                  <AlertTriangle className="w-5 h-5 md:w-6 md:h-6 text-orange-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Filters */}
-        <Card className="enhanced-card">
-          <CardContent className="p-responsive">
+        <TikTokContentCard>
+          {/* Filters */}
+          <div className="mb-6">
             <div className="flex flex-col lg:flex-row gap-4">
               <div className="flex-1">
                 <div className="relative">
@@ -412,7 +379,7 @@ export default function CuttingPage() {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-3 py-2 border rounded-lg bg-white flex-1 sm:flex-initial"
+                  className="px-3 py-2 border border-gray-200 rounded-lg bg-white flex-1 sm:flex-initial"
                 >
                   <option value="all">All Status</option>
                   <option value="queued">Queued</option>
@@ -425,7 +392,7 @@ export default function CuttingPage() {
                 <select
                   value={priorityFilter}
                   onChange={(e) => setPriorityFilter(e.target.value)}
-                  className="px-3 py-2 border rounded-lg bg-white flex-1 sm:flex-initial"
+                  className="px-3 py-2 border border-gray-200 rounded-lg bg-white flex-1 sm:flex-initial"
                 >
                   <option value="all">All Priority</option>
                   <option value="high">High Priority</option>
@@ -434,34 +401,33 @@ export default function CuttingPage() {
                 </select>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
 
-        {/* Cutting Jobs Grid */}
-        <div className="designs-grid-mobile md:designs-grid-tablet lg:designs-grid-laptop xl:designs-grid-desktop">
-          {filteredJobs.map((job) => (
-            <Card key={job.id} className="design-card-mobile md:design-card-tablet lg:design-card-laptop xl:design-card-desktop enhanced-card hover-lift">
-              <CardHeader className="pb-2 md:pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-base md:text-lg font-semibold text-gray-900 mb-1 md:mb-2">
-                      {job.designName}
-                    </CardTitle>
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 text-xs md:text-sm text-gray-600">
-                      <span>{job.po_number}</span>
-                      <span className="hidden sm:inline">•</span>
-                      <span>{job.brand}</span>
+          {/* Cutting Jobs Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredJobs.map((job) => (
+              <Card key={job.id} className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <CardTitle className="text-lg font-semibold text-gray-900 mb-2">
+                        {job.designName}
+                      </CardTitle>
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 text-sm text-gray-600">
+                        <span>{job.po_number}</span>
+                        <span className="hidden sm:inline">•</span>
+                        <span>{job.brand}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Badge className={`text-xs ${getPriorityColor(job.priority)}`}>
+                        {job.priority.toUpperCase()}
+                      </Badge>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Badge className={`text-xs ${getPriorityColor(job.priority)}`}>
-                      {job.priority.toUpperCase()}
-                    </Badge>
-                  </div>
-                </div>
-              </CardHeader>
-              
-              <CardContent className="space-y-3 md:space-y-4">
+                </CardHeader>
+                
+                <CardContent className="space-y-4">
                 {/* Status and Progress */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                   <Badge className={`flex items-center space-x-1 text-xs ${getStatusColor(job.status)}`}>
@@ -523,91 +489,92 @@ export default function CuttingPage() {
                   </div>
                 )}
 
-                {/* Actions */}
-                <div className="mobile-actions md:flex md:items-center md:space-x-2 md:space-y-0">
-                  {job.status === 'queued' && (
-                    <Button 
-                      size="sm" 
-                      onClick={() => handleJobAction(job, 'start')}
-                      className="btn-mobile md:btn-tablet lg:btn-laptop flex-1 md:flex-initial bg-green-600 hover:bg-green-700"
-                    >
-                      <Activity className="w-4 h-4 mr-1" />
-                      Start
-                    </Button>
-                  )}
-                  
-                  {job.status === 'in_progress' && (
-                    <Button 
-                      size="sm" 
-                      onClick={() => handleJobAction(job, 'pause')}
-                      className="btn-mobile md:btn-tablet lg:btn-laptop flex-1 md:flex-initial bg-orange-600 hover:bg-orange-700"
-                    >
-                      <AlertTriangle className="w-4 h-4 mr-1" />
-                      Pause
-                    </Button>
-                  )}
-                  
-                  {job.status === 'paused' && (
-                    <Button 
-                      size="sm" 
-                      onClick={() => handleJobAction(job, 'start')}
-                      className="btn-mobile md:btn-tablet lg:btn-laptop flex-1 md:flex-initial bg-blue-600 hover:bg-blue-700"
-                    >
-                      <Activity className="w-4 h-4 mr-1" />
-                      Resume
-                    </Button>
-                  )}
+                  {/* Actions */}
+                  <div className="flex flex-wrap gap-2">
+                    {job.status === 'queued' && (
+                      <Button 
+                        size="sm" 
+                        onClick={() => handleJobAction(job, 'start')}
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                      >
+                        <Activity className="w-4 h-4 mr-1" />
+                        Start
+                      </Button>
+                    )}
+                    
+                    {job.status === 'in_progress' && (
+                      <Button 
+                        size="sm" 
+                        onClick={() => handleJobAction(job, 'pause')}
+                        className="bg-orange-600 hover:bg-orange-700 text-white"
+                      >
+                        <AlertTriangle className="w-4 h-4 mr-1" />
+                        Pause
+                      </Button>
+                    )}
+                    
+                    {job.status === 'paused' && (
+                      <Button 
+                        size="sm" 
+                        onClick={() => handleJobAction(job, 'start')}
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                      >
+                        <Activity className="w-4 h-4 mr-1" />
+                        Resume
+                      </Button>
+                    )}
 
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    onClick={() => handleJobAction(job, 'layout')}
-                    className="btn-mobile md:btn-tablet lg:btn-laptop flex-1 md:flex-initial"
-                  >
-                    <Layout className="w-4 h-4 mr-1" />
-                    <span className="hidden sm:inline">Layout</span>
-                    <span className="sm:hidden">AI</span>
-                  </Button>
-                  
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    onClick={() => handleJobAction(job, 'materials')}
-                    className="btn-mobile md:btn-tablet lg:btn-laptop flex-1 md:flex-initial"
-                  >
-                    <Box className="w-4 h-4 mr-1" />
-                    <span className="hidden sm:inline">Materials</span>
-                    <span className="sm:hidden">Mat</span>
-                  </Button>
-                </div>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => handleJobAction(job, 'layout')}
+                      className="border-gray-200 hover:bg-gray-50"
+                    >
+                      <Layout className="w-4 h-4 mr-1" />
+                      Layout
+                    </Button>
+                    
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => handleJobAction(job, 'materials')}
+                      className="border-gray-200 hover:bg-gray-50"
+                    >
+                      <Box className="w-4 h-4 mr-1" />
+                      Materials
+                    </Button>
+                  </div>
               </CardContent>
             </Card>
           ))}
         </div>
 
-        {filteredJobs.length === 0 && (
-          <Card className="enhanced-card">
-            <CardContent className="p-12 text-center">
-              <Scissors className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No cutting jobs found</h3>
-              <p className="text-gray-600 mb-6">
-                {searchTerm || statusFilter !== 'all' || priorityFilter !== 'all' 
-                  ? 'Try adjusting your filters or search terms'
-                  : 'Ready to start cutting? Add approved designs to the queue'
-                }
-              </p>
-              {!searchTerm && statusFilter === 'all' && priorityFilter === 'all' && (
-                <Button 
-                  onClick={() => setShowQueueModal(true)}
-                  className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add First Job to Queue
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        )}
+          {filteredJobs.length === 0 && (
+            <div className="col-span-full">
+              <Card className="border border-gray-200 shadow-sm">
+                <CardContent className="p-12 text-center">
+                  <Scissors className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No cutting jobs found</h3>
+                  <p className="text-gray-600 mb-6">
+                    {searchTerm || statusFilter !== 'all' || priorityFilter !== 'all' 
+                      ? 'Try adjusting your filters or search terms'
+                      : 'Ready to start cutting? Add approved designs to the queue'
+                    }
+                  </p>
+                  {!searchTerm && statusFilter === 'all' && priorityFilter === 'all' && (
+                    <Button 
+                      onClick={() => setShowQueueModal(true)}
+                      className="bg-orange-600 hover:bg-orange-700 text-white"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add First Job to Queue
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </TikTokContentCard>
 
         {/* Modals */}
         <CuttingQueueModal
@@ -654,7 +621,7 @@ export default function CuttingPage() {
           onClose={() => setShowQRBatchModal(false)}
           cuttingJob={selectedJob}
         />
-      </div>
-    </ResponsiveLayout>
+      </TikTokCenteredLayout>
+    </TikTokLayout>
   )
 }

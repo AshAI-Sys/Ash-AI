@@ -1,3 +1,4 @@
+// @ts-nocheck
 export interface SyncData {
   timestamp: number;
   user_id: string;

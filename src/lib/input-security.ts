@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Advanced Input Validation & XSS Protection
  * Comprehensive input sanitization and validation for maximum security

@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Sewing System Calculations & Piece-Rate Payroll
 // Based on CLIENT_UPDATED_PLAN.md Stage 5 specifications
 

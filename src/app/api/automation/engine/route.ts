@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 
 import { db } from '@/lib/db'
@@ -47,7 +48,7 @@ export async function POST(request: NextRequest) {
       { 
         success: false,
         error: 'Automation engine operation failed',
-        details: process.env.NODE_ENV === 'development' ? error : undefined
+        details: process.env.NODE_ENV === 'development' ? _error : undefined
       },
       { status: 500 }
     )

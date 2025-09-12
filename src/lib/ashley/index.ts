@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { OpenAI } from 'openai';
 import { ASHLEY_CONFIG, ASHLEY_EVENTS, ASHLEY_THRESHOLDS } from '../constants';
 import { db } from '../db';

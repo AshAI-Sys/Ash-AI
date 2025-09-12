@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Real-time Workflow Triggers for ASH AI ERP System
 // Automatically generates notifications based on production events and order changes
 

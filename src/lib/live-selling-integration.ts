@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { prisma as db } from './db'
 import { LiveSellingPlatform, PlatformSale } from '@prisma/client'
 

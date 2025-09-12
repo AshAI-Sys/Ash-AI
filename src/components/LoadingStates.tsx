@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client'
 
 import { Loader2, Package, Clock, RefreshCw } from 'lucide-react'

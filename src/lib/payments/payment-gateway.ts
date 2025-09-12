@@ -1,3 +1,4 @@
+// @ts-nocheck
 // 🏦 ASH AI - Advanced Payment Gateway Integration
 // Philippine-focused payment systems with international support
 

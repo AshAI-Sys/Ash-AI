@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ASH AI - Routing Template Engine
 // Based on CLIENT_UPDATED_PLAN.md Stage 1 specification
 

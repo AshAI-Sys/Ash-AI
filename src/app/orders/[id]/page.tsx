@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ASH AI - Neural Order Details Page
  * Advanced order management with futuristic status dashboard

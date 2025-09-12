@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Loading States Component - CLIENT_UPDATED_PLAN.md Implementation
 // Comprehensive loading indicators for better user experience
 

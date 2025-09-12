@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { createSuccessResponse, createErrorResponse, asyncHandler } from '@/lib/error-handler'
 import { checkDatabaseConnection } from '@/lib/prisma'

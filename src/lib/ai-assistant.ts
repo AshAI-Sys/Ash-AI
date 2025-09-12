@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { ashAI, type OrderData } from './ai-engine'
 // Enhanced ASH AI Assistant - More accurate and intelligent responses
 

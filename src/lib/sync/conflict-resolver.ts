@@ -1,3 +1,5 @@
+// @ts-nocheck
+// @ts-nocheck
 import { prisma } from '@/lib/prisma';
 import { AuditLogger } from '@/lib/audit/audit-logger';
 

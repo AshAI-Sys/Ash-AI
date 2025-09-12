@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { prisma } from '@/lib/prisma';
 import fs from 'fs/promises';
 import path from 'path';

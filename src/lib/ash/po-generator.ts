@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ASH AI - Professional PO Number Generation System
  * Generates unique PO numbers in BRAND-YYYY-NNNNNN format

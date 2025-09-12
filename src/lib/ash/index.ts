@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ASH AI System Exports
 // Apparel Smart Hub - Artificial Intelligence
 

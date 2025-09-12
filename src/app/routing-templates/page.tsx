@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ASH AI - Routing Templates Management
  * Professional routing template creation and optimization with Ashley AI

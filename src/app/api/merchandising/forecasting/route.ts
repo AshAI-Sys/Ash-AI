@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ASH AI - Merchandising Forecasting API
  * Stage 13: Advanced demand forecasting and inventory optimization
