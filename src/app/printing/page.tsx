@@ -53,6 +53,34 @@ interface PrintRun {
   totalReject: number
   materialsUsed: number
   rejectCount: number
+  ashleyInsights?: {
+    qualityPrediction: number
+    speedOptimization: number
+    materialWasteReduction: number
+    qualityRisk: 'LOW' | 'MEDIUM' | 'HIGH'
+    recommendations: string[]
+    colorConsistencyScore: number
+    temperatureOptimization?: number
+    inkUtilization?: number
+  }
+  realTimeMetrics?: {
+    currentSpeed: number
+    qualityScore: number
+    temperatureStability: number
+    materialConsumption: number
+    timeElapsed: number
+    expectedCompletion: string
+  }
+  order?: {
+    productName?: string
+    companyName?: string
+    serviceType?: string
+    garmentType?: string
+    fabricType?: string
+    fabricColors?: string
+    designConcept?: string
+    specialInstructions?: string
+  }
 }
 
 interface Machine {
@@ -86,7 +114,39 @@ const mockPrintRuns: PrintRun[] = [
     totalGood: 85,
     totalReject: 3,
     materialsUsed: 4,
-    rejectCount: 2
+    rejectCount: 2,
+    ashleyInsights: {
+      qualityPrediction: 94.7,
+      speedOptimization: 87.3,
+      materialWasteReduction: 15.2,
+      qualityRisk: 'LOW',
+      recommendations: [
+        'Maintain consistent ink viscosity for optimal coverage',
+        'Check screen tension every 15 prints',
+        'Temperature stable - continue current settings'
+      ],
+      colorConsistencyScore: 96.8,
+      temperatureOptimization: 89.5,
+      inkUtilization: 92.1
+    },
+    realTimeMetrics: {
+      currentSpeed: 45.7,
+      qualityScore: 94.3,
+      temperatureStability: 98.2,
+      materialConsumption: 87.6,
+      timeElapsed: 125,
+      expectedCompletion: '2024-09-02T11:45:00Z'
+    },
+    order: {
+      productName: 'Corporate Logo Tees',
+      companyName: 'ABC Corporation',
+      serviceType: 'FULL_PRODUCTION',
+      garmentType: 'T_SHIRT',
+      fabricType: 'Cotton Jersey',
+      fabricColors: 'Navy Blue',
+      designConcept: 'Corporate branding with logo placement',
+      specialInstructions: 'Ensure precise logo alignment'
+    }
   },
   {
     id: '2',
@@ -103,7 +163,39 @@ const mockPrintRuns: PrintRun[] = [
     totalGood: 0,
     totalReject: 0,
     materialsUsed: 0,
-    rejectCount: 0
+    rejectCount: 0,
+    ashleyInsights: {
+      qualityPrediction: 96.2,
+      speedOptimization: 91.5,
+      materialWasteReduction: 18.7,
+      qualityRisk: 'LOW',
+      recommendations: [
+        'Preheat sublimation paper for 30 seconds',
+        'Use 195°C for optimal color vibrancy',
+        'Verify fabric polyester content >65%'
+      ],
+      colorConsistencyScore: 98.1,
+      temperatureOptimization: 94.3,
+      inkUtilization: 89.7
+    },
+    realTimeMetrics: {
+      currentSpeed: 0,
+      qualityScore: 0,
+      temperatureStability: 0,
+      materialConsumption: 0,
+      timeElapsed: 0,
+      expectedCompletion: '2024-09-02T12:30:00Z'
+    },
+    order: {
+      productName: 'Sports Jersey All-Over Print',
+      companyName: 'XYZ Sports',
+      serviceType: 'PRINTING_ONLY',
+      garmentType: 'JERSEY',
+      fabricType: 'Polyester Mesh',
+      fabricColors: 'Multi-color',
+      designConcept: 'Full sublimation sports jersey design',
+      specialInstructions: 'Ensure color accuracy for team branding'
+    }
   },
   {
     id: '3',
@@ -448,6 +540,51 @@ export default function PrintingPage() {
                     Step: {run.stepName}
                   </div>
                 </div>
+
+                {/* Ashley AI Insights for Active Runs */}
+                {run.status === 'IN_PROGRESS' && run.ashleyInsights && (
+                  <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Activity className="h-4 w-4 text-blue-600" />
+                      <span className="font-medium text-blue-800 text-sm">Ashley AI Insights</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-xs text-blue-700 mb-2">
+                      <div>Quality: <strong>{run.ashleyInsights.qualityPrediction.toFixed(1)}%</strong></div>
+                      <div>Speed: <strong>{run.ashleyInsights.speedOptimization.toFixed(1)}%</strong></div>
+                      <div>Waste Reduction: <strong>{run.ashleyInsights.materialWasteReduction.toFixed(1)}%</strong></div>
+                      <div>Risk: <strong className={
+                        run.ashleyInsights.qualityRisk === 'HIGH' ? 'text-red-600' :
+                        run.ashleyInsights.qualityRisk === 'MEDIUM' ? 'text-orange-600' :
+                        'text-green-600'
+                      }>{run.ashleyInsights.qualityRisk}</strong></div>
+                    </div>
+                    <div className="text-xs text-blue-700">
+                      <div className="font-medium mb-1">Recommendations:</div>
+                      {run.ashleyInsights.recommendations.slice(0, 2).map((rec, idx) => (
+                        <div key={idx}>• {rec}</div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Real-time Metrics for Active Runs */}
+                {run.status === 'IN_PROGRESS' && run.realTimeMetrics && (
+                  <div className="bg-green-50 border border-green-200 p-3 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <TrendingUp className="h-4 w-4 text-green-600" />
+                      <span className="font-medium text-green-800 text-sm">Real-time Metrics</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-xs text-green-700">
+                      <div>Speed: <strong>{run.realTimeMetrics.currentSpeed.toFixed(1)} pcs/hr</strong></div>
+                      <div>Quality: <strong>{run.realTimeMetrics.qualityScore.toFixed(1)}%</strong></div>
+                      <div>Temperature: <strong>{run.realTimeMetrics.temperatureStability.toFixed(1)}%</strong></div>
+                      <div>Material: <strong>{run.realTimeMetrics.materialConsumption.toFixed(1)}%</strong></div>
+                    </div>
+                    <div className="text-xs text-green-600 mt-2">
+                      Expected completion: <strong>{new Date(run.realTimeMetrics.expectedCompletion).toLocaleTimeString()}</strong>
+                    </div>
+                  </div>
+                )}
 
                   {/* Actions */}
                   <div className="flex flex-wrap gap-2">

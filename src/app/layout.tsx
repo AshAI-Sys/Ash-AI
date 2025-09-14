@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     apple: '/ash-ai-logo-hero.svg',
     shortcut: '/favicon.ico',
   },
-  metadataBase: new URL('https://localhost:3000'),
+  metadataBase: new URL('http://localhost:3000'),
   openGraph: {
     title: "ASH AI - Revolutionary Apparel Manufacturing ERP",
     description: "Transform your apparel manufacturing with AI-powered insights, automated workflows, and real-time production tracking.",

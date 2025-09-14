@@ -1283,7 +1283,7 @@ export default function SewingPage() {
               </div>
             </TabsContent>
 
-        <TabsContent value="operations">
+            <TabsContent value="operations">
           <div className="grid gap-4">
             {operations.map((operation) => (
               <Card key={operation.id} className="hover:shadow-md transition-shadow">
@@ -1349,9 +1349,9 @@ export default function SewingPage() {
               </Card>
             ))}
           </div>
-        </TabsContent>
+            </TabsContent>
 
-        <TabsContent value="completed">
+            <TabsContent value="completed">
           <div className="grid gap-4">
             {runs.filter(run => run.status === 'COMPLETED').map((run) => (
               <Card key={run.id} className="hover:shadow-md transition-shadow">
@@ -1406,9 +1406,9 @@ export default function SewingPage() {
               </Card>
             ))}
           </div>
-        </TabsContent>
+            </TabsContent>
 
-        <TabsContent value="analytics">
+            <TabsContent value="ashley-ai">
           <div className="grid gap-6">
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-2">
@@ -1421,8 +1421,10 @@ export default function SewingPage() {
               </p>
             </div>
           </div>
-        </TabsContent>
-      </Tabs>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
     </div>
   )
 }
