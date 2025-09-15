@@ -10,14 +10,14 @@ import { OrderWorkflowEngine } from '@/lib/order-workflow'
 // GET /api/orders/[id] - Get single order with full details
 export const GET = withErrorHandler(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
     throw Errors.UNAUTHORIZED;
   }
 
-  const { id } = params;
+  const { id } = await params;
 
   try {
     const workspace_id = 'default';
@@ -135,14 +135,14 @@ export const GET = withErrorHandler(async (
 // PATCH /api/orders/[id] - Update order status (status transitions)
 export const PATCH = withErrorHandler(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
     throw Errors.UNAUTHORIZED;
   }
 
-  const { id } = params;
+  const { id } = await params;
   const body = await request.json();
   const { status, notes } = body;
 

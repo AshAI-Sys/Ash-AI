@@ -36,7 +36,9 @@
       "Bash(find:*)",
       "Bash(python:*)",
       "Bash(netstat:*)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(git remote:*)",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "ask": []

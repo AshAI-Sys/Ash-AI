@@ -22,14 +22,14 @@ const RoutingStepUpdateSchema = z.object({
 // GET /api/orders/[id]/routing - Get order routing plan and progress
 export const GET = withErrorHandler(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
     throw Errors.UNAUTHORIZED;
   }
 
-  const order_id = params.id;
+  const { id: order_id } = await params;
 
   try {
     const [order, routingSteps, sewingRuns] = await Promise.all([
@@ -129,14 +129,14 @@ export const GET = withErrorHandler(async (
 // PUT /api/orders/[id]/routing - Update routing step status
 export const PUT = withErrorHandler(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
     throw Errors.UNAUTHORIZED;
   }
 
-  const order_id = params.id;
+  const { id: order_id } = await params;
   const body = await request.json();
   const validatedData = RoutingStepUpdateSchema.parse(body);
 
@@ -246,14 +246,14 @@ export const PUT = withErrorHandler(async (
 // POST /api/orders/[id]/routing - Generate routing plan using Ashley AI
 export const POST = withErrorHandler(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
     throw Errors.UNAUTHORIZED;
   }
 
-  const order_id = params.id;
+  const { id: order_id } = await params;
   const body = await request.json();
   const { regenerate = false } = body;
 

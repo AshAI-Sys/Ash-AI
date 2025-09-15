@@ -71,7 +71,7 @@ interface TransitionResponse {
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Verify authentication
@@ -83,7 +83,7 @@ export async function POST(
       )
     }
 
-    const orderId = params.id
+    const { id: orderId } = await params
     const body: TransitionRequest = await request.json()
 
     // Validate request
@@ -261,10 +261,10 @@ export async function POST(
 // Automated transition endpoint (for system-triggered transitions)
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const orderId = params.id
+    const { id: orderId } = await params
     const body = await request.json()
 
     // This endpoint is for automated system transitions

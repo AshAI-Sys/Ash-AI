@@ -29,14 +29,14 @@ const InternalApprovalSchema = z.object({
 // GET /api/orders/[id]/approval - Get approval status and pending approvals
 export const GET = withErrorHandler(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
     throw Errors.UNAUTHORIZED;
   }
 
-  const order_id = params.id;
+  const { id: order_id } = await params;
   const { searchParams } = new URL(request.url);
   const approvalType = searchParams.get('type') || 'all';
 
@@ -116,14 +116,14 @@ export const GET = withErrorHandler(async (
 // POST /api/orders/[id]/approval - Submit approval decision
 export const POST = withErrorHandler(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
     throw Errors.UNAUTHORIZED;
   }
 
-  const order_id = params.id;
+  const { id: order_id } = await params;
   const body = await request.json();
   const { approval_type } = body;
 

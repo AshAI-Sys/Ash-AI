@@ -20,15 +20,15 @@ const OrderStatusUpdateSchema = z.object({
 
 // PUT /api/orders/[id]/status - Update order status with workflow automation
 export const PUT = withErrorHandler(async (
-  request: NextRequest, 
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
     throw Errors.UNAUTHORIZED;
   }
 
-  const order_id = params.id;
+  const { id: order_id } = await params;
   const body = await request.json();
   const validatedData = OrderStatusUpdateSchema.parse(body);
 
@@ -89,14 +89,14 @@ export const PUT = withErrorHandler(async (
 // GET /api/orders/[id]/status - Get order status history and workflow info
 export const GET = withErrorHandler(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
     throw Errors.UNAUTHORIZED;
   }
 
-  const order_id = params.id;
+  const { id: order_id } = await params;
 
   try {
     const [order, statusHistory, availableTransitions] = await Promise.all([

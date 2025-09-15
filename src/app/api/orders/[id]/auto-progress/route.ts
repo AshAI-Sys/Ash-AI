@@ -41,14 +41,14 @@ const AutoProgressConfigSchema = z.object({
 // POST /api/orders/[id]/auto-progress - Trigger automated progression
 export const POST = withErrorHandler(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   const session = await getServerSession(authOptions)
   if (!session?.user) {
     throw Errors.UNAUTHORIZED
   }
 
-  const orderId = params.id
+  const { id: orderId } = await params
   const body = await request.json()
   const { force, skipValidation, reason, notify } = AutoProgressRequestSchema.parse(body)
 
@@ -125,14 +125,14 @@ export const POST = withErrorHandler(async (
 // GET /api/orders/[id]/auto-progress - Get auto-progression status and possibilities
 export const GET = withErrorHandler(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   const session = await getServerSession(authOptions)
   if (!session?.user) {
     throw Errors.UNAUTHORIZED
   }
 
-  const orderId = params.id
+  const { id: orderId } = await params
 
   try {
     const order = await db.order.findUnique({
@@ -180,14 +180,14 @@ export const GET = withErrorHandler(async (
 // PUT /api/orders/[id]/auto-progress - Configure auto-progression settings
 export const PUT = withErrorHandler(async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   const session = await getServerSession(authOptions)
   if (!session?.user || !['ADMIN', 'MANAGER'].includes(session.user.role)) {
     throw Errors.INSUFFICIENT_PERMISSIONS
   }
 
-  const orderId = params.id
+  const { id: orderId } = await params
   const body = await request.json()
   const config = AutoProgressConfigSchema.parse(body)
 
