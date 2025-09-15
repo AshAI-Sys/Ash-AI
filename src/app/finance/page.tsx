@@ -8,12 +8,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { 
-  Wallet, 
-  CreditCard, 
-  TrendingUp, 
-  TrendingDown, 
-  Plus, 
+import {
+  Wallet,
+  CreditCard,
+  TrendingUp,
+  TrendingDown,
+  Plus,
   ArrowUpRight,
   ArrowDownLeft,
   Eye,
@@ -39,7 +39,18 @@ import {
   Building,
   BookOpen,
   Download,
-  Upload
+  Upload,
+  Target,
+  Monitor,
+  Percent,
+  Timer,
+  Building2,
+  Flag,
+  Briefcase,
+  Banknote,
+  HandCoins,
+  TrendingUp as TrendIcon,
+  AlertCircle
 } from 'lucide-react'
 import { Role } from '@prisma/client'
 import { TikTokCenteredLayout, TikTokPageHeader, TikTokContentCard, TikTokMetricsGrid, TikTokMetricCard } from '@/components/TikTokCenteredLayout'
@@ -91,17 +102,74 @@ interface BIRCompliance {
     dueDate: string
     status: 'PENDING' | 'FILED' | 'OVERDUE'
     amount: number
+    form: '2550M' | '2550Q'
+    penalties?: number
   }[]
   withholdingTax: {
     month: string
     amount: number
     status: 'PENDING' | 'REMITTED' | 'OVERDUE'
+    form: '2307' | '1601-C'
+    certificate?: string
   }[]
   annualITR: {
     year: string
     status: 'PENDING' | 'FILED' | 'EXTENDED'
     dueDate: string
+    form: '1701' | '1702'
+    taxDue?: number
   }[]
+  alphaList: {
+    year: string
+    status: 'PENDING' | 'SUBMITTED'
+    suppliers: number
+    customers: number
+  }[]
+}
+
+interface ProfitLossStatement {
+  period: string
+  revenue: {
+    sales: number
+    serviceIncome: number
+    otherIncome: number
+    total: number
+  }
+  costOfGoodsSold: {
+    materials: number
+    labor: number
+    overhead: number
+    total: number
+  }
+  grossProfit: number
+  operatingExpenses: {
+    salaries: number
+    rent: number
+    utilities: number
+    marketing: number
+    depreciation: number
+    other: number
+    total: number
+  }
+  ebitda: number
+  netIncome: number
+  margins: {
+    gross: number
+    operating: number
+    net: number
+  }
+}
+
+interface FinancialKPIs {
+  currentRatio: number
+  quickRatio: number
+  debtToEquity: number
+  returnOnAssets: number
+  returnOnEquity: number
+  inventoryTurnover: number
+  receivablesTurnover: number
+  payablesTurnover: number
+  cashConversionCycle: number
 }
 
 interface ExpenseItem {
@@ -201,6 +269,116 @@ const mockTransactions: Transaction[] = [
   }
 ]
 
+const mockBIRCompliance: BIRCompliance = {
+  vatReturns: [
+    {
+      quarter: 'Q3 2025',
+      dueDate: '2025-10-25',
+      status: 'PENDING',
+      amount: 45600.00,
+      form: '2550Q',
+      penalties: 0
+    },
+    {
+      quarter: 'Q2 2025',
+      dueDate: '2025-07-25',
+      status: 'FILED',
+      amount: 38900.00,
+      form: '2550Q'
+    }
+  ],
+  withholdingTax: [
+    {
+      month: 'September 2025',
+      amount: 12500.00,
+      status: 'PENDING',
+      form: '2307',
+      certificate: 'WHT-2025-09'
+    },
+    {
+      month: 'August 2025',
+      amount: 11800.00,
+      status: 'REMITTED',
+      form: '2307',
+      certificate: 'WHT-2025-08'
+    }
+  ],
+  annualITR: [
+    {
+      year: '2025',
+      status: 'PENDING',
+      dueDate: '2026-04-15',
+      form: '1702',
+      taxDue: 125000.00
+    },
+    {
+      year: '2024',
+      status: 'FILED',
+      dueDate: '2025-04-15',
+      form: '1702'
+    }
+  ],
+  alphaList: [
+    {
+      year: '2025',
+      status: 'PENDING',
+      suppliers: 45,
+      customers: 128
+    },
+    {
+      year: '2024',
+      status: 'SUBMITTED',
+      suppliers: 38,
+      customers: 95
+    }
+  ]
+}
+
+const mockProfitLoss: ProfitLossStatement = {
+  period: 'Q3 2025',
+  revenue: {
+    sales: 2850000.00,
+    serviceIncome: 450000.00,
+    otherIncome: 25000.00,
+    total: 3325000.00
+  },
+  costOfGoodsSold: {
+    materials: 1200000.00,
+    labor: 680000.00,
+    overhead: 185000.00,
+    total: 2065000.00
+  },
+  grossProfit: 1260000.00,
+  operatingExpenses: {
+    salaries: 320000.00,
+    rent: 85000.00,
+    utilities: 45000.00,
+    marketing: 75000.00,
+    depreciation: 25000.00,
+    other: 95000.00,
+    total: 645000.00
+  },
+  ebitda: 640000.00,
+  netIncome: 615000.00,
+  margins: {
+    gross: 37.9,
+    operating: 19.2,
+    net: 18.5
+  }
+}
+
+const mockFinancialKPIs: FinancialKPIs = {
+  currentRatio: 2.8,
+  quickRatio: 1.9,
+  debtToEquity: 0.45,
+  returnOnAssets: 12.5,
+  returnOnEquity: 18.2,
+  inventoryTurnover: 8.5,
+  receivablesTurnover: 12.3,
+  payablesTurnover: 9.8,
+  cashConversionCycle: 45.2
+}
+
 const mockBills: Bill[] = [
   {
     id: '1',
@@ -295,34 +473,189 @@ export default function FinancePage() {
 
   return (
     <TikTokLayout>
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-6xl mx-auto space-y-6">
-          {/* Header */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                  Finance Management
-                </h1>
-                <p className="text-gray-600 text-lg">
-                  Financial oversight with BIR compliance
-                </p>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">
-                  ₱{totalBalance.toLocaleString()}
+      <div className="neural-bg min-h-screen relative">
+        {/* Quantum Field Background */}
+        <div className="quantum-field">
+          {Array.from({ length: 15 }).map((_, i) => (
+            <div
+              key={i}
+              className="quantum-particle"
+              style={{
+                left: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 8}s`,
+              }}
+            />
+          ))}
+        </div>
+
+        <div className="relative z-10 p-6 max-w-7xl mx-auto space-y-8">
+          {/* Neural Financial Command Center Header */}
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h1 className="text-5xl font-bold glitch-text text-white mb-3" data-text="FINANCIAL COMMAND CENTER">
+                💰 FINANCIAL COMMAND CENTER
+              </h1>
+              <p className="text-cyan-300 text-xl font-mono">
+                Advanced BIR compliance • P&L analytics • Real-time monitoring • Philippine tax authority integration
+              </p>
+            </div>
+
+            <div className="flex gap-4">
+              <div className="hologram-card p-4">
+                <div className="text-center">
+                  <p className="text-sm text-cyan-300 font-mono">TOTAL LIQUIDITY</p>
+                  <p className="text-2xl font-bold text-white">₱{totalBalance.toLocaleString()}</p>
+                  <Badge className="bg-green-500/20 text-green-400 border-green-500/50 mt-2">
+                    <TrendingUp className="w-3 h-3 mr-1" />
+                    OPERATIONAL
+                  </Badge>
                 </div>
-                <Button variant="outline" className="border-gray-300">
-                  <Settings className="w-4 h-4 mr-2" />
-                  Settings
-                </Button>
               </div>
+
+              <Button className="neon-btn">
+                <Brain className="w-4 h-4 mr-2" />
+                AI INSIGHTS
+              </Button>
+
+              <Button className="neon-btn-primary">
+                <Download className="w-4 h-4 mr-2" />
+                BIR REPORTS
+              </Button>
             </div>
           </div>
-          
-          {/* Action Buttons */}
-          <div className="flex gap-4 flex-wrap">
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+
+          {/* Advanced Financial Metrics Dashboard */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <Card className="hologram-card">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-cyan-300 font-mono">NET INCOME</p>
+                    <p className="text-3xl font-bold text-white">₱{mockProfitLoss.netIncome.toLocaleString()}</p>
+                    <p className="text-xs text-green-400 mt-1">{mockProfitLoss.margins.net}% margin</p>
+                  </div>
+                  <div className="ai-orb">
+                    <TrendingUp className="h-6 w-6 text-green-400" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="hologram-card">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-cyan-300 font-mono">GROSS PROFIT</p>
+                    <p className="text-3xl font-bold text-white">₱{mockProfitLoss.grossProfit.toLocaleString()}</p>
+                    <p className="text-xs text-blue-400 mt-1">{mockProfitLoss.margins.gross}% margin</p>
+                  </div>
+                  <div className="ai-orb">
+                    <BarChart3 className="h-6 w-6 text-blue-400" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="hologram-card">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-cyan-300 font-mono">VAT LIABILITY</p>
+                    <p className="text-3xl font-bold text-white">₱{mockBIRCompliance.vatReturns[0].amount.toLocaleString()}</p>
+                    <p className="text-xs text-red-400 mt-1">Due: {mockBIRCompliance.vatReturns[0].dueDate}</p>
+                  </div>
+                  <div className="ai-orb">
+                    <Flag className="h-6 w-6 text-red-400" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="hologram-card">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-cyan-300 font-mono">CASH CYCLE</p>
+                    <p className="text-3xl font-bold text-white">{mockFinancialKPIs.cashConversionCycle}</p>
+                    <p className="text-xs text-purple-400 mt-1">days conversion</p>
+                  </div>
+                  <div className="ai-orb">
+                    <Timer className="h-6 w-6 text-purple-400" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* BIR Compliance Alert Panel */}
+          <Card className="quantum-card border-red-500/30 mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center text-white">
+                <div className="ai-orb mr-3">
+                  <AlertCircle className="w-6 h-6 text-red-400" />
+                </div>
+                BIR COMPLIANCE STATUS
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="p-4 rounded-lg border border-red-500/20 hover:border-red-500/40 transition-colors">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Badge className="bg-red-500/20 text-red-400 border-red-500/50">
+                      PENDING
+                    </Badge>
+                    <span className="text-cyan-300 font-mono text-sm">VAT RETURN</span>
+                  </div>
+                  <p className="text-white font-bold text-lg">Form {mockBIRCompliance.vatReturns[0].form}</p>
+                  <p className="text-red-400 text-sm">Due: {mockBIRCompliance.vatReturns[0].dueDate}</p>
+                  <p className="text-cyan-300 font-mono">₱{mockBIRCompliance.vatReturns[0].amount.toLocaleString()}</p>
+                </div>
+
+                <div className="p-4 rounded-lg border border-yellow-500/20 hover:border-yellow-500/40 transition-colors">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/50">
+                      PENDING
+                    </Badge>
+                    <span className="text-cyan-300 font-mono text-sm">WITHHOLDING TAX</span>
+                  </div>
+                  <p className="text-white font-bold text-lg">Form {mockBIRCompliance.withholdingTax[0].form}</p>
+                  <p className="text-yellow-400 text-sm">{mockBIRCompliance.withholdingTax[0].month}</p>
+                  <p className="text-cyan-300 font-mono">₱{mockBIRCompliance.withholdingTax[0].amount.toLocaleString()}</p>
+                </div>
+
+                <div className="p-4 rounded-lg border border-purple-500/20 hover:border-purple-500/40 transition-colors">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/50">
+                      PENDING
+                    </Badge>
+                    <span className="text-cyan-300 font-mono text-sm">ANNUAL ITR</span>
+                  </div>
+                  <p className="text-white font-bold text-lg">Form {mockBIRCompliance.annualITR[0].form}</p>
+                  <p className="text-purple-400 text-sm">Due: {mockBIRCompliance.annualITR[0].dueDate}</p>
+                  <p className="text-cyan-300 font-mono">₱{mockBIRCompliance.annualITR[0].taxDue?.toLocaleString()}</p>
+                </div>
+              </div>
+
+              <div className="mt-6 flex gap-4">
+                <Button className="neon-btn-primary">
+                  <Download className="w-4 h-4 mr-2" />
+                  GENERATE VAT RETURN
+                </Button>
+                <Button className="neon-btn">
+                  <FileText className="w-4 h-4 mr-2" />
+                  PRINT CERTIFICATES
+                </Button>
+                <Button className="neon-btn">
+                  <Upload className="w-4 h-4 mr-2" />
+                  E-FILE RETURNS
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Neural Action Buttons */}
+          <div className="flex gap-4 flex-wrap mb-8">
+            <Button className="neon-btn-primary">
               <Plus className="w-4 h-4 mr-2" />
               Add Transaction
             </Button>

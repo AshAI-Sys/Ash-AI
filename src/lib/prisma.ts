@@ -5,7 +5,7 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
-// Enhanced Prisma client with better connection handling and pooling
+// Enhanced Prisma client with advanced connection pooling and performance optimization
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
@@ -16,6 +16,12 @@ export const prisma =
         url: process.env.DATABASE_URL,
       },
     },
+    // Advanced connection pooling configuration
+    transactionOptions: {
+      maxWait: 5000, // 5 seconds max wait
+      timeout: 10000, // 10 seconds timeout
+      isolationLevel: 'ReadCommitted'
+    }
   })
 
 if (process.env.NODE_ENV !== 'production') {

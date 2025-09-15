@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSuccessResponse, createErrorResponse, asyncHandler } from '@/lib/error-handler'
 import { checkDatabaseConnection } from '@/lib/prisma'
+import { withApiHandler, createApiResponse, ApiException } from '@/lib/api-handler'
 
 // System Health Check - CLIENT_UPDATED_PLAN.md Implementation
 // Comprehensive health monitoring for all ASH AI components
