@@ -119,18 +119,17 @@ export async function POST(request: NextRequest) {
         full_name,
         role,
         workspace_id,
-        active: false, // Require email verification for security
-        email_verified: null, // Use null instead of false for DateTime field
-        verification_token: verificationToken,
-        verification_expires: verificationExpires,
-        created_at: new Date(),
+        active: true, // Activate immediately for demo (in production, require verification)
+        email_verified: new Date(), // Mark as verified for demo
         profile: {
           company_name,
           phone,
           department,
           position,
           registration_date: new Date(),
-          registration_ip: request.headers.get('x-forwarded-for') || 'unknown'
+          registration_ip: request.headers.get('x-forwarded-for') || 'unknown',
+          verification_token: verificationToken,
+          verification_expires: verificationExpires.toISOString()
         }
       },
       select: {
