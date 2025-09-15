@@ -129,7 +129,7 @@ export default function Home() {
             </div>
             
             <div className="simple-flex gap-2 sm:gap-4">
-              <Link href="/auth/signin">
+              <Link href="/login">
                 <button className="simple-btn text-xs sm:text-sm px-3 py-1.5 sm:px-4 sm:py-2">Access Portal</button>
               </Link>
             </div>
@@ -148,7 +148,7 @@ export default function Home() {
             </p>
             
             <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mb-8 sm:mb-12">
-              <Link href="/auth/signin">
+              <Link href="/login">
                 <button className="simple-btn w-full sm:w-auto text-xs px-4 py-2">Get Started</button>
               </Link>
               <button

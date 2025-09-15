@@ -1,7 +1,4 @@
 // @ts-nocheck
-// ASH AI Production Login Page
-// Production ready with authentication
-
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -15,7 +12,7 @@ import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Eye, EyeOff, LogIn, AlertCircle, Loader2, Shield } from 'lucide-react'
 
-export default function SignInPage() {
+export default function LoginPage() {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
