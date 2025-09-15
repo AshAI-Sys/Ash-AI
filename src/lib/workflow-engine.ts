@@ -12,15 +12,19 @@ import { NotificationAutomation } from './notification-automation'
 import { TaskAutoAssignment } from './task-automation'
 
 export interface WorkflowCondition {
-  type: 'TIME_ELAPSED' | 'STATUS_REACHED' | 'APPROVAL_RECEIVED' | 'QC_PASSED' | 'MATERIALS_READY' | 'TASKS_COMPLETED'
+  type: 'TIME_ELAPSED' | 'STATUS_REACHED' | 'APPROVAL_RECEIVED' | 'QC_PASSED' | 'MATERIALS_READY' | 'TASKS_COMPLETED' | 'AUTO_PROGRESSION' | 'DEADLINE_APPROACHING' | 'HIGH_VALUE_ORDER'
   parameters?: Record<string, any>
   dependencies?: string[]
+  operator?: 'AND' | 'OR'
+  threshold?: number
 }
 
 export interface WorkflowAction {
-  type: 'CHANGE_STATUS' | 'CREATE_TASK' | 'SEND_NOTIFICATION' | 'START_ROUTING_STEP' | 'ASSIGN_OPERATOR'
+  type: 'CHANGE_STATUS' | 'CREATE_TASK' | 'SEND_NOTIFICATION' | 'START_ROUTING_STEP' | 'ASSIGN_OPERATOR' | 'AUTO_APPROVE' | 'TRIGGER_PRODUCTION' | 'UPDATE_PRIORITY' | 'ESCALATE_ISSUE'
   parameters: Record<string, any>
   delay?: number // milliseconds
+  conditions?: WorkflowCondition[]
+  retryOnFailure?: boolean
 }
 
 export interface WorkflowRule {

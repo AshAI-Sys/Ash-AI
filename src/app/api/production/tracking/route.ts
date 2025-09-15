@@ -6,6 +6,7 @@ import { Role } from '@prisma/client'
 import { db } from '@/lib/db'
 import { z } from 'zod'
 import { withErrorHandler, createSuccessResponse, createErrorResponse, Errors } from '@/lib/api-error-handler'
+import { productionTracker } from '@/lib/production-tracker'
 
 // Production Tracking System - CLIENT_UPDATED_PLAN.md Implementation
 // Real-time production monitoring with stage transitions and performance metrics
@@ -60,7 +61,13 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
       active_only
     });
 
-    return createSuccessResponse(productionData);
+    // Enhance with real-time dashboard data from production tracker
+    const realtimeData = await productionTracker.getDashboardData();
+
+    return createSuccessResponse({
+      ...productionData,
+      realtime: realtimeData
+    });
 
   } catch (_error) {
     console.error('Production Tracking API Error:', error);
