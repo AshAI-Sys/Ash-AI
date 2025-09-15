@@ -104,35 +104,37 @@ export default function TikTokLogin() {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* ASH-AI Sidebar */}
-      <div className="fixed left-0 top-0 h-full w-16 bg-black flex flex-col items-center py-4">
-        <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center mb-8">
+      <div className="fixed left-0 top-0 h-full w-20 bg-black flex flex-col items-center py-6">
+        <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center mb-8 shadow-lg">
           <Image
             src="/Ash-AI.png"
             alt="ASH-AI"
-            width={24}
-            height={24}
+            width={48}
+            height={48}
             className="object-contain"
           />
         </div>
       </div>
 
       {/* Main Login Content */}
-      <div className="ml-16 flex-1 flex items-center justify-center">
+      <div className="ml-20 flex-1 flex items-center justify-center">
         <div className="w-full max-w-md">
           {/* ASH-AI Header */}
           <div className="text-center mb-8">
-            <div className="flex items-center justify-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-black rounded-sm flex items-center justify-center">
+            <div className="flex items-center justify-center space-x-3 mb-6">
+              <div className="w-14 h-14 bg-black rounded-lg flex items-center justify-center shadow-lg">
                 <Image
                   src="/Ash-AI.png"
                   alt="ASH-AI"
-                  width={20}
-                  height={20}
+                  width={40}
+                  height={40}
                   className="object-contain"
                 />
               </div>
-              <span className="text-lg font-medium text-gray-600">ASH-AI</span>
-              <span className="text-lg font-medium text-gray-900">Portal</span>
+              <div className="text-left">
+                <div className="text-xl font-bold text-gray-900">ASH-AI</div>
+                <div className="text-lg font-medium text-gray-600">Portal</div>
+              </div>
             </div>
             <h1 className="text-2xl font-semibold text-gray-900 mb-2">Sign in to your account</h1>
             <p className="text-gray-600">Access your dashboard and manage your business</p>
@@ -184,7 +186,7 @@ export default function TikTokLogin() {
                     placeholder="Enter your email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="pl-10 h-11 border-gray-300 focus:border-teal-500 focus:ring-teal-500"
+                    className="pl-10 h-11 border-gray-300 focus:border-teal-500 focus:ring-teal-500 text-gray-900 bg-white"
                     required
                   />
                 </div>
@@ -203,7 +205,7 @@ export default function TikTokLogin() {
                     placeholder="Enter your password"
                     value={formData.password}
                     onChange={handleInputChange}
-                    className="pl-10 pr-10 h-11 border-gray-300 focus:border-teal-500 focus:ring-teal-500"
+                    className="pl-10 pr-10 h-11 border-gray-300 focus:border-teal-500 focus:ring-teal-500 text-gray-900 bg-white"
                     required
                   />
                   <button

@@ -30,9 +30,9 @@ export const metadata: Metadata = {
   creator: "ASH AI",
   publisher: "Apparel Smart Hub",
   icons: {
-    icon: '/ash-ai-logo-hero.svg',
-    apple: '/ash-ai-logo-hero.svg',
-    shortcut: '/favicon.ico',
+    icon: '/Ash-AI.png',
+    apple: '/Ash-AI.png',
+    shortcut: '/Ash-AI.png',
   },
   metadataBase: new URL('http://localhost:3000'),
   openGraph: {
@@ -42,9 +42,9 @@ export const metadata: Metadata = {
     locale: "en_US",
     images: [
       {
-        url: "/ash-ai-logo-hero.svg",
+        url: "/Ash-AI.png",
         width: 300,
-        height: 120,
+        height: 300,
         alt: "ASH AI - Apparel Smart Hub Logo"
       }
     ],
