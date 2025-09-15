@@ -36,7 +36,6 @@ export type WorkOrderPriority =
 // Work Order Interface
 export interface WorkOrder {
   id: string;
-  work_order_number: string;
   type: WorkOrderType;
   status: WorkOrderStatus;
   priority: WorkOrderPriority;
@@ -47,22 +46,15 @@ export interface WorkOrder {
   machine_id?: string;
   assigned_to?: string;
   created_by: string;
-  estimated_duration_hours: number;
-  actual_duration_hours?: number;
-  scheduled_start: Date;
-  scheduled_end: Date;
+  estimated_hours?: number;
+  actual_hours?: number;
+  scheduled_start?: Date;
+  scheduled_end?: Date;
   actual_start?: Date;
   actual_end?: Date;
-  materials_required?: string[];
-  tools_required?: string[];
-  skills_required?: string[];
-  instructions: string;
-  quality_requirements?: string;
-  safety_notes?: string;
-  completion_notes?: string;
-  completion_photos?: string[];
+  notes?: string;
+  attachments?: any;
   dependencies?: string[]; // Other work order IDs that must complete first
-  progress_percentage: number;
   workspace_id: string;
   created_at: Date;
   updated_at: Date;
