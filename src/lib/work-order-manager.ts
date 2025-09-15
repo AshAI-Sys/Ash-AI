@@ -116,8 +116,8 @@ class WorkOrderManager {
 
     const workOrder = await prisma.workOrder.create({
       data: {
+        workspace_id: data.workspace_id,
         type: data.type,
-        status: 'PENDING',
         priority: data.priority,
         title: data.title,
         description: data.description,
@@ -128,7 +128,8 @@ class WorkOrderManager {
         scheduled_start: data.scheduled_start,
         scheduled_end: scheduledEnd,
         dependencies: data.dependencies || [],
-        workspace_id: data.workspace_id
+        created_by: data.created_by,
+        status: 'PENDING'
       }
     });
 
@@ -298,9 +299,7 @@ class WorkOrderManager {
         status: 'COMPLETED',
         actual_end: actualEnd,
         actual_hours: actualDuration,
-        progress_percentage: 100,
-        completion_notes: data.completion_notes,
-        completion_photos: data.completion_photos || [],
+        notes: data.completion_notes,
         updated_at: new Date()
       }
     });
@@ -386,9 +385,9 @@ class WorkOrderManager {
       prisma.workOrder.findMany({
         where: whereClause,
         include: {
-          assignedTo: { select: { name: true } },
+          assigned_user: { select: { full_name: true } },
           order: { select: { po_number: true, client: { select: { name: true } } } },
-          machine: { select: { name: true, code: true } }
+          machine: { select: { name: true } }
         },
         orderBy: [
           { priority: 'desc' },
@@ -422,10 +421,7 @@ class WorkOrderManager {
         workspace_id: workspaceId,
         role: { in: ['OPERATOR', 'PRODUCTION_MANAGER'] },
         active: true,
-        skills: {
-          hasSome: skillsRequired
-        },
-        assignedWorkOrders: {
+        assigned_work_orders: {
           none: {
             status: { in: ['ASSIGNED', 'IN_PROGRESS'] },
             OR: [

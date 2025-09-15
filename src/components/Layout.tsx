@@ -36,6 +36,7 @@ import {
 import Link from 'next/link'
 import { Role } from '@prisma/client'
 import AshleyAIChat from '@/components/ai/AshleyAIChat'
+import TopTaskbar from '@/components/TopTaskbar'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -450,28 +451,34 @@ function Layout({ children }: LayoutProps) {
       </div>
 
       {/* Futuristic Main Content Area */}
-      <div className="flex-1 overflow-auto neural-bg relative">
-        {/* Data Stream Background */}
-        <div className="absolute inset-0 data-stream opacity-30"></div>
-        
-        {/* Futuristic Quick Access Orb for Management Roles */}
-        {(['ADMIN', 'MANAGER'].includes(session.user.role as string)) && (
-          <Link
-            href="/dashboard"
-            className="fixed top-6 right-6 z-50 group"
-            title="Neural Dashboard Access"
-          >
-            <div className="ai-orb w-14 h-14 neon-glow hover:scale-110 hover:rotate-6 transition-all duration-500">
-              <Home className="w-7 h-7 text-white drop-shadow-lg group-hover:scale-110 transition-transform duration-300 z-10 relative" />
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-cyan-400 to-cyan-500 rounded-full flex items-center justify-center border border-green-300/50 animate-pulse">
-                <span className="text-[8px] font-bold text-white">Δ</span>
+      <div className="flex-1 flex flex-col overflow-hidden neural-bg relative">
+        {/* Top Taskbar */}
+        <TopTaskbar />
+
+        {/* Main Content */}
+        <div className="flex-1 overflow-auto relative">
+          {/* Data Stream Background */}
+          <div className="absolute inset-0 data-stream opacity-30"></div>
+
+          {/* Futuristic Quick Access Orb for Management Roles */}
+          {(['ADMIN', 'MANAGER'].includes(session.user.role as string)) && (
+            <Link
+              href="/dashboard"
+              className="fixed top-6 right-6 z-50 group"
+              title="Neural Dashboard Access"
+            >
+              <div className="ai-orb w-14 h-14 neon-glow hover:scale-110 hover:rotate-6 transition-all duration-500">
+                <Home className="w-7 h-7 text-white drop-shadow-lg group-hover:scale-110 transition-transform duration-300 z-10 relative" />
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-cyan-400 to-cyan-500 rounded-full flex items-center justify-center border border-green-300/50 animate-pulse">
+                  <span className="text-[8px] font-bold text-white">Δ</span>
+                </div>
               </div>
-            </div>
-          </Link>
-        )}
-        
-        <div className="relative z-10">
-          {children}
+            </Link>
+          )}
+
+          <div className="relative z-10">
+            {children}
+          </div>
         </div>
       </div>
       

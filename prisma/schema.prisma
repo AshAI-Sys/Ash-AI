@@ -3,9 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 // ==============================================
@@ -2567,7 +2566,7 @@ model WorkOrder {
   actual_end        DateTime?
   notes             String?
   attachments       Json?
-  dependencies      String[]          // Array of work order IDs
+  dependencies      Json?             // Array of work order IDs (JSON format for SQLite)
   created_by        String
   created_at        DateTime          @default(now())
   updated_at        DateTime          @updatedAt
