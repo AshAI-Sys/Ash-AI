@@ -1409,22 +1409,22 @@ export default function SewingPage() {
             </TabsContent>
 
             <TabsContent value="ashley-ai">
-          <div className="grid gap-6">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <TrendingUp className="h-4 w-4 text-blue-600" />
-                <span className="font-semibold text-blue-900">Analytics Coming Soon</span>
+              <div className="grid gap-6">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <TrendingUp className="h-4 w-4 text-blue-600" />
+                    <span className="font-semibold text-blue-900">Analytics Coming Soon</span>
+                  </div>
+                  <p className="text-blue-700">
+                    Advanced sewing analytics and reporting dashboard coming soon. This will include real-time efficiency tracking,
+                    operator performance insights, and production forecasting.
+                  </p>
+                </div>
               </div>
-              <p className="text-blue-700">
-                Advanced sewing analytics and reporting dashboard coming soon. This will include real-time efficiency tracking, 
-                operator performance insights, and production forecasting.
-              </p>
-            </div>
-          </div>
             </TabsContent>
           </Tabs>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   )
 }

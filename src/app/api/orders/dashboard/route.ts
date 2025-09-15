@@ -360,34 +360,38 @@ async function calculateRevenue(workspace_id: string) {
       }
     }
 
-    const totalRevenue = orderItems
+    const totalRevenue = orderItems._sum.total_price || 0
 
     // This month's revenue
     const startOfMonth = new Date()
     startOfMonth.setDate(1)
     startOfMonth.setHours(0, 0, 0, 0)
 
-    const thisMonthRevenue = await prisma.order.aggregate({
+    const thisMonthRevenue = await prisma.orderItem.aggregate({
       where: {
-        workspace_id,
-        created_at: { gte: startOfMonth }
+        order: {
+          workspace_id,
+          created_at: { gte: startOfMonth }
+        }
       },
-      _sum: { total_amount: true }
+      _sum: { total_price: true }
     })
 
     // Pending revenue (orders not yet delivered)
-    const pendingRevenue = await prisma.order.aggregate({
+    const pendingRevenue = await prisma.orderItem.aggregate({
       where: {
-        workspace_id,
-        status: { notIn: ['DELIVERED', 'CLOSED', 'CANCELLED'] }
+        order: {
+          workspace_id,
+          status: { notIn: ['DELIVERED', 'CLOSED', 'CANCELLED'] }
+        }
       },
-      _sum: { total_amount: true }
+      _sum: { total_price: true }
     })
 
     return {
-      total: totalRevenue._sum.total_amount || 0,
-      this_month: thisMonthRevenue._sum.total_amount || 0,
-      pending: pendingRevenue._sum.total_amount || 0
+      total: totalRevenue,
+      this_month: thisMonthRevenue._sum.total_price || 0,
+      pending: pendingRevenue._sum.total_price || 0
     }
   } catch (error) {
     console.error('Revenue calculation error:', error)

@@ -635,164 +635,326 @@ export default function DeliveriesPage() {
               <TabsContent value="deliveries">
                 {/* Enhanced Deliveries List */}
                 <div className="space-y-4">
-          {filteredDeliveries.map((delivery) => (
-            <Card key={delivery.id}>
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-4 mb-3">
-                      <h3 className="text-lg font-semibold">{delivery.orderNumber}</h3>
-                      <Badge className={getStatusColor(delivery.status)}>
-                        {delivery.status.replace('_', ' ')}
-                      </Badge>
-                      <Badge className={getPriorityColor(delivery.priority)}>
-                        Priority {delivery.priority}
-                      </Badge>
-                    </div>
+                  {filteredDeliveries.map((delivery) => (
+                    <Card key={delivery.id} className="quantum-card border-cyan-500/20">
+                      <CardContent className="p-6">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-4 mb-3">
+                              <h3 className="text-lg font-semibold text-white">{delivery.orderNumber}</h3>
+                              <Badge className={getStatusColor(delivery.status)}>
+                                {delivery.status.replace('_', ' ')}
+                              </Badge>
+                              <Badge className={getPriorityColor(delivery.priority)}>
+                                Priority {delivery.priority}
+                              </Badge>
+                            </div>
 
-                    <div className="mb-4">
-                      <h4 className="font-medium text-gray-900 mb-1">{delivery.clientName}</h4>
-                      <p className="text-gray-600 flex items-center">
-                        <MapPin className="w-4 h-4 mr-1" />
-                        {delivery.address}
-                      </p>
-                      <p className="text-gray-600 mt-1">{delivery.items}</p>
-                    </div>
+                            <div className="mb-4">
+                              <h4 className="font-medium text-white mb-1">{delivery.clientName}</h4>
+                              <p className="text-cyan-300 flex items-center">
+                                <MapPin className="w-4 h-4 mr-1" />
+                                {delivery.address}
+                              </p>
+                              <p className="text-cyan-300 mt-1">{delivery.items}</p>
+                            </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                      <div>
-                        <p className="font-medium text-gray-900">Driver</p>
-                        <p className="text-gray-600">{delivery.driverName}</p>
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-900">Vehicle</p>
-                        <p className="text-gray-600">{delivery.vehiclePlate}</p>
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-900">Scheduled</p>
-                        <p className="text-gray-600 flex items-center">
-                          <Clock className="w-3 h-3 mr-1" />
-                          {delivery.scheduledAt}
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                              <div>
+                                <p className="font-medium text-white">Driver</p>
+                                <p className="text-cyan-300">{delivery.driverName}</p>
+                              </div>
+                              <div>
+                                <p className="font-medium text-white">Vehicle</p>
+                                <p className="text-cyan-300">{delivery.vehiclePlate}</p>
+                              </div>
+                              <div>
+                                <p className="font-medium text-white">Scheduled</p>
+                                <p className="text-cyan-300 flex items-center">
+                                  <Clock className="w-3 h-3 mr-1" />
+                                  {delivery.scheduledAt}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="font-medium text-white">
+                                  {delivery.status === 'DELIVERED' ? 'Completed' :
+                                   delivery.status === 'IN_TRANSIT' ? 'Started' : 'Status'}
+                                </p>
+                                <p className="text-cyan-300">
+                                  {delivery.completedAt || delivery.startedAt || 'Not started'}
+                                </p>
+                              </div>
+                            </div>
+
+                            {delivery.notes && (
+                              <div className="mt-4 p-3 bg-gray-800/50 rounded border border-cyan-500/30">
+                                <p className="text-sm text-cyan-300">
+                                  <span className="font-medium text-white">Notes:</span> {delivery.notes}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex flex-col gap-2 ml-4">
+                            {delivery.status === 'SCHEDULED' && isDriver && (
+                              <Button
+                                onClick={() => handleStatusUpdate(delivery.id, 'IN_TRANSIT')}
+                                size="sm"
+                                className="neon-btn"
+                              >
+                                <Truck className="w-4 h-4 mr-1" />
+                                Start Delivery
+                              </Button>
+                            )}
+
+                            {delivery.status === 'IN_TRANSIT' && isDriver && (
+                              <Button
+                                onClick={() => handleStatusUpdate(delivery.id, 'DELIVERED')}
+                                size="sm"
+                                className="neon-btn-success"
+                              >
+                                <CheckCircle className="w-4 h-4 mr-1" />
+                                Mark Delivered
+                              </Button>
+                            )}
+
+                            {delivery.status === 'DELIVERED' && (
+                              <div className="text-center">
+                                <div className="ai-orb mb-2">
+                                  <CheckCircle className="w-6 h-6 text-green-400" />
+                                </div>
+                                <p className="text-xs text-green-400 font-mono">COMPLETE</p>
+                              </div>
+                            )}
+
+                            {!isDriver && delivery.status === 'SCHEDULED' && (
+                              <Button variant="outline" size="sm" className="cyber-btn-outline">
+                                <Edit className="w-4 h-4 mr-1" />
+                                Edit Schedule
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+
+                  {filteredDeliveries.length === 0 && (
+                    <Card className="quantum-card border-cyan-500/20">
+                      <CardContent className="p-12 text-center">
+                        <div className="ai-orb mb-4 mx-auto">
+                          <Package className="w-12 h-12 text-cyan-400" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-white mb-2">No deliveries found</h3>
+                        <p className="text-cyan-300">
+                          {isDriver
+                            ? "You don't have any assigned deliveries at the moment."
+                            : "No deliveries match the selected filters."
+                          }
                         </p>
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-900">
-                          {delivery.status === 'DELIVERED' ? 'Completed' : 
-                           delivery.status === 'IN_TRANSIT' ? 'Started' : 'Status'}
-                        </p>
-                        <p className="text-gray-600">
-                          {delivery.completedAt || delivery.startedAt || 'Not started'}
-                        </p>
-                      </div>
-                    </div>
-
-                    {delivery.notes && (
-                      <div className="mt-4 p-3 bg-gray-50 rounded">
-                        <p className="text-sm">
-                          <span className="font-medium">Notes:</span> {delivery.notes}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex flex-col gap-2 ml-4">
-                    {delivery.status === 'SCHEDULED' && isDriver && (
-                      <Button 
-                        onClick={() => handleStatusUpdate(delivery.id, 'IN_TRANSIT')}
-                        size="sm"
-                      >
-                        <Truck className="w-4 h-4 mr-1" />
-                        Start Delivery
-                      </Button>
-                    )}
-                    
-                    {delivery.status === 'IN_TRANSIT' && isDriver && (
-                      <Button 
-                        onClick={() => handleStatusUpdate(delivery.id, 'DELIVERED')}
-                        size="sm"
-                        className="bg-green-600 hover:bg-green-700"
-                      >
-                        <CheckCircle className="w-4 h-4 mr-1" />
-                        Mark Delivered
-                      </Button>
-                    )}
-
-                    {delivery.status === 'DELIVERED' && (
-                      <div className="text-center">
-                        <CheckCircle className="w-8 h-8 text-green-600 mx-auto" />
-                        <p className="text-xs text-gray-600 mt-1">Completed</p>
-                      </div>
-                    )}
-
-                    {!isDriver && delivery.status === 'SCHEDULED' && (
-                      <Button variant="outline" size="sm">
-                        Edit Schedule
-                      </Button>
-                    )}
-                  </div>
+                      </CardContent>
+                    </Card>
+                  )}
                 </div>
-              </CardContent>
-            </Card>
-          ))}
+              </TabsContent>
 
-          {filteredDeliveries.length === 0 && (
-            <Card>
-              <CardContent className="p-12 text-center">
-                <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No deliveries found</h3>
-                <p className="text-gray-600">
-                  {isDriver 
-                    ? "You don't have any assigned deliveries at the moment."
-                    : "No deliveries match the selected filters."
-                  }
-                </p>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+              <TabsContent value="drivers">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {drivers.map((driver) => (
+                    <Card key={driver.id} className="quantum-card border-cyan-500/20">
+                      <CardContent className="p-6">
+                        <div className="flex items-center gap-4 mb-4">
+                          <div className="ai-orb">
+                            <Users className="w-6 h-6 text-cyan-400" />
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-white">{driver.name}</h3>
+                            <Badge className={driver.currentStatus === 'AVAILABLE' ? 'bg-green-100 text-green-800' :
+                                           driver.currentStatus === 'ON_DELIVERY' ? 'bg-yellow-100 text-yellow-800' :
+                                           'bg-gray-100 text-gray-800'}>
+                              {driver.currentStatus.replace('_', ' ')}
+                            </Badge>
+                          </div>
+                        </div>
 
-        {/* Vehicle Status (for non-drivers) */}
-        {!isDriver && (
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle>Vehicle Status</CardTitle>
-              <CardDescription>Current status of delivery vehicles</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {vehicles.map(vehicle => {
-                  const currentDelivery = deliveries.find(d => 
-                    d.vehiclePlate === vehicle.plateNumber && d.status === 'IN_TRANSIT'
-                  )
-                  
-                  return (
-                    <div key={vehicle.id} className="p-4 border rounded">
-                      <div className="flex items-center gap-3 mb-2">
-                        <Truck className="w-5 h-5 text-blue-600" />
-                        <div>
-                          <p className="font-medium">{vehicle.plateNumber}</p>
-                          <p className="text-sm text-gray-600">{vehicle.type}</p>
+                        <div className="space-y-3 text-sm">
+                          <div className="flex items-center justify-between">
+                            <span className="text-cyan-300">Rating</span>
+                            <div className="flex items-center gap-1">
+                              <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                              <span className="text-white font-mono">{driver.rating}</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-cyan-300">Total Deliveries</span>
+                            <span className="text-white font-mono">{driver.totalDeliveries}</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-cyan-300">On-Time Rate</span>
+                            <span className="text-white font-mono">{driver.onTimeRate}%</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-cyan-300">Contact</span>
+                            <div className="flex gap-2">
+                              <Button size="sm" variant="ghost" className="h-6 w-6 p-0">
+                                <Phone className="w-3 h-3 text-cyan-400" />
+                              </Button>
+                              <Button size="sm" variant="ghost" className="h-6 w-6 p-0">
+                                <Mail className="w-3 h-3 text-cyan-400" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="vehicles">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {vehicles.map((vehicle) => {
+                    const currentDelivery = deliveries.find(d =>
+                      d.vehiclePlate === vehicle.plateNumber && d.status === 'IN_TRANSIT'
+                    )
+
+                    return (
+                      <Card key={vehicle.id} className="quantum-card border-cyan-500/20">
+                        <CardContent className="p-6">
+                          <div className="flex items-center gap-4 mb-4">
+                            <div className="ai-orb">
+                              <Truck className="w-6 h-6 text-cyan-400" />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-white">{vehicle.plateNumber}</h3>
+                              <p className="text-cyan-300 text-sm">{vehicle.type}</p>
+                            </div>
+                          </div>
+
+                          <div className="space-y-3 text-sm">
+                            <div className="flex items-center justify-between">
+                              <span className="text-cyan-300">Driver</span>
+                              <span className="text-white">{vehicle.driverName}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-cyan-300">Status</span>
+                              <Badge className={currentDelivery ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}>
+                                {currentDelivery ? 'In Transit' : 'Available'}
+                              </Badge>
+                            </div>
+                            {vehicle.fuelLevel && (
+                              <div className="flex items-center justify-between">
+                                <span className="text-cyan-300">Fuel Level</span>
+                                <div className="flex items-center gap-2">
+                                  <div className="w-16 h-2 bg-gray-700 rounded overflow-hidden">
+                                    <div
+                                      className={`h-full transition-all duration-500 ${
+                                        vehicle.fuelLevel > 50 ? 'bg-green-400' :
+                                        vehicle.fuelLevel > 25 ? 'bg-yellow-400' : 'bg-red-400'
+                                      }`}
+                                      style={{ width: `${vehicle.fuelLevel}%` }}
+                                    />
+                                  </div>
+                                  <span className="text-white font-mono text-xs">{Math.round(vehicle.fuelLevel)}%</span>
+                                </div>
+                              </div>
+                            )}
+                            {vehicle.maintenanceStatus && (
+                              <div className="flex items-center justify-between">
+                                <span className="text-cyan-300">Maintenance</span>
+                                <Badge className={vehicle.maintenanceStatus === 'OK' ? 'bg-green-100 text-green-800' :
+                                               vehicle.maintenanceStatus === 'DUE' ? 'bg-yellow-100 text-yellow-800' :
+                                               'bg-red-100 text-red-800'}>
+                                  {vehicle.maintenanceStatus}
+                                </Badge>
+                              </div>
+                            )}
+                            {currentDelivery && (
+                              <div className="mt-4 p-3 bg-yellow-900/20 border border-yellow-400/30 rounded">
+                                <p className="text-yellow-300 text-xs font-mono">
+                                  CURRENT MISSION: {currentDelivery.orderNumber}
+                                </p>
+                                <p className="text-yellow-200 text-xs">
+                                  {currentDelivery.clientName}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )
+                  })}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="analytics">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <Card className="quantum-card border-cyan-500/20">
+                    <CardHeader>
+                      <CardTitle className="text-white flex items-center gap-2">
+                        <TrendingUp className="w-5 h-5 text-cyan-400" />
+                        Delivery Performance
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <span className="text-cyan-300">On-Time Rate</span>
+                          <span className="text-white font-mono text-xl">94.2%</span>
+                        </div>
+                        <div className="w-full bg-gray-700 rounded-full h-2">
+                          <div className="bg-green-400 h-2 rounded-full" style={{ width: '94.2%' }}></div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <p className="text-cyan-300">Avg Delivery Time</p>
+                            <p className="text-white font-mono">42 min</p>
+                          </div>
+                          <div>
+                            <p className="text-cyan-300">Success Rate</p>
+                            <p className="text-white font-mono">99.1%</p>
+                          </div>
                         </div>
                       </div>
-                      <p className="text-sm text-gray-600 mb-2">
-                        Driver: {vehicle.driverName}
-                      </p>
-                      <Badge className={currentDelivery ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}>
-                        {currentDelivery ? 'In Transit' : 'Available'}
-                      </Badge>
-                      {currentDelivery && (
-                        <p className="text-xs text-gray-600 mt-1">
-                          {currentDelivery.orderNumber} - {currentDelivery.clientName}
-                        </p>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+                    </CardContent>
+                  </Card>
+
+                  <Card className="quantum-card border-cyan-500/20">
+                    <CardHeader>
+                      <CardTitle className="text-white flex items-center gap-2">
+                        <BarChart3 className="w-5 h-5 text-purple-400" />
+                        Route Efficiency
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <span className="text-cyan-300">Fuel Efficiency</span>
+                          <span className="text-white font-mono text-xl">87%</span>
+                        </div>
+                        <div className="w-full bg-gray-700 rounded-full h-2">
+                          <div className="bg-purple-400 h-2 rounded-full" style={{ width: '87%' }}></div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <p className="text-cyan-300">Avg Distance</p>
+                            <p className="text-white font-mono">23.4 km</p>
+                          </div>
+                          <div>
+                            <p className="text-cyan-300">Cost per km</p>
+                            <p className="text-white font-mono">₱18.50</p>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+        </div>
       </div>
-    </ResponsiveLayout>
+    </TikTokLayout>
   )
 }

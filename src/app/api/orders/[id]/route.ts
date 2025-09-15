@@ -34,7 +34,7 @@ export const GET = withErrorHandler(async (
             billing_address: true 
           }
         },
-        orderItems: {
+        items: {
           select: { 
             id: true, 
             product_type: true, 
@@ -77,7 +77,7 @@ export const GET = withErrorHandler(async (
         },
         _count: {
           select: { 
-            orderItems: true,
+            items: true,
             design_assets: true,
             routing_steps: true
           }
@@ -118,7 +118,7 @@ export const GET = withErrorHandler(async (
       risk_assessment: riskAssessment,
       production_metrics: productionMetrics,
       counts: {
-        total_items: order._count.orderItems,
+        total_items: order._count.items,
         design_assets: order._count.design_assets,
         routing_steps: order._count.routing_steps
       }
@@ -165,7 +165,7 @@ export const PATCH = withErrorHandler(async (
       where: { id },
       include: {
         client: { select: { id: true, name: true, emails: true } },
-        orderItems: true,
+        items: true,
         statusHistory: { 
           orderBy: { changed_at: 'desc' }, 
           take: 1 

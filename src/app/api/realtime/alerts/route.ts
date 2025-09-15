@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     const unread = searchParams.get('unread') === 'true'
 
     // Get recent alerts from Redis
-    let alerts = await redis.lrange('alerts:recent', 0, limit - 1)
+    const alerts = await redis.lrange('alerts:recent', 0, limit - 1)
     let parsedAlerts = alerts.map(alert => JSON.parse(alert))
 
     // Apply filters
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
         const { type: markAllType } = data || {}
         
         // Get recent alerts
-        let alerts = await redis.lrange('alerts:recent', 0, 99)
+        const alerts = await redis.lrange('alerts:recent', 0, 99)
         let alertIds = alerts.map(alert => JSON.parse(alert).id)
         
         // Filter by type if specified

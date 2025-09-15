@@ -100,7 +100,7 @@ export async function POST(
       include: {
         client: { select: { id: true, name: true, company: true } },
         brand: { select: { id: true, name: true } },
-        orderItems: true,
+        items: true,
         routingSteps: {
           orderBy: { sequence: 'asc' }
         },

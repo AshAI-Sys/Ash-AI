@@ -286,7 +286,7 @@ async function createProductionPlan(order_id: string, user_id: string): Promise<
   const order = await db.order.findUnique({
     where: { id: order_id },
     include: { 
-      orderItems: true,
+      items: true,
       client: { select: { preferences: true } }
     }
   });
@@ -294,7 +294,7 @@ async function createProductionPlan(order_id: string, user_id: string): Promise<
   if (!order) return;
 
   // Create intelligent routing-based production plan
-  for (const item of order.orderItems) {
+  for (const item of order.items) {
     const specs = item.specifications ? JSON.parse(item.specifications as string) : {};
     const method = specs.printing_method || 'Silkscreen';
     

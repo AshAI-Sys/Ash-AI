@@ -215,7 +215,7 @@ class AutomatedQualityControl {
       },
       include: {
         routingSteps: true,
-        orderItems: true
+        items: true
       },
       take: 10 // Process in batches
     })

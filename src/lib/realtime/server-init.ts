@@ -7,7 +7,7 @@ import InventoryMonitor from './inventory-monitor'
 import AnalyticsEngine from './analytics-engine'
 
 let isInitialized = false
-let server: any = null
+const server: any = null
 
 export function initializeRealtimeServer() {
   if (isInitialized) {

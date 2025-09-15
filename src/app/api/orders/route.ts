@@ -119,7 +119,7 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
           client: {
             select: { id: true, name: true, emails: true }
           },
-          orderItems: {
+          items: {
             select: { id: true, product_type: true, quantity: true, unit_price: true }
           },
           statusHistory: {
@@ -128,7 +128,7 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
             take: 1
           },
           _count: {
-            select: { orderItems: true }
+            select: { items: true }
           }
         },
         orderBy: { created_at: 'desc' },
@@ -149,7 +149,7 @@ export const GET = withErrorHandler(async (request: NextRequest) => {
       ...order,
       progress_percentage: OrderWorkflowEngine.getStatusProgress(order.status),
       available_transitions: [], // Will be populated on individual order view
-      total_items: order._count.orderItems,
+      total_items: order._count.items,
       estimated_completion: calculateEstimatedCompletion(order.status, order.due_date),
       risk_assessment: assessOrderRisk(order),
       recent_activity: order.statusHistory[0] || null
@@ -536,7 +536,7 @@ export const PUT = withErrorHandler(async (request: NextRequest) => {
         },
         include: {
           client: { select: { id: true, name: true, emails: true } },
-          orderItems: true,
+          items: true,
           statusHistory: { orderBy: { changed_at: 'desc' }, take: 5 }
         }
       });

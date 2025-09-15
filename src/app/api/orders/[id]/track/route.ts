@@ -115,7 +115,7 @@ export async function GET(
         brand: {
           select: { id: true, name: true, code: true }
         },
-        orderItems: {
+        items: {
           select: {
             id: true,
             product_name: true,

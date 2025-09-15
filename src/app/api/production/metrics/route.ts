@@ -124,7 +124,6 @@ async function getProductionSummary(workspace_id: string) {
         status: 'IN_PROGRESS'
       }
     })
-  */
 
     // Calculate overall efficiency (mock calculation for demo)
     const efficiencyData = await prisma.productionTracking.aggregate({
@@ -179,6 +178,7 @@ async function getProductionSummary(workspace_id: string) {
       on_time_percentage: 88
     }
   }
+  */
 }
 
 async function getStageBreakdown(workspace_id: string) {

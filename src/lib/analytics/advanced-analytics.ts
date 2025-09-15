@@ -575,7 +575,7 @@ class AdvancedAnalytics {
     const isWeekend = dayOfWeek === 0 || dayOfWeek === 6
 
     // Base demand (historical average)
-    let baseDemand = 25 // Average daily orders
+    const baseDemand = 25 // Average daily orders
 
     // Seasonal adjustment
     const month = targetDate.getMonth()
@@ -603,7 +603,7 @@ class AdvancedAnalytics {
     value: number, confidence: number, factors: Array<{ factor: string, influence: number }>
   }> {
     // Quality prediction (defect rate %)
-    let baseDefectRate = 3.5 // 3.5% base defect rate
+    const baseDefectRate = 3.5 // 3.5% base defect rate
 
     // Environmental factors (humidity, temperature affect quality)
     const envFactor = 0.8 + Math.random() * 0.4 // 0.8-1.2 multiplier
@@ -630,7 +630,7 @@ class AdvancedAnalytics {
     value: number, confidence: number, factors: Array<{ factor: string, influence: number }>
   }> {
     // Cost optimization prediction (PHP per unit)
-    let baseCost = 165 // PHP 165 base cost per unit
+    const baseCost = 165 // PHP 165 base cost per unit
 
     // Material cost fluctuation
     const materialFactor = 0.95 + Math.random() * 0.1 // ±5% material cost variation
@@ -657,7 +657,7 @@ class AdvancedAnalytics {
     value: number, confidence: number, factors: Array<{ factor: string, influence: number }>
   }> {
     // Production efficiency prediction (%)
-    let baseEfficiency = 85 // 85% base efficiency
+    const baseEfficiency = 85 // 85% base efficiency
 
     // Operator performance variation
     const operatorFactor = 0.95 + Math.random() * 0.1 // ±5% operator performance

@@ -211,4 +211,4 @@ async function getMachineAlerts(machines: any[]) {
   });
 }
 
-export { withApiHandler(GET) as GET, withApiHandler(POST) as POST };
+export { GET, POST };

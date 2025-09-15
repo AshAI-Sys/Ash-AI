@@ -36,7 +36,7 @@ export const GET = withErrorHandler(async (
       db.order.findUnique({
         where: { id: order_id },
         include: {
-          orderItems: {
+          items: {
             select: {
               id: true,
               product_type: true,
@@ -71,8 +71,8 @@ export const GET = withErrorHandler(async (
 
     // Generate Ashley AI routing recommendations if no routing exists
     let recommendations = null;
-    if (routingSteps.length === 0 && order.orderItems.length > 0) {
-      const item = order.orderItems[0];
+    if (routingSteps.length === 0 && order.items.length > 0) {
+      const item = order.items[0];
       const specs = item.specifications ? JSON.parse(item.specifications as string) : {};
       
       const orderContext: OrderContext = {
@@ -265,7 +265,7 @@ export const POST = withErrorHandler(async (
     const order = await db.order.findUnique({
       where: { id: order_id },
       include: {
-        orderItems: true,
+        items: true,
         client: { select: { preferences: true } }
       }
     });
@@ -322,8 +322,8 @@ export const POST = withErrorHandler(async (
 async function createProductionPlan(order_id: string, user_id: string): Promise<void> {
   const order = await db.order.findUnique({
     where: { id: order_id },
-    include: { 
-      orderItems: true,
+    include: {
+      items: true,
       client: { select: { preferences: true } }
     }
   });
@@ -331,7 +331,7 @@ async function createProductionPlan(order_id: string, user_id: string): Promise<
   if (!order) return;
 
   // Create intelligent routing-based production plan
-  for (const item of order.orderItems) {
+  for (const item of order.items) {
     const specs = item.specifications ? JSON.parse(item.specifications as string) : {};
     const method = specs.printing_method || 'Silkscreen';
     

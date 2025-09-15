@@ -54,7 +54,7 @@ export const PUT = withErrorHandler(async (
             changedBy: { select: { name: true } }
           }
         },
-        orderItems: true
+        items: true
       }
     });
 

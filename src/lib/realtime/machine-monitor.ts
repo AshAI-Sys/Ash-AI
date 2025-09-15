@@ -327,7 +327,7 @@ class MachineMonitor {
   }
 
   private async handleStatusChange(machine: any, oldStatus: string, newStatus: string) {
-    let alertType: 'machine' = 'machine'
+    const alertType: 'machine' = 'machine'
     let severity: 'low' | 'medium' | 'high' | 'critical' = 'medium'
     let message = ''
 

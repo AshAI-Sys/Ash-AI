@@ -298,4 +298,4 @@ async function PUT(request: NextRequest) {
   }
 }
 
-export { withApiHandler(GET) as GET, withApiHandler(POST) as POST, withApiHandler(PUT) as PUT };
+export { GET, POST, PUT };
