@@ -114,8 +114,22 @@ async function POST(request: NextRequest) {
       case 'create':
         const validatedData = CreateWorkOrderSchema.parse(data);
         const workOrder = await workOrderManager.createWorkOrder({
-          ...validatedData,
+          type: validatedData.type,
+          priority: validatedData.priority,
+          title: validatedData.title,
+          description: validatedData.description,
+          order_id: validatedData.order_id,
+          production_stage: validatedData.production_stage,
+          machine_id: validatedData.machine_id,
+          estimated_duration_hours: validatedData.estimated_duration_hours,
           scheduled_start: new Date(validatedData.scheduled_start),
+          materials_required: validatedData.materials_required,
+          tools_required: validatedData.tools_required,
+          skills_required: validatedData.skills_required,
+          instructions: validatedData.instructions,
+          quality_requirements: validatedData.quality_requirements,
+          safety_notes: validatedData.safety_notes,
+          dependencies: validatedData.dependencies,
           created_by: session.user.id,
           workspace_id
         });

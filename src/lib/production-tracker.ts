@@ -45,6 +45,7 @@ export interface ProductionEvent {
 // Machine Telemetry Data
 export interface MachineMetrics {
   machine_id: string;
+  workspace_id?: string;
   machine_type: string;
   status: 'RUNNING' | 'IDLE' | 'MAINTENANCE' | 'ERROR' | 'OFFLINE';
   current_order_id?: string;
@@ -187,13 +188,20 @@ class ProductionTracker {
       error_count: 0,
       total_pieces_today: 0,
       timestamp: new Date(),
+      workspace_id: 'default',
       ...metrics
     };
 
     // Store in database
     await prisma.machineMetrics.upsert({
-      where: { machine_id: metrics.machine_id },
+      where: {
+        workspace_id_machine_id: {
+          workspace_id: fullMetrics.workspace_id || 'default',
+          machine_id: metrics.machine_id
+        }
+      },
       create: {
+        workspace_id: fullMetrics.workspace_id || 'default',
         machine_id: fullMetrics.machine_id,
         machine_type: fullMetrics.machine_type,
         status: fullMetrics.status,
@@ -373,13 +381,15 @@ class ProductionTracker {
     try {
       await prisma.productionStage.upsert({
         where: {
-          order_id_stage: {
+          order_id_stage_name: {
             order_id: event.order_id,
-            stage: event.stage
+            stage_name: event.stage
           }
         },
         create: {
+          workspace_id: 'default',
           order_id: event.order_id,
+          stage_name: event.stage,
           stage: event.stage,
           status: event.status,
           assigned_to: event.operator_id,
@@ -387,7 +397,9 @@ class ProductionTracker {
           pieces_completed: event.pieces_completed,
           pieces_total: event.pieces_total,
           start_time: event.start_time,
+          started_at: event.start_time,
           end_time: event.end_time,
+          completed_at: event.end_time,
           efficiency_score: event.efficiency_score,
           quality_score: event.quality_score,
           notes: event.notes
@@ -395,7 +407,10 @@ class ProductionTracker {
         update: {
           status: event.status,
           pieces_completed: event.pieces_completed,
+          start_time: event.start_time,
+          started_at: event.start_time,
           end_time: event.end_time,
+          completed_at: event.end_time,
           efficiency_score: event.efficiency_score,
           quality_score: event.quality_score,
           notes: event.notes

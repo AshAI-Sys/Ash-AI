@@ -568,6 +568,66 @@ export class WorkflowEngine {
   private async executeAssignOperatorAction(action: WorkflowAction, workspaceId: string) {
     // Implementation for operator assignment
   }
+
+  // Add event listener system
+  private eventListeners: Map<string, Function[]> = new Map();
+
+  addEventListener(event: string, callback: Function) {
+    if (!this.eventListeners.has(event)) {
+      this.eventListeners.set(event, []);
+    }
+    this.eventListeners.get(event)!.push(callback);
+  }
+
+  private emitEvent(event: string, data: any) {
+    const listeners = this.eventListeners.get(event) || [];
+    listeners.forEach(callback => {
+      try {
+        callback(data);
+      } catch (error) {
+        console.error(`🚨 [WORKFLOW ENGINE] Event listener error:`, error);
+      }
+    });
+  }
+
+  // Trigger workflow method
+  async triggerWorkflow(workflowId: string, context: any = {}): Promise<void> {
+    try {
+      console.log(`🎖️ [WORKFLOW ENGINE] Triggering workflow: ${workflowId}`);
+
+      const rule = this.rules.get(workflowId);
+      if (!rule) {
+        console.error(`🚨 [WORKFLOW ENGINE] Workflow ${workflowId} not found`);
+        return;
+      }
+
+      // Check trigger conditions
+      const conditionMet = await this.checkCondition(rule.trigger, rule.workspace_id, context);
+      if (!conditionMet) {
+        console.log(`🎖️ [WORKFLOW ENGINE] Workflow ${workflowId} conditions not met`);
+        return;
+      }
+
+      // Execute actions
+      for (const action of rule.actions) {
+        try {
+          await this.executeWorkflowAction(action, rule.workspace_id);
+        } catch (error) {
+          console.error(`🚨 [WORKFLOW ENGINE] Action execution failed:`, error);
+          if (!action.retryOnFailure) {
+            break;
+          }
+        }
+      }
+
+      // Emit completion event
+      this.emitEvent('workflow_completed', { workflowId, context });
+
+      console.log(`✅ [WORKFLOW ENGINE] Workflow ${workflowId} completed`);
+    } catch (error) {
+      console.error(`🚨 [WORKFLOW ENGINE] Workflow trigger failed:`, error);
+    }
+  }
 }
 
 // Singleton instance
