@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
         role,
         workspace_id,
         active: false, // Require email verification for security
-        email_verified: false,
+        email_verified: null, // Use null instead of false for DateTime field
         verification_token: verificationToken,
         verification_expires: verificationExpires,
         created_at: new Date(),
@@ -217,10 +217,9 @@ export async function GET(request: NextRequest) {
         where: { id: user.id },
         data: {
           active: true,
-          email_verified: true,
+          email_verified: new Date(), // Set to current timestamp for verification
           verification_token: null,
-          verification_expires: null,
-          verified_at: new Date()
+          verification_expires: null
         }
       })
 

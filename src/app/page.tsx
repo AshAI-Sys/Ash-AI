@@ -149,9 +149,11 @@ export default function Home() {
             
             <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mb-8 sm:mb-12">
               <Link href="/login">
-                <button className="simple-btn w-full sm:w-auto text-sm px-6 py-2.5">Get Started</button>
+                <button className="simple-btn w-full sm:w-auto text-xs px-4 py-2">Get Started</button>
               </Link>
-              <button className="simple-btn simple-btn-secondary w-full sm:w-auto text-sm px-6 py-2.5">Learn More</button>
+              <Link href="/demo">
+                <button className="simple-btn simple-btn-secondary w-full sm:w-auto text-xs px-4 py-2">Learn More</button>
+              </Link>
             </div>
 
             {/* Simple Stats - Mobile Responsive */}

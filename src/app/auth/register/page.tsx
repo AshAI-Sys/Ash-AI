@@ -22,7 +22,7 @@ import {
   Building,
   Phone,
   Briefcase,
-  Department,
+  Building2,
   CheckCircle,
   AlertCircle,
   Eye,
@@ -410,7 +410,7 @@ export default function RegisterPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="department" className="flex items-center">
-                    <Department className="h-4 w-4 mr-1" />
+                    <Building2 className="h-4 w-4 mr-1" />
                     Department
                   </Label>
                   <Input

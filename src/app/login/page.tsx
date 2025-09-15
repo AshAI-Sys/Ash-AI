@@ -186,7 +186,7 @@ export default function TikTokLogin() {
                     placeholder="Enter your email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="pl-10 h-11 border-gray-300 focus:border-teal-500 focus:ring-teal-500 text-gray-900 bg-white"
+                    className="pl-10 h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white selection:bg-blue-200 selection:text-gray-900"
                     required
                   />
                 </div>
@@ -205,7 +205,7 @@ export default function TikTokLogin() {
                     placeholder="Enter your password"
                     value={formData.password}
                     onChange={handleInputChange}
-                    className="pl-10 pr-10 h-11 border-gray-300 focus:border-teal-500 focus:ring-teal-500 text-gray-900 bg-white"
+                    className="pl-10 pr-10 h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-gray-900 bg-white selection:bg-blue-200 selection:text-gray-900"
                     required
                   />
                   <button
@@ -248,8 +248,8 @@ export default function TikTokLogin() {
             </form>
 
             {/* Demo Credentials */}
-            <div className="mt-6 p-4 bg-teal-50 border border-teal-200 rounded-lg">
-              <p className="text-sm font-medium text-teal-800 mb-2">
+            <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm font-bold text-gray-900 mb-2">
                 Demo Credentials
               </p>
               <Button
@@ -257,22 +257,22 @@ export default function TikTokLogin() {
                 variant="outline"
                 size="sm"
                 onClick={fillDemoCredentials}
-                className="w-full mb-3 text-teal-700 border-teal-300 hover:bg-teal-100"
+                className="w-full mb-3 text-blue-700 border-blue-400 hover:bg-blue-100 font-medium"
               >
                 Use Demo Credentials
               </Button>
-              <div className="text-xs text-teal-700">
+              <div className="text-sm text-gray-800 font-medium">
                 {mode === 'admin' ? (
-                  <p className="font-mono">admin@example.com / admin123</p>
+                  <p className="font-mono bg-white px-3 py-2 rounded border text-gray-900">admin@example.com / admin123</p>
                 ) : (
-                  <p className="font-mono">client@example.com / demo123</p>
+                  <p className="font-mono bg-white px-3 py-2 rounded border text-gray-900">client@example.com / demo123</p>
                 )}
               </div>
             </div>
           </div>
 
           {/* Footer */}
-          <div className="text-center mt-6 text-sm text-gray-500">
+          <div className="text-center mt-6 text-sm text-gray-700">
             <p>© 2024 ASH-AI Portal. All rights reserved.</p>
           </div>
         </div>
