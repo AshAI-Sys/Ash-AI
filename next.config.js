@@ -21,16 +21,10 @@ const nextConfig = {
       '@radix-ui/react-label',
       '@radix-ui/react-select',
       '@radix-ui/react-tabs'
-    ],
-    // Enable modern build features
-    swcMinify: true,
-    // Optimize static generation
-    isrMemoryCacheSize: 0, // Disable ISR cache for development
-    // Bundle analyzer integration
-    bundlePagesRouterDependencies: true,
-    // Optimize server-side rendering
-    serverComponentsExternalPackages: ['prisma', '@prisma/client']
+    ]
   },
+  // Move serverComponentsExternalPackages to top level
+  serverExternalPackages: ['prisma', '@prisma/client'],
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
     // Remove React dev tools in production
