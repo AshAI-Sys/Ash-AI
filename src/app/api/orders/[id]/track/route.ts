@@ -91,7 +91,7 @@ interface RealTimeOrderStatus {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Verify authentication
@@ -103,7 +103,7 @@ export async function GET(
       )
     }
 
-    const orderId = params.id
+    const { id: orderId } = await params
 
     // Get comprehensive order data
     const order = await prisma.order.findUnique({
