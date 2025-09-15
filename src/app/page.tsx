@@ -151,13 +151,18 @@ export default function Home() {
               <Link href="/auth/signin">
                 <button className="simple-btn w-full sm:w-auto text-xs px-4 py-2">Get Started</button>
               </Link>
-              <Link href="/demo">
-                <button className="simple-btn simple-btn-secondary w-full sm:w-auto text-xs px-4 py-2">Learn More</button>
-              </Link>
+              <button
+                className="simple-btn simple-btn-secondary w-full sm:w-auto text-xs px-4 py-2"
+                onClick={() => {
+                  document.getElementById('features-section')?.scrollIntoView({ behavior: 'smooth' })
+                }}
+              >
+                Learn More
+              </button>
             </div>
 
             {/* Simple Stats - Mobile Responsive */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-4xl mx-auto">
+            <div id="features-section" className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-4xl mx-auto">
               <div className="simple-card text-center p-3 sm:p-6">
                 <div className="text-lg sm:text-2xl font-bold text-blue-600 mb-1 sm:mb-2">1,247</div>
                 <div className="text-xs sm:text-sm simple-text-muted">Total Orders</div>

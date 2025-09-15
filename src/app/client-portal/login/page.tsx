@@ -29,7 +29,7 @@ export default function ClientPortalLogin() {
     email: '',
     password: ''
   })
-  const [showPassword, setShowPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(true)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 

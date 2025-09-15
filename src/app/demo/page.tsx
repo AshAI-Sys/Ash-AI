@@ -8,7 +8,7 @@ import { ArrowLeft, User, Lock, Eye, EyeOff } from 'lucide-react'
 
 export default function DemoLogin() {
   const router = useRouter()
-  const [showPassword, setShowPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
 
   const handleDemoLogin = () => {

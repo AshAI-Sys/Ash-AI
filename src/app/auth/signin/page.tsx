@@ -19,7 +19,7 @@ export default function SignInPage() {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(true)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -154,10 +154,48 @@ export default function SignInPage() {
               <Shield className="h-4 w-4 mr-2" />
               Demo Credentials
             </h4>
-            <div className="text-xs text-blue-800 space-y-1">
+            <div className="text-xs text-blue-800 space-y-1 mb-3">
               <div><strong>Admin:</strong> admin@example.com / admin123</div>
               <div><strong>Manager:</strong> manager@example.com / manager123</div>
               <div><strong>Operator:</strong> sewing@example.com / sewing123</div>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="text-xs h-8"
+                onClick={() => {
+                  setEmail('admin@example.com')
+                  setPassword('admin123')
+                }}
+              >
+                Use Admin
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="text-xs h-8"
+                onClick={() => {
+                  setEmail('manager@example.com')
+                  setPassword('manager123')
+                }}
+              >
+                Use Manager
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="text-xs h-8"
+                onClick={() => {
+                  setEmail('sewing@example.com')
+                  setPassword('sewing123')
+                }}
+              >
+                Use Operator
+              </Button>
             </div>
           </div>
         </CardContent>
