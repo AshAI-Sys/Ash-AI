@@ -16,7 +16,7 @@ import {
 } from './error-handler'
 
 // Security configurations
-export const AUTH_CONFIG = {
+const AUTH_CONFIG = {
   MAX_LOGIN_ATTEMPTS: 5,
   LOCKOUT_DURATION: 15 * 60 * 1000, // 15 minutes
   SESSION_TIMEOUT: 30 * 24 * 60 * 60 * 1000, // 30 days
@@ -549,3 +549,6 @@ export async function secureLogout(userId?: string, reason: string = 'User logou
     console.error('Logout logging failed:', error)
   }
 }
+
+// Export AUTH_CONFIG
+export { AUTH_CONFIG }
