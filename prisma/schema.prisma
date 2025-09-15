@@ -1066,6 +1066,7 @@ model Notification {
   related_entity_id     String?
   metadata              Json?
   status                String      @default("PENDING") // PENDING/DELIVERED/FAILED
+  is_read               Boolean     @default(false)
   read_at               DateTime?
   delivered_at          DateTime?
   delivery_details      Json?
@@ -2628,24 +2629,37 @@ model MachineMetrics {
 
 // Production stages tracking
 model ProductionStage {
-  id           String   @id @default(uuid())
-  workspace_id String
-  order_id     String
-  stage_name   String   // "cutting", "printing", "sewing", "qc", "finishing"
-  status       String   // "pending", "in_progress", "completed", "blocked"
-  started_at   DateTime?
-  completed_at DateTime?
-  notes        String?
-  metadata     Json?
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
+  id                   String   @id @default(uuid())
+  workspace_id         String
+  order_id             String
+  stage_name           String   // "cutting", "printing", "sewing", "qc", "finishing"
+  stage                String   // alias for stage_name for compatibility
+  status               String   // "pending", "in_progress", "completed", "blocked"
+  production_line_id   String?  // Production line assignment
+  assigned_to          String?  // User ID of assigned operator
+  assignedOperator     String?  // Additional operator assignment field
+  machine_id           String?  // Machine assignment
+  pieces_completed     Int?     @default(0)
+  pieces_total         Int?     @default(0)
+  start_time           DateTime? // Alias for started_at
+  end_time             DateTime? // Alias for completed_at
+  started_at           DateTime?
+  completed_at         DateTime?
+  efficiency_score     Float?   @default(0)
+  quality_score        Float?   @default(100)
+  notes                String?
+  metadata             Json?
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
 
   // Relations
-  workspace    Workspace @relation(fields: [workspace_id], references: [id])
-  order        Order     @relation(fields: [order_id], references: [id])
+  workspace            Workspace @relation(fields: [workspace_id], references: [id])
+  order                Order     @relation(fields: [order_id], references: [id])
 
+  @@unique([order_id, stage_name], map: "order_id_stage")
   @@index([workspace_id, order_id, stage_name])
   @@index([status, started_at])
+  @@index([production_line_id, assigned_to])
   @@map("production_stages")
 }
 
