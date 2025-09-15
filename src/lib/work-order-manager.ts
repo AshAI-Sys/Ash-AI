@@ -60,23 +60,23 @@ export interface WorkOrder {
   updated_at: Date;
 }
 
-// Work Order Template
-export interface WorkOrderTemplate {
-  id: string;
-  name: string;
-  type: WorkOrderType;
-  category: string;
-  description: string;
-  estimated_duration_hours: number;
-  materials_required: string[];
-  tools_required: string[];
-  skills_required: string[];
-  instructions: string;
-  quality_requirements?: string;
-  safety_notes?: string;
-  is_active: boolean;
-  workspace_id: string;
-}
+// Work Order Template - DISABLED (model not in schema)
+// export interface WorkOrderTemplate {
+//   id: string;
+//   name: string;
+//   type: WorkOrderType;
+//   category: string;
+//   description: string;
+//   estimated_duration_hours: number;
+//   materials_required: string[];
+//   tools_required: string[];
+//   skills_required: string[];
+//   instructions: string;
+//   quality_requirements?: string;
+//   safety_notes?: string;
+//   is_active: boolean;
+//   workspace_id: string;
+// }
 
 class WorkOrderManager {
   private static instance: WorkOrderManager;
@@ -116,7 +116,6 @@ class WorkOrderManager {
 
     const workOrder = await prisma.workOrder.create({
       data: {
-        work_order_number: workOrderNumber,
         type: data.type,
         status: 'PENDING',
         priority: data.priority,
@@ -125,18 +124,10 @@ class WorkOrderManager {
         order_id: data.order_id,
         production_stage: data.production_stage,
         machine_id: data.machine_id,
-        created_by: data.created_by,
-        estimated_duration_hours: data.estimated_duration_hours,
+        estimated_hours: data.estimated_duration_hours,
         scheduled_start: data.scheduled_start,
         scheduled_end: scheduledEnd,
-        materials_required: data.materials_required || [],
-        tools_required: data.tools_required || [],
-        skills_required: data.skills_required || [],
-        instructions: data.instructions,
-        quality_requirements: data.quality_requirements,
-        safety_notes: data.safety_notes,
         dependencies: data.dependencies || [],
-        progress_percentage: 0,
         workspace_id: data.workspace_id
       }
     });
@@ -145,55 +136,30 @@ class WorkOrderManager {
     await this.autoAssignWorkOrder(workOrder.id);
 
     // Log creation
-    console.log(`🎖️ [WORK ORDER] Created ${workOrder.work_order_number}: ${workOrder.title}`);
+    console.log(`🎖️ [WORK ORDER] Created ${workOrder.id}: ${workOrder.title}`);
 
     return workOrder as WorkOrder;
   }
 
-  // Create Work Order from Template
-  async createFromTemplate(templateId: string, data: {
-    order_id?: string;
-    production_stage?: string;
-    machine_id?: string;
-    scheduled_start: Date;
-    priority?: WorkOrderPriority;
-    created_by: string;
-    workspace_id: string;
-    customizations?: {
-      title?: string;
-      description?: string;
-      instructions?: string;
-      estimated_duration_hours?: number;
-    };
-  }): Promise<WorkOrder> {
-    const template = await prisma.workOrderTemplate.findUnique({
-      where: { id: templateId }
-    });
-
-    if (!template) {
-      throw new Error('Work order template not found');
-    }
-
-    return this.createWorkOrder({
-      type: template.type as WorkOrderType,
-      priority: data.priority || 'MEDIUM',
-      title: data.customizations?.title || template.name,
-      description: data.customizations?.description || template.description,
-      order_id: data.order_id,
-      production_stage: data.production_stage,
-      machine_id: data.machine_id,
-      estimated_duration_hours: data.customizations?.estimated_duration_hours || template.estimated_duration_hours,
-      scheduled_start: data.scheduled_start,
-      materials_required: template.materials_required,
-      tools_required: template.tools_required,
-      skills_required: template.skills_required,
-      instructions: data.customizations?.instructions || template.instructions,
-      quality_requirements: template.quality_requirements || undefined,
-      safety_notes: template.safety_notes || undefined,
-      created_by: data.created_by,
-      workspace_id: data.workspace_id
-    });
-  }
+  // Create Work Order from Template - DISABLED (WorkOrderTemplate model not in schema)
+  // async createFromTemplate(templateId: string, data: {
+  //   order_id?: string;
+  //   production_stage?: string;
+  //   machine_id?: string;
+  //   scheduled_start: Date;
+  //   priority?: WorkOrderPriority;
+  //   created_by: string;
+  //   workspace_id: string;
+  //   customizations?: {
+  //     title?: string;
+  //     description?: string;
+  //     instructions?: string;
+  //     estimated_duration_hours?: number;
+  //   };
+  // }): Promise<WorkOrder> {
+  //   // WorkOrderTemplate model doesn't exist in schema
+  //   throw new Error('WorkOrderTemplate functionality not available');
+  // }
 
   // Auto-assign Work Order
   async autoAssignWorkOrder(workOrderId: string): Promise<boolean> {
@@ -204,16 +170,16 @@ class WorkOrderManager {
 
       if (!workOrder) return false;
 
-      // Find available operators with required skills
+      // Find available operators
       const availableOperators = await this.findAvailableOperators(
-        workOrder.skills_required,
+        [],
         workOrder.scheduled_start,
         workOrder.scheduled_end,
         workOrder.workspace_id
       );
 
       if (availableOperators.length === 0) {
-        console.log(`🎖️ [WORK ORDER] No available operators for ${workOrder.work_order_number}`);
+        console.log(`🎖️ [WORK ORDER] No available operators for ${workOrder.id}`);
         return false;
       }
 
@@ -229,7 +195,7 @@ class WorkOrderManager {
           }
         });
 
-        console.log(`🎖️ [WORK ORDER] Auto-assigned ${workOrder.work_order_number} to ${bestOperator.name}`);
+        console.log(`🎖️ [WORK ORDER] Auto-assigned ${workOrder.id} to ${bestOperator.name}`);
         return true;
       }
 
@@ -260,13 +226,12 @@ class WorkOrderManager {
         machine_id: workOrder.machine_id || undefined,
         pieces_total: 100, // Default, should be calculated from order
         metadata: {
-          work_order_id: workOrderId,
-          work_order_number: workOrder.work_order_number
+          work_order_id: workOrderId
         }
       });
     }
 
-    console.log(`🎖️ [WORK ORDER] Started ${workOrder.work_order_number}`);
+    console.log(`🎖️ [WORK ORDER] Started ${workOrder.id}`);
     return workOrder as WorkOrder;
   }
 
@@ -283,29 +248,25 @@ class WorkOrderManager {
       updated_at: new Date()
     };
 
-    if (data.progress_percentage !== undefined) {
-      updateData.progress_percentage = Math.min(100, Math.max(0, data.progress_percentage));
-    }
+    // Progress tracking removed - not in schema
 
     const workOrder = await prisma.workOrder.update({
       where: { id: workOrderId },
       data: updateData
     });
 
-    // Create progress entry
-    await prisma.workOrderProgress.create({
-      data: {
-        work_order_id: workOrderId,
-        progress_percentage: data.progress_percentage || workOrder.progress_percentage,
-        notes: data.notes,
-        materials_used: data.materials_used || [],
-        quality_checks: data.quality_checks || [],
-        photos: data.photos || [],
-        issues_encountered: data.issues_encountered,
-        recorded_at: new Date(),
-        workspace_id: workOrder.workspace_id
-      }
-    });
+    // Progress tracking disabled - workOrderProgress model not in schema
+    // await prisma.workOrderProgress.create({
+    //   data: {
+    //     work_order_id: workOrderId,
+    //     materials_used: data.materials_used || [],
+    //     quality_checks: data.quality_checks || [],
+    //     photos: data.photos || [],
+    //     issues_encountered: data.issues_encountered,
+    //     recorded_at: new Date(),
+    //     workspace_id: workOrder.workspace_id
+    //   }
+    // });
 
     return workOrder as WorkOrder;
   }
@@ -329,14 +290,14 @@ class WorkOrderManager {
     const actualEnd = new Date();
     const actualDuration = workOrder.actual_start
       ? (actualEnd.getTime() - workOrder.actual_start.getTime()) / (1000 * 60 * 60) // hours
-      : data.actual_duration_override || workOrder.estimated_duration_hours;
+      : data.actual_duration_override || workOrder.estimated_hours;
 
     const updatedWorkOrder = await prisma.workOrder.update({
       where: { id: workOrderId },
       data: {
         status: 'COMPLETED',
         actual_end: actualEnd,
-        actual_duration_hours: actualDuration,
+        actual_hours: actualDuration,
         progress_percentage: 100,
         completion_notes: data.completion_notes,
         completion_photos: data.completion_photos || [],
@@ -353,7 +314,7 @@ class WorkOrderManager {
     // Check if this completion unblocks other work orders
     await this.checkDependentWorkOrders(workOrderId);
 
-    console.log(`🎖️ [WORK ORDER] Completed ${workOrder.work_order_number}`);
+    console.log(`🎖️ [WORK ORDER] Completed ${workOrder.id}`);
     return updatedWorkOrder as WorkOrder;
   }
 
@@ -361,7 +322,7 @@ class WorkOrderManager {
   async generateProductionWorkOrders(orderId: string, createdBy: string): Promise<WorkOrder[]> {
     const order = await prisma.order.findUnique({
       where: { id: orderId },
-      include: { productionStages: true }
+      include: { production_stages: true }
     });
 
     if (!order) {
@@ -383,7 +344,7 @@ class WorkOrderManager {
         description: `${stage} production stage for order ${order.po_number}`,
         order_id: orderId,
         production_stage: stage,
-        estimated_duration_hours: this.getStageEstimatedHours(stage, order.quantity || 1),
+        estimated_duration_hours: this.getStageEstimatedHours(stage, order.estimated_quantity || 1),
         scheduled_start: scheduledStart,
         instructions: this.getStageInstructions(stage),
         quality_requirements: this.getStageQualityRequirements(stage),
@@ -450,16 +411,9 @@ class WorkOrderManager {
     const date = new Date();
     const year = date.getFullYear().toString().slice(-2);
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const timestamp = Date.now().toString().slice(-4);
 
-    const count = await prisma.workOrder.count({
-      where: {
-        work_order_number: {
-          startsWith: `WO-${prefix}-${year}${month}`
-        }
-      }
-    });
-
-    return `WO-${prefix}-${year}${month}-${(count + 1).toString().padStart(4, '0')}`;
+    return `WO-${prefix}-${year}${month}-${timestamp}`;
   }
 
   private async findAvailableOperators(skillsRequired: string[], startTime: Date, endTime: Date, workspaceId: string) {
@@ -467,7 +421,7 @@ class WorkOrderManager {
       where: {
         workspace_id: workspaceId,
         role: { in: ['OPERATOR', 'PRODUCTION_MANAGER'] },
-        is_active: true,
+        active: true,
         skills: {
           hasSome: skillsRequired
         },
@@ -487,7 +441,7 @@ class WorkOrderManager {
     // Score operators based on skill match and current workload
     const scoredOperators = await Promise.all(
       operators.map(async (operator) => {
-        const skillMatch = this.calculateSkillMatch(operator.skills, workOrder.skills_required);
+        const skillMatch = this.calculateSkillMatch(operator.skills, []);
         const currentWorkload = await this.getCurrentWorkload(operator.id);
         const efficiency = operator.performance_rating || 100;
 

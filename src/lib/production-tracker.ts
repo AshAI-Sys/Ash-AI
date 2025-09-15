@@ -256,8 +256,7 @@ class ProductionTracker {
           }
         },
         include: {
-          order: true,
-          assignedOperator: true
+          order: true
         }
       });
 
@@ -326,7 +325,7 @@ class ProductionTracker {
           }
         },
         include: {
-          productionStages: {
+          production_stages: {
             where: {
               status: {
                 not: 'COMPLETED'

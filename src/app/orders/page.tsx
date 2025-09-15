@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-// Removed Layout import to prevent duplicate navigation
+import Layout from '@/components/Layout'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -330,7 +330,8 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <Layout>
+      <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto p-6">
         <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-6">
           <div className="p-6">
@@ -715,7 +716,8 @@ export default function OrdersPage() {
             </Card>
           )}
         </div>
+        </div>
       </div>
-    </div>
+    </Layout>
   )
 }

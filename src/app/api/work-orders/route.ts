@@ -137,7 +137,7 @@ async function POST(request: NextRequest) {
         return NextResponse.json({
           success: true,
           data: workOrder,
-          message: `Work order ${workOrder.work_order_number} created successfully`
+          message: `Work order ${workOrder.id} created successfully`
         });
 
       case 'create_from_template':
@@ -148,21 +148,10 @@ async function POST(request: NextRequest) {
           );
         }
 
-        const templateWorkOrder = await workOrderManager.createFromTemplate(
-          data.template_id,
-          {
-            ...data,
-            scheduled_start: new Date(data.scheduled_start),
-            created_by: session.user.id,
-            workspace_id
-          }
+        return NextResponse.json(
+          { success: false, error: 'Work order templates not available - model not in schema' },
+          { status: 501 }
         );
-
-        return NextResponse.json({
-          success: true,
-          data: templateWorkOrder,
-          message: `Work order ${templateWorkOrder.work_order_number} created from template`
-        });
 
       case 'generate_production':
         if (!data.order_id) {
@@ -240,7 +229,7 @@ async function PUT(request: NextRequest) {
         return NextResponse.json({
           success: true,
           data: startedWorkOrder,
-          message: `Work order ${startedWorkOrder.work_order_number} started`
+          message: `Work order ${startedWorkOrder.id} started`
         });
 
       case 'update_progress':
@@ -286,7 +275,7 @@ async function PUT(request: NextRequest) {
         return NextResponse.json({
           success: true,
           data: completedWorkOrder,
-          message: `Work order ${completedWorkOrder.work_order_number} completed`
+          message: `Work order ${completedWorkOrder.id} completed`
         });
 
       default:

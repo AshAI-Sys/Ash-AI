@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import Layout from '@/components/Layout'
 import {
   Activity,
   AlertTriangle,
@@ -79,20 +80,21 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen neural-bg p-6">
-      {/* Quantum Field Background */}
-      <div className="quantum-field">
-        {Array.from({ length: 15 }).map((_, i) => (
-          <div
-            key={i}
-            className="quantum-particle"
-            style={{
-              left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 6}s`,
-            }}
-          />
-        ))}
-      </div>
+    <Layout>
+      <div className="min-h-screen p-6">
+        {/* Quantum Field Background */}
+        <div className="quantum-field">
+          {Array.from({ length: 15 }).map((_, i) => (
+            <div
+              key={i}
+              className="quantum-particle"
+              style={{
+                left: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 6}s`,
+              }}
+            />
+          ))}
+        </div>
 
       {/* Dashboard Header */}
       <div className="relative z-10 mb-8">
@@ -375,5 +377,6 @@ export default function DashboardPage() {
         </Card>
       </div>
     </div>
+    </Layout>
   )
 }
