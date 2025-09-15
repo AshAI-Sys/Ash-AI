@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react'
+import Image from 'next/image'
 
 type LoginMode = 'admin' | 'client'
 
@@ -102,24 +103,36 @@ export default function TikTokLogin() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      {/* TikTok Sidebar */}
+      {/* ASH-AI Sidebar */}
       <div className="fixed left-0 top-0 h-full w-16 bg-black flex flex-col items-center py-4">
         <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center mb-8">
-          <span className="text-black font-bold text-sm">🎵</span>
+          <Image
+            src="/Ash-AI.png"
+            alt="ASH-AI"
+            width={24}
+            height={24}
+            className="object-contain"
+          />
         </div>
       </div>
 
       {/* Main Login Content */}
       <div className="ml-16 flex-1 flex items-center justify-center">
         <div className="w-full max-w-md">
-          {/* TikTok Header */}
+          {/* ASH-AI Header */}
           <div className="text-center mb-8">
             <div className="flex items-center justify-center space-x-2 mb-4">
               <div className="w-8 h-8 bg-black rounded-sm flex items-center justify-center">
-                <span className="text-white text-xs font-bold">🎵</span>
+                <Image
+                  src="/Ash-AI.png"
+                  alt="ASH-AI"
+                  width={20}
+                  height={20}
+                  className="object-contain"
+                />
               </div>
-              <span className="text-lg font-medium text-gray-600">TikTok</span>
-              <span className="text-lg font-medium text-gray-900">Seller Center</span>
+              <span className="text-lg font-medium text-gray-600">ASH-AI</span>
+              <span className="text-lg font-medium text-gray-900">Portal</span>
             </div>
             <h1 className="text-2xl font-semibold text-gray-900 mb-2">Sign in to your account</h1>
             <p className="text-gray-600">Access your dashboard and manage your business</p>
@@ -186,7 +199,7 @@ export default function TikTokLogin() {
                   <Input
                     id="password"
                     name="password"
-                    type={showPassword ? 'text' : 'password'}
+                    type="text"
                     placeholder="Enter your password"
                     value={formData.password}
                     onChange={handleInputChange}
@@ -258,7 +271,7 @@ export default function TikTokLogin() {
 
           {/* Footer */}
           <div className="text-center mt-6 text-sm text-gray-500">
-            <p>© 2024 TikTok Seller Center. All rights reserved.</p>
+            <p>© 2024 ASH-AI Portal. All rights reserved.</p>
           </div>
         </div>
       </div>

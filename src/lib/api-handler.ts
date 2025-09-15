@@ -4,6 +4,20 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { prisma, ensureDatabaseConnection } from '@/lib/prisma'
 import { Role } from '@prisma/client'
+import {
+  logError,
+  createSuccessResponse,
+  createErrorResponse,
+  createDatabaseError,
+  createAuthenticationError,
+  createAuthorizationError,
+  createValidationError,
+  createRateLimitError,
+  ErrorType,
+  ErrorSeverity,
+  type ErrorContext,
+  type ApplicationError
+} from '@/lib/error-handler'
 
 export interface ApiError {
   code: string
@@ -107,18 +121,25 @@ export function createApiErrorResponse(error: ApiError) {
   }, { status: error.statusCode })
 }
 
-export async function validateSession(requiredRoles?: Role[]): Promise<any> {
+export async function validateSession(requiredRoles?: Role[], context?: ErrorContext): Promise<any> {
   const session = await getServerSession(authOptions)
 
   if (!session || !session.user) {
-    throw new ApiException('UNAUTHORIZED', 'Authentication required', 401)
+    const authError = createAuthenticationError('Authentication required', context)
+    throw new ApiException('UNAUTHORIZED', authError.message, 401, authError)
   }
 
   if (requiredRoles && requiredRoles.length > 0) {
     if (!requiredRoles.includes(session.user.role)) {
-      throw new ApiException('FORBIDDEN', 'Insufficient permissions', 403, {
+      const authzError = createAuthorizationError(
+        'resource',
+        'access',
+        { ...context, userId: session.user.id }
+      )
+      throw new ApiException('FORBIDDEN', authzError.message, 403, {
         requiredRoles,
-        userRole: session.user.role
+        userRole: session.user.role,
+        applicationError: authzError
       })
     }
   }
@@ -159,10 +180,17 @@ export function withApiHandler(
         const identifier = `${clientIp}:${req.nextUrl.pathname}`
 
         if (!rateLimit(identifier, options.rateLimit.limit, options.rateLimit.windowMs)) {
-          throw new ApiException('RATE_LIMIT_EXCEEDED', 'Too many requests', 429, {
-            limit: options.rateLimit.limit,
-            windowMs: options.rateLimit.windowMs
-          })
+          const rateLimitError = createRateLimitError(
+            options.rateLimit.limit,
+            `${options.rateLimit.windowMs}ms`,
+            {
+              apiEndpoint: req.nextUrl.pathname,
+              ip: clientIp,
+              requestId,
+              timestamp: new Date().toISOString()
+            }
+          )
+          throw new ApiException('RATE_LIMIT_EXCEEDED', rateLimitError.message, 429, rateLimitError)
         }
       }
 
@@ -187,28 +215,89 @@ export function withApiHandler(
       return response
 
     } catch (error) {
-      console.error(`API Error [${requestId}]:`, error)
-
-      let apiError: ApiError
-
-      if (error instanceof ApiException) {
-        apiError = createApiError(error.code, error.message, error.statusCode, error.details, requestId)
-      } else if (error instanceof Error) {
-        // Handle Prisma errors
-        if (error.message.includes('P2002')) {
-          apiError = createApiError('DUPLICATE_ENTRY', 'Duplicate entry found', 409, { originalError: error.message }, requestId)
-        } else if (error.message.includes('P2025')) {
-          apiError = createApiError('NOT_FOUND', 'Record not found', 404, { originalError: error.message }, requestId)
-        } else if (error.message.includes('P2003')) {
-          apiError = createApiError('FOREIGN_KEY_CONSTRAINT', 'Foreign key constraint failed', 400, { originalError: error.message }, requestId)
-        } else {
-          apiError = createApiError('INTERNAL_ERROR', error.message || 'An unexpected error occurred', 500, { originalError: error.message }, requestId)
-        }
-      } else {
-        apiError = createApiError('UNKNOWN_ERROR', 'An unknown error occurred', 500, { error }, requestId)
+      // Create comprehensive error context
+      const errorContext: ErrorContext = {
+        apiEndpoint: req.nextUrl.pathname,
+        userAgent: req.headers.get('user-agent') || undefined,
+        ip: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || undefined,
+        requestId,
+        timestamp: new Date().toISOString()
       }
 
-      return createApiErrorResponse(apiError)
+      let applicationError: ApplicationError
+
+      if (error instanceof ApiException) {
+        // Convert existing ApiException to ApplicationError
+        applicationError = {
+          type: ErrorType.SYSTEM,
+          severity: ErrorSeverity.MEDIUM,
+          message: error.message,
+          context: errorContext,
+          metadata: { code: error.code, details: error.details },
+          retryable: error.statusCode >= 500
+        }
+      } else if (error instanceof Error) {
+        // Enhanced Prisma error handling
+        if (error.message.includes('P2002')) {
+          applicationError = createValidationError('unique_constraint', 'Duplicate entry found', errorContext)
+        } else if (error.message.includes('P2025')) {
+          applicationError = {
+            type: ErrorType.NOT_FOUND,
+            severity: ErrorSeverity.LOW,
+            message: 'Record not found',
+            context: errorContext,
+            retryable: false
+          }
+        } else if (error.message.includes('P2003')) {
+          applicationError = createValidationError('foreign_key', 'Foreign key constraint failed', errorContext)
+        } else if (error.message.includes('P1001')) {
+          applicationError = createDatabaseError('connection', error, errorContext)
+        } else if (error.message.includes('P1008')) {
+          applicationError = createDatabaseError('timeout', error, errorContext)
+        } else {
+          applicationError = createDatabaseError('operation', error, errorContext)
+        }
+      } else {
+        applicationError = {
+          type: ErrorType.SYSTEM,
+          severity: ErrorSeverity.HIGH,
+          message: 'An unknown error occurred',
+          context: errorContext,
+          metadata: { originalError: error },
+          retryable: true
+        }
+      }
+
+      // Log the error using our comprehensive logging system
+      await logError(applicationError, errorContext)
+
+      // Determine HTTP status code
+      const statusCode = error instanceof ApiException ? error.statusCode :
+                        applicationError.type === ErrorType.NOT_FOUND ? 404 :
+                        applicationError.type === ErrorType.VALIDATION ? 400 :
+                        applicationError.type === ErrorType.AUTHENTICATION ? 401 :
+                        applicationError.type === ErrorType.AUTHORIZATION ? 403 :
+                        applicationError.type === ErrorType.RATE_LIMIT ? 429 :
+                        applicationError.type === ErrorType.DATABASE ? 503 : 500
+
+      // Create comprehensive error response
+      const errorResponse = {
+        success: false,
+        error: applicationError.message,
+        type: applicationError.type,
+        severity: applicationError.severity,
+        retryable: applicationError.retryable || false,
+        requestId,
+        timestamp: new Date().toISOString(),
+        context: process.env.NODE_ENV === 'development' ? applicationError.context : undefined,
+        metadata: process.env.NODE_ENV === 'development' ? applicationError.metadata : undefined
+      }
+
+      const response = NextResponse.json(errorResponse, { status: statusCode })
+      response.headers.set('X-Request-ID', requestId)
+      response.headers.set('X-Response-Time', `${Date.now() - startTime}ms`)
+
+      return response
     }
   }
 }

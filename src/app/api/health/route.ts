@@ -1,8 +1,14 @@
 // @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
-import { createSuccessResponse, createErrorResponse, asyncHandler } from '@/lib/error-handler'
+import {
+  createSuccessResponse,
+  createErrorResponse,
+  createHealthCheckError,
+  logError,
+  ErrorType,
+  ErrorSeverity
+} from '@/lib/error-handler'
 import { checkDatabaseConnection } from '@/lib/prisma'
-import { withApiHandler, createApiResponse, ApiException } from '@/lib/api-handler'
 
 // System Health Check - CLIENT_UPDATED_PLAN.md Implementation
 // Comprehensive health monitoring for all ASH AI components
@@ -42,20 +48,18 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    return NextResponse.json(
-      createSuccessResponse(health, 'System health check completed'),
-      { 
-        status: health.status === 'healthy' ? 200 : 503,
-        headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate'
-        }
+    return createSuccessResponse(health, 'System health check completed')
+  } catch (_error) {
+    const healthError = createHealthCheckError(
+      'system',
+      _error instanceof Error ? _error.message : 'Unknown error',
+      {
+        apiEndpoint: '/api/health',
+        userAgent: request.headers.get('user-agent') || undefined,
+        ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || undefined
       }
     )
-  } catch (_error) {
-    return NextResponse.json(
-      createErrorResponse(error),
-      { status: 500 }
-    )
+    return createErrorResponse(healthError, 503)
   }
 }
 
@@ -122,13 +126,17 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json(
-      createSuccessResponse(result, 'System diagnostics completed')
-    )
+    return createSuccessResponse(result, 'System diagnostics completed')
   } catch (_error) {
-    return NextResponse.json(
-      createErrorResponse(error),
-      { status: 500 }
+    const healthError = createHealthCheckError(
+      'diagnostics',
+      _error instanceof Error ? _error.message : 'Unknown error',
+      {
+        apiEndpoint: '/api/health',
+        userAgent: request.headers.get('user-agent') || undefined,
+        ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || undefined
+      }
     )
+    return createErrorResponse(healthError, 500)
   }
 }
