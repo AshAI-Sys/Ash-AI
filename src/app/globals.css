@@ -1,61 +1,33 @@
 @import "tailwindcss";
 
-/* TikTok-style Clean Interface - Force Light Theme */
-html, body {
-  background: #f9fafb !important;
-  color: #111827 !important;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-}
-
-/* Force all main content areas to be light */
-#__next, .main-content, main, [data-main-content] {
-  background: #f9fafb !important;
-  color: #111827 !important;
-}
-
-/* Override any dark themes */
+/* TikTok-Style Dark Theme */
 * {
   box-sizing: border-box;
 }
 
-/* Clean TikTok-style interface */
-.tiktok-container {
-  background: white;
-  min-height: 100vh;
+html, body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
 }
 
-/* Remove any dark backgrounds - Stronger overrides */
-.dark, .neural-bg, .quantum-field, [data-theme="dark"], .bg-black, .bg-gray-900, .bg-slate-900 {
-  background: #f9fafb !important;
-  color: #111827 !important;
+/* Allow Tailwind utilities to work properly */
+.dashboard-container {
+  /* Let Tailwind handle all styling */
 }
 
-/* Force all divs to have light background */
-div, section, main, article {
-  background-color: inherit !important;
+/* Smooth transitions for TikTok-style interactions */
+button, .card, .tab {
+  transition: all 0.2s ease-in-out;
 }
 
-/* Override any flex containers that might be dark */
-.flex, .grid {
-  background: inherit !important;
+/* Glassmorphism effect support */
+.glassmorphism {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
-/* Ensure all text is visible */
-h1, h2, h3, h4, h5, h6, p, span, div {
-  color: inherit !important;
-}
-
-/* TikTok-style button overrides */
-button {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-}
-
-/* Clean card styles */
-.card {
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+/* Gradient text support */
+.gradient-text {
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }

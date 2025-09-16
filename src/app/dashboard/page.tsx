@@ -2,54 +2,10 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
-import Layout from '@/components/Layout'
-import {
-  Activity,
-  AlertTriangle,
-  BarChart3,
-  Brain,
-  Calendar,
-  CheckCircle2,
-  Clock,
-  Crown,
-  DollarSign,
-  FileText,
-  Package,
-  Palette,
-  Plus,
-  Printer,
-  Scissors,
-  Settings,
-  Shield,
-  Star,
-  Target,
-  TrendingUp,
-  Users,
-  Wallet,
-  Wrench,
-  Zap,
-  ArrowUp,
-  ArrowDown,
-  Info,
-  MessageCircle,
-  Bell,
-  HelpCircle,
-  ChevronDown,
-  Filter,
-  Search,
-  Calendar as CalendarIcon,
-  LineChart,
-  Eye,
-  PlayCircle,
-  ShoppingCart,
-  Video,
-  Shirt
-} from 'lucide-react'
 
 export default function DashboardPage() {
   const [mounted, setMounted] = useState(false)
+  const [activeTab, setActiveTab] = useState('overview')
 
   useEffect(() => {
     setMounted(true)
@@ -57,65 +13,191 @@ export default function DashboardPage() {
 
   if (!mounted) {
     return (
-      <Layout>
-        <div className="min-h-screen bg-white flex items-center justify-center" style={{ backgroundColor: '#ffffff', color: '#000000' }}>
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Loading Dashboard...</h1>
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-          </div>
+      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-purple-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-bounce text-6xl mb-4">🎵</div>
+          <h1 className="text-4xl font-bold text-white mb-4">Loading ASH AI...</h1>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto"></div>
         </div>
-      </Layout>
+      </div>
     )
   }
 
   return (
-    <Layout>
-      <div className="min-h-screen p-6" style={{ backgroundColor: '#ffffff', color: '#000000' }}>
-        {/* Simple Test Content */}
-        <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
-          <h1 className="text-4xl font-bold text-gray-900 mb-6">🎉 ASH AI Dashboard</h1>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
-              <h3 className="text-lg font-semibold text-blue-900 mb-2">TikTok-Style Analytics</h3>
-              <p className="text-3xl font-bold text-blue-600">₱271,303</p>
-              <p className="text-sm text-blue-700">GMV - vs last 7 days: +43.56%</p>
+    <div className="dashboard-container min-h-screen bg-gradient-to-br from-black via-gray-900 to-purple-900">
+      {/* TikTok-Style Header */}
+      <div className="sticky top-0 z-50 bg-black/80 backdrop-blur-md border-b border-gray-700">
+        <div className="px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
+              <span className="text-white font-bold text-lg">A</span>
             </div>
-
-            <div className="bg-green-50 p-6 rounded-lg border border-green-200">
-              <h3 className="text-lg font-semibold text-green-900 mb-2">Manufacturing Center</h3>
-              <p className="text-3xl font-bold text-green-600">884</p>
-              <p className="text-sm text-green-700">Items Sold This Week</p>
-            </div>
-
-            <div className="bg-purple-50 p-6 rounded-lg border border-purple-200">
-              <h3 className="text-lg font-semibold text-purple-900 mb-2">AI Powered System</h3>
-              <p className="text-3xl font-bold text-purple-600">✅ WORKING</p>
-              <p className="text-sm text-purple-700">All Systems Operational</p>
+            <div>
+              <h1 className="text-white font-bold text-xl">ASH AI</h1>
+              <p className="text-gray-400 text-xs">Manufacturing ERP</p>
             </div>
           </div>
 
-          <div className="bg-gray-50 p-6 rounded-lg border">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">🚀 Dashboard Successfully Loaded!</h2>
-            <div className="space-y-2 text-gray-700">
-              <p>✅ <strong>Server Status:</strong> Running & Healthy</p>
-              <p>✅ <strong>CSS Theme:</strong> Light Background Applied</p>
-              <p>✅ <strong>Layout:</strong> Working Correctly</p>
-              <p>✅ <strong>Dashboard:</strong> Content Visible</p>
-              <p>✅ <strong>Navigation:</strong> Sidebar Active</p>
-            </div>
-
-            <div className="mt-6 p-4 bg-white rounded border border-blue-200">
-              <p className="text-lg text-gray-800">
-                <strong>Congratulations!</strong> Your ASH AI Manufacturing Center is now fully operational with the TikTok-style interface.
-              </p>
-              <p className="text-sm text-gray-600 mt-2">
-                The system includes Order Management, Production Tracking, Quality Control, AI Assistant, and complete ERP functionality.
-              </p>
-            </div>
+          <div className="flex items-center space-x-2">
+            <button className="p-2 rounded-full bg-gray-800 hover:bg-gray-700 transition-colors">
+              <div className="w-5 h-5 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full animate-pulse"></div>
+            </button>
+            <button className="p-2 rounded-full bg-gray-800 hover:bg-gray-700 transition-colors">
+              <span className="text-white text-lg">💬</span>
+            </button>
+            <button className="p-2 rounded-full bg-gray-800 hover:bg-gray-700 transition-colors">
+              <span className="text-white text-lg">🔔</span>
+            </button>
           </div>
         </div>
       </div>
-    </Layout>
+
+      {/* Main Content */}
+      <div className="p-4 space-y-6">
+        {/* TikTok-Style Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-gradient-to-r from-pink-500/20 to-purple-600/20 backdrop-blur-sm border border-pink-500/30 rounded-2xl p-6 hover:scale-105 transition-transform cursor-pointer">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-2xl">💰</span>
+              <span className="text-green-400 text-sm font-bold bg-green-400/20 px-2 py-1 rounded-full">+43.56%</span>
+            </div>
+            <h3 className="text-white font-bold text-lg mb-1">Revenue</h3>
+            <p className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400">₱271,303</p>
+            <p className="text-gray-400 text-sm">Last 7 days</p>
+          </div>
+
+          <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 backdrop-blur-sm border border-blue-500/30 rounded-2xl p-6 hover:scale-105 transition-transform cursor-pointer">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-2xl">📦</span>
+              <span className="text-blue-400 text-sm font-bold bg-blue-400/20 px-2 py-1 rounded-full">LIVE</span>
+            </div>
+            <h3 className="text-white font-bold text-lg mb-1">Production</h3>
+            <p className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">884</p>
+            <p className="text-gray-400 text-sm">Items this week</p>
+          </div>
+
+          <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 backdrop-blur-sm border border-green-500/30 rounded-2xl p-6 hover:scale-105 transition-transform cursor-pointer">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-2xl">🤖</span>
+              <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+            </div>
+            <h3 className="text-white font-bold text-lg mb-1">AI Status</h3>
+            <p className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400">ACTIVE</p>
+            <p className="text-gray-400 text-sm">All systems operational</p>
+          </div>
+        </div>
+
+        {/* TikTok-Style Navigation Tabs */}
+        <div className="flex space-x-1 bg-black/50 backdrop-blur-sm rounded-2xl p-1 border border-gray-700">
+          {[
+            { id: 'overview', label: '📊 Overview', icon: '📊' },
+            { id: 'orders', label: '📋 Orders', icon: '📋' },
+            { id: 'production', label: '🏭 Production', icon: '🏭' },
+            { id: 'ai', label: '🤖 AI Hub', icon: '🤖' }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex-1 px-4 py-3 rounded-xl font-semibold transition-all ${
+                activeTab === tab.id
+                  ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
+              }`}
+            >
+              <span className="text-lg mr-2">{tab.icon}</span>
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* TikTok-Style Action Buttons */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <button className="bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white font-bold py-4 px-6 rounded-2xl transform hover:scale-105 transition-all shadow-lg">
+            <div className="text-2xl mb-2">➕</div>
+            <div>New Order</div>
+          </button>
+
+          <button className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold py-4 px-6 rounded-2xl transform hover:scale-105 transition-all shadow-lg">
+            <div className="text-2xl mb-2">🏭</div>
+            <div>Production</div>
+          </button>
+
+          <button className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white font-bold py-4 px-6 rounded-2xl transform hover:scale-105 transition-all shadow-lg">
+            <div className="text-2xl mb-2">📊</div>
+            <div>Analytics</div>
+          </button>
+
+          <button className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold py-4 px-6 rounded-2xl transform hover:scale-105 transition-all shadow-lg">
+            <div className="text-2xl mb-2">🤖</div>
+            <div>Ask Ashley</div>
+          </button>
+        </div>
+
+        {/* Content Area */}
+        <div className="bg-black/30 backdrop-blur-sm border border-gray-700 rounded-2xl p-6">
+          {activeTab === 'overview' && (
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold text-white mb-4">📈 Business Overview</h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-xl p-4 border border-gray-600">
+                  <h3 className="text-white font-semibold mb-3">🔥 Today's Highlights</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between text-gray-300">
+                      <span>Active Orders</span>
+                      <span className="text-yellow-400 font-bold">24</span>
+                    </div>
+                    <div className="flex justify-between text-gray-300">
+                      <span>Production Lines</span>
+                      <span className="text-green-400 font-bold">8/10</span>
+                    </div>
+                    <div className="flex justify-between text-gray-300">
+                      <span>Quality Score</span>
+                      <span className="text-blue-400 font-bold">98.5%</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-xl p-4 border border-gray-600">
+                  <h3 className="text-white font-semibold mb-3">⚡ Quick Actions</h3>
+                  <div className="space-y-2">
+                    <button className="w-full text-left p-2 rounded-lg bg-gray-700/50 hover:bg-gray-600/50 transition-colors text-gray-300 text-sm">
+                      📝 Create Purchase Order
+                    </button>
+                    <button className="w-full text-left p-2 rounded-lg bg-gray-700/50 hover:bg-gray-600/50 transition-colors text-gray-300 text-sm">
+                      🔍 Track Production
+                    </button>
+                    <button className="w-full text-left p-2 rounded-lg bg-gray-700/50 hover:bg-gray-600/50 transition-colors text-gray-300 text-sm">
+                      💳 Generate Invoice
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'orders' && (
+            <div>
+              <h2 className="text-2xl font-bold text-white mb-4">📋 Order Management</h2>
+              <p className="text-gray-400">Order management interface coming soon...</p>
+            </div>
+          )}
+
+          {activeTab === 'production' && (
+            <div>
+              <h2 className="text-2xl font-bold text-white mb-4">🏭 Production Dashboard</h2>
+              <p className="text-gray-400">Production tracking interface coming soon...</p>
+            </div>
+          )}
+
+          {activeTab === 'ai' && (
+            <div>
+              <h2 className="text-2xl font-bold text-white mb-4">🤖 Ashley AI Hub</h2>
+              <p className="text-gray-400">AI assistant interface coming soon...</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   )
 }
