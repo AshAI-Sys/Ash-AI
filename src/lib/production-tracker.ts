@@ -285,7 +285,7 @@ class ProductionTracker {
       }, {} as Record<string, number>);
 
       const bottleneckStage = Object.entries(stageCounts)
-        .sort(([,a], [,b]) => b - a)[0]?.[0] as ProductionStage;
+        .sort(([,a], [,b]) => (b as number) - (a as number))[0]?.[0] as ProductionStage;
 
       const metrics: ProductionLineMetrics = {
         line_id,

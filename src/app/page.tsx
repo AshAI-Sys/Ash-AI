@@ -17,10 +17,6 @@ export default function Home() {
   useEffect(() => {
     if (status === 'loading') return
 
-    // Always redirect to dashboard for testing TikTok design
-    router.push('/dashboard')
-    return
-
     if (session) {
       router.push('/dashboard')
       return

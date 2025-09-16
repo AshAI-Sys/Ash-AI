@@ -163,48 +163,162 @@ export default function DashboardPage() {
         <div className="bg-black/30 backdrop-blur-sm border border-gray-700 rounded-2xl p-6">
           {activeTab === 'overview' && (
             <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-white mb-4">📈 Business Overview</h2>
+              {/* Business Data Cards Row */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/20 rounded-xl p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-blue-400 text-sm font-medium">GMV</span>
+                    <span className="text-green-400 text-xs bg-green-400/10 px-2 py-1 rounded-full">+43.56%</span>
+                  </div>
+                  <div className="text-2xl font-bold text-white mb-1">₱271,303</div>
+                  <div className="text-xs text-gray-400">vs last 7 days</div>
+                  <div className="text-xs text-blue-400 mt-2 cursor-pointer hover:text-blue-300">View breakdown ↗</div>
+                </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-xl p-4 border border-gray-600">
-                  <h3 className="text-white font-semibold mb-3">🔥 Today's Highlights</h3>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between text-gray-300">
-                      <span>Active Orders</span>
-                      <span className="text-yellow-400 font-bold">24</span>
-                    </div>
-                    <div className="flex justify-between text-gray-300">
-                      <span>Production Lines</span>
-                      <span className="text-green-400 font-bold">8/10</span>
-                    </div>
-                    <div className="flex justify-between text-gray-300">
-                      <span>Quality Score</span>
-                      <span className="text-blue-400 font-bold">98.5%</span>
+                <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-xl p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-purple-400 text-sm font-medium">Gross revenue</span>
+                    <span className="text-green-400 text-xs bg-green-400/10 px-2 py-1 rounded-full">+48.34%</span>
+                  </div>
+                  <div className="text-2xl font-bold text-white mb-1">₱284,728</div>
+                  <div className="text-xs text-gray-400">vs last 7 days</div>
+                  <div className="text-xs text-purple-400 mt-2 cursor-pointer hover:text-purple-300">View breakdown ↗</div>
+                </div>
+
+                <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-green-400 text-sm font-medium">Items sold</span>
+                    <span className="text-green-400 text-xs bg-green-400/10 px-2 py-1 rounded-full">+64.6%</span>
+                  </div>
+                  <div className="text-2xl font-bold text-white mb-1">884</div>
+                  <div className="text-xs text-gray-400">vs last 7 days</div>
+                  <div className="text-xs text-green-400 mt-2 cursor-pointer hover:text-green-300">View breakdown ↗</div>
+                </div>
+
+                <div className="bg-gradient-to-br from-orange-500/10 to-red-500/10 border border-orange-500/20 rounded-xl p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-orange-400 text-sm font-medium">Today's data</span>
+                    <span className="text-gray-400 text-xs">Last updated: 17:39</span>
+                  </div>
+                  <div className="text-2xl font-bold text-white mb-1">₱62,991</div>
+                  <div className="text-xs text-gray-400">Yesterday ₱50,340</div>
+                  <div className="text-xs text-orange-400 mt-2 cursor-pointer hover:text-orange-300">Trends ↗</div>
+                </div>
+              </div>
+
+              {/* Performance Chart Area */}
+              <div className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 border border-gray-600/50 rounded-xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-white font-semibold">Business performance</h3>
+                  <div className="flex space-x-2">
+                    <button className="text-xs px-3 py-1 bg-blue-500 text-white rounded-full">GMV</button>
+                    <button className="text-xs px-3 py-1 bg-gray-600 text-gray-300 rounded-full hover:bg-gray-500">Gross revenue</button>
+                  </div>
+                </div>
+
+                {/* Simple Chart Area */}
+                <div className="bg-gray-800/30 rounded-lg p-4 h-48 border border-gray-700/50">
+                  <div className="flex items-end h-full space-x-2">
+                    {[40, 45, 35, 55, 60, 48, 65, 70, 58, 75, 80, 85].map((height, i) => (
+                      <div
+                        key={i}
+                        className="bg-gradient-to-t from-blue-500 to-blue-400 rounded-sm flex-1"
+                        style={{ height: `${height}%` }}
+                      ></div>
+                    ))}
+                  </div>
+                  <div className="flex justify-between mt-2 text-xs text-gray-400">
+                    <span>Sep 02</span>
+                    <span className="text-green-400">↗ +43.56%</span>
+                    <span>Sep 08</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Sales Sources Section */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 border border-gray-600/50 rounded-xl p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-white font-medium flex items-center">
+                      <span className="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
+                      LIVE
+                    </h4>
+                    <span className="text-blue-400 text-xs cursor-pointer hover:text-blue-300">View analytics ↗</span>
+                  </div>
+                  <div className="text-xl font-bold text-white mb-1">₱42,934.04</div>
+                  <div className="text-xs text-gray-400 mb-3">GMV from 1 out of operated accounts</div>
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2 text-sm">
+                      <div className="w-8 h-8 bg-orange-500 rounded flex items-center justify-center text-white font-bold">S</div>
+                      <div>
+                        <div className="text-white">₱17,164.69</div>
+                        <div className="text-xs text-gray-400">2025/09/16 16:01 • @norbertcx</div>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-xl p-4 border border-gray-600">
-                  <h3 className="text-white font-semibold mb-3">⚡ Quick Actions</h3>
+                <div className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 border border-gray-600/50 rounded-xl p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-white font-medium flex items-center">
+                      <span className="w-3 h-3 bg-yellow-500 rounded-full mr-2"></span>
+                      Videos
+                    </h4>
+                    <span className="text-blue-400 text-xs cursor-pointer hover:text-blue-300">View analytics ↗</span>
+                  </div>
+                  <div className="text-xl font-bold text-white mb-1">₱239</div>
+                  <div className="text-xs text-gray-400 mb-3">GMV from 1 direct accounts</div>
                   <div className="space-y-2">
-                    <button
-                      onClick={() => router.push('/orders')}
-                      className="w-full text-left p-2 rounded-lg bg-gray-700/50 hover:bg-gray-600/50 transition-colors text-gray-300 text-sm"
-                    >
-                      📝 Create Purchase Order
-                    </button>
-                    <button
-                      onClick={() => router.push('/production')}
-                      className="w-full text-left p-2 rounded-lg bg-gray-700/50 hover:bg-gray-600/50 transition-colors text-gray-300 text-sm"
-                    >
-                      🔍 Track Production
-                    </button>
-                    <button
-                      onClick={() => router.push('/finance')}
-                      className="w-full text-left p-2 rounded-lg bg-gray-700/50 hover:bg-gray-600/50 transition-colors text-gray-300 text-sm"
-                    >
-                      💳 Generate Invoice
-                    </button>
+                    <div className="flex items-center space-x-2 text-sm">
+                      <div className="w-8 h-8 bg-purple-500 rounded flex items-center justify-center text-white">🎥</div>
+                      <div>
+                        <div className="text-white">₱259</div>
+                        <div className="text-xs text-gray-400">2024/09/15 17:44 • #99 Hoodied Little...</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 border border-gray-600/50 rounded-xl p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-white font-medium flex items-center">
+                      <span className="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>
+                      Product cards
+                    </h4>
+                    <span className="text-blue-400 text-xs cursor-pointer hover:text-blue-300">View analytics ↗</span>
+                  </div>
+                  <div className="text-xl font-bold text-white mb-1">₱6,602.38</div>
+                  <div className="text-xs text-gray-400 mb-3">GMV from 16 product cards</div>
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2 text-sm">
+                      <div className="w-8 h-8 bg-gray-700 rounded flex items-center justify-center text-white">👕</div>
+                      <div>
+                        <div className="text-white">₱2,310.90</div>
+                        <div className="text-xs text-gray-400">SUPER CLOTH PRINT - DARK DAYS (D) #2</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Business Accelerator */}
+              <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-white font-medium">🚀 Business accelerator</h4>
+                  <span className="text-green-400 text-xs cursor-pointer hover:text-green-300">More ↗</span>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-300">Optimize product info that f...</span>
+                    <span className="text-green-400 bg-green-400/10 px-2 py-1 rounded text-xs">Could increase sales by 7%</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-300">Optimize product margins</span>
+                    <span className="text-green-400 bg-green-400/10 px-2 py-1 rounded text-xs">Could increase sales by 7%</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-300">Improve search traffic wit...</span>
+                    <span className="text-green-400 bg-green-400/10 px-2 py-1 rounded text-xs">Could increase sales by 7%</span>
                   </div>
                 </div>
               </div>

@@ -97,7 +97,7 @@ async function POST(request: NextRequest) {
     }
 
     const userRole = session.user.role as Role;
-    if (!['ADMIN', 'MANAGER', 'PRODUCTION_MANAGER', 'OPERATOR'].includes(userRole)) {
+    if (!['ADMIN', 'MANAGER', 'OPERATOR'].includes(userRole)) {
       return NextResponse.json(
         { success: false, error: 'Insufficient permissions' },
         { status: 403 }
