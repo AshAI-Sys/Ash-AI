@@ -54,36 +54,25 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (status === 'loading') return
-    if (!session) {
-      router.push('/auth/signin')
-      return
-    }
+    // Bypass authentication for testing TikTok design
     setMounted(true)
   }, [session, status, router])
 
   if (status === 'loading' || !mounted) {
     return (
-      <div className="flex h-screen neural-bg items-center justify-center">
-        <div className="text-center">
+      <div className="flex h-screen bg-gray-50 items-center justify-center">
+        <div className="text-center bg-white rounded-lg shadow-sm border border-gray-200 p-8">
           <div className="relative mb-6 mx-auto w-16 h-16">
-            <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/20 to-cyan-400/30 rounded-full blur-lg animate-pulse"></div>
-            <div className="absolute inset-1 bg-gradient-to-br from-cyan-400/30 to-cyan-500/40 rounded-full border border-cyan-400/50 animate-pulse"></div>
-            <div className="relative w-full h-full rounded-full bg-gradient-to-br from-slate-900 to-slate-800 border-2 border-cyan-500/60 flex items-center justify-center shadow-xl shadow-cyan-500/20">
-              <img
-                src="/ash-ai-logo-hero.svg"
-                alt="ASH AI Logo"
-                className="w-20 h-8 object-contain z-10 relative filter brightness-125 contrast-125 animate-pulse shadow-lg shadow-cyan-500/40"
-              />
-              <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/10 to-cyan-400/20 rounded-full animate-pulse"></div>
-            </div>
-            <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-cyan-400 to-cyan-500 rounded-full border-2 border-slate-900 animate-pulse flex items-center justify-center">
-              <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
+            <div className="w-full h-full rounded-full bg-white border-2 border-gray-200 flex items-center justify-center shadow-sm">
+              <div className="w-8 h-8 bg-black rounded flex items-center justify-center">
+                <span className="text-white text-sm font-bold">🎖️</span>
+              </div>
             </div>
           </div>
-          <p className="text-cyan-300 font-medium">Loading ASH AI Dashboard...</p>
-          <div className="flex items-center justify-center gap-2 mt-2 text-xs text-cyan-400/80">
-            <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
-            <span className="font-medium">NEURAL INTERFACE STARTING</span>
+          <p className="text-gray-900 font-medium mb-2">Loading ASH AI Dashboard...</p>
+          <div className="flex items-center justify-center gap-2 text-xs text-gray-600">
+            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+            <span className="font-medium">Manufacturing Center</span>
           </div>
         </div>
       </div>
