@@ -347,8 +347,8 @@ function Layout({ children }: LayoutProps) {
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex-1 overflow-auto">
+        <div className="flex-1 flex flex-col overflow-hidden bg-gray-50">
+          <div className="flex-1 overflow-auto bg-gray-50">
             {children}
           </div>
         </div>
@@ -431,8 +431,8 @@ function Layout({ children }: LayoutProps) {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="flex-1 overflow-auto">
+      <div className="flex-1 flex flex-col overflow-hidden bg-gray-50">
+        <div className="flex-1 overflow-auto bg-gray-50">
           {children}
         </div>
       </div>
