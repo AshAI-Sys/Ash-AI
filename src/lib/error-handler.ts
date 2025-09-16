@@ -12,9 +12,11 @@ export enum ErrorType {
   AUTHORIZATION = 'AUTHORIZATION',
   NOT_FOUND = 'NOT_FOUND',
   BUSINESS_LOGIC = 'BUSINESS_LOGIC',
+  BUSINESS = 'BUSINESS',
   EXTERNAL_SERVICE = 'EXTERNAL_SERVICE',
   RATE_LIMIT = 'RATE_LIMIT',
-  SYSTEM = 'SYSTEM'
+  SYSTEM = 'SYSTEM',
+  API = 'API'
 }
 
 export enum ErrorSeverity {
@@ -29,10 +31,17 @@ export interface ErrorContext {
   workspaceId?: string
   orderId?: string
   apiEndpoint?: string
+  endpoint?: string
   userAgent?: string
   ip?: string
   requestId?: string
   timestamp?: string
+  materialCode?: string
+  materialId?: string
+  alerts?: any
+  error?: any
+  alertType?: string
+  reservations?: any
 }
 
 export interface ApplicationError {

@@ -44,311 +44,227 @@ import {
   Filter,
   Search,
   Calendar as CalendarIcon,
-  LineChart
+  LineChart,
+  Eye,
+  PlayCircle,
+  ShoppingCart,
+  Video,
+  Shirt
 } from 'lucide-react'
 
 export default function DashboardPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
-  const [mounted, setMounted] = useState(false)
+  const [activeTab, setActiveTab] = useState('home')
 
-  useEffect(() => {
-    if (status === 'loading') return
-    // Bypass authentication for testing TikTok design
-    setMounted(true)
-  }, [session, status, router])
+  // Mock data for TikTok-style analytics
+  const businessData = [
+    {
+      title: 'GMV',
+      value: '₱271,303',
+      subtitle: 'vs last 7 days: +43.56%',
+      trend: 'up',
+      color: 'teal'
+    },
+    {
+      title: 'Gross revenue',
+      value: '₱264,728',
+      subtitle: 'vs last 7 days: +44.58%',
+      trend: 'up',
+      color: 'teal'
+    },
+    {
+      title: 'Items sold',
+      value: '884',
+      subtitle: 'vs last 7 days: +56.4%',
+      trend: 'up',
+      color: 'orange'
+    }
+  ]
 
-  if (status === 'loading' || !mounted) {
-    return (
-      <div className="flex h-screen bg-gray-50 items-center justify-center">
-        <div className="text-center bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-          <div className="relative mb-6 mx-auto w-16 h-16">
-            <div className="w-full h-full rounded-full bg-white border-2 border-gray-200 flex items-center justify-center shadow-sm">
-              <div className="w-8 h-8 bg-black rounded flex items-center justify-center">
-                <span className="text-white text-sm font-bold">🎖️</span>
-              </div>
-            </div>
-          </div>
-          <p className="text-gray-900 font-medium mb-2">Loading ASH AI Dashboard...</p>
-          <div className="flex items-center justify-center gap-2 text-xs text-gray-600">
-            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-            <span className="font-medium">Manufacturing Center</span>
-          </div>
-        </div>
-      </div>
-    )
+  const todaysData = {
+    gmv: '₱62,991',
+    yesterdayGmv: '₱96,378.46',
+    itemsSold: '200',
+    yesterdayItems: '284',
+    visitors: '2,947',
+    yesterdayVisitors: '2,534',
+    customers: '128',
+    yesterdayCustomers: '161'
   }
+
+  const salesSources = [
+    {
+      type: 'LIVE',
+      icon: PlayCircle,
+      value: '₱42,524.68',
+      subtitle: 'GMV from 1 self operated accounts',
+      color: 'red',
+      topItems: [
+        { name: 'Sorbetes Jersey', price: '₱17,164.69', date: '2025/09/16 18:01' },
+        { name: 'Custom Hoodie', price: '₱16,303.22', date: '2025/09/16 09:25' }
+      ]
+    },
+    {
+      type: 'Videos',
+      icon: Video,
+      value: '₱259',
+      subtitle: 'GMV from 1 linked accounts',
+      color: 'orange',
+      topItems: [
+        { name: 'DTF Print Tee', price: '₱259', date: '2024/09/15 17:43' },
+        { name: 'Embroidered Polo', price: '₱0', date: '2024/07/07 10:38' }
+      ]
+    },
+    {
+      type: 'Product cards',
+      icon: ShoppingCart,
+      value: '₱6,662.36',
+      subtitle: 'GMV from 16 product cards',
+      color: 'blue',
+      topItems: [
+        { name: 'Sublimation Jersey', price: '₱2,310.90', date: 'SHIRT/F CLOTH MENS - DARK GRAY' },
+        { name: 'Screen Print Tee', price: '₱937.18', date: 'SHIRT/F CLOTHING - CHAMPION BLACK' }
+      ]
+    }
+  ]
 
   return (
     <Layout>
       <div className="min-h-screen bg-gray-50">
-        {/* TikTok-style Header */}
+        {/* Top Header */}
         <div className="bg-white border-b border-gray-200">
           <div className="px-6 py-4">
-            {/* Top navigation */}
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-black rounded flex items-center justify-center">
-                    <span className="text-white text-sm font-bold">🎖️</span>
-                  </div>
-                  <span className="text-gray-900 font-medium">Manufacturing Center</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <Button variant="ghost" size="sm">
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  Customer messages
-                </Button>
-                <Button variant="ghost" size="sm">
-                  <Bell className="w-4 h-4" />
-                </Button>
-                <Button variant="ghost" size="sm">
-                  <HelpCircle className="w-4 h-4" />
-                  Help
-                </Button>
-                <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm font-bold">A</span>
-                </div>
-              </div>
-            </div>
+            <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
+          </div>
 
-            {/* Analytics Header */}
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">Analytics</h1>
-
-            {/* Tabs Navigation */}
-            <div className="flex items-center gap-6 border-b border-gray-200">
-              <button className="pb-3 border-b-2 border-blue-500 text-blue-600 font-medium">Home</button>
-              <button className="pb-3 text-gray-600 hover:text-gray-900">Growth & insights</button>
-              <button className="pb-3 text-gray-600 hover:text-gray-900">LIVE & video</button>
-              <button className="pb-3 text-gray-600 hover:text-gray-900">Product card</button>
-              <button className="pb-3 text-gray-600 hover:text-gray-900">Production</button>
-              <button className="pb-3 text-gray-600 hover:text-gray-900">Manufacturing</button>
-              <button className="pb-3 text-gray-600 hover:text-gray-900">Post purchase</button>
-            </div>
+          {/* Navigation Tabs */}
+          <div className="px-6">
+            <nav className="flex space-x-8">
+              {[
+                { key: 'home', label: 'Home' },
+                { key: 'growth', label: 'Growth & insights' },
+                { key: 'live', label: 'LIVE & video' },
+                { key: 'product', label: 'Product card' },
+                { key: 'products', label: 'Product' },
+                { key: 'marketing', label: 'Marketing' },
+                { key: 'purchase', label: 'Post purchase' }
+              ].map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                    activeTab === tab.key
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
           </div>
         </div>
 
         {/* Main Content */}
-        <div className="px-6 py-6">
+        <div className="p-6">
           <div className="grid grid-cols-12 gap-6">
-
-            {/* Left Section - Business Data */}
+            {/* Left Column - Business Data and Chart */}
             <div className="col-span-8">
               {/* Business Data Cards */}
               <div className="mb-6">
-                <div className="flex items-center gap-4 mb-4">
+                <div className="flex items-center justify-between mb-4">
                   <h2 className="text-lg font-semibold text-gray-900">Business data</h2>
                   <div className="flex items-center gap-2">
-                    <button className="px-3 py-1 bg-blue-100 text-blue-600 rounded text-sm font-medium">Daily</button>
-                    <button className="px-3 py-1 text-gray-600 rounded text-sm hover:bg-gray-100">Traffic</button>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <CalendarIcon className="w-4 h-4" />
-                    Last 7 days: Sep 02, 2025 - Sep 09, 2025
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-3 gap-4 mb-6">
-                  {/* GMV Card */}
-                  <div className="bg-white rounded-lg border border-gray-200 p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-gray-600">GMV</span>
-                      <Info className="w-4 h-4 text-gray-400" />
-                    </div>
-                    <div className="text-2xl font-bold text-gray-900">₱ 271,303</div>
-                    <div className="text-sm text-gray-600 mb-2">vs last 7 days: +83.09%</div>
-                    <button className="text-blue-600 text-sm font-medium">View breakdown</button>
-                  </div>
-
-                  {/* Gross Revenue Card */}
-                  <div className="bg-white rounded-lg border border-gray-200 p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-gray-600">Gross revenue</span>
-                      <Info className="w-4 h-4 text-gray-400" />
-                    </div>
-                    <div className="text-2xl font-bold text-gray-900">₱ 284,728</div>
-                    <div className="text-sm text-gray-600 mb-2">vs last 7 days: +89.34%</div>
-                    <button className="text-blue-600 text-sm font-medium">View breakdown</button>
-                  </div>
-
-                  {/* Items Sold Card */}
-                  <div className="bg-white rounded-lg border border-gray-200 p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-gray-600">Items sold</span>
-                      <Info className="w-4 h-4 text-gray-400" />
-                    </div>
-                    <div className="text-2xl font-bold text-gray-900">884</div>
-                    <div className="text-sm text-gray-600 mb-2">vs last 7 days: +65.86%</div>
-                  </div>
-                </div>
-
-                {/* Chart Section */}
-                <div className="bg-white rounded-lg border border-gray-200 p-6">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                      <span className="text-sm text-gray-600">GMV</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                      <span className="text-sm text-gray-600">Gross revenue</span>
-                    </div>
-                  </div>
-
-                  {/* Simulated Chart */}
-                  <div className="h-64 flex items-end justify-between px-4">
-                    {Array.from({ length: 7 }).map((_, i) => (
-                      <div key={i} className="flex flex-col items-center gap-2">
-                        <div className="flex flex-col items-center gap-1">
-                          <div
-                            className="w-8 bg-blue-500 rounded-t"
-                            style={{ height: `${Math.random() * 120 + 40}px` }}
-                          ></div>
-                          <div
-                            className="w-8 bg-green-500 rounded-t"
-                            style={{ height: `${Math.random() * 100 + 30}px` }}
-                          ></div>
-                        </div>
-                        <span className="text-xs text-gray-500">Sep 0{i + 3}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Sales Sources */}
-              <div>
-                <div className="flex items-center gap-4 mb-4">
-                  <h2 className="text-lg font-semibold text-gray-900">Sales sources</h2>
-                  <div className="flex items-center gap-2">
-                    <button className="px-3 py-1 bg-blue-100 text-blue-600 rounded text-sm font-medium">Highest GMV</button>
-                    <button className="px-3 py-1 text-gray-600 rounded text-sm hover:bg-gray-100">Most views</button>
+                    <Badge variant="outline" className="bg-teal-50 text-teal-700 border-teal-200">
+                      Omni
+                    </Badge>
+                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                      TikTok
+                    </Badge>
+                    <span className="text-sm text-gray-500">Last 7 days</span>
+                    <span className="text-sm text-gray-500">Sep 02, 2025 - Sep 08, 2025</span>
+                    <Button variant="ghost" size="sm">
+                      <ChevronDown className="w-4 h-4" />
+                    </Button>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-3 gap-4">
-                  {/* LIVE Orders */}
-                  <div className="bg-white rounded-lg border border-gray-200 p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                        <span className="font-medium text-gray-900">LIVE</span>
+                  {businessData.map((item, index) => (
+                    <Card key={index} className="p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-sm text-gray-600">{item.title}</h3>
+                        <Info className="w-4 h-4 text-gray-400" />
                       </div>
-                      <button className="text-blue-600 text-sm">View analytics ›</button>
-                    </div>
-                    <div className="text-sm text-gray-600 mb-4">₱42,535.08 GMV from 1 golf sponsored accounts.</div>
-
-                    <div className="text-xs text-gray-600 mb-2">Top 5 LIVE streams, ranked by GMV</div>
-
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-orange-100 rounded flex items-center justify-center">
-                          <Package className="w-4 h-4 text-orange-600" />
-                        </div>
-                        <div>
-                          <div className="font-medium text-gray-900">₱17,164.69</div>
-                          <div className="text-xs text-gray-500">2024/09/08 19:07 | @peejhance</div>
-                        </div>
+                      <div className="text-2xl font-bold text-gray-900 mb-1">
+                        {item.value}
                       </div>
-
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-orange-100 rounded flex items-center justify-center">
-                          <Package className="w-4 h-4 text-orange-600" />
-                        </div>
-                        <div>
-                          <div className="font-medium text-gray-900">₱16,303.22</div>
-                          <div className="text-xs text-gray-500">2024/09/08 09:25 | @peejhance</div>
-                        </div>
+                      <div className={`text-sm flex items-center gap-1 ${
+                        item.trend === 'up' ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {item.trend === 'up' ? (
+                          <ArrowUp className="w-3 h-3" />
+                        ) : (
+                          <ArrowDown className="w-3 h-3" />
+                        )}
+                        {item.subtitle}
                       </div>
-                    </div>
-                  </div>
-
-                  {/* Videos */}
-                  <div className="bg-white rounded-lg border border-gray-200 p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                        <span className="font-medium text-gray-900">Videos</span>
+                      <div className="mt-2">
+                        <Button variant="link" size="sm" className="p-0 h-auto text-teal-600">
+                          View breakdown
+                        </Button>
                       </div>
-                      <button className="text-blue-600 text-sm">View analytics ›</button>
-                    </div>
-                    <div className="text-sm text-gray-600 mb-4">₱239 GMV from 1 direct accounts.</div>
-
-                    <div className="text-xs text-gray-600 mb-2">Top 3 videos, ranked by GMV</div>
-
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-gray-100 rounded">
-                          <img src="/api/placeholder/32/32" alt="Video thumbnail" className="w-full h-full rounded object-cover" />
-                        </div>
-                        <div>
-                          <div className="font-medium text-gray-900">₱239</div>
-                          <div className="text-xs text-gray-500">2024/09/13 17:44 | ₱99 Headset Ultra...</div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-gray-100 rounded">
-                          <img src="/api/placeholder/32/32" alt="Video thumbnail" className="w-full h-full rounded object-cover" />
-                        </div>
-                        <div>
-                          <div className="font-medium text-gray-900">₱0</div>
-                          <div className="text-xs text-gray-500">2024/07/17 16:09 | 40% Player + HDD...</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Product Cards */}
-                  <div className="bg-white rounded-lg border border-gray-200 p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 bg-cyan-500 rounded-full"></div>
-                        <span className="font-medium text-gray-900">Product cards</span>
-                      </div>
-                      <button className="text-blue-600 text-sm">View analytics ›</button>
-                    </div>
-                    <div className="text-sm text-gray-600 mb-4">₱8,802.38 GMV from 16 product cards.</div>
-
-                    <div className="text-xs text-gray-600 mb-2">Top 3 product cards by GMV</div>
-
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-black rounded">
-                          <img src="/api/placeholder/32/32" alt="Product" className="w-full h-full rounded object-cover" />
-                        </div>
-                        <div>
-                          <div className="font-medium text-gray-900">₱2,310.90</div>
-                          <div className="text-xs text-gray-500">SIREN CLOTH PRINT - DARK GRAY (S) #1</div>
-                          <div className="text-xs text-green-600">🟢 Estimated P9 16% ⚡6 product this li...</div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-black rounded">
-                          <img src="/api/placeholder/32/32" alt="Product" className="w-full h-full rounded object-cover" />
-                        </div>
-                        <div>
-                          <div className="font-medium text-gray-900">₱937.18</div>
-                          <div className="text-xs text-gray-500">SIREN CLOTH PRINT - CHAMPION PIGSHI</div>
-                          <div className="text-xs text-green-600">🟢 Estimated P9 32% ⚡8 product this li...</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                    </Card>
+                  ))}
                 </div>
               </div>
+
+              {/* Chart Area */}
+              <Card className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                      <span className="text-sm text-gray-600">GMV</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-teal-500 rounded-full"></div>
+                      <span className="text-sm text-gray-600">Gross revenue</span>
+                    </div>
+                  </div>
+                  <div className="text-sm text-gray-500">Daily movement (₱)</div>
+                </div>
+
+                {/* Mock Chart */}
+                <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center border">
+                  <div className="text-center">
+                    <LineChart className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                    <p className="text-gray-500">Chart visualization area</p>
+                    <p className="text-sm text-gray-400">Revenue trends over time</p>
+                  </div>
+                </div>
+
+                <div className="flex justify-center mt-4 space-x-4 text-xs text-gray-500">
+                  <span>Sep 02</span>
+                  <span>Sep 03</span>
+                  <span>Sep 04</span>
+                  <span>Sep 05</span>
+                  <span>Sep 06</span>
+                  <span>Sep 07</span>
+                  <span>Sep 08</span>
+                </div>
+              </Card>
             </div>
 
-            {/* Right Section - Today's Data */}
+            {/* Right Column - Today's Data */}
             <div className="col-span-4">
-              <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <Card className="p-4">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold text-gray-900">Today's data</h3>
-                  <div className="flex items-center gap-1 text-blue-600 text-sm">
-                    <TrendingUp className="w-4 h-4" />
-                    Trends
+                  <h3 className="text-lg font-semibold text-gray-900">Today's data</h3>
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-teal-600" />
+                    <span className="text-sm text-teal-600">Trends</span>
                   </div>
                 </div>
 
@@ -357,29 +273,30 @@ export default function DashboardPage() {
                 <div className="grid grid-cols-2 gap-4 mb-6">
                   <div>
                     <div className="text-sm text-gray-600 mb-1">GMV</div>
-                    <div className="text-xl font-bold text-gray-900">₱ 62,991</div>
-                    <div className="text-xs text-gray-500">Yesterday ₱96,378.46</div>
+                    <div className="text-xl font-bold text-gray-900">{todaysData.gmv}</div>
+                    <div className="text-xs text-gray-500">Yesterday {todaysData.yesterdayGmv}</div>
                   </div>
 
                   <div>
                     <div className="text-sm text-gray-600 mb-1">Items sold</div>
-                    <div className="text-xl font-bold text-gray-900">200</div>
-                    <div className="text-xs text-gray-500">Yesterday 284</div>
+                    <div className="text-xl font-bold text-gray-900">{todaysData.itemsSold}</div>
+                    <div className="text-xs text-gray-500">Yesterday {todaysData.yesterdayItems}</div>
                   </div>
 
                   <div>
                     <div className="text-sm text-gray-600 mb-1">Visitors</div>
-                    <div className="text-xl font-bold text-gray-900">2,947</div>
-                    <div className="text-xs text-gray-500">Yesterday 2,534</div>
+                    <div className="text-xl font-bold text-gray-900">{todaysData.visitors}</div>
+                    <div className="text-xs text-gray-500">Yesterday {todaysData.yesterdayVisitors}</div>
                   </div>
 
                   <div>
                     <div className="text-sm text-gray-600 mb-1">Customers</div>
-                    <div className="text-xl font-bold text-gray-900">128</div>
-                    <div className="text-xs text-gray-500">Yesterday 161</div>
+                    <div className="text-xl font-bold text-gray-900">{todaysData.customers}</div>
+                    <div className="text-xs text-gray-500">Yesterday {todaysData.yesterdayCustomers}</div>
                   </div>
                 </div>
 
+                {/* Campaign Section */}
                 <div className="flex gap-1 mb-4">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <div key={i} className="w-8 h-8 bg-orange-100 rounded flex items-center justify-center">
@@ -392,6 +309,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
+                {/* Business Accelerator */}
                 <div className="border-t border-gray-200 pt-4">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-4 h-4 bg-green-500 rounded"></div>
@@ -419,7 +337,63 @@ export default function DashboardPage() {
                     <button className="px-3 py-1 text-gray-600 rounded text-sm hover:bg-gray-100">Last 7 days</button>
                   </div>
                 </div>
+              </Card>
+            </div>
+          </div>
+
+          {/* Sales Sources Section */}
+          <div className="mt-8">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-gray-900">Sales sources</h2>
+              <div className="flex gap-2">
+                <Badge variant="outline" className="bg-blue-50 text-blue-700">Highest GMV</Badge>
+                <Badge variant="outline">Most views</Badge>
+                <div className="flex gap-2 ml-4">
+                  <Button variant="outline" size="sm">Yesterday</Button>
+                  <Button variant="outline" size="sm">Last 7 days</Button>
+                </div>
               </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-6">
+              {salesSources.map((source, index) => (
+                <Card key={index} className="p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <source.icon className={`w-5 h-5 ${
+                      source.color === 'red' ? 'text-red-500' :
+                      source.color === 'orange' ? 'text-orange-500' :
+                      'text-blue-500'
+                    }`} />
+                    <span className="font-medium text-gray-900">{source.type}</span>
+                    <Button variant="link" size="sm" className="ml-auto p-0 text-blue-600">
+                      View analysis ›
+                    </Button>
+                  </div>
+
+                  <div className="text-2xl font-bold text-gray-900 mb-1">{source.value}</div>
+                  <div className="text-sm text-gray-600 mb-4">{source.subtitle}</div>
+
+                  <div className="space-y-3">
+                    <div className="text-sm font-medium text-gray-900">
+                      Top {source.type === 'Product cards' ? '2 product cards' :
+                           source.type === 'Videos' ? '3 videos' : '3 LIVE streams'} by GMV
+                    </div>
+
+                    {source.topItems.map((item, itemIndex) => (
+                      <div key={itemIndex} className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
+                          <Shirt className="w-4 h-4 text-gray-600" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="text-sm font-medium text-gray-900">{item.price}</div>
+                          <div className="text-xs text-gray-500">{item.date}</div>
+                        </div>
+                        <div className="text-xs text-gray-500">{item.name}</div>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              ))}
             </div>
           </div>
         </div>

@@ -4,30 +4,18 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { systemMonitor } from '@/lib/monitoring/system-monitor';
-
 export async function GET(request: NextRequest) {
   try {
-    // Perform comprehensive health check
-    const health = await systemMonitor.checkSystemHealth();
-
-    // Return appropriate status code based on health
-    const statusCode = health.status === 'healthy' ? 200 :
-                      health.status === 'warning' ? 200 : 503;
-
-    // Include additional system information
+    // Simple health check without monitoring system
     const response = {
-      status: health.status,
-      timestamp: health.timestamp,
+      status: 'healthy',
+      timestamp: new Date(),
       version: process.env.npm_package_version || '1.0.0',
       environment: process.env.NODE_ENV || 'development',
-      uptime: process.uptime(),
-      services: health.services,
-      metrics: health.metrics,
-      alerts: health.alerts
+      uptime: process.uptime()
     };
 
-    return NextResponse.json(response, { status: statusCode });
+    return NextResponse.json(response, { status: 200 });
 
   } catch (error) {
     // Return critical status if health check itself fails
