@@ -11,7 +11,12 @@
     "lint:fix": "eslint --fix",
     "analyze": "ANALYZE=true npm run build",
     "analyze:bundle": "node scripts/analyze-bundle.js",
-    "backup": "node scripts/daily-backup.js",
+    "backup": "node scripts/backup-database.js",
+    "backup:list": "node scripts/backup-database.js list",
+    "backup:verify": "node scripts/backup-database.js verify",
+    "setup:db": "node scripts/setup-database.js",
+    "seed": "node scripts/seed-database.js",
+    "deploy": "node scripts/deploy-production.js",
     "type-check": "npx tsc --noEmit"
   },
   "dependencies": {
