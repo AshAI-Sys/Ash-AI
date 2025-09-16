@@ -44,5 +44,4 @@ async function GET(request: NextRequest) {
   }
 }
 
-export const GET_HANDLER = withApiHandler(GET);
-export { GET_HANDLER as GET };
+export { withApiHandler(GET) as GET };
