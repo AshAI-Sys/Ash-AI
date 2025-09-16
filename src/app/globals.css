@@ -1,10 +1,16 @@
 @import "tailwindcss";
 
-/* TikTok-style Clean Interface */
+/* TikTok-style Clean Interface - Force Light Theme */
 html, body {
-  background: #f9fafb;
-  color: #111827;
+  background: #f9fafb !important;
+  color: #111827 !important;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Force all main content areas to be light */
+#__next, .main-content, main, [data-main-content] {
+  background: #f9fafb !important;
+  color: #111827 !important;
 }
 
 /* Override any dark themes */
@@ -18,10 +24,20 @@ html, body {
   min-height: 100vh;
 }
 
-/* Remove any dark backgrounds */
-.dark, .neural-bg, .quantum-field {
-  background: white !important;
+/* Remove any dark backgrounds - Stronger overrides */
+.dark, .neural-bg, .quantum-field, [data-theme="dark"], .bg-black, .bg-gray-900, .bg-slate-900 {
+  background: #f9fafb !important;
   color: #111827 !important;
+}
+
+/* Force all divs to have light background */
+div, section, main, article {
+  background-color: inherit !important;
+}
+
+/* Override any flex containers that might be dark */
+.flex, .grid {
+  background: inherit !important;
 }
 
 /* Ensure all text is visible */

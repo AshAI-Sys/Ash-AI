@@ -1,6 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
+import {
+  getAuthenticatedUser,
+  hasPermission,
+  getOrderWithWorkspaceCheck,
+  getFabricBatchWithWorkspaceCheck,
+  unauthorizedResponse,
+  forbiddenResponse,
+  notFoundResponse,
+  validateUUID,
+  sanitizeInput,
+  checkRateLimit
+} from '@/lib/auth-helpers'
 
 // Schema validation for cutting issues
 const createCutIssueSchema = z.object({
@@ -13,22 +25,39 @@ const createCutIssueSchema = z.object({
 // POST /api/cutting/issues - Issue fabric to cutting
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const validatedData = createCutIssueSchema.parse(body)
+    // Authentication check
+    const user = await getAuthenticatedUser(request)
+    if (!user) {
+      return unauthorizedResponse()
+    }
 
-    // Get user ID from session (simplified for now)
-    const issued_by = 'user_id_placeholder' // TODO: Get from session
+    // Permission check
+    if (!hasPermission(user, 'cutting.issue')) {
+      return forbiddenResponse('Insufficient permissions to issue fabric')
+    }
 
-    // Check if fabric batch exists and has sufficient quantity
-    const fabricBatch = await prisma.fabricBatch.findUnique({
-      where: { id: validatedData.batch_id }
-    })
-
-    if (!fabricBatch) {
-      return NextResponse.json(
-        { error: 'Fabric batch not found' },
-        { status: 404 }
+    // Rate limiting
+    if (!checkRateLimit(`cutting-issue-${user.id}`, 50, 60000)) {
+      return Response.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
       )
+    }
+
+    const body = await request.json()
+    const sanitizedBody = sanitizeInput(body)
+    const validatedData = createCutIssueSchema.parse(sanitizedBody)
+
+    // Validate and get order with workspace check
+    const order = await getOrderWithWorkspaceCheck(validatedData.order_id, user.workspace_id)
+    if (!order) {
+      return notFoundResponse('Order')
+    }
+
+    // Validate and get fabric batch with workspace check
+    const fabricBatch = await getFabricBatchWithWorkspaceCheck(validatedData.batch_id, user.workspace_id)
+    if (!fabricBatch) {
+      return notFoundResponse('Fabric batch')
     }
 
     if (Number(fabricBatch.qty_on_hand) < validatedData.qty_issued) {
@@ -47,7 +76,7 @@ export async function POST(request: NextRequest) {
           batch_id: validatedData.batch_id,
           qty_issued: validatedData.qty_issued,
           uom: validatedData.uom,
-          issued_by
+          issued_by: user.id
         }
       })
 
@@ -89,10 +118,42 @@ export async function POST(request: NextRequest) {
 // GET /api/cutting/issues - List cutting issues
 export async function GET(request: NextRequest) {
   try {
+    // Authentication check
+    const user = await getAuthenticatedUser(request)
+    if (!user) {
+      return unauthorizedResponse()
+    }
+
+    // Permission check
+    if (!hasPermission(user, 'cutting.view')) {
+      return forbiddenResponse('Insufficient permissions to view cutting issues')
+    }
+
     const { searchParams } = new URL(request.url)
     const order_id = searchParams.get('order_id')
 
-    const where = order_id ? { order_id } : {}
+    // Validate order_id if provided
+    if (order_id) {
+      try {
+        validateUUID(order_id)
+      } catch {
+        return Response.json(
+          { error: 'Invalid order ID format' },
+          { status: 400 }
+        )
+      }
+    }
+
+    // Build where clause with workspace filter
+    const where: any = {
+      batch: {
+        workspace_id: user.workspace_id
+      }
+    }
+
+    if (order_id) {
+      where.order_id = order_id
+    }
 
     const cutIssues = await prisma.cutIssue.findMany({
       where,

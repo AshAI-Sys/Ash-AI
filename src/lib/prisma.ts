@@ -5,44 +5,25 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
-// Production-ready connection pool configuration
-const getConnectionPoolConfig = () => {
-  if (process.env.NODE_ENV === 'production') {
-    return {
-      connectionLimit: parseInt(process.env.DATABASE_CONNECTION_LIMIT || '20'),
-      poolTimeout: parseInt(process.env.DATABASE_POOL_TIMEOUT || '20000'),
-      transactionOptions: {
-        maxWait: 10000, // 10 seconds max wait for production
-        timeout: 20000, // 20 seconds timeout for production
-        isolationLevel: 'ReadCommitted'
-      }
-    }
-  }
-
+// Production-ready configuration
+const getPrismaConfig = () => {
   return {
-    transactionOptions: {
-      maxWait: 5000, // 5 seconds max wait for development
-      timeout: 10000, // 10 seconds timeout for development
-      isolationLevel: 'ReadCommitted'
-    }
-  }
-}
-
-// Enhanced Prisma client with production-ready connection pooling
-export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient({
     log: process.env.NODE_ENV === 'development'
       ? ['query', 'error', 'warn', 'info']
       : ['error', 'warn'],
-    errorFormat: 'pretty',
+    errorFormat: 'pretty' as const,
     datasources: {
       db: {
         url: process.env.DATABASE_URL,
       },
-    },
-    ...getConnectionPoolConfig()
-  })
+    }
+  }
+}
+
+// Enhanced Prisma client
+export const prisma =
+  globalForPrisma.prisma ??
+  new PrismaClient(getPrismaConfig())
 
 if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = prisma

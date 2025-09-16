@@ -83,6 +83,7 @@ export default function RootLayout({
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        style={{ backgroundColor: '#f9fafb', color: '#111827' }}
       >
         <ClientErrorBoundary>
           <Providers>

@@ -117,46 +117,46 @@ export default function Home() {
   }
 
   return (
-    <div className="simple-page-container">
-      <div className="simple-content-wrapper">
-        {/* Simple Header */}
-        <div className="simple-header">
-          <div className="simple-flex justify-between">
-            <div className="simple-flex">
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="p-6 border-b border-gray-200 bg-white">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-3">
               <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-600 rounded-lg flex items-center justify-center">
                 <img src="/Ash-AI.png" alt="ASH AI" className="w-8 h-8 sm:w-10 sm:h-10 object-contain" />
               </div>
               <div>
-                <h1 className="text-lg sm:text-xl font-semibold simple-text-primary">ASH AI</h1>
-                <p className="text-xs sm:text-sm simple-text-secondary">Apparel Smart Hub</p>
+                <h1 className="text-lg sm:text-xl font-semibold text-gray-900">ASH AI</h1>
+                <p className="text-xs sm:text-sm text-gray-600">Apparel Smart Hub</p>
               </div>
             </div>
-            
-            <div className="simple-flex gap-2 sm:gap-4">
+
+            <div className="flex gap-2 sm:gap-4">
               <Link href="/login">
-                <button className="simple-btn text-xs sm:text-sm px-3 py-1.5 sm:px-4 sm:py-2">Access Portal</button>
+                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-xs sm:text-sm">Access Portal</button>
               </Link>
             </div>
           </div>
         </div>
 
-        {/* Simple Main Content */}
-        <div className="simple-main">
-          <div className="text-center py-8 sm:py-12 md:py-16 px-4">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold simple-text-primary mb-3 sm:mb-4">
+        {/* Main Content */}
+        <div className="p-6">
+          <div className="text-center py-8 sm:py-12 md:py-16">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
               Welcome to ASH AI
             </h1>
-            <p className="text-sm sm:text-base md:text-lg simple-text-secondary mb-6 sm:mb-8 max-w-2xl mx-auto">
-              Intelligent apparel manufacturing system powered by AI. 
+            <p className="text-sm sm:text-base md:text-lg text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto">
+              Intelligent apparel manufacturing system powered by AI.
               Streamline your operations from design to delivery.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mb-8 sm:mb-12">
               <Link href="/login">
-                <button className="simple-btn w-full sm:w-auto text-xs px-4 py-2">Get Started</button>
+                <button className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 w-full sm:w-auto">Get Started</button>
               </Link>
               <button
-                className="simple-btn simple-btn-secondary w-full sm:w-auto text-xs px-4 py-2"
+                className="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 w-full sm:w-auto"
                 onClick={() => {
                   document.getElementById('features-section')?.scrollIntoView({ behavior: 'smooth' })
                 }}
@@ -165,23 +165,23 @@ export default function Home() {
               </button>
             </div>
 
-            {/* Simple Stats - Mobile Responsive */}
+            {/* Stats */}
             <div id="features-section" className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-4xl mx-auto">
-              <div className="simple-card text-center p-3 sm:p-6">
+              <div className="bg-white rounded-lg border border-gray-200 text-center p-3 sm:p-6">
                 <div className="text-lg sm:text-2xl font-bold text-blue-600 mb-1 sm:mb-2">1,247</div>
-                <div className="text-xs sm:text-sm simple-text-muted">Total Orders</div>
+                <div className="text-xs sm:text-sm text-gray-500">Total Orders</div>
               </div>
-              <div className="simple-card text-center p-3 sm:p-6">
+              <div className="bg-white rounded-lg border border-gray-200 text-center p-3 sm:p-6">
                 <div className="text-lg sm:text-2xl font-bold text-green-600 mb-1 sm:mb-2">23</div>
-                <div className="text-xs sm:text-sm simple-text-muted">Active Orders</div>
+                <div className="text-xs sm:text-sm text-gray-500">Active Orders</div>
               </div>
-              <div className="simple-card text-center p-3 sm:p-6">
+              <div className="bg-white rounded-lg border border-gray-200 text-center p-3 sm:p-6">
                 <div className="text-lg sm:text-2xl font-bold text-purple-600 mb-1 sm:mb-2">₱2.8M</div>
-                <div className="text-xs sm:text-sm simple-text-muted">Revenue</div>
+                <div className="text-xs sm:text-sm text-gray-500">Revenue</div>
               </div>
-              <div className="simple-card text-center p-3 sm:p-6">
+              <div className="bg-white rounded-lg border border-gray-200 text-center p-3 sm:p-6">
                 <div className="text-lg sm:text-2xl font-bold text-orange-600 mb-1 sm:mb-2">94.2%</div>
-                <div className="text-xs sm:text-sm simple-text-muted">Efficiency</div>
+                <div className="text-xs sm:text-sm text-gray-500">Efficiency</div>
               </div>
             </div>
           </div>
