@@ -470,17 +470,25 @@ class WorkOrderManager {
   }
 
   private async checkDependentWorkOrders(completedWorkOrderId: string) {
-    const dependentWorkOrders = await prisma.workOrder.findMany({
+    // Get all pending work orders and filter those that depend on completed one
+    const pendingWorkOrders = await prisma.workOrder.findMany({
       where: {
-        dependencies: { has: completedWorkOrderId },
         status: 'PENDING'
       }
     });
 
+    const dependentWorkOrders = pendingWorkOrders.filter(wo => {
+      const deps = Array.isArray(wo.dependencies) ? wo.dependencies as string[] : [];
+      return deps.includes(completedWorkOrderId);
+    });
+
     for (const workOrder of dependentWorkOrders) {
       // Check if all dependencies are completed
+      const dependencies = Array.isArray(workOrder.dependencies)
+        ? workOrder.dependencies as string[]
+        : [];
       const allDependencies = await prisma.workOrder.findMany({
-        where: { id: { in: workOrder.dependencies } }
+        where: { id: { in: dependencies } }
       });
 
       const allCompleted = allDependencies.every(dep => dep.status === 'COMPLETED');
