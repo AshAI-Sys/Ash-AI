@@ -8,8 +8,13 @@ export interface RoutingStep {
   estimatedHours: number
   requiredSkills: string[]
   dependencies: string[]
+  join_type?: 'AND' | 'OR' | null // For parallel workflow joins
   department: 'CUTTING' | 'PRINTING' | 'SEWING' | 'QC' | 'FINISHING' | 'DESIGN' | 'PACKAGING'
   capacity: number // units per hour
+  can_run_parallel?: boolean // Can run in parallel with other steps
+  standard_spec?: any // Default specifications for the step
+  expected_inputs?: any // Input requirements
+  expected_outputs?: any // Output specifications
   qualityCheckpoints?: string[]
   materials?: string[]
   equipment?: string[]
@@ -297,8 +302,100 @@ export const ROUTING_TEMPLATES: RoutingTemplate[] = [
         equipment: ['Folding equipment', 'Sealing machine']
       }
     ]
+  },
+  {
+    id: 'COMPLEX_PARALLEL_SEWING',
+    name: 'Cut → [Sleeves || Collars] → Final Assembly → QC → Pack',
+    method: 'Silkscreen',
+    productTypes: ['Hoodie', 'Uniform'],
+    complexity: 'HIGH',
+    riskFactors: ['Parallel coordination', 'Sub-assembly timing'],
+    ashleyRecommendation: 'SUITABLE',
+    steps: [
+      {
+        id: 'cutting_complex',
+        name: 'Pattern Cutting & Component Separation',
+        estimatedHours: 6,
+        requiredSkills: ['Advanced Pattern Reading', 'Component Cutting'],
+        dependencies: [],
+        department: 'CUTTING',
+        capacity: 30,
+        can_run_parallel: false,
+        expected_outputs: { main_panels: true, sleeve_panels: true, collar_pieces: true }
+      },
+      {
+        id: 'sleeve_assembly',
+        name: 'Sleeve Sub-Assembly',
+        estimatedHours: 8,
+        requiredSkills: ['Sleeve Construction', 'Set-in Sleeves'],
+        dependencies: ['cutting_complex'],
+        department: 'SEWING',
+        capacity: 12,
+        can_run_parallel: true,
+        expected_inputs: { sleeve_panels: true },
+        expected_outputs: { finished_sleeves: true }
+      },
+      {
+        id: 'collar_assembly',
+        name: 'Collar Sub-Assembly',
+        estimatedHours: 6,
+        requiredSkills: ['Collar Construction', 'Interfacing'],
+        dependencies: ['cutting_complex'],
+        department: 'SEWING',
+        capacity: 15,
+        can_run_parallel: true,
+        expected_inputs: { collar_pieces: true },
+        expected_outputs: { finished_collars: true }
+      },
+      {
+        id: 'final_assembly',
+        name: 'Final Garment Assembly',
+        estimatedHours: 10,
+        requiredSkills: ['Advanced Sewing', 'Quality Assembly'],
+        dependencies: ['sleeve_assembly', 'collar_assembly'],
+        join_type: 'AND', // Requires BOTH sub-assemblies complete
+        department: 'SEWING',
+        capacity: 8,
+        can_run_parallel: false,
+        expected_inputs: { main_panels: true, finished_sleeves: true, finished_collars: true },
+        expected_outputs: { complete_garment: true }
+      },
+      {
+        id: 'complex_qc',
+        name: 'Complex Garment QC',
+        estimatedHours: 4,
+        requiredSkills: ['Advanced QC', 'Construction Inspection'],
+        dependencies: ['final_assembly'],
+        department: 'QC',
+        capacity: 20
+      },
+      {
+        id: 'complex_packing',
+        name: 'Premium Packing',
+        estimatedHours: 2,
+        requiredSkills: ['Premium Packing'],
+        dependencies: ['complex_qc'],
+        department: 'PACKAGING',
+        capacity: 25
+      }
+    ]
   }
 ]
+
+export interface ParallelSchedule {
+  step_id: string
+  start_time: Date
+  end_time: Date
+  assigned_resources: string[]
+  parallel_lane: number
+}
+
+export interface AdvancedCriticalPath extends CriticalPath {
+  parallel_schedule: ParallelSchedule[]
+  resource_conflicts: string[]
+  optimization_suggestions: string[]
+  critical_path_steps: string[]
+}
 
 export class RoutingEngine {
   private templates: RoutingTemplate[] = ROUTING_TEMPLATES
@@ -426,6 +523,337 @@ export class RoutingEngine {
       insights,
       warnings
     }
+  }
+
+  // Advanced parallel processing with dependency resolution
+  calculateAdvancedCriticalPath(template: RoutingTemplate, quantity: number, targetDate: Date): AdvancedCriticalPath {
+    const steps = template.steps
+    const stepMap = new Map(steps.map(step => [step.id, step]))
+    const completed = new Set<string>()
+    const inProgress = new Map<string, { start: Date, end: Date }>()
+    const parallelSchedule: ParallelSchedule[] = []
+    const resourceConflicts: string[] = []
+    const optimizationSuggestions: string[] = []
+
+    let currentTime = new Date()
+    const workHoursPerDay = 8
+
+    // Build dependency graph
+    const dependencyGraph = new Map<string, string[]>()
+    const reverseDependencies = new Map<string, string[]>()
+
+    for (const step of steps) {
+      dependencyGraph.set(step.id, step.dependencies)
+      for (const dep of step.dependencies) {
+        if (!reverseDependencies.has(dep)) {
+          reverseDependencies.set(dep, [])
+        }
+        reverseDependencies.get(dep)!.push(step.id)
+      }
+    }
+
+    // Find steps that can be executed (no pending dependencies)
+    const getReadySteps = (): RoutingStep[] => {
+      return steps.filter(step => {
+        if (completed.has(step.id) || inProgress.has(step.id)) return false
+
+        // Check if all dependencies are completed
+        return step.dependencies.every(dep => completed.has(dep))
+      })
+    }
+
+    // Process steps using topological sort with parallel execution
+    let parallelLane = 0
+
+    while (completed.size < steps.length) {
+      const readySteps = getReadySteps()
+
+      if (readySteps.length === 0) {
+        // Check for circular dependencies or waiting for in-progress steps
+        const waitingSteps = steps.filter(step =>
+          !completed.has(step.id) && !inProgress.has(step.id)
+        )
+
+        if (waitingSteps.length > 0 && inProgress.size > 0) {
+          // Wait for in-progress steps to complete
+          const nextCompletion = Math.min(...Array.from(inProgress.values()).map(p => p.end.getTime()))
+          currentTime = new Date(nextCompletion)
+
+          // Mark completed steps
+          for (const [stepId, progress] of inProgress.entries()) {
+            if (progress.end.getTime() <= currentTime.getTime()) {
+              completed.add(stepId)
+              inProgress.delete(stepId)
+            }
+          }
+          continue
+        } else {
+          // Circular dependency or other issue
+          resourceConflicts.push('Circular dependency detected or scheduling conflict')
+          break
+        }
+      }
+
+      // Group steps that can run in parallel
+      const parallelGroups = this.groupParallelSteps(readySteps)
+
+      for (const group of parallelGroups) {
+        for (const step of group) {
+          const stepDuration = Math.max(
+            step.estimatedHours,
+            quantity / step.capacity
+          )
+
+          // Convert hours to actual time (considering work days)
+          const stepDurationMs = stepDuration * 60 * 60 * 1000 // Convert to milliseconds
+          const endTime = new Date(currentTime.getTime() + stepDurationMs)
+
+          // Schedule the step
+          parallelSchedule.push({
+            step_id: step.id,
+            start_time: new Date(currentTime),
+            end_time: endTime,
+            assigned_resources: [step.department],
+            parallel_lane: parallelLane
+          })
+
+          inProgress.set(step.id, { start: new Date(currentTime), end: endTime })
+
+          // Check for resource conflicts
+          const conflictingSteps = parallelSchedule.filter(ps =>
+            ps.step_id !== step.id &&
+            ps.assigned_resources.some(r => step.department === r) &&
+            ps.start_time < endTime && ps.end_time > currentTime
+          )
+
+          if (conflictingSteps.length > 0) {
+            resourceConflicts.push(`Resource conflict: ${step.department} overbooked during ${step.name}`)
+          }
+        }
+        parallelLane++
+      }
+
+      // Move to next time point
+      if (inProgress.size > 0) {
+        const nextCompletion = Math.min(...Array.from(inProgress.values()).map(p => p.end.getTime()))
+        currentTime = new Date(nextCompletion)
+
+        // Mark completed steps
+        for (const [stepId, progress] of inProgress.entries()) {
+          if (progress.end.getTime() <= currentTime.getTime()) {
+            completed.add(stepId)
+            inProgress.delete(stepId)
+          }
+        }
+      }
+    }
+
+    // Calculate critical path
+    const criticalPathSteps = this.findCriticalPath(steps, parallelSchedule)
+
+    // Generate optimization suggestions
+    if (resourceConflicts.length > 0) {
+      optimizationSuggestions.push('Consider adding additional capacity to overbooked departments')
+    }
+
+    const parallelOpportunities = steps.filter(step => step.can_run_parallel &&
+      !parallelSchedule.some(ps => ps.step_id === step.id && ps.parallel_lane > 0)
+    )
+
+    if (parallelOpportunities.length > 0) {
+      optimizationSuggestions.push(`Additional parallelization possible for: ${parallelOpportunities.map(s => s.name).join(', ')}`)
+    }
+
+    // Calculate final metrics
+    const totalHours = Math.max(...parallelSchedule.map(ps => ps.end_time.getTime())) -
+                      Math.min(...parallelSchedule.map(ps => ps.start_time.getTime()))
+    const totalHoursDecimal = totalHours / (1000 * 60 * 60)
+
+    const bufferHours = totalHoursDecimal * 0.2
+    const estimatedDeliveryDate = new Date(Math.max(...parallelSchedule.map(ps => ps.end_time.getTime())) + (bufferHours * 60 * 60 * 1000))
+
+    const feasible = estimatedDeliveryDate <= targetDate
+    const risks = [...template.riskFactors]
+
+    if (!feasible) {
+      risks.push('Delivery date not achievable with current parallel schedule')
+    }
+
+    return {
+      totalEstimatedHours: totalHoursDecimal,
+      estimatedDeliveryDate,
+      bottleneckSteps: this.findBottlenecks(parallelSchedule, steps),
+      bufferHours,
+      feasible,
+      risks,
+      parallel_schedule: parallelSchedule,
+      resource_conflicts: resourceConflicts,
+      optimization_suggestions: optimizationSuggestions,
+      critical_path_steps: criticalPathSteps
+    }
+  }
+
+  private groupParallelSteps(steps: RoutingStep[]): RoutingStep[][] {
+    const groups: RoutingStep[][] = []
+    const used = new Set<string>()
+
+    for (const step of steps) {
+      if (used.has(step.id)) continue
+
+      if (step.can_run_parallel) {
+        // Find other steps that can run in parallel
+        const parallelGroup = steps.filter(s =>
+          !used.has(s.id) &&
+          s.can_run_parallel &&
+          s.department !== step.department // Different departments can run in parallel
+        )
+
+        parallelGroup.forEach(s => used.add(s.id))
+        groups.push(parallelGroup)
+      } else {
+        groups.push([step])
+        used.add(step.id)
+      }
+    }
+
+    return groups
+  }
+
+  private findCriticalPath(steps: RoutingStep[], schedule: ParallelSchedule[]): string[] {
+    // Find the longest path through the dependency graph
+    const stepMap = new Map(steps.map(step => [step.id, step]))
+    const scheduleMap = new Map(schedule.map(ps => [ps.step_id, ps]))
+
+    // Start from steps with no dependencies
+    const startSteps = steps.filter(step => step.dependencies.length === 0)
+
+    let longestPath: string[] = []
+    let longestDuration = 0
+
+    const findLongestPath = (stepId: string, currentPath: string[], currentDuration: number): void => {
+      const step = stepMap.get(stepId)!
+      const stepSchedule = scheduleMap.get(stepId)!
+
+      const newPath = [...currentPath, stepId]
+      const newDuration = currentDuration + (stepSchedule.end_time.getTime() - stepSchedule.start_time.getTime())
+
+      // Find dependent steps
+      const dependentSteps = steps.filter(s => s.dependencies.includes(stepId))
+
+      if (dependentSteps.length === 0) {
+        // End of path
+        if (newDuration > longestDuration) {
+          longestDuration = newDuration
+          longestPath = newPath
+        }
+      } else {
+        // Continue path exploration
+        for (const depStep of dependentSteps) {
+          findLongestPath(depStep.id, newPath, newDuration)
+        }
+      }
+    }
+
+    for (const startStep of startSteps) {
+      findLongestPath(startStep.id, [], 0)
+    }
+
+    return longestPath
+  }
+
+  private findBottlenecks(schedule: ParallelSchedule[], steps: RoutingStep[]): string[] {
+    const stepMap = new Map(steps.map(step => [step.id, step]))
+    const bottlenecks: string[] = []
+
+    for (const ps of schedule) {
+      const step = stepMap.get(ps.step_id)!
+      const plannedDuration = ps.end_time.getTime() - ps.start_time.getTime()
+      const estimatedDurationMs = step.estimatedHours * 60 * 60 * 1000
+
+      // If actual duration is significantly longer than estimated, it's a bottleneck
+      if (plannedDuration > estimatedDurationMs * 1.3) {
+        bottlenecks.push(step.name)
+      }
+    }
+
+    return bottlenecks
+  }
+
+  // Template management methods
+  addCustomTemplate(template: RoutingTemplate): void {
+    // Validate template
+    if (!template.id || !template.name || !template.steps || template.steps.length === 0) {
+      throw new Error('Invalid template: missing required fields')
+    }
+
+    // Check for circular dependencies
+    if (this.hasCircularDependencies(template.steps)) {
+      throw new Error('Invalid template: circular dependencies detected')
+    }
+
+    this.templates.push(template)
+  }
+
+  private hasCircularDependencies(steps: RoutingStep[]): boolean {
+    const visited = new Set<string>()
+    const recursionStack = new Set<string>()
+
+    const hasCycle = (stepId: string, stepMap: Map<string, RoutingStep>): boolean => {
+      if (recursionStack.has(stepId)) return true
+      if (visited.has(stepId)) return false
+
+      visited.add(stepId)
+      recursionStack.add(stepId)
+
+      const step = stepMap.get(stepId)
+      if (step) {
+        for (const dep of step.dependencies) {
+          if (hasCycle(dep, stepMap)) return true
+        }
+      }
+
+      recursionStack.delete(stepId)
+      return false
+    }
+
+    const stepMap = new Map(steps.map(step => [step.id, step]))
+
+    for (const step of steps) {
+      if (hasCycle(step.id, stepMap)) {
+        return true
+      }
+    }
+
+    return false
+  }
+
+  updateTemplate(templateId: string, updates: Partial<RoutingTemplate>): void {
+    const index = this.templates.findIndex(t => t.id === templateId)
+    if (index === -1) {
+      throw new Error('Template not found')
+    }
+
+    const updatedTemplate = { ...this.templates[index], ...updates }
+
+    // Validate updated template
+    if (updatedTemplate.steps && this.hasCircularDependencies(updatedTemplate.steps)) {
+      throw new Error('Update rejected: would create circular dependencies')
+    }
+
+    this.templates[index] = updatedTemplate
+  }
+
+  deleteTemplate(templateId: string): void {
+    const index = this.templates.findIndex(t => t.id === templateId)
+    if (index === -1) {
+      throw new Error('Template not found')
+    }
+
+    this.templates.splice(index, 1)
+  }
+
+  getAllTemplates(): RoutingTemplate[] {
+    return [...this.templates]
   }
 }
 

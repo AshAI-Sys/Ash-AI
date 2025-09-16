@@ -298,3 +298,218 @@ export function validateCuring(temp_c: number, seconds: number, ink_type: string
     }
   }
 }
+
+// HEAT PRESS VALIDATION (for sublimation)
+export function validateHeatPress(temp_c: number, seconds: number, pressure: string): {
+  status: 'PASS' | 'WARN' | 'FAIL'
+  message: string
+  heat_index: number
+} {
+  // Standard sublimation: ~200°C, 60 seconds, medium pressure
+  const heat_index = temp_c * Math.log(seconds + 1)
+  const pressure_factor = pressure === 'LIGHT' ? 0.8 : pressure === 'FIRM' ? 1.2 : 1.0
+  const adjusted_index = heat_index * pressure_factor
+
+  const optimal_range = { min: 1100, max: 1400 } // ~200°C for 60s
+
+  if (adjusted_index < optimal_range.min) {
+    return {
+      status: 'FAIL',
+      heat_index: adjusted_index,
+      message: `Under-pressed: Need ${optimal_range.min} heat index (got ${Math.round(adjusted_index)})`
+    }
+  } else if (adjusted_index > optimal_range.max) {
+    return {
+      status: 'WARN',
+      heat_index: adjusted_index,
+      message: `Over-pressed: May cause scorching or poor transfer`
+    }
+  } else {
+    return {
+      status: 'PASS',
+      heat_index: adjusted_index,
+      message: `Optimal heat press parameters`
+    }
+  }
+}
+
+// DTF CURE VALIDATION
+export function validateDTFCure(temp_c: number, seconds: number): {
+  status: 'PASS' | 'WARN' | 'FAIL'
+  cure_index: number
+  message: string
+} {
+  // DTF powder cure: typically 160-180°C for 2-3 minutes
+  const cure_index = temp_c * Math.log(seconds + 1)
+
+  if (cure_index < 650) {
+    return {
+      status: 'FAIL',
+      cure_index,
+      message: `Under-cured powder: Risk of poor adhesion`
+    }
+  } else if (cure_index > 900) {
+    return {
+      status: 'WARN',
+      cure_index,
+      message: `Over-cured: May cause powder degradation`
+    }
+  } else {
+    return {
+      status: 'PASS',
+      cure_index,
+      message: `Powder properly cured`
+    }
+  }
+}
+
+// DTF PRESS VALIDATION
+export function validateDTFPress(temp_c: number, seconds: number, pressure: string, fabric_type?: string): {
+  status: 'PASS' | 'WARN' | 'FAIL'
+  message: string
+  press_index: number
+} {
+  const press_index = temp_c * Math.log(seconds + 1)
+  const pressure_factor = pressure === 'LIGHT' ? 0.8 : pressure === 'FIRM' ? 1.2 : 1.0
+  const adjusted_index = press_index * pressure_factor
+
+  // Fabric-specific adjustments
+  let fabric_adjustment = 1.0
+  let fabric_notes = ''
+
+  if (fabric_type) {
+    switch (fabric_type.toUpperCase()) {
+      case 'COTTON':
+        fabric_adjustment = 1.1 // Slightly higher heat for cotton
+        fabric_notes = ' (Cotton optimized)'
+        break
+      case 'POLYESTER':
+        fabric_adjustment = 0.9 // Lower heat for synthetic
+        fabric_notes = ' (Polyester optimized)'
+        break
+      case 'BLEND':
+        fabric_adjustment = 1.0
+        fabric_notes = ' (Cotton/Poly blend)'
+        break
+    }
+  }
+
+  const final_index = adjusted_index * fabric_adjustment
+  const optimal_range = { min: 900, max: 1200 } // ~150-165°C for 10-15s
+
+  if (final_index < optimal_range.min) {
+    return {
+      status: 'FAIL',
+      press_index: final_index,
+      message: `Under-pressed: Poor adhesion risk${fabric_notes}`
+    }
+  } else if (final_index > optimal_range.max) {
+    return {
+      status: 'WARN',
+      press_index: final_index,
+      message: `Over-pressed: May damage film or fabric${fabric_notes}`
+    }
+  } else {
+    return {
+      status: 'PASS',
+      press_index: final_index,
+      message: `Optimal DTF press parameters${fabric_notes}`
+    }
+  }
+}
+
+// EMBROIDERY SPECIFICATIONS VALIDATION
+export function validateEmbroiderySpecs(specs: {
+  stitch_count: number
+  fabric_type?: string
+  stabilizer_type?: string
+  thread_colors: string[]
+}): {
+  status: 'PASS' | 'WARN' | 'FAIL'
+  message: string
+  density_analysis: any
+} {
+  const { stitch_count, fabric_type, stabilizer_type, thread_colors } = specs
+
+  // Calculate stitch density (simplified - assuming 5cm x 5cm area)
+  const assumed_area_cm2 = 25
+  const density_per_cm2 = stitch_count / assumed_area_cm2
+
+  let status: 'PASS' | 'WARN' | 'FAIL' = 'PASS'
+  let issues: string[] = []
+
+  // Density validation
+  if (density_per_cm2 > 400) {
+    status = 'FAIL'
+    issues.push('Extremely high stitch density - will cause puckering')
+  } else if (density_per_cm2 > 300) {
+    status = 'WARN'
+    issues.push('High stitch density - recommend backing stabilizer')
+  }
+
+  // Thread color count validation
+  if (thread_colors.length > 8) {
+    status = status === 'FAIL' ? 'FAIL' : 'WARN'
+    issues.push('High color count increases production time')
+  }
+
+  // Fabric-specific recommendations
+  if (fabric_type) {
+    switch (fabric_type.toUpperCase()) {
+      case 'KNIT':
+      case 'STRETCH':
+        if (density_per_cm2 > 200) {
+          status = status === 'FAIL' ? 'FAIL' : 'WARN'
+          issues.push('Reduce density for stretch fabrics')
+        }
+        break
+      case 'LIGHTWEIGHT':
+        if (!stabilizer_type || stabilizer_type !== 'CUTAWAY') {
+          issues.push('Recommend cut-away stabilizer for lightweight fabric')
+        }
+        break
+    }
+  }
+
+  const density_analysis = {
+    stitch_count,
+    estimated_area_cm2: assumed_area_cm2,
+    density_per_cm2: Math.round(density_per_cm2),
+    density_rating: density_per_cm2 > 300 ? 'HIGH' : density_per_cm2 > 150 ? 'MEDIUM' : 'LOW',
+    color_count: thread_colors.length,
+    complexity_score: Math.round((density_per_cm2 * 0.01) + (thread_colors.length * 0.5))
+  }
+
+  return {
+    status,
+    message: issues.length > 0 ? issues.join('; ') : 'Embroidery specs look good',
+    density_analysis
+  }
+}
+
+// EMBROIDERY RUNTIME CALCULATION
+export function calculateEmbroideryRuntime(stitch_count: number, machine_spm: number, quantity: number): {
+  stitches_per_piece: number
+  total_stitches: number
+  machine_minutes_per_piece: number
+  total_machine_minutes: number
+  total_minutes: number
+  efficiency_factor: number
+} {
+  const efficiency_factor = 0.75 // Account for thread changes, setup, breaks
+
+  const machine_minutes_per_piece = (stitch_count / machine_spm)
+  const actual_minutes_per_piece = machine_minutes_per_piece / efficiency_factor
+
+  const total_machine_minutes = machine_minutes_per_piece * quantity
+  const total_minutes = actual_minutes_per_piece * quantity
+
+  return {
+    stitches_per_piece: stitch_count,
+    total_stitches: stitch_count * quantity,
+    machine_minutes_per_piece: Math.round(machine_minutes_per_piece * 100) / 100,
+    total_machine_minutes: Math.round(total_machine_minutes),
+    total_minutes: Math.round(total_minutes),
+    efficiency_factor
+  }
+}

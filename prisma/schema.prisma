@@ -2828,3 +2828,186 @@ model DesignCheck {
   @@index([asset_id, version])
   @@map("design_checks")
 }
+
+// ==============================================
+// MAINTENANCE MANAGEMENT MODELS
+// Based on CLIENT_UPDATED_PLAN.md Stage 11
+// ==============================================
+
+// Asset registry (machines/vehicles/equipment)
+model Asset {
+  id                    String                @id @default(uuid())
+  workspace_id          String
+  asset_no              String                @unique // Auto-generated: AST-YYYY-NNNN
+  name                  String
+  category              String                // MACHINE/VEHICLE/TOOL/FACILITY
+  type                  String                // Specific type within category
+  manufacturer          String?
+  model                 String?
+  serial_number         String?
+  purchase_date         DateTime?
+  purchase_cost         Float?
+  location              String?
+  department            String?
+  assigned_to           String?               // Employee responsible
+  status                String                @default("ACTIVE") // ACTIVE/INACTIVE/DISPOSED/MAINTENANCE
+  warranty_expires      DateTime?
+  specifications        Json?                 // Technical specs
+  maintenance_notes     String?
+  created_at            DateTime              @default(now())
+  updated_at            DateTime              @updatedAt
+
+  // Relations
+  workspace         Workspace              @relation(fields: [workspace_id], references: [id])
+  assigned_employee Employee?              @relation(fields: [assigned_to], references: [id])
+  maintenance_schedules MaintenanceSchedule[]
+  work_orders       MaintenanceWorkOrder[]
+  asset_meters      AssetMeter[]
+
+  @@map("assets")
+}
+
+// Asset meter readings (for usage-based maintenance)
+model AssetMeter {
+  id          String   @id @default(uuid())
+  asset_id    String
+  meter_type  String   // HOURS/KM/CYCLES/PAGES
+  reading     Float
+  recorded_by String
+  recorded_at DateTime @default(now())
+  notes       String?
+
+  // Relations
+  asset        Asset    @relation(fields: [asset_id], references: [id])
+  recorded_user Employee @relation(fields: [recorded_by], references: [id])
+
+  @@map("asset_meters")
+}
+
+// Maintenance schedules (PM scheduling)
+model MaintenanceSchedule {
+  id                String   @id @default(uuid())
+  workspace_id      String
+  asset_id          String?  // Optional - can be for general equipment type
+  schedule_name     String
+  description       String?
+  schedule_type     String   // TIME_BASED/USAGE_BASED
+  frequency_type    String   // DAILY/WEEKLY/MONTHLY/QUARTERLY/YEARLY/HOURS/KM/CYCLES
+  frequency_value   Int      // Every X units
+  estimated_duration Int?    // Minutes
+  checklist         Json?    // Array of tasks
+  assigned_to       String?  // Default technician
+  priority          String   @default("MEDIUM") // LOW/MEDIUM/HIGH/CRITICAL
+  is_active         Boolean  @default(true)
+  next_due_date     DateTime
+  last_completed    DateTime?
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  // Relations
+  workspace     Workspace   @relation(fields: [workspace_id], references: [id])
+  asset         Asset?      @relation(fields: [asset_id], references: [id])
+  assigned_tech Employee?   @relation(fields: [assigned_to], references: [id])
+  work_orders   MaintenanceWorkOrder[]
+
+  @@map("maintenance_schedules")
+}
+
+// Maintenance work orders (maintenance tasks)
+model MaintenanceWorkOrder {
+  id                  String    @id @default(uuid())
+  workspace_id        String
+  wo_number           String    @unique // Auto-generated: WO-YYYY-NNNN
+  asset_id            String?
+  schedule_id         String?   // Link to maintenance schedule if scheduled
+  title               String
+  description         String?
+  work_type           String    // SCHEDULED/BREAKDOWN/INSPECTION/UPGRADE/CALIBRATION
+  priority            String    @default("MEDIUM") // LOW/MEDIUM/HIGH/EMERGENCY
+  status              String    @default("OPEN") // OPEN/ASSIGNED/IN_PROGRESS/COMPLETED/CANCELLED
+  requested_by        String
+  assigned_to         String?
+  requested_date      DateTime  @default(now())
+  scheduled_date      DateTime?
+  started_at          DateTime?
+  completed_at        DateTime?
+  estimated_duration  Int?      // Minutes
+  actual_duration     Int?      // Minutes
+  estimated_cost      Float?
+  actual_cost         Float?
+  completion_notes    String?
+  requires_followup   Boolean   @default(false)
+  followup_date       DateTime?
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @updatedAt
+
+  // Relations
+  workspace       Workspace            @relation(fields: [workspace_id], references: [id])
+  asset           Asset?               @relation(fields: [asset_id], references: [id])
+  schedule        MaintenanceSchedule? @relation(fields: [schedule_id], references: [id])
+  requester       Employee             @relation("MaintenanceWorkOrderRequester", fields: [requested_by], references: [id])
+  assignee        Employee?            @relation("MaintenanceWorkOrderAssignee", fields: [assigned_to], references: [id])
+  labor_entries   MaintenanceWorkOrderLabor[]
+  parts_used      MaintenanceWorkOrderPart[]
+  attachments     MaintenanceWorkOrderAttachment[]
+
+  @@map("maintenance_work_orders")
+}
+
+// Maintenance work order labor tracking
+model MaintenanceWorkOrderLabor {
+  id              String   @id @default(uuid())
+  work_order_id   String
+  employee_id     String
+  start_time      DateTime
+  end_time        DateTime?
+  hours_worked    Float?   // Calculated or manual entry
+  hourly_rate     Float?
+  labor_cost      Float?   // hours * rate
+  task_performed  String?
+  created_at      DateTime @default(now())
+
+  // Relations
+  work_order MaintenanceWorkOrder @relation(fields: [work_order_id], references: [id])
+  employee   Employee  @relation(fields: [employee_id], references: [id])
+
+  @@map("maintenance_work_order_labor")
+}
+
+// Maintenance work order parts consumption
+model MaintenanceWorkOrderPart {
+  id              String   @id @default(uuid())
+  work_order_id   String
+  part_name       String
+  part_number     String?
+  quantity_used   Float
+  unit_cost       Float?
+  total_cost      Float?   // quantity * unit_cost
+  supplier        String?
+  notes           String?
+  created_at      DateTime @default(now())
+
+  // Relations
+  work_order MaintenanceWorkOrder @relation(fields: [work_order_id], references: [id])
+
+  @@map("maintenance_work_order_parts")
+}
+
+// Maintenance work order attachments (photos, documents)
+model MaintenanceWorkOrderAttachment {
+  id              String   @id @default(uuid())
+  work_order_id   String
+  file_name       String
+  file_url        String
+  file_type       String   // IMAGE/DOCUMENT/VIDEO
+  file_size       Int?     // Bytes
+  description     String?
+  uploaded_by     String
+  uploaded_at     DateTime @default(now())
+
+  // Relations
+  work_order MaintenanceWorkOrder @relation(fields: [work_order_id], references: [id])
+  uploader   Employee  @relation(fields: [uploaded_by], references: [id])
+
+  @@map("maintenance_work_order_attachments")
+}

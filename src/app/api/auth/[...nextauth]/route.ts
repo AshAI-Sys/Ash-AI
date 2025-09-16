@@ -6,6 +6,3 @@ const handler = NextAuth(authOptions)
 
 export const GET = handler
 export const POST = handler
-
-// Export authOptions for other API routes
-export { authOptions }
