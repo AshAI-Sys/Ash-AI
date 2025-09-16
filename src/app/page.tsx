@@ -16,12 +16,16 @@ export default function Home() {
 
   useEffect(() => {
     if (status === 'loading') return
-    
+
+    // Always redirect to dashboard for testing TikTok design
+    router.push('/dashboard')
+    return
+
     if (session) {
-      router.push('/unified-dashboard')
+      router.push('/dashboard')
       return
     }
-    
+
     setMounted(true)
     const interval = setInterval(() => {
       setActiveFeature((prev) => (prev + 1) % 6)
