@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '../../auth/[...nextauth]/route'
+import { authOptions } from '@/lib/auth'
 import WebSocketManager from '@/lib/realtime/websocket-manager'
 import ProductionTracker from '@/lib/realtime/production-tracker'
 import MachineMonitor from '@/lib/realtime/machine-monitor'

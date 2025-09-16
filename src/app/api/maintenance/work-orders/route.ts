@@ -13,7 +13,7 @@ async function generateWorkOrderNumber(workspace_id: string): Promise<string> {
   const prefix = `WO-${year}-`
 
   // Find the latest work order number for this year
-  const lastWorkOrder = await db.workOrder.findFirst({
+  const lastWorkOrder = await db.maintenanceWorkOrder.findFirst({
     where: {
       workspace_id,
       wo_number: { startsWith: prefix }
@@ -153,7 +153,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const workOrders = await db.workOrder.findMany({
+    const workOrders = await db.maintenanceWorkOrder.findMany({
       where,
       include: include_options,
       orderBy: [
@@ -390,7 +390,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create work order
-    const workOrder = await db.workOrder.create({
+    const workOrder = await db.maintenanceWorkOrder.create({
       data: {
         workspace_id,
         wo_number,
@@ -536,7 +536,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Get existing work order
-    const existing_wo = await db.workOrder.findFirst({
+    const existing_wo = await db.maintenanceWorkOrder.findFirst({
       where: {
         id: work_order_id,
         workspace_id
@@ -605,7 +605,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Update work order
-    const updated_wo = await db.workOrder.update({
+    const updated_wo = await db.maintenanceWorkOrder.update({
       where: { id: work_order_id },
       data: update_data,
       include: {

@@ -187,6 +187,9 @@ model Workspace {
   machines              Machine[]
   suppliers             Supplier[]
   invoices              Invoice[]
+  assets                Asset[]
+  maintenance_schedules MaintenanceSchedule[]
+  maintenance_work_orders MaintenanceWorkOrder[]
   payments              Payment[]
   bills                 Bill[]
   channel_settlements   ChannelSettlement[]
@@ -2045,6 +2048,13 @@ model Employee {
   disciplinary_actions DisciplinaryAction[]
   performance_reviews  PerformanceReview[]
   training_records     TrainingRecord[]
+  assigned_assets      Asset[]
+  asset_meter_recordings AssetMeter[]
+  maintenance_schedules MaintenanceSchedule[]
+  requested_work_orders MaintenanceWorkOrder[] @relation("MaintenanceWorkOrderRequester")
+  assigned_work_orders MaintenanceWorkOrder[]  @relation("MaintenanceWorkOrderAssignee")
+  maintenance_labor    MaintenanceWorkOrderLabor[]
+  maintenance_uploads  MaintenanceWorkOrderAttachment[]
 
   @@unique([workspace_id, employee_no])
   @@map("employees")

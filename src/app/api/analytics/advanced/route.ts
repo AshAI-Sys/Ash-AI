@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '../../auth/[...nextauth]/route'
+import { authOptions } from '@/lib/auth'
 import AdvancedAnalytics from '@/lib/analytics/advanced-analytics'
 import PredictiveEngine from '@/lib/analytics/predictive-engine'
 
