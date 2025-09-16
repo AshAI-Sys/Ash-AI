@@ -89,10 +89,16 @@ export async function POST(request: NextRequest) {
       data: {
         workspace_id: user.workspace_id,
         type: 'ORDER_VALIDATION',
+        priority: validationResult.risk === 'RED' ? 'HIGH' :
+                  validationResult.risk === 'AMBER' ? 'MEDIUM' : 'LOW',
+        title: `Order Validation - ${orderDetails!.po_number}`,
+        message: validationResult.risk === 'GREEN' ?
+                 'Order validation passed successfully' :
+                 `Order validation ${validationResult.risk.toLowerCase()} - ${validationResult.issues.length} issues found`,
         entity_id: order_id,
         confidence: validationResult.risk === 'GREEN' ? 0.9 :
                    validationResult.risk === 'AMBER' ? 0.7 : 0.4,
-        insights: {
+        insights: JSON.parse(JSON.stringify({
           trigger,
           risk_level: validationResult.risk,
           issues: validationResult.issues,
@@ -100,14 +106,14 @@ export async function POST(request: NextRequest) {
           assumptions: validationResult.assumptions,
           blocking: validationResult.blocking || false,
           validated_at: new Date().toISOString()
-        },
-        metadata: {
+        })),
+        metadata: JSON.parse(JSON.stringify({
           order_po: orderDetails!.po_number,
           method: orderDetails!.method,
           total_qty: orderDetails!.total_qty,
-          target_date: orderDetails!.target_delivery_date,
+          target_date: orderDetails!.target_delivery_date.toISOString(),
           validated_by: user.id
-        }
+        }))
       }
     })
 

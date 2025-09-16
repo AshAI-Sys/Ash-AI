@@ -5,12 +5,13 @@ import { verifyApprovalToken } from '@/lib/design-approval'
 // GET /api/portal/approvals/[id] - Get approval details for client portal
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
   try {
     const { searchParams } = new URL(request.url)
     const token = searchParams.get('token')
-    const approval_id = params.id
+    const approval_id = id
 
     if (!token) {
       return NextResponse.json(
@@ -124,12 +125,13 @@ export async function GET(
 // PUT /api/portal/approvals/[id] - Update approval (for portal use)
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
   try {
     const body = await request.json()
     const { token, viewed_at } = body
-    const approval_id = params.id
+    const approval_id = id
 
     if (!token) {
       return NextResponse.json(

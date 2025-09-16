@@ -15,17 +15,19 @@ const sendApprovalSchema = z.object({
 // POST /api/designs/[id]/versions/[version]/send-approval
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string; version: string } }
+  { params }: { params: Promise<{ id: string; version: string }> }
 ) {
+  const { id, version } = await params
   try {
     const body = await request.json()
     const validatedData = sendApprovalSchema.parse(body)
-    const { id: asset_id, version } = params
+    const asset_id = id
+    const version_number = parseInt(version)
 
     // Validate design version exists
     const designVersion = await prisma.designVersion.findUnique({
       where: {
-        asset_id_version: { asset_id, version: parseInt(version) }
+        asset_id_version: { asset_id, version: version_number }
       },
       include: {
         asset: {

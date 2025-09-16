@@ -217,7 +217,7 @@ export async function lockDesignVersion(
           entity_type: 'design_asset',
           entity_id: asset_id,
           action: 'LOCK',
-          after: {
+          after_data: {
             version,
             status: 'LOCKED',
             locked_at: new Date().toISOString()

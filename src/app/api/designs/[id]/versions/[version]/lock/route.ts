@@ -5,10 +5,11 @@ import { lockDesignVersion, canEditDesign } from '@/lib/design-approval'
 // POST /api/designs/[id]/versions/[version]/lock - Lock design version
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string; version: string } }
+  { params }: { params: Promise<{ id: string; version: string }> }
 ) {
+  const resolvedParams = await params
   try {
-    const { id: asset_id, version } = params
+    const { id: asset_id, version } = resolvedParams
     const locked_by = 'user_id_placeholder' // TODO: Get from session
 
     // Check if design can be locked
@@ -78,10 +79,11 @@ export async function POST(
 // DELETE /api/designs/[id]/versions/[version]/lock - Unlock design version (emergency)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string; version: string } }
+  { params }: { params: Promise<{ id: string; version: string }> }
 ) {
+  const resolvedParams = await params
   try {
-    const { id: asset_id, version } = params
+    const { id: asset_id, version } = resolvedParams
     const unlocked_by = 'user_id_placeholder' // TODO: Get from session
 
     // Verify design version exists
@@ -134,7 +136,7 @@ export async function DELETE(
           entity_type: 'design_asset',
           entity_id: asset_id,
           action: 'EMERGENCY_UNLOCK',
-          after: {
+          after_data: {
             version: parseInt(version),
             status: 'APPROVED',
             unlocked_at: new Date().toISOString(),

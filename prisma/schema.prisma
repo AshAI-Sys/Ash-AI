@@ -69,6 +69,8 @@ enum AuditAction {
   REJECT
   GENERATE_PAYROLL
   UPDATE_PAYROLL_STATUS
+  LOCK
+  EMERGENCY_UNLOCK
 }
 
 enum TaskStatus {
@@ -295,13 +297,17 @@ model InventoryItem {
 model AIInsight {
   id           String   @id @default(uuid())
   workspace_id String
-  type         String // CAPACITY/STOCK/ROUTE/QUALITY/COST
+  type         String // CAPACITY/STOCK/ROUTE/QUALITY/COST/ORDER_VALIDATION
   priority     String // HIGH/MEDIUM/LOW
   title        String
   message      String
   data         Json?
   resolved     Boolean  @default(false)
   created_at   DateTime @default(now())
+  entity_id    String? // Reference to related entity (order_id, asset_id, etc.)
+  confidence   Float? // AI confidence score 0.0-1.0
+  insights     Json? // Detailed insight data
+  metadata     Json? // Additional metadata
 
   // Relations
   workspace Workspace @relation(fields: [workspace_id], references: [id])
@@ -683,14 +689,19 @@ model DesignAsset {
 
 // Client design approval workflow
 model DesignApproval {
-  id              String    @id @default(uuid())
-  design_asset_id String
-  client_id       String
-  status          String // PENDING/APPROVED/REJECTED
-  feedback        String?
-  signature_data  Json? // E-signature if required
-  approved_at     DateTime?
-  created_at      DateTime  @default(now())
+  id                 String    @id @default(uuid())
+  design_asset_id    String
+  client_id          String
+  status             String // PENDING/SENT/APPROVED/REJECTED/CHANGES_REQUESTED
+  feedback           String?
+  signature_data     Json? // E-signature if required
+  approved_at        DateTime?
+  created_at         DateTime  @default(now())
+  approver_name      String?
+  approver_email     String?
+  approver_signed_at DateTime?
+  esign_envelope_id  String?
+  comments           String?
 
   // Relations
   design_asset DesignAsset @relation(fields: [design_asset_id], references: [id])

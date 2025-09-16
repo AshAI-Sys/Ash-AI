@@ -112,7 +112,11 @@ export async function POST(
       order: approval.design_asset.order,
       client: approval.client,
       revision: result.revision,
-      specific_changes: validatedData.specific_changes
+      specific_changes: validatedData.specific_changes?.filter(c => c.area && c.description).map(c => ({
+        area: c.area!,
+        description: c.description!,
+        priority: c.priority || 'MEDIUM'
+      }))
     })
 
     // Emit event (placeholder)

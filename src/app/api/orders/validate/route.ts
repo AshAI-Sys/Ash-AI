@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
       method: validatedData.method,
       total_qty: validatedData.total_qty,
       size_curve: validatedData.size_curve,
-      variants: validatedData.variants,
+      variants: validatedData.variants?.filter(v => v.color && v.qty).map(v => ({ color: v.color!, qty: v.qty! })),
       addons: validatedData.addons,
       target_delivery_date: validatedData.target_delivery_date,
       commercials: validatedData.commercials,
